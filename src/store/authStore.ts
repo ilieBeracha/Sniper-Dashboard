@@ -7,15 +7,22 @@ import { LoginUserData, RegisterUserData } from "../types/auth";
 interface props {
   token: string | null;
   registerCommander: (userData: RegisterUserData) => Promise<string | Error>;
-  login: (userData: LoginUserData) => Promise<string | Error>;
+  login: (userData: LoginUserData) => Promise<string | Error | any>;
   logout: () => void;
   checkAuth: () => void;
-
   setTokenInLocalStorage: (token: string) => void;
+
+  justRegisteredCommander: boolean;
+  resetJustRegistered: () => void;
+
+  error: string;
+  resetError: () => void;
 }
 
 export const authStore = create<props>((set) => ({
   token: localStorage.getItem("access_token_sniper") || null,
+  justRegisteredCommander: false,
+  error: "",
 
   checkAuth: async () => {
     const token = localStorage.getItem("access_token_sniper");
@@ -28,22 +35,26 @@ export const authStore = create<props>((set) => ({
     localStorage.setItem("access_token_sniper", token);
   },
 
-  registerCommander: async (user: {}) => {
+  registerCommander: async (user: RegisterUserData) => {
     try {
+      authStore.getState().resetError();
+
       const res = await authService.registerCommander(user);
-      set({ token: res.access_token });
+      set({ token: res.access_token, justRegisteredCommander: true });
 
       userStore.getState().setUser(res.user);
       authStore.getState().setTokenInLocalStorage(res.access_token);
 
       return res;
-    } catch (error) {
+    } catch (error: any) {
+      set({ error: error.response.data.error });
       console.log(error);
     }
   },
 
-  login: async (user: {}) => {
+  login: async (user: LoginUserData) => {
     try {
+      authStore.getState().resetError();
       const res = await authService.login(user);
       set({ token: res.access_token });
 
@@ -51,7 +62,8 @@ export const authStore = create<props>((set) => ({
       userStore.getState().setUser(res.user);
 
       return res;
-    } catch (error) {
+    } catch (error: any) {
+      set({ error: error.response.data.error });
       console.log(error);
     }
   },
@@ -59,7 +71,12 @@ export const authStore = create<props>((set) => ({
   logout: () => {
     localStorage.removeItem("access_token_sniper");
     set({ token: null });
+    authStore.getState().resetError();
     userStore.getState().setUser({} as User);
     location.href = "/";
   },
+
+  resetJustRegistered: () => set({ justRegisteredCommander: false }),
+
+  resetError: () => set({ error: "" }),
 }));

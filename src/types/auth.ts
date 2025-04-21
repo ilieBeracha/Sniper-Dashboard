@@ -3,6 +3,7 @@ export interface RegisterUserData {
   lastName: string;
   email: string;
   password: string;
+  user_role?: string;
 }
 
 export interface LoginUserData {
