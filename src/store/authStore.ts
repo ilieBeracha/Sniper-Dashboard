@@ -11,7 +11,7 @@ interface props {
   logout: () => void;
   checkAuth: () => void;
   setTokenInLocalStorage: (token: string) => void;
-  registerTeamMember: (user: RegisterUserData) => Promise<string | Error>;
+  registerSquadCommander: (user: RegisterUserData) => Promise<string | Error>;
 
   justRegisteredCommander: boolean;
   resetJustRegistered: () => void;
@@ -53,9 +53,9 @@ export const authStore = create<props>((set) => ({
     }
   },
 
-  registerTeamMember: async (user: RegisterUserData) => {
+  registerSquadCommander: async (user: RegisterUserData) => {
     try {
-      const res = await authService.registerTeamMember(user);
+      const res = await authService.registerSquadCommander(user);
       set({ token: res.access_token });
 
       userStore.getState().setUser(res.user);

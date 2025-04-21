@@ -7,13 +7,13 @@ async function registerCommander(user: RegisterUserData) {
   const res = await axios.post(`auth/signup/commander`, user);
   return res.data;
 }
-async function registerTeamMember(user: RegisterUserData) {
+async function registerSquadCommander(user: RegisterUserData) {
   user.user_role = "Squad commander";
-  const res = await axios.post(`auth/signup/commander`, user);
+  const res = await axios.post(`auth/signup/squad-commander`, user);
   return res.data;
 }
 async function registerSoldier(user: User) {
-  const res = await axios.post(`auth/signup/commander`, user);
+  const res = await axios.post(`auth/signup/soldier`, user);
   return res.data;
 }
 
@@ -25,6 +25,6 @@ async function login(user: LoginUserData) {
 export const authService = {
   registerCommander,
   registerSoldier,
-  registerTeamMember,
+  registerSquadCommander,
   login,
 };

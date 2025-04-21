@@ -12,8 +12,13 @@ type AuthType = "login" | "register" | "team-member";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { login, registerCommander, registerTeamMember, error, resetError } =
-    useStore(authStore);
+  const {
+    login,
+    registerCommander,
+    registerSquadCommander,
+    error,
+    resetError,
+  } = useStore(authStore);
 
   const [authType, setAuthType] = useState<AuthType>("login");
   const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +31,7 @@ export default function Auth() {
       } else if (authType === "register") {
         await registerCommander(user as RegisterUserData);
       } else if (authType === "team-member") {
-        await registerTeamMember(user);
+        await registerSquadCommander(user);
       }
       navigate("/");
     } catch (error) {
