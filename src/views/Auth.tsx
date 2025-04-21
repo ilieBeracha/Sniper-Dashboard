@@ -8,7 +8,7 @@ import { LoginUserData, RegisterUserData } from "../types/auth";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { login, register } = useStore(authStore);
+  const { login, registerCommander } = useStore(authStore);
 
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +19,7 @@ export default function Auth() {
       if (isLogin) {
         await login(user as LoginUserData);
       } else {
-        await register(user as RegisterUserData);
+        await registerCommander(user as RegisterUserData);
       }
       navigate("/");
     } catch (error) {

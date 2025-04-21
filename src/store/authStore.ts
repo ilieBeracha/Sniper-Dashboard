@@ -6,7 +6,7 @@ import { LoginUserData, RegisterUserData } from "../types/auth";
 
 interface props {
   token: string | null;
-  register: (userData: RegisterUserData) => Promise<string | Error>;
+  registerCommander: (userData: RegisterUserData) => Promise<string | Error>;
   login: (userData: LoginUserData) => Promise<string | Error>;
   logout: () => void;
   checkAuth: () => void;
@@ -28,9 +28,9 @@ export const authStore = create<props>((set) => ({
     localStorage.setItem("access_token_sniper", token);
   },
 
-  register: async (user: {}) => {
+  registerCommander: async (user: {}) => {
     try {
-      const res = await authService.register(user);
+      const res = await authService.registerCommander(user);
       set({ token: res.access_token });
 
       userStore.getState().setUser(res.user);

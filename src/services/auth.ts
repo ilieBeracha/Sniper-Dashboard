@@ -1,7 +1,11 @@
 import { axiosInstance as axios } from "./requestService";
 
-async function register(user: {}) {
-  const res = await axios.post(`auth/signup`, user);
+async function registerCommander(user: {}) {
+  const res = await axios.post(`auth/signup/commander`, user);
+  return res.data;
+}
+async function registerSoldier(user: {}) {
+  const res = await axios.post(`auth/signup/commander`, user);
   return res.data;
 }
 
@@ -11,6 +15,7 @@ async function login(user: {}) {
 }
 
 export const authService = {
-  register,
+  registerCommander,
+  registerSoldier,
   login,
 };

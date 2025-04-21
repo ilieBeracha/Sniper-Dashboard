@@ -15,7 +15,6 @@ export default function Home() {
       <main className="flex-1 bg-[#EBEBF1] overflow-y-hidden p-6">
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          {/* Add more routes as needed */}
         </Routes>
       </main>
     </div>
