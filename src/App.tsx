@@ -11,6 +11,7 @@ export default function App() {
 
   useEffect(() => {
     useAuthStore.checkAuth();
+    console.log(1);
   }, []);
 
   return (

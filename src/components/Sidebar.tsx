@@ -3,7 +3,11 @@ import { BiUser } from "react-icons/bi";
 import { BsInbox } from "react-icons/bs";
 import { GoHome } from "react-icons/go";
 
+import { authStore } from "../store/authStore";
+import { useStore } from "zustand";
+
 export default function Sidebar() {
+  const useAuthStore = useStore(authStore);
   const menuList = [
     { label: "Home", icon: <GoHome />, href: "/" },
     {
@@ -17,9 +21,9 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-[10%] min-w-[120px] h-screen bg-[#252229] px-3 py-4 hidden sm:block">
+    <aside className="w-[10%] min-w-[120px] max-w-[200px] max-h-screen bg-[#252229] px-3 py-4 sm:block relative">
       <h3 className="py-5 text-2xl px-2 text-white">Sniper</h3>
-      <ul className="space-y-2 font-medium">
+      <ul className="space-y-2 font-medium ">
         {menuList.map((item, idx) => (
           <li key={idx}>
             <a
@@ -45,6 +49,12 @@ export default function Sidebar() {
           </li>
         ))}
       </ul>
+      <p
+        onClick={() => useAuthStore.logout()}
+        className="absolute bottom-5 left-5 w-full text-xl"
+      >
+        Logout
+      </p>
     </aside>
   );
 }
