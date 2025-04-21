@@ -9,7 +9,7 @@ import {
 } from "../ui/table";
 import AvatarText from "../ui/badge/Badge";
 import Checkbox from "./Checkbox";
-import { BiTrash, BiFilterAlt, BiChevronRight } from "react-icons/bi";
+import { BiTrash, BiChevronRight } from "react-icons/bi";
 
 interface TableRowData {
   id: string;
@@ -215,7 +215,7 @@ export default function TeamTable() {
                 </TableCell>
                 <TableCell className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium">
+                    <div className="flex-shrink-0 h-9 w-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-900 font-medium">
                       {row.user.initials}
                     </div>
                     <div className="flex flex-col">
@@ -271,12 +271,8 @@ export default function TeamTable() {
         </Table>
       </div>
       <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50">
-        {/* <div className="text-sm text-gray-500">
-          Showing <span className="font-medium">{tableRowData.length}</span> of{" "}
-          <span className="font-medium">25</span> entries
-        </div> */}
         <div className="flex items-center gap-2">
-          <button className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700">
+          <button className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors">
             See all
             <BiChevronRight className="h-4 w-4" />
           </button>

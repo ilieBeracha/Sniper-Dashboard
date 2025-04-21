@@ -117,7 +117,7 @@ export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
       <div>
         <button
           type="submit"
-          className="flex w-full justify-center rounded-md bg-gray-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus:outline focus:ring-2 focus:ring-green-600"
+          className="flex w-full justify-center rounded-md bg-gray-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm focus:outline focus:ring-2"
         >
           Register
         </button>

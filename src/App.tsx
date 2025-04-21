@@ -14,7 +14,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="w-screen h-screen">
+    <div className="w-screen min-h-screen">
       <Routes>
         {useAuthStore.token ? (
           <Route path={"*"} element={<Home />} />

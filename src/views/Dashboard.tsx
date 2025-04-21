@@ -1,36 +1,60 @@
-import BasicTableTwo from "@/components/TeamTable";
+import LineChartTwo from "@/components/LineChart";
+import BasicTable from "@/components/TeamTable";
 import UserProfile from "@/components/UserProfile";
 import { userStore } from "@/store/userStore";
 import { User } from "@/types/user";
 import { useStore } from "zustand";
 
-export default function dashboard() {
+export default function Dashboard() {
   const useUserStore = useStore(userStore);
 
   return (
-    <div className="grid grid-cols-7 grid-rows-[repeat(10,minmax(130px,1fr))] gap-6 overflow-scroll px-24 transition-all duration-300">
-      <div className="col-span-2 row-span-2 bg-white rounded-md shadow-sm cursor-pointer transition-all duration-500">
-        <UserProfile user={useUserStore.user as User} />
-      </div>
+    <div className="bg-[#EBEBF1] min-h-screen w-full overflow-y-auto py-10 px-6 md:px-16">
+      <div className="grid grid-cols-12 gap-4 auto-rows-min">
+        {/* User Profile */}
+        <div className="col-span-12 md:col-span-3 bg-white rounded-2xl shadow-md">
+          <UserProfile user={useUserStore.user as User} />
+        </div>
 
-      <div className="col-span-2 row-span-2 col-start-3 bg-white rounded-md shadow-sm"></div>
+        {/* Calendar / Stats */}
+        <div className="col-span-12 md:col-span-5 bg-white rounded-2xl shadow-md p-6 flex items-center justify-center text-gray-500 text-center">
+          Calendar / Upcoming Events / Quick Stats
+        </div>
 
-      <div className="col-span-3 row-span-4 col-start-5 bg-white rounded-md shadow-sm"></div>
+        {/* Placeholder Card */}
+        <div className="col-span-12 md:col-span-4 bg-gradient-to-br from-indigo-50 to-purple-100 rounded-2xl shadow-md p-6 flex items-center justify-center text-indigo-700 font-medium text-sm">
+          AI Summary / Notification / Productivity Card
+        </div>
 
-      <div className="col-span-4 row-span-2 row-start-3 bg-white rounded-md shadow-sm">
-        {/* Content */}
-      </div>
+        <div className="col-span-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="bg-white rounded-2xl shadow-md p-4 h-44 flex items-center justify-center text-gray-400"
+            >
+              Small Chart {i}
+            </div>
+          ))}
+        </div>
 
-      <div className="col-span-7 row-span-3 row-start-5 bg-white rounded-md shadow-sm">
-        <BasicTableTwo />
-      </div>
+        {/* Line Chart */}
+        <div className="col-span-12 md:col-span-8 bg-white rounded-2xl shadow-md p-6">
+          <h3 className="font-semibold text-gray-800 mb-4">Team Performance</h3>
+          <LineChartTwo />
+        </div>
 
-      <div className="col-span-5 row-span-3 row-start-8 bg-white rounded-md shadow-sm">
-        6
-      </div>
+        {/* Placeholder next to chart */}
+        <div className="col-span-12 md:col-span-4 bg-white rounded-2xl shadow-md p-6 flex items-center justify-center text-gray-400">
+          Timeline / Activity Log
+        </div>
 
-      <div className="col-span-2 row-span-3 col-start-6 row-start-8 bg-white rounded-md shadow-sm">
-        9
+        {/* Team Table */}
+        <div className="col-span-12 bg-white rounded-2xl shadow-md p-6">
+          <h3 className="font-semibold text-gray-800 mb-4">Team Members</h3>
+          <BasicTable />
+        </div>
+
+        {/* Small charts area */}
       </div>
     </div>
   );
