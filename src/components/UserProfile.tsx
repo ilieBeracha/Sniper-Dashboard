@@ -7,7 +7,7 @@ export default function UserProfile({ user }: { user: User }) {
       <div className="h-full rounded-xl border border-gray-200 bg-white shadow-lg p-6 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Personal Info</h2>
+          <h2 className="font-semibold text-gray-800 mb-4">Personal Info</h2>
           <span className="text-sm font-semibold tracking-wide text-yellow-800 bg-gradient-to-r from-yellow-200 via-yellow-300 to-yellow-400 px-3 py-1 rounded-full shadow border border-yellow-400 whitespace-nowrap">
             {user.user_role}
           </span>

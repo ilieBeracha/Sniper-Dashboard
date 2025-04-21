@@ -11,17 +11,14 @@ export default function Dashboard() {
   return (
     <div className="bg-[#EBEBF1] min-h-screen w-full overflow-y-auto py-10 px-6 md:px-16">
       <div className="grid grid-cols-12 gap-4 auto-rows-min">
-        {/* User Profile */}
         <div className="col-span-12 md:col-span-3 bg-white rounded-2xl shadow-md">
           <UserProfile user={useUserStore.user as User} />
         </div>
 
-        {/* Calendar / Stats */}
         <div className="col-span-12 md:col-span-5 bg-white rounded-2xl shadow-md p-6 flex items-center justify-center text-gray-500 text-center">
           Calendar / Upcoming Events / Quick Stats
         </div>
 
-        {/* Placeholder Card */}
         <div className="col-span-12 md:col-span-4 bg-gradient-to-br from-indigo-50 to-purple-100 rounded-2xl shadow-md p-6 flex items-center justify-center text-indigo-700 font-medium text-sm">
           AI Summary / Notification / Productivity Card
         </div>
@@ -37,13 +34,11 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Line Chart */}
         <div className="col-span-12 md:col-span-8 bg-white rounded-2xl shadow-md p-6">
-          <h3 className="font-semibold text-gray-800 mb-4">Team Performance</h3>
+          <h2 className="font-semibold text-gray-800 mb-4">Team Performance</h2>
           <LineChartTwo />
         </div>
 
-        {/* Placeholder next to chart */}
         <div className="col-span-12 md:col-span-4 bg-white rounded-2xl shadow-md p-6 flex items-center justify-center text-gray-400">
           Timeline / Activity Log
         </div>
