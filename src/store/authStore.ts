@@ -45,11 +45,9 @@ export const authStore = create<props>((set) => ({
   login: async (user: {}) => {
     try {
       const res = await authService.login(user);
-      set({ token: res.user.session.access_token });
+      set({ token: res.access_token });
 
-      authStore
-        .getState()
-        .setTokenInLocalStorage(res.user.session.access_token);
+      authStore.getState().setTokenInLocalStorage(res.access_token);
       userStore.getState().setUser(res.user);
       set({ isLoggedIn: true });
       return res;
