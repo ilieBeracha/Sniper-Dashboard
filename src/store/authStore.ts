@@ -1,12 +1,13 @@
 import { create } from "zustand";
 import { authService } from "../services/auth";
 import { userStore } from "./userStore";
+import { User } from "../types/user";
+import { LoginUserData, RegisterUserData } from "../types/auth";
 
 interface props {
   token: string | null;
-  isLoggedIn: boolean;
-  register: (userData: any) => Promise<string | Error>;
-  login: (userData: any) => Promise<string | Error>;
+  register: (userData: RegisterUserData) => Promise<string | Error>;
+  login: (userData: LoginUserData) => Promise<string | Error>;
   logout: () => void;
   checkAuth: () => void;
 
@@ -15,12 +16,11 @@ interface props {
 
 export const authStore = create<props>((set) => ({
   token: localStorage.getItem("access_token_sniper") || null,
-  isLoggedIn: false,
 
   checkAuth: async () => {
     const token = localStorage.getItem("access_token_sniper");
     if (token) {
-      set({ token, isLoggedIn: true });
+      set({ token });
     }
   },
 
@@ -49,7 +49,7 @@ export const authStore = create<props>((set) => ({
 
       authStore.getState().setTokenInLocalStorage(res.access_token);
       userStore.getState().setUser(res.user);
-      set({ isLoggedIn: true });
+
       return res;
     } catch (error) {
       console.log(error);
@@ -59,7 +59,7 @@ export const authStore = create<props>((set) => ({
   logout: () => {
     localStorage.removeItem("access_token_sniper");
     set({ token: null });
-    userStore.getState().setUser({});
+    userStore.getState().setUser({} as User);
     location.href = "/";
   },
 }));

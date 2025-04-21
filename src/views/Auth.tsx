@@ -4,6 +4,7 @@ import { useStore } from "zustand";
 import Login from "../components/LoginForm";
 import RegisterForm from "../components/RegisterForm";
 import { authStore } from "../store/authStore";
+import { LoginUserData, RegisterUserData } from "../types/auth";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -12,13 +13,13 @@ export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  const AuthSubmit = async (user: any) => {
+  const AuthSubmit = async (user: RegisterUserData | LoginUserData) => {
     try {
       setIsLoading(true);
       if (isLogin) {
-        await login(user);
+        await login(user as LoginUserData);
       } else {
-        await register(user);
+        await register(user as RegisterUserData);
       }
       navigate("/");
     } catch (error) {
