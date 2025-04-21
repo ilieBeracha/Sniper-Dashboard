@@ -13,7 +13,7 @@ export default function Sidebar() {
   const useAuthStore = useStore(authStore);
 
   return (
-    <div className="flex flex-col gap-y-5 overflow-y-auto min-w-[15%] max-w-[20%] border-r border-gray-200 bg-white px-6 py-6">
+    <div className="flex flex-col gap-y-5 overflow-y-auto min-w-[15%] max-w-[20%] bg-[#0e0e0e]  px-6 py-6">
       <div className="flex h-16 items-center">
         <img
           alt="Logo"
@@ -28,7 +28,7 @@ export default function Sidebar() {
             <li key={item.name}>
               <NavLink
                 to={item.href}
-                className=" rounded-md px-4 py-2 text-md font-semibold text-gray-700 hover:bg-gray-100 flex justify-start items-center gap-2"
+                className=" rounded-md px-4 py-2 text-md font-semibold text-gray-400 hover:bg-gray-100 flex justify-start items-center gap-2"
               >
                 {item.icon}
                 {item.name}

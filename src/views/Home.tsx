@@ -1,9 +1,9 @@
-// Home.tsx
 import { Route, Routes } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import { authStore } from "../store/authStore";
 import { useStore } from "zustand";
 import SidebarT from "@/components/Sidebar";
+import ErrorPage from "./404";
 
 export default function Home() {
   const { token } = useStore(authStore);
@@ -12,9 +12,10 @@ export default function Home() {
     <div className="flex overflow-y-auto min-h-screen w-screen">
       {token && <SidebarT />}
 
-      <main className="flex-1 bg-[#EBEBF1] overflow-y-hidden p-6">
+      <main className="flex-1  overflow-y-hidden p-6">
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/*" element={<ErrorPage />}></Route>
         </Routes>
       </main>
     </div>

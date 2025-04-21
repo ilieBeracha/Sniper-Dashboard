@@ -4,17 +4,12 @@ import Home from "./views/Home";
 import Auth from "./views/Auth";
 import { useStore } from "zustand";
 import { authStore } from "./store/authStore";
-import { useEffect } from "react";
 
 export default function App() {
   const useAuthStore = useStore(authStore);
 
-  useEffect(() => {
-    console.log(1);
-  }, []);
-
   return (
-    <div className="w-screen min-h-screen">
+    <div className="w-screen min-h-screen  bg-[#161616]">
       <Routes>
         {useAuthStore.token ? (
           <Route path={"*"} element={<Home />} />

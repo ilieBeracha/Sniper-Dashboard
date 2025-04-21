@@ -1,7 +1,7 @@
 export default function Loader() {
   return (
     <div className="flex items-center justify-center gap-4 sm:justify-normal">
-      <div className="text-gray-200 animate-spin stroke-brand-500 dark:text-gray-800">
+      <div className="text-gray-200 animate-spin stroke-brand-500 dark:text-gray-400">
         <svg
           width="20"
           height="20"
@@ -28,7 +28,7 @@ export default function Loader() {
         </svg>
       </div>
 
-      <div className="text-gray-200 animate-spin stroke-brand-500 dark:text-gray-800">
+      <div className="text-gray-200 animate-spin stroke-brand-500 dark:text-gray-400">
         <svg
           width="28"
           height="28"
@@ -55,7 +55,7 @@ export default function Loader() {
         </svg>
       </div>
 
-      <div className="text-gray-200 animate-spin stroke-brand-500 dark:text-gray-800">
+      <div className="text-gray-200 animate-spin stroke-brand-500 dark:text-gray-400">
         <svg
           width="36"
           height="36"
@@ -82,7 +82,7 @@ export default function Loader() {
         </svg>
       </div>
 
-      <div className="text-gray-200 animate-spin stroke-brand-500 dark:text-gray-800">
+      <div className="text-gray-200 animate-spin stroke-brand-500 dark:text-gray-400">
         <svg
           width="40"
           height="40"
@@ -109,7 +109,7 @@ export default function Loader() {
         </svg>
       </div>
 
-      <div className="text-gray-200 animate-spin stroke-brand-500 dark:text-gray-800">
+      <div className="text-gray-200 animate-spin stroke-brand-500 dark:text-gray-400">
         <svg
           width="48"
           height="48"

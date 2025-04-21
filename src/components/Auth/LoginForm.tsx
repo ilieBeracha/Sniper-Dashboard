@@ -14,7 +14,7 @@ export default function Login({ AuthSubmit }: { AuthSubmit: any }) {
       <div>
         <label
           htmlFor="email"
-          className="block text-sm font-medium text-gray-900"
+          className="block text-sm font-medium text-gray-400"
         >
           Email address
         </label>
@@ -25,7 +25,7 @@ export default function Login({ AuthSubmit }: { AuthSubmit: any }) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm"
+            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-400 outline-1 -outline-offset-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm"
           />
         </div>
       </div>
@@ -33,7 +33,7 @@ export default function Login({ AuthSubmit }: { AuthSubmit: any }) {
       <div>
         <label
           htmlFor="password"
-          className="block text-sm font-medium text-gray-900"
+          className="block text-sm font-medium text-gray-400"
         >
           Password
         </label>
@@ -44,7 +44,7 @@ export default function Login({ AuthSubmit }: { AuthSubmit: any }) {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300  focus:outline-indigo-600 sm:text-sm"
+            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-400 outline-1 -outline-offset-1 outline-gray-300  focus:outline-indigo-600 sm:text-sm"
           />
         </div>
       </div>
@@ -57,7 +57,7 @@ export default function Login({ AuthSubmit }: { AuthSubmit: any }) {
             type="checkbox"
             className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
           />
-          <label htmlFor="remember-me" className="text-sm text-gray-900">
+          <label htmlFor="remember-me" className="text-sm text-gray-400">
             Remember me
           </label>
         </div>
@@ -75,7 +75,7 @@ export default function Login({ AuthSubmit }: { AuthSubmit: any }) {
       <div>
         <button
           type="submit"
-          className="flex w-full justify-center rounded-md  bg-gray-600  px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline focus:ring-2 focus:ring-indigo-600"
+          className="flex w-full justify-center rounded-md  bg-gray-600  px-3 py-1.5 text-sm font-semibold text-gray-400 shadow-sm hover:bg-indigo-500 focus:outline focus:ring-2 focus:ring-indigo-600"
         >
           Sign in
         </button>

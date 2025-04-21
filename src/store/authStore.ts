@@ -11,6 +11,7 @@ interface props {
   logout: () => void;
   checkAuth: () => void;
   setTokenInLocalStorage: (token: string) => void;
+  registerTeamMember: (user: RegisterUserData) => Promise<string | Error>;
 
   justRegisteredCommander: boolean;
   resetJustRegistered: () => void;
@@ -41,6 +42,21 @@ export const authStore = create<props>((set) => ({
 
       const res = await authService.registerCommander(user);
       set({ token: res.access_token, justRegisteredCommander: true });
+
+      userStore.getState().setUser(res.user);
+      authStore.getState().setTokenInLocalStorage(res.access_token);
+
+      return res;
+    } catch (error: any) {
+      set({ error: error.response.data.error });
+      console.log(error);
+    }
+  },
+
+  registerTeamMember: async (user: RegisterUserData) => {
+    try {
+      const res = await authService.registerTeamMember(user);
+      set({ token: res.access_token });
 
       userStore.getState().setUser(res.user);
       authStore.getState().setTokenInLocalStorage(res.access_token);

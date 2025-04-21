@@ -6,8 +6,8 @@ import {
   TableCell,
   TableHeader,
   TableRow,
-} from "../ui/table";
-import AvatarText from "../ui/badge/Badge";
+} from "../components/ui/table";
+import AvatarText from "../components/ui/badge/Badge";
 import Checkbox from "./Checkbox";
 import { BiTrash, BiChevronRight } from "react-icons/bi";
 
@@ -157,35 +157,35 @@ export default function TeamTable() {
   };
 
   return (
-    <div className="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
-      <div className="flex flex-col gap-4 px-6 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100"></div>
+    <div className="overflow-hidden rounded-md border border-[#161616] bg-[#161616 shadow-sm">
+      <div className="flex flex-col gap-4 px-6 sm:flex-row sm:items-center sm:justify-between border-b border-[#161616"></div>
 
       <div className="max-w-full overflow-x-auto">
         <Table>
-          <TableHeader className="bg-gray-50">
-            <TableRow className="border-y border-gray-200">
-              <TableCell className="px-6 py-8 font-medium text-gray-600 text-xs uppercase tracking-wider">
+          <TableHeader className="">
+            <TableRow className="border-y-2 border-[#161616]">
+              <TableCell className="px-6 py-8 font-medium text-gray-400 text-xs uppercase tracking-wider">
                 <div className="flex items-center gap-3">
                   <Checkbox checked={selectAll} onChange={handleSelectAll} />
                   <span>Deal ID</span>
                 </div>
               </TableCell>
-              <TableCell className="px-6 py-3.5 font-medium text-gray-600 text-xs uppercase tracking-wider">
+              <TableCell className="px-6 py-3.5 font-medium text-gray-400 text-xs uppercase tracking-wider">
                 Customer
               </TableCell>
-              <TableCell className="px-6 py-3.5 font-medium text-gray-600 text-xs uppercase tracking-wider">
+              <TableCell className="px-6 py-3.5 font-medium text-gray-400 text-xs uppercase tracking-wider">
                 Product/Service
               </TableCell>
-              <TableCell className="px-6 py-3.5 font-medium text-gray-600 text-xs uppercase tracking-wider">
+              <TableCell className="px-6 py-3.5 font-medium text-gray-400 text-xs uppercase tracking-wider">
                 Deal Value
               </TableCell>
-              <TableCell className="px-6 py-3.5 font-medium text-gray-600 text-xs uppercase tracking-wider">
+              <TableCell className="px-6 py-3.5 font-medium text-gray-400 text-xs uppercase tracking-wider">
                 Close Date
               </TableCell>
-              <TableCell className="px-6 py-3.5 font-medium text-gray-600 text-xs uppercase tracking-wider">
+              <TableCell className="px-6 py-3.5 font-medium text-gray-400 text-xs uppercase tracking-wider">
                 Status
               </TableCell>
-              <TableCell className="px-6 py-3.5 font-medium text-gray-600 text-xs uppercase tracking-wider">
+              <TableCell className="px-6 py-3.5 font-medium text-gray-400 text-xs uppercase tracking-wider">
                 Action
               </TableCell>
             </TableRow>
@@ -194,8 +194,8 @@ export default function TeamTable() {
             {tableRowData.map((row: TableRowData, index) => (
               <TableRow
                 key={row.id}
-                className={`hover:bg-gray-50 transition-colors ${
-                  selectedRows.includes(row.id) ? "bg-blue-500" : ""
+                className={`hover:bg-gray-900 transition-colors ${
+                  selectedRows.includes(row.id) ? "border-[#161616]" : ""
                 } ${
                   index === tableRowData.length - 1
                     ? ""
@@ -208,38 +208,38 @@ export default function TeamTable() {
                       checked={selectedRows.includes(row.id)}
                       onChange={() => handleRowSelect(row.id)}
                     />
-                    <span className="font-medium text-gray-800 text-sm">
+                    <span className="font-medium text-gray-400 text-sm">
                       {row.id}
                     </span>
                   </div>
                 </TableCell>
                 <TableCell className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 h-9 w-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-900 font-medium">
+                    <div className="flex-shrink-0 h-9 w-9 rounded-full bg-gray-400 flex items-center justify-center text-gray-400 font-medium">
                       {row.user.initials}
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-medium text-gray-800 text-sm">
+                      <span className="font-medium text-gray-400 text-sm">
                         {row.user.name}
                       </span>
-                      <span className="text-gray-500 text-xs">
+                      <span className="text-gray-400 text-xs">
                         {row.user.email}
                       </span>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell className="px-6 py-4">
-                  <p className="text-gray-700 text-sm font-medium">
+                  <p className="text-gray-400 text-sm font-medium">
                     {row.product.name}
                   </p>
                 </TableCell>
                 <TableCell className="px-6 py-4">
-                  <p className="text-gray-800 text-sm font-semibold">
+                  <p className="text-gray-400 text-sm font-semibold">
                     {row.product.price}
                   </p>
                 </TableCell>
                 <TableCell className="px-6 py-4">
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-400 text-sm">
                     {row.product.purchaseDate}
                   </p>
                 </TableCell>
@@ -260,8 +260,8 @@ export default function TeamTable() {
                 </TableCell>
                 <TableCell className="px-6 py-4">
                   {row.actions.delete && (
-                    <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                      <BiTrash className="text-gray-500 size-5 hover:text-red-500" />
+                    <button className="p-2 rounded-full transition-colors">
+                      <BiTrash className="text-gray-400 size-5 hover:text-red-500" />
                     </button>
                   )}
                 </TableCell>
@@ -270,9 +270,9 @@ export default function TeamTable() {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50">
+      <div className="flex items-center justify-between px-6 py-4 border-t border-gray-400 ">
         <div className="flex items-center gap-2">
-          <button className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors">
+          <button className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-gray-400 shadow-sm transition-colors">
             See all
             <BiChevronRight className="h-4 w-4" />
           </button>
