@@ -7,12 +7,13 @@ interface props {
   isLoggedIn: boolean;
   register: (userData: any) => Promise<string | Error>;
   login: (userData: any) => Promise<string | Error>;
+  logout: () => void;
   checkAuth: () => void;
 
   setTokenInLocalStorage: (token: string) => void;
 }
 
-export const authStore = create<props>((set, get) => ({
+export const authStore = create<props>((set) => ({
   token: localStorage.getItem("access_token_sniper") || null,
   isLoggedIn: false,
 
@@ -53,5 +54,12 @@ export const authStore = create<props>((set, get) => ({
     } catch (error) {
       console.log(error);
     }
+  },
+
+  logout: () => {
+    localStorage.removeItem("access_token_sniper");
+    set({ token: null });
+    userStore.getState().setUser({});
+    location.href = "/";
   },
 }));

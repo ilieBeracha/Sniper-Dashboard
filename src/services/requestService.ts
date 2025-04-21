@@ -5,7 +5,7 @@ import type {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
-// import { authStore } from '@/store/authStore';
+import { authStore } from "../store/authStore";
 
 const VITE_AUTH_BASE_URL = import.meta.env.VITE_AUTH_BASE_URL;
 
@@ -29,12 +29,12 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// axiosInstance.interceptors.response.use(
-//   (res: AxiosResponse) => res,
-//   (error: AxiosError) => {
-//     if (error.response?.status === 401) {
-//       authStore.getState().logout();
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+axiosInstance.interceptors.response.use(
+  (res: AxiosResponse) => res,
+  (error: AxiosError) => {
+    if (error.response?.status === 401) {
+      authStore.getState().logout();
+    }
+    return Promise.reject(error);
+  }
+);
