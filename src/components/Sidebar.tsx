@@ -1,60 +1,49 @@
-// Sidebar.tsx
-import { BiUser } from "react-icons/bi";
-import { BsInbox } from "react-icons/bs";
-import { GoHome } from "react-icons/go";
-
-import { authStore } from "../store/authStore";
+import { authStore } from "@/store/authStore";
+import { BiSolidDashboard } from "react-icons/bi";
+import { BsKanban } from "react-icons/bs";
+import { NavLink } from "react-router-dom";
 import { useStore } from "zustand";
+
+const navigation = [
+  { name: "Dashboard", href: "/", icon: <BiSolidDashboard /> },
+  { name: "Kanban Board", href: "/kanban", icon: <BsKanban /> },
+];
 
 export default function Sidebar() {
   const useAuthStore = useStore(authStore);
-  const menuList = [
-    { label: "Home", icon: <GoHome />, href: "/" },
-    {
-      label: "Inbox",
-      icon: <BsInbox />,
-      href: "#",
-      badge: "",
-      badgeColor: "blue",
-    },
-    { label: "Users", icon: <BiUser />, href: "#" },
-  ];
 
   return (
-    <aside className="w-[10%] min-w-[120px] max-w-[200px] max-h-screen bg-[#252229] px-3 py-4 sm:block relative">
-      <h3 className="py-5 text-2xl px-2 text-white">Sniper</h3>
-      <ul className="space-y-2 font-medium ">
-        {menuList.map((item, idx) => (
-          <li key={idx}>
-            <a
-              href={item.href}
-              className="flex items-center p-2 rounded-lg text-white hover:bg-gray-700 group"
-            >
-              {item.icon}
-              <span className="flex-1 ms-3 whitespace-nowrap">
-                {item.label}
-              </span>
-              {item.badge && (
-                <span
-                  className={`inline-flex items-center justify-center px-2 ms-3 text-sm font-medium rounded-full ${
-                    item.badgeColor === "blue"
-                      ? "text-blue-800 bg-blue-100"
-                      : "text-gray-800 bg-gray-100"
-                  }`}
-                >
-                  {item.badge}
-                </span>
-              )}
-            </a>
-          </li>
-        ))}
-      </ul>
-      <p
-        onClick={() => useAuthStore.logout()}
-        className="absolute bottom-5 left-5 w-full text-xl"
-      >
-        Logout
-      </p>
-    </aside>
+    <div className="flex flex-col gap-y-5 overflow-y-auto min-w-[15%] max-w-[20%] border-r border-gray-200 bg-white px-6 py-6">
+      <div className="flex h-16 items-center">
+        <img
+          alt="Logo"
+          src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+          className="h-8 w-auto"
+        />
+      </div>
+
+      <nav className="flex flex-1 flex-col">
+        <ul className="space-y-2">
+          {navigation.map((item) => (
+            <li key={item.name}>
+              <NavLink
+                to={item.href}
+                className=" rounded-md px-4 py-2 text-md font-semibold text-gray-700 hover:bg-gray-100 flex justify-start items-center gap-2"
+              >
+                {item.icon}
+                {item.name}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+
+        <button
+          onClick={() => useAuthStore.logout()}
+          className="mt-auto text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
+        >
+          Logout
+        </button>
+      </nav>
+    </div>
   );
 }

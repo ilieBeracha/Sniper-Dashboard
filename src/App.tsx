@@ -10,7 +10,6 @@ export default function App() {
   const useAuthStore = useStore(authStore);
 
   useEffect(() => {
-    useAuthStore.checkAuth();
     console.log(1);
   }, []);
 

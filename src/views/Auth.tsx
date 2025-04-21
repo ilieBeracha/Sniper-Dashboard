@@ -5,7 +5,7 @@ import Login from "../components/LoginForm";
 import RegisterForm from "../components/RegisterForm";
 import { authStore } from "../store/authStore";
 import { LoginUserData, RegisterUserData } from "../types/auth";
-import BaseLoader from "@/components/BaseLoader";
+import Loader from "@/components/Loader";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ export default function Auth() {
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center px-4 pt-5">
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-        {isLoading ?? <BaseLoader />}
+        {isLoading ?? <Loader />}
         <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
           {isLogin ? (
             <Login AuthSubmit={AuthSubmit} />
