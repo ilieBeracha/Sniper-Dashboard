@@ -10,6 +10,8 @@ import {
 import AvatarText from "../components/ui/badge/Badge";
 import Checkbox from "./Checkbox";
 import { BiTrash, BiChevronRight } from "react-icons/bi";
+import { useStore } from "zustand";
+import { teamStore } from "@/store/teamStore";
 
 interface TableRowData {
   id: string;
@@ -139,6 +141,10 @@ export default function TeamTable() {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState<boolean>(false);
 
+  const useTeamStore = useStore(teamStore);
+
+  const members = useTeamStore.members;
+
   const handleSelectAll = () => {
     setSelectAll(!selectAll);
     if (!selectAll) {
@@ -191,82 +197,81 @@ export default function TeamTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tableRowData.map((row: TableRowData, index) => (
-              <TableRow
-                key={row.id}
-                className={`hover:bg-gray-900 transition-colors ${
-                  selectedRows.includes(row.id) ? "border-[#161616]" : ""
-                } ${
-                  index === tableRowData.length - 1
-                    ? ""
-                    : "border-b border-gray-100"
-                }`}
-              >
-                <TableCell className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <Checkbox
-                      checked={selectedRows.includes(row.id)}
-                      onChange={() => handleRowSelect(row.id)}
-                    />
-                    <span className="font-medium text-gray-400 text-sm">
-                      {row.id}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 h-9 w-9 rounded-full bg-gray-400 flex items-center justify-center text-gray-400 font-medium">
-                      {row.user.initials}
-                    </div>
-                    <div className="flex flex-col">
+            {members?.map((member: any, index: number) => {
+              const rowId = member.id;
+              const initials =
+                member.first_name?.charAt(0).toUpperCase() +
+                member.last_name?.charAt(0).toUpperCase();
+
+              return (
+                <TableRow
+                  key={rowId}
+                  className={`hover:bg-gray-900 transition-colors ${
+                    selectedRows.includes(rowId) ? "border-[#161616]" : ""
+                  } ${
+                    index === members.length - 1
+                      ? ""
+                      : "border-b border-gray-100"
+                  }`}
+                >
+                  <TableCell className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked={selectedRows.includes(rowId)}
+                        onChange={() => handleRowSelect(rowId)}
+                      />
                       <span className="font-medium text-gray-400 text-sm">
-                        {row.user.name}
-                      </span>
-                      <span className="text-gray-400 text-xs">
-                        {row.user.email}
+                        {rowId.slice(0, 8).toUpperCase()}
                       </span>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                  <p className="text-gray-400 text-sm font-medium">
-                    {row.product.name}
-                  </p>
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                  <p className="text-gray-400 text-sm font-semibold">
-                    {row.product.price}
-                  </p>
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                  <p className="text-gray-400 text-sm">
-                    {row.product.purchaseDate}
-                  </p>
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                  <AvatarText
-                    variant="light"
-                    color={
-                      row.status.type === "Complete"
-                        ? "success"
-                        : row.status.type === "Pending"
-                        ? "warning"
-                        : "error"
-                    }
-                    size="sm"
-                  >
-                    {row.status.type}
-                  </AvatarText>
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                  {row.actions.delete && (
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0 h-9 w-9 rounded-full bg-gray-400 flex items-center justify-center text-gray-800 font-medium">
+                        {initials}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-gray-400 text-sm">
+                          {member.first_name} {member.last_name}
+                        </span>
+                        <span className="text-gray-400 text-xs">
+                          {member.email}
+                        </span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-gray-500 text-sm">
+                    {member.user_role}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-gray-500 text-sm">
+                    {"–"}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-gray-500 text-sm">
+                    {"–"}
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    <AvatarText
+                      variant="light"
+                      color={
+                        member.user_role === "commander"
+                          ? "success"
+                          : member.user_role === "squad_commander"
+                          ? "warning"
+                          : "gray"
+                      }
+                      size="sm"
+                    >
+                      {member.user_role}
+                    </AvatarText>
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
                     <button className="p-2 rounded-full transition-colors">
                       <BiTrash className="text-gray-400 size-5 hover:text-red-500" />
                     </button>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

@@ -3,12 +3,12 @@ import { axiosInstance as axios } from "./requestService";
 import { LoginUserData, RegisterUserData } from "@/types/auth";
 
 async function registerCommander(user: RegisterUserData) {
-  user.user_role = "Team commander";
+  user.user_role = "commander";
   const res = await axios.post(`auth/signup/commander`, user);
   return res.data;
 }
 async function registerSquadCommander(user: RegisterUserData) {
-  user.user_role = "Squad commander";
+  user.user_role = "squad-commander";
   const res = await axios.post(`auth/signup/squad-commander`, user);
   return res.data;
 }

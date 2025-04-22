@@ -2,8 +2,10 @@ import LineChartTwo from "@/components/LineChart";
 import BaseStat from "@/components/Stat";
 import BasicTable from "@/components/TeamTable";
 import UserProfile from "@/components/UserProfile";
+import { teamStore } from "@/store/teamStore";
 import { userStore } from "@/store/userStore";
 import { User } from "@/types/user";
+import { useEffect, useState } from "react";
 import { useStore } from "zustand";
 
 const stats = [
@@ -14,6 +16,18 @@ const stats = [
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
+  const useTeamStore = useStore(teamStore);
+
+  const members = useTeamStore.members;
+
+  useEffect(() => {
+    const loadTeam = async () => {
+      if (useUserStore.user?.team_id) {
+        await useTeamStore.fetchMembers(useUserStore.user.team_id);
+      }
+    };
+    loadTeam();
+  }, [useUserStore.user?.team_id]);
 
   return (
     <div className=" min-h-screen w-full overflow-y-auto py-18 px-6 md:px-16">

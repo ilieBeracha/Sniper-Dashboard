@@ -6,5 +6,4 @@ export interface User {
   last_name: string;
   team_id: string;
   squad_id?: string;
-  invite_code?: string;
 }

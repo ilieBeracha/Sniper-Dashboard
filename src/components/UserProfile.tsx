@@ -1,5 +1,5 @@
 import { User } from "@/types/user";
-import { BiCalendar, BiCreditCard, BiMailSend, BiUser } from "react-icons/bi";
+import { BiCalendar, BiMailSend, BiUser } from "react-icons/bi";
 
 export default function UserProfile({ user }: { user: User }) {
   return (
@@ -17,11 +17,11 @@ export default function UserProfile({ user }: { user: User }) {
         <div className="space-y-4 text-sm text-gray-400">
           <InfoRow
             icon={<BiUser className="h-5 w-5 text-indigo-500" />}
-            label={`${user.first_name.toUpperCase()} ${user.last_name.toUpperCase()}`}
+            label={`${user?.first_name?.toUpperCase()} ${user.last_name.toUpperCase()}`}
           />
           <InfoRow
             icon={<BiMailSend className="h-5 w-5 text-blue-500" />}
-            label={user.email}
+            label={user?.email}
           />
           <InfoRow
             icon={<BiCalendar className="h-5 w-5 text-emerald-500" />}
@@ -32,24 +32,13 @@ export default function UserProfile({ user }: { user: User }) {
               </>
             }
           />
-          {user.squad_id && (
+          {user?.squad_id && (
             <InfoRow
               icon={<BiCalendar className="h-5 w-5 text-teal-500" />}
               label={
                 <>
                   <span className="font-bold text-gray-400">Squad ID:</span>{" "}
-                  {user.squad_id}
-                </>
-              }
-            />
-          )}
-          {user.invite_code && (
-            <InfoRow
-              icon={<BiCreditCard className="h-5 w-5 text-pink-500" />}
-              label={
-                <>
-                  <span className="font-bold text-gray-400">Invite Code:</span>{" "}
-                  {user.invite_code}
+                  {user?.squad_id}
                 </>
               }
             />
