@@ -12,6 +12,7 @@ import Checkbox from "./Checkbox";
 import { BiTrash, BiChevronRight } from "react-icons/bi";
 import { useStore } from "zustand";
 import { teamStore } from "@/store/teamStore";
+import { User } from "@/types/user";
 
 interface TableRowData {
   id: string;
@@ -177,27 +178,18 @@ export default function TeamTable() {
                 </div>
               </TableCell>
               <TableCell className="px-6 py-3.5 font-medium text-gray-400 text-xs uppercase tracking-wider">
-                Customer
+                User
               </TableCell>
               <TableCell className="px-6 py-3.5 font-medium text-gray-400 text-xs uppercase tracking-wider">
-                Product/Service
+                Squad
               </TableCell>
               <TableCell className="px-6 py-3.5 font-medium text-gray-400 text-xs uppercase tracking-wider">
-                Deal Value
-              </TableCell>
-              <TableCell className="px-6 py-3.5 font-medium text-gray-400 text-xs uppercase tracking-wider">
-                Close Date
-              </TableCell>
-              <TableCell className="px-6 py-3.5 font-medium text-gray-400 text-xs uppercase tracking-wider">
-                Status
-              </TableCell>
-              <TableCell className="px-6 py-3.5 font-medium text-gray-400 text-xs uppercase tracking-wider">
-                Action
+                Role
               </TableCell>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {members?.map((member: any, index: number) => {
+            {members?.map((member: User, index: number) => {
               const rowId = member.id;
               const initials =
                 member.first_name?.charAt(0).toUpperCase() +
@@ -240,16 +232,14 @@ export default function TeamTable() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-gray-500 text-sm">
+                  {/* <TableCell className="px-6 py-4 text-gray-500 text-sm">
                     {member.user_role}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell className="px-6 py-4 text-gray-500 text-sm">
-                    {"–"}
+                    {member?.squads?.squad_name}
                   </TableCell>
-                  <TableCell className="px-6 py-4 text-gray-500 text-sm">
-                    {"–"}
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
+
+                  <TableCell className="px-6 py-4 text-white">
                     <AvatarText
                       variant="light"
                       color={
@@ -257,7 +247,7 @@ export default function TeamTable() {
                           ? "success"
                           : member.user_role === "squad_commander"
                           ? "warning"
-                          : "gray"
+                          : "info"
                       }
                       size="sm"
                     >
@@ -274,14 +264,6 @@ export default function TeamTable() {
             })}
           </TableBody>
         </Table>
-      </div>
-      <div className="flex items-center justify-between px-6 py-4 border-t border-gray-400 ">
-        <div className="flex items-center gap-2">
-          <button className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-gray-400 shadow-sm transition-colors">
-            See all
-            <BiChevronRight className="h-4 w-4" />
-          </button>
-        </div>
       </div>
     </div>
   );
