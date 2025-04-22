@@ -9,7 +9,7 @@ import {
 } from "../components/ui/table";
 import AvatarText from "../components/ui/badge/Badge";
 import Checkbox from "./Checkbox";
-import { BiTrash, BiChevronRight } from "react-icons/bi";
+import { BiTrash } from "react-icons/bi";
 import { useStore } from "zustand";
 import { teamStore } from "@/store/teamStore";
 import { User } from "@/types/user";

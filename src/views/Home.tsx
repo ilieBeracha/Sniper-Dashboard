@@ -12,7 +12,7 @@ export default function Home() {
     <div className="flex overflow-y-auto min-h-screen w-screen">
       {token && <SidebarT />}
 
-      <main className="flex-1  overflow-y-hidden p-6">
+      <main className="flex-1  overflow-y-hidden ">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/*" element={<ErrorPage />}></Route>
