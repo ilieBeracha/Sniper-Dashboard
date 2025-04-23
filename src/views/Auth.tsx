@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStore } from "zustand";
-import Login from "@/components/Auth/LoginForm";
 import TeamManagerRegisterForm from "@/components/Auth/TeamManagerRegisterForm";
 import TeamMemberRegisterForm from "@/components/Auth/TeamMemberRegisterForm";
 import { authStore } from "@/store/authStore";
 import { LoginUserData, RegisterUserData } from "../types/auth";
-import Loader from "@/components/Loader";
+import Login from "@/components/Auth/LoginForm";
 
 type AuthType = "login" | "register" | "team-member";
 
@@ -89,7 +88,7 @@ export default function Auth() {
         <div className="relative bg-[#1a1a1a] py-8 px-6 shadow-xl rounded-xl border border-gray-800 sm:px-10">
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-10 rounded-xl">
-              <Loader />
+              Loader...
             </div>
           )}
 

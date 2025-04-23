@@ -4,10 +4,9 @@ import { BiCalendar, BiMailSend, BiUser } from "react-icons/bi";
 export default function UserProfile({ user }: { user: User }) {
   return (
     <div className="h-full">
-      <div className="h-full rounded-xl bg-[#0e0e0e] shadow-lg p-6 flex flex-col overflow-hidden">
+      <div className="h-full rounded-xl p-2 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="font-semibold text-gray-400 mb-4">Personal Info</h2>
           <span className="text-sm font-semibold tracking-wide text-yellow-800 bg-gradient-to-r from-yellow-200 via-yellow-300 to-yellow-400 px-3 py-1 rounded-full shadow border border-yellow-400 whitespace-nowrap">
             {user.user_role}
           </span>
