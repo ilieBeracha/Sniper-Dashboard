@@ -106,7 +106,7 @@ export default function TeamTable() {
                 ].map((header, i) => (
                   <th
                     key={i}
-                    className="px-6 py-4 text-left text-xs font-medium text-dashboard-text-muted uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-semibold text-white/70 uppercase tracking-wider bg-white/5"
                   >
                     {header === "ID" ? (
                       <div className="flex items-center gap-3">
@@ -124,7 +124,7 @@ export default function TeamTable() {
               </tr>
             </thead>
 
-            <tbody className="bg-dashboard-card divide-y divide-dashboard-border">
+            <tbody className="bg-dashboard-card divide-y divide-white/10">
               {members?.map((member: User) => {
                 const rowId = member.id;
                 const initials =
@@ -146,9 +146,9 @@ export default function TeamTable() {
                   <tr
                     key={rowId}
                     className={`transition-colors ${
-                      selectedRows.includes(rowId) ? "bg-white/5" : ""
+                      selectedRows.includes(rowId) ? "bg-white/10" : ""
                     } ${
-                      hoveredRow === rowId ? "bg-white/10" : "hover:bg-white/5"
+                      hoveredRow === rowId ? "bg-white/10" : "hover:bg-white/10"
                     }`}
                     onMouseEnter={() => setHoveredRow(rowId)}
                     onMouseLeave={() => setHoveredRow(null)}
@@ -159,7 +159,7 @@ export default function TeamTable() {
                           checked={selectedRows.includes(rowId)}
                           onChange={() => handleRowSelect(rowId)}
                         />
-                        <span className="text-sm">
+                        <span className="text-xs text-gray-200">
                           {rowId.slice(0, 8).toUpperCase()}
                         </span>
                       </div>
@@ -205,7 +205,7 @@ export default function TeamTable() {
                           <BiPencil className="text-dashboard-text-muted size-4 hover:text-blue-400" />
                         </button>
                         <button className="p-1.5 rounded-md transition-colors hover:bg-white/10">
-                          <BiTrash className="text-dashboard-text-muted size-4 hover:text-[#F25F4C]" />
+                          <BiTrash className="text-gray-400 size-5 hover:text-[#F25F4C]" />
                         </button>
                         <button className="p-1.5 rounded-md transition-colors hover:bg-white/10">
                           <BiDotsHorizontalRounded className="text-dashboard-text-muted size-4 hover:text-white" />

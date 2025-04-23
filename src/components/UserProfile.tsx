@@ -54,8 +54,8 @@ export default function UserProfile({ user }: { user: User }) {
         icon={<BiShieldAlt className="h-5 w-5 text-purple-400" />}
         label={
           <>
-            <span className="text-gray-400">Region:</span>{" "}
-            <span className="text-white font-medium">Global Ops</span>
+            <span className="text-gray-400">Last Shooting Range:</span>{" "}
+            <span className="text-white font-medium">Yesterday</span>
           </>
         }
       />
