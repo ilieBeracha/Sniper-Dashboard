@@ -1,4 +1,3 @@
-// Dashboard.tsx - Main component
 import { teamStore } from "@/store/teamStore";
 import { userStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
@@ -10,19 +9,17 @@ import DashboardRowTwo from "@/components/DashboardRowTwo";
 import DashboardRowThree from "@/components/DashboardRowThree";
 import DashboardRowFour from "@/components/DashboardRowFour";
 import InviteModal from "@/components/InviteModal";
-import { groupingScoreStore } from "@/store/groupingScoresStore";
 import { ScoreStore } from "@/store/scoreStore";
-import { trainingStore } from "@/store/trainingStore";
+import { TrainingStore, trainingStore } from "@/store/trainingStore";
 import { squadStore } from "@/store/squadStore";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
   const { fetchMembers } = useStore(teamStore);
-  const { getUserHitPercentage } = useStore(ScoreStore);
+  const { getUserHitPercentage, getUserGroupingScores } = useStore(ScoreStore);
   const { getSquadMetricsByRole } = useStore(squadStore);
-  const { loadTrainings } = useStore(trainingStore);
+  const { loadTrainings } = useStore(TrainingStore);
   const [loading, setLoading] = useState(true);
-  const { getUserGroupingScores } = useStore(groupingScoreStore);
 
   const userRole = useUserStore.userRole;
   const user = useUserStore.user;
@@ -53,6 +50,9 @@ export default function Dashboard() {
         <DashboardRowTwo />
         <DashboardRowThree loading={loading} />
         <DashboardRowFour />
+        {/* {groupingScores.map((group) => {
+          return <GroupingScoreCard groupingScore={group} />;
+        })} */}
       </div>
       {userRole !== "soldier" && user?.id && (
         <InviteModal

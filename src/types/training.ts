@@ -10,3 +10,8 @@ export interface TrainingSession {
     }[]; // <-- was missing array brackets here
   }[];
 }
+
+export interface Trainings {
+  next: TrainingSession | null;
+  last: TrainingSession | null;
+}
