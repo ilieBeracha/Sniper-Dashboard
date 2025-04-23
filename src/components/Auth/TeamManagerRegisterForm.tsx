@@ -91,37 +91,6 @@ export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="flex gap-3">
-          <input
-            id="remember-me"
-            name="remember-me"
-            type="checkbox"
-            className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
-          />
-        </div>
-
-        <div className="text-sm">
-          <a href="#" className="font-semibold text-white">
-            Forgot password?
-          </a>
-        </div>
-      </div>
-
-      <div className="flex items-center">
-        <div className="flex gap-3">
-          <input
-            id="terms"
-            name="terms"
-            type="checkbox"
-            className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
-          />
-          <label htmlFor="terms" className="text-sm text-gray-400">
-            Acknowledge operational code of conduct
-          </label>
-        </div>
-      </div>
-
       <div>
         <button
           type="submit"

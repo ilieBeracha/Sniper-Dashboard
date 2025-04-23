@@ -123,7 +123,7 @@ export default function TeamTable() {
           </thead>
 
           <tbody className="bg-dashboard-card divide-y divide-dashboard-border">
-            {members?.map((member: User, index: number) => {
+            {members?.map((member: User) => {
               const rowId = member.id;
               const initials =
                 member.first_name?.charAt(0).toUpperCase() +

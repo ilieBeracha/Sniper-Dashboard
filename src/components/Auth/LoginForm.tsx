@@ -49,20 +49,12 @@ export default function Login({ AuthSubmit }: { AuthSubmit: any }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="text-sm">
-          <a href="#" className="font-semibold text-white ">
-            Forgot password?
-          </a>
-        </div>
-      </div>
-
       <div>
         <button
           type="submit"
-          className="flex w-full justify-center rounded-md  bg-gray-600  px-3 py-1.5 text-sm font-semibold text-gray-400 shadow-sm hover:bg-indigo-500 focus:outline focus:ring-2 focus:ring-indigo-600"
+          className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-all"
         >
-          Sign in
+          Sign In
         </button>
       </div>
     </form>

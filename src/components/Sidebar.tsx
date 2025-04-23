@@ -36,13 +36,6 @@ export default function Sidebar() {
             </li>
           ))}
         </ul>
-
-        <button
-          onClick={() => useAuthStore.logout()}
-          className="mt-auto text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
-        >
-          Logout
-        </button>
       </nav>
     </div>
   );
