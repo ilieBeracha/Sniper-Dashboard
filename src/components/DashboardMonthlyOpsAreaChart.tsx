@@ -25,19 +25,37 @@ export default function DashboardMonthlyOpsAreaChart() {
         margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
       >
         <defs>
-          <linearGradient id="colorUser" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#4F46E5" stopOpacity={0.1} />
+          {/* Gradient for User */}
+          <linearGradient id="strokeUser" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#7F5AF0" />
+            <stop offset="100%" stopColor="#2CB67D" />
           </linearGradient>
-          <linearGradient id="colorSquad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#2CB67D" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#2CB67D" stopOpacity={0.1} />
+          <linearGradient id="fillUser" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#7F5AF0" stopOpacity={0.3} />
+            <stop offset="100%" stopColor="#2CB67D" stopOpacity={0.05} />
           </linearGradient>
-          <linearGradient id="colorTeam" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#F25F4C" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#F25F4C" stopOpacity={0.1} />
+
+          {/* Gradient for Squad */}
+          <linearGradient id="strokeSquad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#2CB67D" />
+            <stop offset="100%" stopColor="#7F5AF0" />
+          </linearGradient>
+          <linearGradient id="fillSquad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#2CB67D" stopOpacity={0.3} />
+            <stop offset="100%" stopColor="#7F5AF0" stopOpacity={0.05} />
+          </linearGradient>
+
+          {/* Gradient for Team */}
+          <linearGradient id="strokeTeam" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#F25F4C" />
+            <stop offset="100%" stopColor="#FF8906" />
+          </linearGradient>
+          <linearGradient id="fillTeam" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#F25F4C" stopOpacity={0.3} />
+            <stop offset="100%" stopColor="#FF8906" stopOpacity={0.05} />
           </linearGradient>
         </defs>
+
         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
         <XAxis dataKey="month" stroke="#9CA3AF" />
         <YAxis stroke="#9CA3AF" />
@@ -49,35 +67,36 @@ export default function DashboardMonthlyOpsAreaChart() {
             boxShadow: "0 4px 12px rgba(0, 0, 0, 0.5)",
           }}
           labelStyle={{
-            color: "white",
+            color: "#F3F4F6",
             fontWeight: "bold",
             marginBottom: "8px",
           }}
-          itemStyle={{ padding: "4px 0" }}
+          itemStyle={{ padding: "4px 0", color: "#F3F4F6" }}
         />
         <Legend wrapperStyle={{ paddingTop: "10px", color: "#F3F4F6" }} />
+
         <Area
           type="monotone"
           dataKey="userHits"
           name="User Hits"
-          stroke="#4F46E5"
-          fill="url(#colorUser)"
+          stroke="url(#strokeUser)"
+          fill="url(#fillUser)"
           strokeWidth={2}
         />
         <Area
           type="monotone"
           dataKey="squadHits"
           name="Squad Hits"
-          stroke="#2CB67D"
-          fill="url(#colorSquad)"
+          stroke="url(#strokeSquad)"
+          fill="url(#fillSquad)"
           strokeWidth={2}
         />
         <Area
           type="monotone"
           dataKey="teamHits"
           name="Team Hits"
-          stroke="#F25F4C"
-          fill="url(#colorTeam)"
+          stroke="url(#strokeTeam)"
+          fill="url(#fillTeam)"
           strokeWidth={2}
         />
       </AreaChart>

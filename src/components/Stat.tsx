@@ -19,7 +19,7 @@ export default function BaseStat({
           <h3 className="text-lg font-medium text-white">{stat.name}</h3>
         </div>
         <div className="mt-auto">
-          <div className="text-3xl font-bold text-white">
+          <div className="text-3xl font-bold ">
             {stat.value}
             <span className="ml-1 text-sm text-gray-400 font-normal">
               {stat.unit}

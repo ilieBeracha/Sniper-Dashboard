@@ -91,9 +91,9 @@ export default function TeamTable() {
           </div>
         )}
 
-        <div className="max-w-full overflow-x-auto">
+        <div className="max-w-full overflow-x-auto ">
           <table className="min-w-full divide-y divide-dashboard-border">
-            <thead className="bg-dashboard-card">
+            <thead className="bg-dashboard-card ">
               <tr>
                 {[
                   "ID",
