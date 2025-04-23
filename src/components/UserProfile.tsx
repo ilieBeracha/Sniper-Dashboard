@@ -3,47 +3,43 @@ import { BiCalendar, BiMailSend, BiUser } from "react-icons/bi";
 
 export default function UserProfile({ user }: { user: User }) {
   return (
-    <div className="h-full">
-      <div className="h-full rounded-xl flex flex-col overflow-hidden">
-        <div className="flex justify-between items-center mb-6 ">
-          <h2 className="text-lg font-semibold mb-6 text-white">
-            User Profile
-          </h2>
-          <span className="text-sm font-semibold tracking-wide text-yellow-800 bg-gradient-to-r from-yellow-200 via-yellow-300 to-yellow-400 px-3 py-1 rounded-full shadow border border-yellow-400 whitespace-nowrap">
-            {user.user_role}
+    <div className="space-y-4 text-sm text-gray-300">
+      <span className="text-xs px-3 py-1 rounded-full border border-white/10 bg-[#2CB67D]/20 text-[#2CB67D] font-semibold tracking-wide inline-block w-fit">
+        {user.user_role}
+      </span>
+
+      <InfoRow
+        icon={<BiUser className="h-5 w-5 text-indigo-400" />}
+        label={
+          <span className="font-medium text-white">
+            {user?.first_name} {user.last_name}
           </span>
-        </div>
-        <div className="space-y-4 text-sm text-gray-400">
-          <InfoRow
-            icon={<BiUser className="h-5 w-5 text-indigo-500" />}
-            label={`${user?.first_name?.toUpperCase()} ${user.last_name.toUpperCase()}`}
-          />
-          <InfoRow
-            icon={<BiMailSend className="h-5 w-5 text-blue-500" />}
-            label={user?.email}
-          />
-          <InfoRow
-            icon={<BiCalendar className="h-5 w-5 text-emerald-500" />}
-            label={
-              <>
-                <span className="font-bold text-gray-400">Team ID:</span>{" "}
-                {user.team_id}
-              </>
-            }
-          />
-          {user?.squad_id && (
-            <InfoRow
-              icon={<BiCalendar className="h-5 w-5 text-teal-500" />}
-              label={
-                <>
-                  <span className="font-bold text-gray-400">Squad ID:</span>{" "}
-                  {user?.squad_id}
-                </>
-              }
-            />
-          )}
-        </div>
-      </div>
+        }
+      />
+      <InfoRow
+        icon={<BiMailSend className="h-5 w-5 text-cyan-400" />}
+        label={<span className="text-gray-400">{user?.email}</span>}
+      />
+      <InfoRow
+        icon={<BiCalendar className="h-5 w-5 text-emerald-400" />}
+        label={
+          <>
+            <span className="text-gray-400">Team ID:</span>{" "}
+            <span className="text-white font-medium">{user.team_id}</span>
+          </>
+        }
+      />
+      {user?.squad_id && (
+        <InfoRow
+          icon={<BiCalendar className="h-5 w-5 text-pink-400" />}
+          label={
+            <>
+              <span className="text-gray-400">Squad ID:</span>{" "}
+              <span className="text-white font-medium">{user?.squad_id}</span>
+            </>
+          }
+        />
+      )}
     </div>
   );
 }
@@ -57,8 +53,8 @@ function InfoRow({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="p-2 bg-gray-100 rounded-full">{icon}</div>
-      <div className="truncate font-medium">{label}</div>
+      <div className="p-2 bg-white/10 rounded-full">{icon}</div>
+      <div className="text-sm leading-5">{label}</div>
     </div>
   );
 }

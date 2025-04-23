@@ -18,10 +18,7 @@ const barChartData = [
 export default function TeamBarChart() {
   return (
     <>
-      <h2 className="text-lg pl-6 font-semibold mb-6 text-white">
-        Team Performance Metrics
-      </h2>
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={350}>
         <BarChart
           data={barChartData}
           margin={{ top: 20, right: 30, left: 20, bottom: 5 }}

@@ -75,14 +75,7 @@ export default function TeamTable() {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-white">
-          Active Sniper Units
-        </h3>
-        <button className="px-4 py-2 bg-[#333] hover:bg-[#444] border border-white/10 rounded-lg text-xs font-medium text-white transition-all">
-          Deploy New Unit +
-        </button>
-      </div>
+      <div className="flex justify-between items-center "></div>
       <div className="overflow-hidden rounded-xl  bg-dashboard-card">
         {selectedRows.length > 0 && (
           <div className="flex items-center justify-between p-4 bg-white/5 border-b border-dashboard-border">

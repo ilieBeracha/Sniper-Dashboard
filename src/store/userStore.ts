@@ -5,7 +5,6 @@ interface UserStore {
   user: User | null;
   userRole: UserRole | null;
   setUser: (user: User) => void;
-
   clearUser: () => void;
 }
 

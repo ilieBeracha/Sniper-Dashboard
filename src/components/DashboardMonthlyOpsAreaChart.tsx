@@ -27,9 +27,6 @@ const monthlyOperationsData = [
 export default function MonthlyOpsAreaChart() {
   return (
     <>
-      <h2 className="text-lg font-semibold mb-6 text-white">
-        Monthly Operation Success Rate
-      </h2>
       <ResponsiveContainer width="100%" height={350}>
         <AreaChart
           data={monthlyOperationsData}

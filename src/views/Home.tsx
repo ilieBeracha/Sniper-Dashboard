@@ -9,7 +9,7 @@ export default function Home() {
   const { token } = useStore(authStore);
 
   return (
-    <div className="flex overflow-y-auto min-h-screen w-screen">
+    <div className="flex w-screen">
       {token && <SidebarT />}
 
       <main className="flex-1  overflow-y-hidden ">
