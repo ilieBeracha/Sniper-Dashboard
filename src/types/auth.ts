@@ -4,6 +4,8 @@ export interface RegisterUserData {
   email: string;
   password: string;
   user_role?: string;
+
+  registered?: boolean;
 }
 
 export interface LoginUserData {

@@ -5,7 +5,7 @@ import TeamBarChart from "./DashboardTeamBarChart";
 export default function DashboardRowFour() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <BaseDashboardCard title="Monthly Operations">
+      <BaseDashboardCard title="Hits Over Time (Monthly)">
         <MonthlyOpsAreaChart />
       </BaseDashboardCard>
 

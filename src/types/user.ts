@@ -15,6 +15,7 @@ export interface User {
   last_name: string;
   team_id: string;
   squad_id?: string | null;
+  registered?: boolean;
 
   teams?: Team;
   squads?: Squad;

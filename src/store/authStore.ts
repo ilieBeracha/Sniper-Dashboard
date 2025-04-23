@@ -11,11 +11,7 @@ interface props {
   logout: () => void;
   checkAuth: () => void;
   setTokenInLocalStorage: (token: string) => void;
-  registerSquadCommander: (user: RegisterUserData) => Promise<string | Error>;
   registerSoldier: (user: RegisterUserData) => Promise<string | Error>;
-
-  justRegisteredCommander: boolean;
-  resetJustRegistered: () => void;
 
   error: string;
   resetError: () => void;
@@ -23,7 +19,7 @@ interface props {
 
 export const authStore = create<props>((set) => ({
   token: localStorage.getItem("access_token_sniper") || null,
-  justRegisteredCommander: false,
+  registered: false,
   error: "",
 
   checkAuth: async () => {
@@ -42,7 +38,7 @@ export const authStore = create<props>((set) => ({
       authStore.getState().resetError();
 
       const res = await authService.registerCommander(user);
-      set({ token: res.access_token, justRegisteredCommander: true });
+      set({ token: res.access_token });
 
       userStore.getState().setUser(res.user);
       authStore.getState().setTokenInLocalStorage(res.access_token);
@@ -107,8 +103,6 @@ export const authStore = create<props>((set) => ({
     userStore.getState().setUser({} as User);
     location.href = "/";
   },
-
-  resetJustRegistered: () => set({ justRegisteredCommander: false }),
 
   resetError: () => set({ error: "" }),
 }));
