@@ -1,19 +1,34 @@
 import React, { useState } from "react";
 
-export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
+export default function SoldierRegisterForm({
+  AuthSubmit,
+}: {
+  AuthSubmit: (data: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    invite_code: string;
+  }) => void;
+}) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    AuthSubmit({ first_name: firstName, last_name: lastName, email, password });
+    AuthSubmit({
+      first_name: firstName,
+      last_name: lastName,
+      email,
+      password,
+      invite_code: inviteCode,
+    });
   };
 
   return (
-    // <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-    //   <div className="bg-gray-800 px-6 py-12 shadow sm:rounded-lg sm:px-12">
     <form className="space-y-6" onSubmit={handleSubmit}>
       <div>
         <label
@@ -58,7 +73,7 @@ export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
           htmlFor="email"
           className="block text-sm font-medium text-gray-400"
         >
-          Email address
+          Military Email
         </label>
         <div className="mt-2">
           <input
@@ -91,20 +106,23 @@ export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="flex gap-3">
+      <div>
+        <label
+          htmlFor="invite-code"
+          className="block text-sm font-medium text-gray-400"
+        >
+          Squad Invite Code
+        </label>
+        <div className="mt-2">
           <input
-            id="remember-me"
-            name="remember-me"
-            type="checkbox"
-            className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+            type="text"
+            id="invite-code"
+            required
+            value={inviteCode}
+            onChange={(e) => setInviteCode(e.target.value)}
+            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-300 outline-1 outline-gray-600 focus:outline-indigo-600 sm:text-sm"
+            placeholder="Code from your commander"
           />
-        </div>
-
-        <div className="text-sm">
-          <a href="#" className="font-semibold text-white">
-            Forgot password?
-          </a>
         </div>
       </div>
 
@@ -127,7 +145,7 @@ export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
           type="submit"
           className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-all"
         >
-          Register
+          Register as Soldier
         </button>
       </div>
     </form>

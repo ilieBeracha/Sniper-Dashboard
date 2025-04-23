@@ -44,7 +44,7 @@ export default function TeamMemberRegisterForm({
             required
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-400 outline-1 -outline-offset-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm"
+            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-300 outline-1 outline-gray-600 focus:outline-indigo-600 sm:text-sm"
           />
         </div>
       </div>
@@ -63,7 +63,7 @@ export default function TeamMemberRegisterForm({
             required
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-400 outline-1 -outline-offset-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm"
+            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-300 outline-1 outline-gray-600 focus:outline-indigo-600 sm:text-sm"
           />
         </div>
       </div>
@@ -82,7 +82,7 @@ export default function TeamMemberRegisterForm({
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-400 outline-1 -outline-offset-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm"
+            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-300 outline-1 outline-gray-600 focus:outline-indigo-600 sm:text-sm"
           />
         </div>
       </div>
@@ -101,7 +101,7 @@ export default function TeamMemberRegisterForm({
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-400 outline-1 -outline-offset-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm"
+            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-300 outline-1 outline-gray-600 focus:outline-indigo-600 sm:text-sm"
           />
         </div>
       </div>
@@ -120,7 +120,7 @@ export default function TeamMemberRegisterForm({
             required
             value={inviteCode}
             onChange={(e) => setInviteCode(e.target.value)}
-            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-400 outline-1 -outline-offset-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm"
+            className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-300 outline-1 outline-gray-600 focus:outline-indigo-600 sm:text-sm"
             placeholder="Enter the invite code from your team leader"
           />
         </div>
@@ -134,8 +134,19 @@ export default function TeamMemberRegisterForm({
             type="checkbox"
             className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
           />
-          <label htmlFor="remember-me" className="text-sm text-gray-400">
-            Remember me
+        </div>
+      </div>
+
+      <div className="flex items-center">
+        <div className="flex gap-3">
+          <input
+            id="terms"
+            name="terms"
+            type="checkbox"
+            className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+          />
+          <label htmlFor="terms" className="text-sm text-gray-400">
+            Acknowledge operational code of conduct
           </label>
         </div>
       </div>
@@ -143,7 +154,7 @@ export default function TeamMemberRegisterForm({
       <div>
         <button
           type="submit"
-          className="flex w-full justify-center rounded-md bg-gray-600 px-3 py-1.5 text-sm font-semibold text-gray-400 shadow-sm hover:bg-indigo-500 focus:outline focus:ring-2 focus:ring-indigo-600"
+          className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-all"
         >
           Join Team
         </button>

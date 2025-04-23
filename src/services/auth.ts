@@ -1,4 +1,3 @@
-import { User } from "@/types/user";
 import { axiosInstance as axios } from "./requestService";
 import { LoginUserData, RegisterUserData } from "@/types/auth";
 
@@ -12,7 +11,7 @@ async function registerSquadCommander(user: RegisterUserData) {
   const res = await axios.post(`auth/signup/squad-commander`, user);
   return res.data;
 }
-async function registerSoldier(user: User) {
+async function registerSoldier(user: RegisterUserData) {
   const res = await axios.post(`auth/signup/soldier`, user);
   return res.data;
 }
