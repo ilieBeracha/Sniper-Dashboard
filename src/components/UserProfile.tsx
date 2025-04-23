@@ -1,5 +1,5 @@
 import { User } from "@/types/user";
-import { BiCalendar, BiMailSend, BiUser } from "react-icons/bi";
+import { BiCalendar, BiMailSend, BiUser, BiShieldAlt } from "react-icons/bi";
 
 export default function UserProfile({ user }: { user: User }) {
   return (
@@ -35,11 +35,30 @@ export default function UserProfile({ user }: { user: User }) {
           label={
             <>
               <span className="text-gray-400">Squad ID:</span>{" "}
-              <span className="text-white font-medium">{user?.squad_id}</span>
+              <span className="text-white font-medium">{user.squad_id}</span>
             </>
           }
         />
       )}
+      <InfoRow
+        icon={<BiCalendar className="h-5 w-5 text-yellow-400" />}
+        label={
+          <>
+            <span className="text-gray-400">User ID:</span>{" "}
+            <span className="text-white font-medium">{user.id}</span>
+          </>
+        }
+      />
+
+      <InfoRow
+        icon={<BiShieldAlt className="h-5 w-5 text-purple-400" />}
+        label={
+          <>
+            <span className="text-gray-400">Region:</span>{" "}
+            <span className="text-white font-medium">Global Ops</span>
+          </>
+        }
+      />
     </div>
   );
 }

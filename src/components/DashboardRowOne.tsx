@@ -28,9 +28,9 @@ export default function DashboardRowOne({ user }: DashboardRowOneProps) {
           </BaseDashboardCard>
         </div>
 
-        <div className="lg:col-span-1">
-          <BaseDashboardCard title="AI Analysis">
-            <div className="h-[300px] overflow-auto">
+        <div className="lg:col-span-1 bg-gradient-to-r from-[#7F5AF0] to-[#2CB67D] rounded-2xl">
+          <BaseDashboardCard title="AI Analysis" withBg={false}>
+            <div className="overflow-auto ">
               <DashboardAiAnalysis />
             </div>
           </BaseDashboardCard>

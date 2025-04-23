@@ -1,8 +1,8 @@
 export default function DashboardAiAnalysis() {
   return (
     <>
-      <h2 className="text-lg font-semibold mb-6">Tactical AI Analysis</h2>
-      <div className="space-y-4">
+      <h2 className="text-lg font-semibold mb-6 ">Tactical AI Analysis</h2>
+      <div className="space-y-4 ">
         {[
           {
             dot: "bg-[#2CB67D]",
@@ -22,7 +22,7 @@ export default function DashboardAiAnalysis() {
         ].map((item, idx) => (
           <div
             key={idx}
-            className=" rounded-lg px-4 py-2 max-h-[40px] overflow-hidden flex items-center"
+            className=" rounded-lg px-4 py-2 max-h-[40px] overflow-hidden flex items-center "
           >
             <div
               className={`w-3 h-3 rounded-full ${item.dot} mr-3 flex-shrink-0`}

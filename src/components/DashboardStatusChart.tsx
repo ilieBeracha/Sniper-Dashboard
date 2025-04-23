@@ -8,14 +8,14 @@ const pieData = [
 
 export default function DashboardStatusChart() {
   return (
-    <ResponsiveContainer width="100%" height={250}>
+    <ResponsiveContainer width="100%" height={350}>
       <PieChart>
         <Pie
           data={pieData}
           cx="50%"
           cy="50%"
-          innerRadius={60}
-          outerRadius={80}
+          innerRadius={80}
+          outerRadius={120}
           paddingAngle={2}
           dataKey="value"
           label={({ name, percent }) =>
