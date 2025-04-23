@@ -1,65 +1,69 @@
 import { User } from "@/types/user";
-import { BiCalendar, BiMailSend, BiUser, BiShieldAlt } from "react-icons/bi";
+import { BiCalendar, BiMailSend, BiShieldAlt } from "react-icons/bi";
 
 export default function UserProfile({ user }: { user: User }) {
   return (
-    <div className="space-y-4 text-sm text-gray-300">
-      <span className="text-xs px-3 py-1 rounded-full border border-white/10 bg-[#2CB67D]/20 text-[#2CB67D] font-semibold tracking-wide inline-block w-fit">
-        {user.user_role}
-      </span>
+    <>
+      <div className="flex text-white items-center gap-4 w-full">
+        <h2 className="text-xl font-bold ">
+          Welcome Back {user?.first_name} {user.last_name}
+        </h2>
+        <span className="text-xs px-3 py-1 rounded-full border border-white/10 bg-[#2CB67D]/20 text-[#2CB67D] font-semibold tracking-wide inline-block w-fit">
+          {user.user_role}
+        </span>
+      </div>
+      <div className=" text-sm text-gray-300 grid grid-cols-2 p-3 gap-10">
+        <div className="flex justify-between items-center col-span-2"></div>
 
-      <InfoRow
-        icon={<BiUser className="h-5 w-5 text-indigo-400" />}
-        label={
-          <span className="font-medium text-white">
-            {user?.first_name} {user.last_name}
-          </span>
-        }
-      />
-      <InfoRow
-        icon={<BiMailSend className="h-5 w-5 text-cyan-400" />}
-        label={<span className="text-gray-400">{user?.email}</span>}
-      />
-      <InfoRow
-        icon={<BiCalendar className="h-5 w-5 text-emerald-400" />}
-        label={
-          <>
-            <span className="text-gray-400">Team ID:</span>{" "}
-            <span className="text-white font-medium">{user.team_id}</span>
-          </>
-        }
-      />
-      {user?.squad_id && (
         <InfoRow
-          icon={<BiCalendar className="h-5 w-5 text-pink-400" />}
+          icon={<BiMailSend className="h-5 w-5 text-cyan-400" />}
+          label={<span className="text-gray-400 truncate">{user?.email}</span>}
+        />
+        <InfoRow
+          icon={<BiCalendar className="h-5 w-5 text-emerald-400" />}
           label={
             <>
-              <span className="text-gray-400">Squad ID:</span>{" "}
-              <span className="text-white font-medium">{user.squad_id}</span>
+              <span className="text-gray-400">Team ID:</span>{" "}
+              <span className="text-white font-medium truncate">
+                {user.team_id}
+              </span>
             </>
           }
         />
-      )}
-      <InfoRow
-        icon={<BiCalendar className="h-5 w-5 text-yellow-400" />}
-        label={
-          <>
-            <span className="text-gray-400">User ID:</span>{" "}
-            <span className="text-white font-medium">{user.id}</span>
-          </>
-        }
-      />
+        {user?.squad_id && (
+          <InfoRow
+            icon={<BiCalendar className="h-5 w-5 text-pink-400" />}
+            label={
+              <>
+                <span className="text-gray-400">Squad ID:</span>{" "}
+                <span className="text-white font-medium truncate">
+                  {user.squad_id}
+                </span>
+              </>
+            }
+          />
+        )}
+        <InfoRow
+          icon={<BiCalendar className="h-5 w-5 text-yellow-400" />}
+          label={
+            <>
+              <span className="text-gray-400">User ID:</span>{" "}
+              <span className="text-white font-medium truncate">{user.id}</span>
+            </>
+          }
+        />
 
-      <InfoRow
-        icon={<BiShieldAlt className="h-5 w-5 text-purple-400" />}
-        label={
-          <>
-            <span className="text-gray-400">Last Shooting Range:</span>{" "}
-            <span className="text-white font-medium">Yesterday</span>
-          </>
-        }
-      />
-    </div>
+        <InfoRow
+          icon={<BiShieldAlt className="h-5 w-5 text-purple-400" />}
+          label={
+            <>
+              <span className="text-gray-400">Last Shooting Range:</span>{" "}
+              <span className="text-white font-medium">Yesterday</span>
+            </>
+          }
+        />
+      </div>
+    </>
   );
 }
 
@@ -73,7 +77,7 @@ function InfoRow({
   return (
     <div className="flex items-center gap-3">
       <div className="p-2 bg-white/10 rounded-full">{icon}</div>
-      <div className="text-sm leading-5">{label}</div>
+      <div className="text-sm leading-5 truncate">{label}</div>
     </div>
   );
 }

@@ -1,9 +1,9 @@
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 
 const pieData = [
-  { name: "Active", value: 68, color: "#7F5AF0" },
-  { name: "Standby", value: 22, color: "#2CB67D" },
-  { name: "Down", value: 10, color: "#F2994A" },
+  { name: "Active", value: 68, color: "#5E3AD3" }, // Darker purple
+  { name: "Standby", value: 22, color: "#1D8A5E" }, // Darker green
+  { name: "Down", value: 10, color: "#D67333" }, // Darker orange
 ];
 
 export default function DashboardStatusChart() {
@@ -30,7 +30,7 @@ export default function DashboardStatusChart() {
         <Tooltip
           contentStyle={{
             backgroundColor: "#252525",
-            borderColor: "#333",
+
             borderRadius: "4px",
           }}
           itemStyle={{ color: "#fff" }}

@@ -7,13 +7,26 @@ type StatItem = {
   trend?: "up" | "down" | "stable";
 };
 
+// 📊 Average Hit Rate (hits / shots fired)
+// ⚠️ Mistake Rate (%) per session or user
+
 const stats: StatItem[] = [
-  { name: "Operatives", value: "158", unit: "" },
-  { name: "Active Teams", value: "14", unit: "" },
-  { name: "Accuracy Rate", value: "94.7", unit: "%", trend: "up" },
-  { name: "Successful Ops", value: "238", unit: "", trend: "up" },
-  { name: "Target Acquisition", value: "92", unit: "%", trend: "stable" },
-  { name: "Recon Efficiency", value: "+12.3", unit: "%", trend: "up" },
+  { name: "Average Hit Rate (hits / shots fired)", value: "158", unit: "" },
+  { name: "Mistake Rate (%) per session or user", value: "14", unit: "" },
+  {
+    name: "Position-based Performance (prone/sitting/standing)",
+    value: "94.7",
+    unit: "%",
+    trend: "up",
+  },
+  { name: "Avg. Time to First Shot", value: "238", unit: "", trend: "up" },
+  {
+    name: "Grouping Accuracy (dispersion in cm)",
+    value: "92",
+    unit: "%",
+    trend: "stable",
+  },
+  { name: "Distance vs Hit Chart", value: "+12.3", unit: "%", trend: "up" },
 ];
 
 export default function DashboardRowTwo() {

@@ -12,10 +12,10 @@ export default function DashboardRowOne({ user }: DashboardRowOneProps) {
   if (!user) return null;
 
   return (
-    <section>
+    <section className="pb-0 mb-8">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-2">
-          <BaseDashboardCard title="Team Performance">
+          <BaseDashboardCard title="User Profile">
             <UserProfile user={user} />
           </BaseDashboardCard>
         </div>
