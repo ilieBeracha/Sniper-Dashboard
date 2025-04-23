@@ -2,7 +2,7 @@ export default function AuthHero() {
   return (
     <>
       {/* Left Side - Hero/Branding */}
-      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-[#2E2B5F] to-[#121212] flex-col justify-center items-center p-12 relative overflow-hidden">
+      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-[#1E1E20] flex-col justify-center items-center p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/images/tactical-pattern.svg')] opacity-10"></div>
         <div className="relative z-10 max-w-xl text-center">
           <h1 className="text-4xl font-bold text-white mb-6">
