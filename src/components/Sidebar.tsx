@@ -18,8 +18,8 @@ const links = [
     icon: <BiSolidDashboard className="w-5 h-5" />,
   },
   {
-    name: "Analytics",
-    href: "/analytics",
+    name: "Training",
+    href: "/training",
     icon: <BsBarChartFill className="w-5 h-5" />,
   },
 ];

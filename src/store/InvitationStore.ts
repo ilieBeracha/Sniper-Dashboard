@@ -3,17 +3,18 @@ import { Invite } from "@/types/Invite";
 import { create } from "zustand";
 
 interface InvitationStore {
-  Invitation: Invite;
+  invitation: Invite;
   getInviteByInviterId: (userId: string) => Promise<Invite | null>;
 }
 
 export const InvitationStore = create<InvitationStore>((set) => ({
-  Invitation: {} as Invite,
+  invitation: {} as Invite,
 
   getInviteByInviterId: async (userId) => {
+    console.log("userId", userId);
     const inviteData = await getInviteByInviterId(userId);
     console.log(inviteData);
-    set({ Invitation: inviteData as Invite });
+    set({ invitation: inviteData as Invite });
     return inviteData;
   },
 }));

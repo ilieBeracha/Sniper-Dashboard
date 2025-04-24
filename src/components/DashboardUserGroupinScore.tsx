@@ -50,27 +50,21 @@ export default function UserGroupScore() {
   const current = tabInfo[tab];
 
   return (
-    <div className=" p-6 rounded-2xl text-white w-full shadow-lg">
+    <div className="rounded-2xl text-white w-full shadow-lg h-full">
       {/* Tab Bar */}
-      <div className="border-b border-white/10 mb-6">
-        <div className="flex justify-start gap-8">
-          {Object.entries(tabInfo).map(([key, info]) => {
-            const isActive = tab === key;
-            return (
-              <button
-                key={key}
-                onClick={() => setTab(key as keyof typeof tabInfo)}
-                className={`pb-3 text-sm font-medium transition-all border-b-2 ${
-                  isActive
-                    ? "border-white text-white"
-                    : "border-transparent text-gray-500 hover:text-white"
-                }`}
-              >
-                {info.label}
-              </button>
-            );
-          })}
-        </div>
+      <div className="mb-8 mt-2">
+        <select
+          id="metric-tab"
+          value={tab}
+          onChange={(e) => setTab(e.target.value as keyof typeof tabInfo)}
+          className="w-full bg-[#1E1E1E] text-white border border-white/10 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7F5AF0] transition"
+        >
+          {Object.entries(tabInfo).map(([key, info]) => (
+            <option key={key} value={key}>
+              {info.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Stat Cards */}

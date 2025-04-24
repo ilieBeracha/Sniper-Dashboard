@@ -44,9 +44,7 @@ function TrainingCard({
   const statusText = color === "gray" ? "Completed" : "Upcoming";
 
   return (
-    <div
-      className={`border-l-4 ${borderColor} bg-[#252525] rounded-xl p-5 h-full`}
-    >
+    <div className={`border-l-4 ${borderColor} bg-[#252525] rounded-xl p-5`}>
       <div className="flex justify-between items-start mb-4">
         <div>
           <h4 className="text-lg font-semibold">{session.session_name}</h4>

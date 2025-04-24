@@ -1,3 +1,5 @@
+import { BiAddToQueue } from "react-icons/bi";
+
 export default function BaseDashboardCard({
   title,
   children,
@@ -9,14 +11,19 @@ export default function BaseDashboardCard({
 }) {
   return (
     <div
-      className={`h-full rounded-2xl border border-white/5 shadow-lg flex flex-col ${
+      className={`h-full rounded-2xl border border-white/5 shadow-lg flex flex-col  ${
         withBg ? "bg-[#1E1E1E]" : "bg-transparent"
       }`}
     >
-      <div className="p-4 border-b border-white/5">
-        <h2 className="font-semibold text-white">{title}</h2>
+      <div className="px-4 pt-4 pb-2 border-b border-white/5 mb-2">
+        <div className="flex justify-between ">
+          <h2 className="font-semibold text-white">{title}</h2>
+          <button>
+            <BiAddToQueue />{" "}
+          </button>
+        </div>
       </div>
-      <div className="p-4 flex-1">{children}</div>
+      <div className="px-4 pb-4 flex-1 h-full">{children}</div>
     </div>
   );
 }

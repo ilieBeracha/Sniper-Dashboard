@@ -10,7 +10,7 @@ import DashboardRowThree from "@/components/DashboardRowThree";
 import DashboardRowFour from "@/components/DashboardRowFour";
 import InviteModal from "@/components/InviteModal";
 import { ScoreStore } from "@/store/scoreStore";
-import { TrainingStore, trainingStore } from "@/store/trainingStore";
+import { TrainingStore } from "@/store/trainingStore";
 import { squadStore } from "@/store/squadStore";
 
 export default function Dashboard() {

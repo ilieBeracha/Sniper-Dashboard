@@ -14,7 +14,7 @@ export default function InviteModal({
   userId: string;
 }) {
   const useInvitationStore = useStore(InvitationStore);
-  const invitation = useInvitationStore.Invitation;
+  const invitation = useInvitationStore.invitation;
   const [loading, setLoading] = useState(false);
   const [inviteFetched, setInviteFetched] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -22,12 +22,14 @@ export default function InviteModal({
   const handleInvite = async () => {
     setLoading(true);
     try {
+      if (!userId) return;
       await useInvitationStore.getInviteByInviterId(userId);
       setInviteFetched(true);
     } catch (err) {
       console.error("Failed to fetch invite:", err);
     } finally {
       setLoading(false);
+      console.log(invitation.token);
     }
   };
 
@@ -50,28 +52,29 @@ export default function InviteModal({
 
   return (
     <BaseModal isOpen={isOpen} onClose={onCloseModal}>
-      <div className="flex flex-col items-center text-center space-y-6 px-4 py-2">
-        <div className="bg-indigo-100 text-indigo-600 p-4 rounded-full shadow-inner">
+      <div className="flex flex-col items-center text-center px-6 py-4 space-y-6">
+        <div className="bg-indigo-500/10 text-indigo-400 p-4 rounded-full shadow-sm">
           <UserPlus className="w-10 h-10" />
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <h2 className="text-2xl font-bold text-white">
           Invite Your Squad Commander
         </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-300 max-w-md">
-          Share the code below to invite your Squad Commander to join your team.
+        <p className="text-sm text-gray-400 max-w-md">
+          Generate and share the invite token below to onboard your Squad
+          Commander.
         </p>
 
         {inviteFetched ? (
           <div className="w-full space-y-4">
-            <div className="relative flex items-center justify-between bg-gray-100 dark:bg-gray-700 px-4 py-3 rounded-lg text-gray-800 dark:text-white font-mono text-sm shadow-inner">
+            <div className="relative flex items-center justify-between bg-gray-800 px-4 py-3 rounded-lg text-white font-mono text-sm shadow-md">
               <span className="truncate">{invitation?.token}</span>
               <button
                 onClick={handleCopy}
-                className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 ml-4"
+                className="ml-4 text-indigo-400 hover:text-indigo-300 transition"
               >
                 {copied ? (
-                  <span className="flex items-center gap-1 text-green-500">
+                  <span className="flex items-center gap-1 text-green-400">
                     <ClipboardCheck className="w-4 h-4" /> Copied
                   </span>
                 ) : (
@@ -79,9 +82,10 @@ export default function InviteModal({
                 )}
               </button>
             </div>
+
             <button
               onClick={onCloseModal}
-              className="w-full px-6 py-2 text-sm bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+              className="w-full px-6 py-2 text-sm text-gray-300 bg-gray-900 border border-gray-700 rounded-lg hover:bg-gray-800 transition-all"
             >
               Close
             </button>
@@ -89,7 +93,7 @@ export default function InviteModal({
         ) : (
           <button
             onClick={handleInvite}
-            className="mt-4 px-6 py-3 w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl shadow hover:opacity-90 transition-all"
+            className="w-full mt-2 px-6 py-3 text-white text-sm bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-60"
             disabled={loading}
           >
             {loading ? "Generating..." : "Generate Invite Code"}

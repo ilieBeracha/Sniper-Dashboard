@@ -22,7 +22,7 @@ export default function UserHitPercentage() {
   }
 
   return (
-    <div className="bg-[#1E1E1E] p-4 rounded-2xl text-white w-full flex flex-col gap-8">
+    <div className="bg-[#1E1E1E] h-full rounded-2xl text-white w-full flex flex-col gap-8">
       <div className="w-full">
         <p className="text-sm text-gray-400 mb-2">Hit Accuracy</p>
         <div className="w-full bg-white/10 rounded-full h-3">
@@ -36,7 +36,7 @@ export default function UserHitPercentage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="h-full justify-between gap-6">
         <StatCard title="Total Shots" value={userHitPercentage.total_shots} />
         <StatCard title="Hits" value={userHitPercentage.total_hits} />
         <StatCard
@@ -54,7 +54,7 @@ export default function UserHitPercentage() {
 
 function StatCard({ title, value }: { title: string; value: string | number }) {
   return (
-    <div className="  rounded-xl  flex flex-col justify-center items-start gap-2">
+    <div className=" h-full rounded-xl  flex flex-col justify-center items-center mb-4">
       <span className="text-sm text-gray-400">{title}</span>
       <span className="text-2xl font-semibold text-white">{value}</span>
     </div>
