@@ -19,14 +19,12 @@ export const ScoreStore = create<ScoreStore>((set) => ({
 
   getUserHitPercentage: async (user_id: string) => {
     const data = await getUserHitPercentageRpc(user_id);
-    console.log(data);
     set({ userHitPercentage: data });
     return data;
   },
 
   getUserGroupingScores: async (user_id: string) => {
     const data = await getUserGroupingScoresRpc(user_id);
-    console.log(data);
     set({ userGroupingScores: data });
     return data;
   },

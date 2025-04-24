@@ -4,7 +4,6 @@ import { supabase } from "./supabaseClient";
 export async function getInviteByInviterId(
   userId: string
 ): Promise<Invite | null> {
-  console.log(userId);
   try {
     const { data, error } = await supabase
       .from("invitations")

@@ -29,7 +29,6 @@ export default function InviteModal({
       console.error("Failed to fetch invite:", err);
     } finally {
       setLoading(false);
-      console.log(invitation.token);
     }
   };
 

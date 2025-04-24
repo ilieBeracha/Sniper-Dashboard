@@ -3,6 +3,7 @@ import { authService } from "../services/auth";
 import { userStore } from "./userStore";
 import { User } from "../types/user";
 import { LoginUserData, RegisterUserData } from "../types/auth";
+import { supabase } from "@/services/supabaseClient";
 
 interface props {
   token: string | null;
@@ -23,9 +24,13 @@ export const authStore = create<props>((set) => ({
   error: "",
 
   checkAuth: async () => {
-    const token = localStorage.getItem("access_token_sniper");
-    if (token) {
-      set({ token });
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      set({ token: session.access_token });
+      authStore.getState().setTokenInLocalStorage(session.access_token);
+      // optionally fetch user here from your users table
     }
   },
 
@@ -39,7 +44,10 @@ export const authStore = create<props>((set) => ({
 
       const res = await authService.registerCommander(user);
       set({ token: res.access_token });
-
+      await supabase.auth.setSession({
+        access_token: res.access_token,
+        refresh_token: res.refresh_token,
+      });
       userStore.getState().setUser(res.user);
       authStore.getState().setTokenInLocalStorage(res.access_token);
 
@@ -57,7 +65,10 @@ export const authStore = create<props>((set) => ({
 
       userStore.getState().setUser(res.user);
       authStore.getState().setTokenInLocalStorage(res.access_token);
-
+      await supabase.auth.setSession({
+        access_token: res.access_token,
+        refresh_token: res.refresh_token,
+      });
       return res;
     } catch (error: any) {
       set({ error: error.response.data.error });
@@ -69,7 +80,10 @@ export const authStore = create<props>((set) => ({
     try {
       const res = await authService.registerSoldier(user);
       set({ token: res.access_token });
-
+      await supabase.auth.setSession({
+        access_token: res.access_token,
+        refresh_token: res.refresh_token,
+      });
       userStore.getState().setUser(res.user);
       authStore.getState().setTokenInLocalStorage(res.access_token);
 
@@ -82,8 +96,14 @@ export const authStore = create<props>((set) => ({
 
   login: async (user: LoginUserData) => {
     try {
+      await supabase.auth.signOut();
+
       authStore.getState().resetError();
       const res = await authService.login(user);
+      await supabase.auth.setSession({
+        access_token: res.access_token,
+        refresh_token: res.refresh_token,
+      });
       set({ token: res.access_token });
 
       authStore.getState().setTokenInLocalStorage(res.access_token);

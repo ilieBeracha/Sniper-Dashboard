@@ -22,7 +22,6 @@ export const TrainingStore = create<TrainingStore>((set) => ({
   loadTrainingByTeamId: async (teamId: string) => {
     const res = await getTrainingByTeamId(teamId);
     set({ trainings: res });
-    console.log(res);
   },
 
   loadNextAndLastTraining: async (team_id: string) => {

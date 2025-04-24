@@ -17,7 +17,6 @@ export const squadStore = create<SquadStore>((set) => ({
 
   getSquadMetricsByRole: async (team_id) => {
     const data = await getSquadMetricsByRoleRpc(team_id);
-    console.log("getSquadMetricsByRole", data);
     set({ metrics: data });
   },
 }));
