@@ -1,4 +1,4 @@
-import UserProfile from "./UserProfile";
+import UserProfile from "./DashboardUserProfile";
 import { User } from "@/types/user";
 import BaseDashboardCard from "./BaseDashboardCard";
 import UserHitPercentage from "./DashboardUserHitPercentage";

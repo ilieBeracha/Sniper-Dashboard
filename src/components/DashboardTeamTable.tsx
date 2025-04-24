@@ -9,11 +9,14 @@ import {
 import { useStore } from "zustand";
 import { teamStore } from "@/store/teamStore";
 import { User } from "@/types/user";
+import { isCommander } from "@/utils/permissions";
+import { userStore } from "@/store/userStore";
 
 export default function TeamTable() {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
+  const { userRole } = useStore(userStore);
 
   const { members } = useStore(teamStore);
 
@@ -34,24 +37,6 @@ export default function TeamTable() {
     );
   };
 
-  // Calculation for operational metrics
-  const getAccuracyRating = (id: string) => {
-    // Simulating accuracy ratings based on user ID
-    const hash = id
-      .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return Math.min(98, Math.max(78, (hash % 20) + 78)).toFixed(1); // Range 78-98%
-  };
-
-  const getMissionsCompleted = (id: string) => {
-    // Simulating missions based on user ID
-    const hash = id
-      .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return Math.floor((hash % 150) + 20); // Range 20-170
-  };
-
-  // Custom role badge component
   const RoleBadge = ({ role }: { role: string }) => {
     const getBadgeColor = () => {
       switch (role) {
@@ -76,7 +61,7 @@ export default function TeamTable() {
   return (
     <>
       <div className="flex justify-between items-center "></div>
-      <div className="overflow-hidden rounded-xl  bg-dashboard-card">
+      <div className="overflow-hidden rounded-sm  bg-dashboard-card">
         {selectedRows.length > 0 && (
           <div className="flex items-center justify-between p-4 bg-white/5 border-b border-dashboard-border">
             <span className="text-sm text-dashboard-text-muted">
@@ -95,32 +80,26 @@ export default function TeamTable() {
           <table className="min-w-full divide-y divide-dashboard-border">
             <thead className="bg-dashboard-card ">
               <tr>
-                {[
-                  "ID",
-                  "Operative",
-                  "Squad",
-                  "Role",
-                  "Accuracy",
-                  "Missions",
-                  "Actions",
-                ].map((header, i) => (
-                  <th
-                    key={i}
-                    className="px-6 py-3 text-left text-xs font-semibold text-white/70 uppercase tracking-wider bg-white/5"
-                  >
-                    {header === "ID" ? (
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          checked={selectAll}
-                          onChange={handleSelectAll}
-                        />
-                        <span>{header}</span>
-                      </div>
-                    ) : (
-                      header
-                    )}
-                  </th>
-                ))}
+                {["ID", "Operative", "Squad", "Role", "Actions"].map(
+                  (header, i) => (
+                    <th
+                      key={i}
+                      className="px-6 py-3 text-left text-xs font-semibold text-white/70 uppercase tracking-wider bg-white/5"
+                    >
+                      {header === "ID" ? (
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            checked={selectAll}
+                            onChange={handleSelectAll}
+                          />
+                          <span>{header}</span>
+                        </div>
+                      ) : (
+                        header
+                      )}
+                    </th>
+                  )
+                )}
               </tr>
             </thead>
 
@@ -130,17 +109,6 @@ export default function TeamTable() {
                 const initials =
                   member.first_name?.charAt(0).toUpperCase() +
                   member.last_name?.charAt(0).toUpperCase();
-
-                const accuracy = getAccuracyRating(rowId);
-                const missions = getMissionsCompleted(rowId);
-
-                const getAccuracyColor = (acc: number) => {
-                  if (acc >= 95)
-                    return "text-dashboard-accent-green bg-[#2CB67D]/10";
-                  if (acc >= 85)
-                    return "text-dashboard-accent-purple bg-[#7F5AF0]/10";
-                  return "text-[#FF8906] bg-[#FF8906]/10";
-                };
 
                 return (
                   <tr
@@ -187,30 +155,23 @@ export default function TeamTable() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <RoleBadge role={member.user_role} />
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div
-                        className={`px-3 py-1 rounded-md text-xs inline-block ${getAccuracyColor(
-                          parseFloat(accuracy)
-                        )}`}
-                      >
-                        {accuracy}%
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-dashboard-text">
-                      {missions}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
-                        <button className="p-1.5 rounded-md transition-colors hover:bg-white/10">
-                          <BiPencil className="text-dashboard-text-muted size-4 hover:text-blue-400" />
-                        </button>
-                        <button className="p-1.5 rounded-md transition-colors hover:bg-white/10">
-                          <BiTrash className="text-gray-400 size-5 hover:text-[#F25F4C]" />
-                        </button>
-                        <button className="p-1.5 rounded-md transition-colors hover:bg-white/10">
-                          <BiDotsHorizontalRounded className="text-dashboard-text-muted size-4 hover:text-white" />
-                        </button>
-                      </div>
+                      {isCommander(userRole) ? (
+                        <div className="flex items-center space-x-2">
+                          <button className="p-1.5 rounded-md transition-colors hover:bg-white/10">
+                            <BiPencil className="text-dashboard-text-muted size-4 hover:text-blue-400" />
+                          </button>
+                          <button className="p-1.5 rounded-md transition-colors hover:bg-white/10">
+                            <BiTrash className="text-gray-400 size-5 hover:text-[#F25F4C]" />
+                          </button>
+                          <button className="p-1.5 rounded-md transition-colors hover:bg-white/10">
+                            <BiDotsHorizontalRounded className="text-dashboard-text-muted size-4 hover:text-white" />
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-sm text-gray-500 italic">—</span> // or just empty
+                      )}
                     </td>
                   </tr>
                 );
@@ -230,24 +191,6 @@ export default function TeamTable() {
             </p>
           </div>
         )}
-
-        <div className="px-6 py-4 border-t border-dashboard-border flex justify-between items-center bg-dashboard-card">
-          <div className="text-sm text-dashboard-text-muted">
-            Showing{" "}
-            <span className="font-medium text-dashboard-text">
-              {members?.length || 0}
-            </span>{" "}
-            units
-          </div>
-          <div className="flex items-center space-x-2">
-            <button className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-dashboard-text-muted rounded-md text-xs">
-              Previous
-            </button>
-            <button className="px-3 py-1.5 bg-gradient-to-r from-dashboard-accent-purple to-dashboard-accent-green hover:opacity-90 text-white rounded-md text-xs">
-              Next
-            </button>
-          </div>
-        </div>
       </div>
     </>
   );

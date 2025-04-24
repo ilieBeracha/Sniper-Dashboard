@@ -1,14 +1,14 @@
 import { TrainingStore } from "@/store/trainingStore";
 import { useStore } from "zustand";
 import { format } from "date-fns";
-import { TrainingSession } from "@/types/training";
+import { TrainingSessionChart } from "@/types/training";
 
 export default function DashboardCalendar() {
   const useTrainingCalendar = useStore(TrainingStore);
-  const { last, next } = useTrainingCalendar.trainings;
+  const { last, next } = useTrainingCalendar.trainingsChartDisplay;
 
   return (
-    <div className=" p-6 rounded-2xl text-white w-full col-span-2">
+    <div className="rounded-2xl text-white w-full col-span-2">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <h3 className="text-sm text-gray-400 mb-3">Last Training</h3>
@@ -36,7 +36,7 @@ function TrainingCard({
   session,
   color,
 }: {
-  session: TrainingSession;
+  session: TrainingSessionChart;
   color: "gray" | "green";
 }) {
   const borderColor = color === "gray" ? "border-gray-500" : "border-green-500";
@@ -55,24 +55,6 @@ function TrainingCard({
         <span className={`text-xs px-2 py-1 rounded-lg ${statusColor}`}>
           {statusText}
         </span>
-      </div>
-
-      <div className="mt-4">
-        <p className="text-xs text-gray-400 mb-2">Assignments:</p>
-        <div className="flex flex-wrap gap-2 text-xs">
-          {session.assignments_trainings.flatMap((a) =>
-            Array.isArray(a.assignments)
-              ? a.assignments.map((assignment) => (
-                  <span
-                    key={assignment.id}
-                    className="bg-[#1E1E1E] border border-white/10 px-2 py-1 rounded-full"
-                  >
-                    {assignment.assignment_name}
-                  </span>
-                ))
-              : []
-          )}
-        </div>
       </div>
     </div>
   );

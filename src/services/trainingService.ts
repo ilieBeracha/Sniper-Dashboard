@@ -1,5 +1,44 @@
 import { supabase } from "./supabaseClient";
 
+export async function getTrainingByTeamId(teamId: string) {
+  const now = new Date().toISOString();
+
+  const { data: trainings, error } = await supabase
+    .from("training_sessions")
+    .select(
+      `
+      id,
+      date,
+      session_name,
+      location,
+      assignments_trainings (
+        assignments (
+          id,
+          assignment_name
+        )
+      )
+    `
+    )
+    .eq("team_id", teamId)
+    .gte("date", now)
+    .order("date", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching trainings:", error);
+    return [];
+  }
+
+  // 🔥 Transform the nested assignments structure here
+  const flattenedTrainings = (trainings || []).map((t) => ({
+    ...t,
+    assignments_trainings: t.assignments_trainings
+      .map((a: any) => a.assignments)
+      .filter(Boolean),
+  }));
+
+  return flattenedTrainings;
+}
+
 export async function getNextAndLastTraining(team_id: string) {
   const { data: nextTraining, error: nextError } = await supabase
     .from("training_sessions")

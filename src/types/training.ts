@@ -1,17 +1,23 @@
+export interface Assignment {
+  id: string;
+  assignment_name: string;
+}
+
 export interface TrainingSession {
+  id: string;
+  date: string; // ISO string
+  session_name: string;
+  location: string;
+  assignments_trainings: Assignment[]; // now a flat array of assignments
+}
+
+export interface TrainingSessionChart {
   id: string;
   date: string;
   session_name: string;
-  assignments_trainings: {
-    assignment_id: string;
-    assignments: {
-      id: string;
-      assignment_name: string;
-    }[]; // <-- was missing array brackets here
-  }[];
 }
 
-export interface Trainings {
-  next: TrainingSession | null;
-  last: TrainingSession | null;
+export interface TrainingsNextLastChart {
+  next: TrainingSessionChart | null;
+  last: TrainingSessionChart | null;
 }

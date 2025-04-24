@@ -18,7 +18,7 @@ export default function Dashboard() {
   const { fetchMembers } = useStore(teamStore);
   const { getUserHitPercentage, getUserGroupingScores } = useStore(ScoreStore);
   const { getSquadMetricsByRole } = useStore(squadStore);
-  const { loadTrainings } = useStore(TrainingStore);
+  const { loadNextAndLastTraining } = useStore(TrainingStore);
   const [loading, setLoading] = useState(true);
 
   const userRole = useUserStore.userRole;
@@ -32,7 +32,7 @@ export default function Dashboard() {
         await fetchMembers(user.team_id);
         await getUserGroupingScores(user.id);
         await getUserHitPercentage(user.id);
-        await loadTrainings(user.team_id);
+        await loadNextAndLastTraining(user.team_id);
         await getSquadMetricsByRole(user.id);
       }
 
@@ -45,14 +45,11 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen from-[#1E1E20] text-gray-100 px-6 md:px-16 lg:px-28 py-8 md:py-12">
       <Header setIsOpen={setIsInviteModalOpen} />
-      <div className="space-y-12">
+      <div className="space-y-8">
         <DashboardRowOne user={user} />
         <DashboardRowTwo />
         <DashboardRowThree loading={loading} />
         <DashboardRowFour />
-        {/* {groupingScores.map((group) => {
-          return <GroupingScoreCard groupingScore={group} />;
-        })} */}
       </div>
       {userRole !== "soldier" && user?.id && (
         <InviteModal

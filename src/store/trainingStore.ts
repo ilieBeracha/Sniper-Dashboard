@@ -1,25 +1,38 @@
 import { create } from "zustand";
-import { getNextAndLastTraining } from "@/services/trainingService";
-import { Trainings } from "@/types/training";
+import {
+  getNextAndLastTraining,
+  getTrainingByTeamId,
+} from "@/services/trainingService";
+import { TrainingsNextLastChart, TrainingSession } from "@/types/training";
 
 interface TrainingStore {
-  trainings: Trainings;
-  loadTrainings: (team_id: string) => Promise<void>;
+  trainings: TrainingSession[] | [];
+  trainingsChartDisplay: TrainingsNextLastChart;
+  loadNextAndLastTraining: (team_id: string) => Promise<void>;
+  loadTrainingByTeamId: (team_id: string) => Promise<void>;
 }
 
 export const TrainingStore = create<TrainingStore>((set) => ({
-  trainings: {
+  trainings: [],
+  trainingsChartDisplay: {
     next: null,
     last: null,
   },
 
-  loadTrainings: async (team_id: string) => {
+  loadTrainingByTeamId: async (teamId: string) => {
+    const res = await getTrainingByTeamId(teamId);
+    set({ trainings: res });
+    console.log(res);
+  },
+
+  loadNextAndLastTraining: async (team_id: string) => {
     try {
       const { nextTraining, lastTraining } = await getNextAndLastTraining(
         team_id
       );
-      console.log({ nextTraining, lastTraining });
-      set({ trainings: { next: nextTraining, last: lastTraining } });
+      set({
+        trainingsChartDisplay: { next: nextTraining, last: lastTraining },
+      });
     } catch (err) {
       console.error("Failed to load trainings:", err);
     }
