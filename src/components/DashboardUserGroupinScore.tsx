@@ -11,7 +11,7 @@ export default function UserGroupScore() {
 
   if (!userGroupingScores || userGroupingScores.length === 0) {
     return (
-      <div className="bg-[#1E1E1E] p-4 rounded-2xl text-white text-center">
+      <div className="p-4 rounded-2xl text-white text-center bg-[#1E1E1E]">
         No grouping score data available.
       </div>
     );
@@ -50,28 +50,31 @@ export default function UserGroupScore() {
   const current = tabInfo[tab];
 
   return (
-    <div className="bg-[#1E1E1E] p-6 rounded-2xl text-white shadow-xl w-full h-full justify-between mx-auto">
-      <h2 className="text-xl font-semibold mb-4 text-center">
-        Grouping Averages
-      </h2>
-
-      <div className="flex justify-center gap-2 mb-6">
-        {Object.keys(tabInfo).map((key) => (
-          <button
-            key={key}
-            onClick={() => setTab(key as keyof typeof tabInfo)}
-            className={`px-3 py-1 rounded-full text-sm ${
-              tab === key
-                ? "bg-white text-[#121212] font-bold"
-                : "bg-[#2A2A2A] text-gray-400"
-            }`}
-          >
-            {tabInfo[key as keyof typeof tabInfo].label}
-          </button>
-        ))}
+    <div className=" p-6 rounded-2xl text-white w-full shadow-lg">
+      {/* Tab Bar */}
+      <div className="border-b border-white/10 mb-6">
+        <div className="flex justify-start gap-8">
+          {Object.entries(tabInfo).map(([key, info]) => {
+            const isActive = tab === key;
+            return (
+              <button
+                key={key}
+                onClick={() => setTab(key as keyof typeof tabInfo)}
+                className={`pb-3 text-sm font-medium transition-all border-b-2 ${
+                  isActive
+                    ? "border-white text-white"
+                    : "border-transparent text-gray-500 hover:text-white"
+                }`}
+              >
+                {info.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 gap-6">
         <StatCard
           title="Average"
           value={`${avg(current.key)} ${current.unit}`}
@@ -97,9 +100,11 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="bg-[#252525] rounded-sm p-4 flex flex-col justify-between shadow border border-white/5">
-      <span className="text-gray-400 text-sm mb-2">{title}</span>
-      <p className="text-2xl font-bold" style={{ color }}>
+    <div className="bg-[#121212] border border-white/5 p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
+      <span className="text-gray-400 text-sm tracking-wide uppercase">
+        {title}
+      </span>
+      <p className="text-3xl font-bold mt-2" style={{ color }}>
         {value}
       </p>
     </div>

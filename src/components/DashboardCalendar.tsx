@@ -8,9 +8,7 @@ export default function DashboardCalendar() {
   const { last, next } = useTrainingCalendar.trainings;
 
   return (
-    <div className="bg-[#1E1E1E] p-6 rounded-2xl text-white w-full col-span-2">
-      <h2 className="text-xl font-semibold mb-2">📅 Training Calendar</h2>
-
+    <div className=" p-6 rounded-2xl text-white w-full col-span-2">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <h3 className="text-sm text-gray-400 mb-3">Last Training</h3>
