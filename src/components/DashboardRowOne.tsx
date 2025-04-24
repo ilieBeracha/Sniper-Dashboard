@@ -20,17 +20,17 @@ export default function DashboardRowOne({ user }: DashboardRowOneProps) {
           </BaseDashboardCard>
         </div>
 
-        <div className=" xl:col-span-2 bg-gradient-to-r from-[#7F5AF0] to-[#2CB67D] rounded-2xl lg:col-span-2">
-          <BaseDashboardCard title="Hits Over Time (Monthly)">
-            <DashboardMonthlyOpsAreaChart />
-          </BaseDashboardCard>
-        </div>
-
         <div className="lg:col-span-1">
           <BaseDashboardCard title="User Hit Percentage">
             <div className="flex items-center justify-center ">
               <UserHitPercentage />
             </div>
+          </BaseDashboardCard>
+        </div>
+
+        <div className=" xl:col-span-2 bg-gradient-to-r from-[#7F5AF0] to-[#2CB67D] rounded-2xl lg:col-span-2">
+          <BaseDashboardCard title="Hits Over Time (Monthly)">
+            <DashboardMonthlyOpsAreaChart />
           </BaseDashboardCard>
         </div>
       </div>

@@ -5,32 +5,26 @@ import Auth from "./views/Auth";
 import { useStore } from "zustand";
 import { authStore } from "./store/authStore";
 import { useEffect } from "react";
-import { supabase } from "./services/supabaseClient";
-import { userStore } from "./store/userStore";
 
 export default function App() {
-  const useAuthStore = useStore(authStore);
+  const { checkAuth, token, isLoadingAuth } = useStore(authStore);
 
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "SIGNED_OUT" || !session) {
-          userStore.getState().clearUser();
-          authStore.getState().logout();
-          location.href = "/";
-        }
-      }
-    );
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
+    checkAuth();
   }, []);
+
+  if (isLoadingAuth) {
+    return (
+      <div className="w-screen h-screen bg-[#161616] flex items-center justify-center text-white">
+        <span className="text-xl animate-pulse">Loading...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="w-screen min-h-screen  bg-[#161616]">
       <Routes>
-        {useAuthStore.token ? (
+        {token ? (
           <Route path={"*"} element={<Home />} />
         ) : (
           <Route path={"*"} element={<Auth />} />
