@@ -43,10 +43,7 @@ export default function Training() {
     <div className="min-h-screen from-[#1E1E20] text-gray-100 px-6 md:px-16 lg:px-28 py-8 md:py-12 ">
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 text-white">
         <TrainingList trainings={trainings} />
-        <TrainingCalendar
-          trainings={trainings}
-          handleAddTrainingModal={handleAddTrainingModal}
-        />
+        <TrainingCalendar trainings={trainings} handleAddTrainingModal={handleAddTrainingModal} />
       </div>
       <TrainingAddTrainingSessionModal
         isOpen={showModal}
