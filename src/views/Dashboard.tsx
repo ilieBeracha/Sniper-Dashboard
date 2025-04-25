@@ -9,13 +9,14 @@ import DashboardRowTwo from "@/components/DashboardRowTwo";
 import DashboardRowThree from "@/components/DashboardRowThree";
 import DashboardRowFour from "@/components/DashboardRowFour";
 import InviteModal from "@/components/InviteModal";
-import { ScoreStore } from "@/store/scoreStore";
 import { TrainingStore } from "@/store/trainingStore";
 import { squadStore } from "@/store/squadStore";
+import { performanceStore } from "@/store/performance";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
-  const { getUserHitPercentage, getUserGroupingScores } = useStore(ScoreStore);
+  const { getUserHitPercentage, getUserGroupingScores } = useStore(performanceStore);
+
   const { getSquadMetricsByRole } = useStore(squadStore);
   const { loadNextAndLastTraining } = useStore(TrainingStore);
 

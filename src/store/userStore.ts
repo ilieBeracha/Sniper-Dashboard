@@ -7,7 +7,7 @@ interface UserStore {
   userRole: UserRole;
   setUser: (user: User) => void;
   clearUser: () => void;
-  setUserFromAuth: (authUser: SupabaseAuthUser) => void; // NEW FUNCTION
+  setUserFromAuth: (authUser: SupabaseAuthUser) => void;
 }
 
 export const userStore = create<UserStore>((set) => ({

@@ -3,7 +3,7 @@ import { BiCalendar, BiMailSend } from "react-icons/bi";
 
 export default function UserProfile({ user }: { user: User }) {
   return (
-    <div className="w-full text-white p-4">
+    <div className="w-full text-white ">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
         <h2 className="text-lg font-bold">
@@ -15,7 +15,7 @@ export default function UserProfile({ user }: { user: User }) {
       </div>
 
       {/* Info Rows */}
-      <div className="grid grid-cols-1 gap-4 text-sm text-gray-300">
+      <div className="grid grid-cols-1 text-sm text-gray-300">
         <InfoRow
           icon={<BiMailSend className="text-cyan-400" />}
           label={
@@ -30,9 +30,7 @@ export default function UserProfile({ user }: { user: User }) {
           label={
             <div className="flex flex-col">
               <span className="text-gray-400">Team ID:</span>
-              <span className="text-white font-medium truncate">
-                {user.team_id}
-              </span>
+              <span className="text-white font-medium truncate">{user.team_id}</span>
             </div>
           }
         />
@@ -42,9 +40,7 @@ export default function UserProfile({ user }: { user: User }) {
             label={
               <div className="flex flex-col">
                 <span className="text-gray-400">Squad ID:</span>
-                <span className="text-white font-medium truncate">
-                  {user.squad_id}
-                </span>
+                <span className="text-white font-medium truncate">{user.squad_id}</span>
               </div>
             }
           />
@@ -63,13 +59,7 @@ export default function UserProfile({ user }: { user: User }) {
   );
 }
 
-function InfoRow({
-  icon,
-  label,
-}: {
-  icon: React.ReactNode;
-  label: React.ReactNode;
-}) {
+function InfoRow({ icon, label }: { icon: React.ReactNode; label: React.ReactNode }) {
   return (
     <div className="w-full flex items-start gap-4 bg-[#161616] px-4 py-3 rounded-lg border border-white/5">
       <div className="p-2 rounded-full bg-white/10">{icon}</div>
