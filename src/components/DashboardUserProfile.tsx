@@ -4,7 +4,6 @@ import { BiCalendar, BiMailSend } from "react-icons/bi";
 export default function UserProfile({ user }: { user: User }) {
   return (
     <div className="w-full text-white ">
-      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
         <h2 className="text-lg font-bold">
           Welcome Back {user?.first_name} {user.last_name}
@@ -14,7 +13,6 @@ export default function UserProfile({ user }: { user: User }) {
         </span>
       </div>
 
-      {/* Info Rows */}
       <div className="grid grid-cols-1 text-sm text-gray-300">
         <InfoRow
           icon={<BiMailSend className="text-cyan-400" />}
@@ -61,7 +59,7 @@ export default function UserProfile({ user }: { user: User }) {
 
 function InfoRow({ icon, label }: { icon: React.ReactNode; label: React.ReactNode }) {
   return (
-    <div className="w-full flex items-start gap-4 bg-[#161616] px-4 py-3 rounded-lg border border-white/5">
+    <div className="w-full flex items-start gap-4 px-4 py-3 rounded-lg">
       <div className="p-2 rounded-full bg-white/10">{icon}</div>
       <div className="flex-1 min-w-0">{label}</div>
     </div>

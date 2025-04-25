@@ -9,7 +9,7 @@ export default function DashboardRowTwo() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-6 min-w-32">
         <div className="lg:col-span-2">
           <BaseDashboardCard title="User Hit Percentage">
-            <div className="flex items-center justify-center h-full">
+            <div className="items-center justify-center h-full w-full">
               <UserHitPercentage />
             </div>
           </BaseDashboardCard>
