@@ -3,6 +3,7 @@ import {
   getAssignments,
   getNextAndLastTraining,
   getTrainingByTeamId,
+  insertTraining,
 } from "@/services/trainingService";
 import {
   TrainingsNextLastChart,
@@ -17,9 +18,10 @@ interface TrainingStore {
   loadNextAndLastTraining: (team_id: string) => Promise<void>;
   loadTrainingByTeamId: (team_id: string) => Promise<void>;
   loadAssignments: () => Promise<Assignment[] | any>;
+  createTraining: (payload: TrainingSession) => Promise<TrainingSession | any>;
 }
 
-export const TrainingStore = create<TrainingStore>((set, get) => ({
+export const TrainingStore = create<TrainingStore>((set) => ({
   trainings: [],
   assignments: [],
   trainingsChartDisplay: {
@@ -53,5 +55,10 @@ export const TrainingStore = create<TrainingStore>((set, get) => ({
     } catch (error) {
       console.error("Failed to load getAssignments:", error);
     }
+  },
+
+  createTraining: async (sessionData: TrainingSession) => {
+    const { data, error } = await insertTraining(sessionData);
+    if (error || !data?.id) return data;
   },
 }));

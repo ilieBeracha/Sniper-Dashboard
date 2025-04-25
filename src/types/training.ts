@@ -4,11 +4,12 @@ export interface Assignment {
 }
 
 export interface TrainingSession {
-  id: string;
+  id?: string;
   date: string; // ISO string
   session_name: string;
   location: string;
-  assignments_trainings: Assignment[]; // now a flat array of assignments
+  team_id?: string;
+  assignments_trainings?: Assignment[];
 }
 
 export interface TrainingSessionChart {

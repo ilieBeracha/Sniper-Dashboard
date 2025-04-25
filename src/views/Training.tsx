@@ -1,4 +1,4 @@
-import TrainingAddTrainingSessionModal from "@/components/TrainingAddTrainingSessionModal";
+import TrainingAddTrainingSessionModal from "@/components/AddTrainingSessionModal";
 import TrainingCalendar from "@/components/TrainingCalendar";
 import TrainingList from "@/components/TrainingList";
 import { teamStore } from "@/store/teamStore";

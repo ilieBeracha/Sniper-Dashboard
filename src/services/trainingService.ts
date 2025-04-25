@@ -92,6 +92,30 @@ export async function getNextAndLastTraining(team_id: string) {
   return { nextTraining, lastTraining };
 }
 
+export async function insertTraining(payload: any) {
+  return supabase
+    .from("training_sessions")
+    .insert([payload])
+    .select("id")
+    .maybeSingle();
+}
+
+export async function assignParticipantsToTraining(
+  training_id: string,
+  participantIds: string[]
+) {
+  const participants = participantIds.map((participant_id) => ({
+    training_id,
+    participant_id,
+  }));
+
+  const { error } = await supabase
+    .from("trainings_participants")
+    .insert(participants);
+
+  if (error) throw new Error(error.message);
+}
+
 export async function getAssignments(): Promise<Assignment[] | []> {
   const { data, error } = await supabase.from("assignments").select("*");
 
