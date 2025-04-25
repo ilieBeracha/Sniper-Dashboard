@@ -2,7 +2,7 @@ import UserProfile from "./DashboardUserProfile";
 import { User } from "@/types/user";
 import BaseDashboardCard from "./BaseDashboardCard";
 import UserHitPercentage from "./DashboardUserHitPercentage";
-import DashboardMonthlyOpsAreaChart from "./DashboardMonthlyOpsAreaChart";
+import TeamBarChart from "./DashboardTeamBarChart";
 
 type DashboardRowOneProps = {
   user: User | null;
@@ -30,7 +30,8 @@ export default function DashboardRowOne({ user }: DashboardRowOneProps) {
 
         <div className=" xl:col-span-2 bg-gradient-to-r from-[#7F5AF0] to-[#2CB67D] rounded-2xl lg:col-span-2">
           <BaseDashboardCard title="Hits Over Time (Monthly)">
-            <DashboardMonthlyOpsAreaChart />
+            {/* <DashboardMonthlyOpsAreaChart /> */}
+            <TeamBarChart />
           </BaseDashboardCard>
         </div>
       </div>

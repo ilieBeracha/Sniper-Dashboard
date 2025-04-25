@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BaseModal from "./BaseModal";
 import { UserPlus, ClipboardCheck } from "lucide-react";
 import { InvitationStore } from "@/store/InvitationStore";
@@ -48,6 +48,10 @@ export default function InviteModal({
     setInviteFetched(false);
     setCopied(false);
   };
+
+  useEffect(() => {
+    console.log(invitation);
+  }, [invitation]);
 
   return (
     <BaseModal isOpen={isOpen} onClose={onCloseModal}>

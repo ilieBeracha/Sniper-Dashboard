@@ -5,6 +5,7 @@ export async function getInviteByInviterId(
   userId: string
 ): Promise<Invite | null> {
   try {
+    console.log(userId);
     const { data, error } = await supabase
       .from("invitations")
       .select("*")

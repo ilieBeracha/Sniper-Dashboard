@@ -27,6 +27,7 @@ export default function Dashboard() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   useEffect(() => {
+    console.log(user);
     const load = async () => {
       if (user?.team_id) {
         // await fetchMembers(user.team_id);
@@ -44,22 +45,14 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen from-[#1E1E20] text-gray-100 px-6 md:px-16 lg:px-28 py-8 md:py-12">
-      {userRole !== "soldier" && user?.id && (
-        <Header setIsOpen={setIsInviteModalOpen} />
-      )}
+      {userRole !== "soldier" && <Header setIsOpen={setIsInviteModalOpen} />}
       <div className="space-y-8">
         <DashboardRowOne user={user} />
         <DashboardRowTwo />
         <DashboardRowThree loading={loading} />
         <DashboardRowFour />
       </div>
-      {userRole !== "soldier" && user?.id && (
-        <InviteModal
-          isOpen={isInviteModalOpen}
-          setIsOpen={setIsInviteModalOpen}
-          userId={user.id}
-        />
-      )}
+      {userRole !== "soldier" && user?.id && <InviteModal isOpen={isInviteModalOpen} setIsOpen={setIsInviteModalOpen} userId={user.id} />}
     </div>
   );
 }

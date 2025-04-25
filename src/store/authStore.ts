@@ -13,10 +13,7 @@ interface props {
   checkAuth: () => void;
   registerSoldier: (user: RegisterUserData) => Promise<string | Error>;
 
-  supabaseLogin: (session: {
-    access_token: string;
-    refresh_token: string;
-  }) => void;
+  supabaseLogin: (session: { access_token: string; refresh_token: string }) => void;
   error: string;
   resetError: () => void;
 
@@ -25,20 +22,38 @@ interface props {
 
 export const authStore = create<props>((set, get) => ({
   token: null,
-  registered: false,
   error: "",
   isLoadingAuth: true,
 
   checkAuth: async () => {
     set({ isLoadingAuth: true });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    console.log(session);
-    if (session?.access_token) {
-      set({ token: session.access_token });
+    try {
+      await supabase.auth.refreshSession();
+
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error || !session) {
+        console.error("Session refresh error:", error?.message);
+        set({ token: null });
+        userStore.getState().clearUser();
+      } else {
+        set({ token: session.access_token });
+
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          userStore.getState().setUserFromAuth(user);
+        }
+      }
+    } catch (error) {
+      console.error("Auth check failed:", error);
+    } finally {
+      set({ isLoadingAuth: false });
     }
-    set({ isLoadingAuth: false });
   },
 
   registerCommander: async (user: RegisterUserData) => {
@@ -113,10 +128,7 @@ export const authStore = create<props>((set, get) => ({
     location.href = "/";
   },
 
-  supabaseLogin: async (session: {
-    access_token: string;
-    refresh_token: string;
-  }) => {
+  supabaseLogin: async (session: { access_token: string; refresh_token: string }) => {
     await supabase.auth.setSession({
       access_token: session.access_token,
       refresh_token: session.refresh_token,

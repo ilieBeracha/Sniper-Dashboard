@@ -1,27 +1,43 @@
 import { create } from "zustand";
 import { User, UserRole } from "../types/user";
+import { User as SupabaseAuthUser } from "@supabase/supabase-js";
 
 interface UserStore {
   user: User | null;
   userRole: UserRole;
   setUser: (user: User) => void;
   clearUser: () => void;
+  setUserFromAuth: (authUser: SupabaseAuthUser) => void; // NEW FUNCTION
 }
 
 export const userStore = create<UserStore>((set) => ({
-  user:
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("user_sniper") || "null")
-      : null,
+  user: null,
   userRole: "" as UserRole,
 
   setUser: (user) => {
-    localStorage.setItem("user_sniper", JSON.stringify(user));
     set({ user, userRole: user.user_role });
   },
 
   clearUser: () => {
-    localStorage.removeItem("user_sniper");
     set({ user: null });
+  },
+
+  setUserFromAuth: (authUser: SupabaseAuthUser) => {
+    if (!authUser) return;
+
+    const meta = authUser.app_metadata || {};
+
+    const mappedUser = {
+      id: authUser.id,
+      email: authUser.email ?? "",
+      first_name: meta.first_name ?? "",
+      last_name: meta.last_name ?? "",
+      user_role: meta.user_role ?? "",
+      team_id: meta.team_id ?? "",
+      squad_id: meta.squad_id ?? "",
+      created_at: authUser.created_at ?? "",
+    };
+
+    set({ user: mappedUser, userRole: mappedUser.user_role });
   },
 }));
