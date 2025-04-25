@@ -8,7 +8,7 @@ export default function TrainingList({
   trainings: TrainingSession[];
 }) {
   return (
-    <div className="bg-[#1E1E1E] p-6 rounded-2xl shadow-xl col-span-3 border border-white/5">
+    <div className="bg-[#1E1E1E] p-6 rounded-2xl shadow-xl col-span-3 border border-white/5 ">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
           Training Sessions
@@ -30,7 +30,7 @@ export default function TrainingList({
           </p>
         </div>
       ) : (
-        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
+        <div className="space-y-4  overflow-y-auto  pr-1 custom-scrollbar">
           {trainings.map((session) => (
             <div
               key={session.id}

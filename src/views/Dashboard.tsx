@@ -15,10 +15,10 @@ import { squadStore } from "@/store/squadStore";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
-  const { fetchMembers } = useStore(teamStore);
   const { getUserHitPercentage, getUserGroupingScores } = useStore(ScoreStore);
   const { getSquadMetricsByRole } = useStore(squadStore);
   const { loadNextAndLastTraining } = useStore(TrainingStore);
+
   const [loading, setLoading] = useState(true);
 
   const userRole = useUserStore.userRole;
@@ -29,7 +29,7 @@ export default function Dashboard() {
   useEffect(() => {
     const load = async () => {
       if (user?.team_id) {
-        await fetchMembers(user.team_id);
+        // await fetchMembers(user.team_id);
         await getUserGroupingScores(user.id);
         await getUserHitPercentage(user.id);
         await loadNextAndLastTraining(user.team_id);

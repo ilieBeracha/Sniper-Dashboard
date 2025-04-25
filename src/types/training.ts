@@ -21,3 +21,10 @@ export interface TrainingsNextLastChart {
   next: TrainingSessionChart | null;
   last: TrainingSessionChart | null;
 }
+
+export interface Assignment {
+  id: string;
+  assignment_name: string;
+  text: string;
+  created_at: string;
+}

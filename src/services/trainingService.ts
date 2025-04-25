@@ -1,3 +1,4 @@
+import { Assignment } from "@/types/training";
 import { supabase } from "./supabaseClient";
 
 export async function getTrainingByTeamId(teamId: string) {
@@ -89,4 +90,15 @@ export async function getNextAndLastTraining(team_id: string) {
   }
 
   return { nextTraining, lastTraining };
+}
+
+export async function getAssignments(): Promise<Assignment[] | []> {
+  const { data, error } = await supabase.from("assignments").select("*");
+
+  if (error) {
+    console.error("Failed to fetch assignments:", error.message);
+    return [];
+  }
+
+  return data || [];
 }
