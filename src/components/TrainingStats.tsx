@@ -54,10 +54,10 @@ export default function TrainingStats({ trainings }: TrainingStatsProps) {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-400">{stat.title}</p>
-                    <p className="text-2xl font-bold text-white mt-1">{stat.value}</p>
+                    <p className="text-xl font-bold text-white mt-1">{stat.value}</p>
                   </div>
                   <div className={`w-10 h-10 rounded-full bg-${stat.color}-500/10 flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 text-${stat.color}-400`} />
+                    <Icon className={`w-3 h-3 text-${stat.color}-400`} />
                   </div>
                 </div>
               </div>

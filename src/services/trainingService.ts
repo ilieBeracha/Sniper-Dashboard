@@ -176,3 +176,13 @@ export async function getAssignments(): Promise<Assignment[] | []> {
 
   return data || [];
 }
+
+export async function getWeeklyAssignmentsStats(team_id: string) {
+  const { data, error } = await supabase.rpc("get_weekly_assignment_stats", {
+    team_id_param: team_id,
+  });
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}

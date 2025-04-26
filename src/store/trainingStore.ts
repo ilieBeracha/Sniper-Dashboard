@@ -1,17 +1,26 @@
 import { create } from "zustand";
-import { getAssignments, getNextAndLastTraining, getTrainingById, getTrainingByTeamId, insertTraining } from "@/services/trainingService";
-import { TrainingsNextLastChart, TrainingSession, Assignment } from "@/types/training";
+import {
+  getAssignments,
+  getNextAndLastTraining,
+  getTrainingById,
+  getTrainingByTeamId,
+  insertTraining,
+  getWeeklyAssignmentsStats,
+} from "@/services/trainingService";
+import { TrainingsNextLastChart, TrainingSession, Assignment, WeeklyAssignmentStats } from "@/types/training";
 
 interface TrainingStore {
   training: TrainingSession | null;
   trainings: TrainingSession[] | [];
   assignments: Assignment[] | [];
   trainingsChartDisplay: TrainingsNextLastChart;
+  weeklyAssignmentsStats: WeeklyAssignmentStats[] | [];
   loadNextAndLastTraining: (team_id: string) => Promise<void>;
   loadTrainingByTeamId: (team_id: string) => Promise<void>;
   loadAssignments: () => Promise<Assignment[] | any>;
   createTraining: (payload: TrainingSession) => Promise<TrainingSession | any>;
   loadTrainingById: (trainingId: string) => Promise<void>;
+  loadWeeklyAssignmentsStats: (team_id: string) => Promise<WeeklyAssignmentStats[] | any>;
   resetTraining: () => void;
 }
 
@@ -19,6 +28,7 @@ export const TrainingStore = create<TrainingStore>((set) => ({
   training: null,
   trainings: [],
   assignments: [],
+  weeklyAssignmentsStats: [],
   trainingsChartDisplay: {
     next: null,
     last: null,
@@ -42,6 +52,16 @@ export const TrainingStore = create<TrainingStore>((set) => ({
       });
     } catch (err) {
       console.error("Failed to load trainings:", err);
+    }
+  },
+
+  loadWeeklyAssignmentsStats: async (team_id: string) => {
+    try {
+      const res = await getWeeklyAssignmentsStats(team_id);
+      set({ weeklyAssignmentsStats: res });
+      return res;
+    } catch (error) {
+      console.error("Failed to load weekly assignments stats:", error);
     }
   },
 

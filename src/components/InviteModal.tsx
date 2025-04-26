@@ -60,7 +60,7 @@ export default function InviteModal({
           <UserPlus className="w-10 h-10" />
         </div>
 
-        <h2 className="text-2xl font-bold text-white">
+        <h2 className="text-xl font-bold text-white">
           Invite Your Squad Commander
         </h2>
         <p className="text-sm text-gray-400 max-w-md">

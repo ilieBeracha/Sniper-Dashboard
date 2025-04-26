@@ -19,11 +19,10 @@ export default function UserHitPercentage() {
     { name: "Miss", value: 100 - percentage },
   ];
 
-  // Calculate color based on percentage
-  const getColor = (pct: any) => {
-    if (pct >= 75) return "#2CB67D"; // Green for excellent
-    if (pct >= 50) return "#FF8906"; // Orange for good
-    return "#F25F4C"; // Red for needs improvement
+  const getColor = (pct: number) => {
+    if (pct >= 75) return "#2CB67D";
+    if (pct >= 50) return "#FF8906";
+    return "#F25F4C";
   };
 
   const hitColor = getColor(percentage);

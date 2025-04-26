@@ -2,12 +2,7 @@ import { authStore } from "@/store/authStore";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { NavLink } from "react-router-dom";
-import {
-  BiSolidDashboard,
-  BiSolidLogOut,
-  BiSolidCog,
-  BiSolidUser,
-} from "react-icons/bi";
+import { BiSolidDashboard, BiSolidLogOut, BiSolidCog, BiSolidUser } from "react-icons/bi";
 import { BsBarChartFill } from "react-icons/bs";
 import { useState } from "react";
 
@@ -49,15 +44,8 @@ export default function Sidebar() {
       } transition-all duration-300 h-screen sticky top-0 left-0 overflow-y-auto`}
     >
       <div className="flex items-center justify-between h-16 px-4 border-b border-[#1D1D1F] sticky top-0 bg-[#121212] z-10">
-        <div className="flex items-center">
-          {!collapsed && (
-            <span className="ml-3 text-lg font-bold text-white">SniperOps</span>
-          )}
-        </div>
-        <div
-          onClick={() => setCollapsed(!collapsed)}
-          className="bg-transparent hover:text-white cursor-pointer text-xl"
-        >
+        <div className="flex items-center">{!collapsed && <span className="ml-3 text-lg font-bold text-white">SniperOps</span>}</div>
+        <div onClick={() => setCollapsed(!collapsed)} className="bg-transparent hover:text-white cursor-pointer text-xl">
           {collapsed ? "›" : "‹"}
         </div>
       </div>
@@ -84,18 +72,14 @@ export default function Sidebar() {
           { title: "ACCOUNT", items: accountLinks },
         ].map(({ title, items }) => (
           <div key={title} className="mb-4">
-            {!collapsed && (
-              <h3 className="text-md text-gray-500 px-4 mb-1">{title}</h3>
-            )}
+            {!collapsed && <h3 className="text-md text-gray-500 px-4 mb-1">{title}</h3>}
             {items.map(({ name, href, icon }) => (
               <NavLink
                 key={name}
                 to={href}
                 className={({ isActive }) =>
                   `flex items-center px-4 py-4 text-md font-medium rounded-lg ${
-                    isActive
-                      ? "bg-[#1E1E20] text-gray-300"
-                      : "text-gray-400 hover:text-white hover:bg-[#1D1D1F]"
+                    isActive ? "bg-[#1E1E20] text-gray-300" : "text-gray-400 hover:text-white hover:bg-[#1D1D1F]"
                   } ${collapsed ? "justify-center" : "justify-start"}`
                 }
               >

@@ -4,7 +4,7 @@ import { HitPercentageData, SquadWeaponPerformance } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 
 export async function getUserHitPercentageRpc(userId: string): Promise<HitPercentageData> {
-  const { data, error } = await supabase.rpc("get_user_hit_percentage", {
+  const { data, error } = await supabase.rpc("get_user_hit_percentage_by_single_sniper", {
     user_id: userId,
   });
   if (error) {
