@@ -15,6 +15,7 @@ type SearchableCheckboxListProps = {
   emptyMessage?: string;
   maxHeight?: number;
   showBadges?: boolean;
+  showClearButton?: boolean;
 };
 
 export default function SearchableCheckboxList({
@@ -27,13 +28,13 @@ export default function SearchableCheckboxList({
   emptyMessage = "No items found",
   maxHeight = 200,
   showBadges = false,
+  showClearButton = true,
 }: SearchableCheckboxListProps) {
   // Filter items based on search term
   const filteredItems = items.filter(
     (item) =>
       item.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.description &&
-        item.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   // Toggle item selection
@@ -51,12 +52,7 @@ export default function SearchableCheckboxList({
       <div className="px-3 py-2 border-b border-white/5">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg
-              className="h-4 w-4 text-gray-500"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
+            <svg className="h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path
                 fillRule="evenodd"
                 d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
@@ -75,14 +71,9 @@ export default function SearchableCheckboxList({
       </div>
 
       {/* Items list */}
-      <div
-        className="overflow-y-auto custom-scrollbar"
-        style={{ maxHeight: `${maxHeight}px` }}
-      >
+      <div className="overflow-y-auto custom-scrollbar" style={{ maxHeight: `${maxHeight}px` }}>
         {filteredItems.length === 0 ? (
-          <div className="px-4 py-6 text-center text-sm text-gray-400">
-            {emptyMessage}
-          </div>
+          <div className="px-4 py-6 text-center text-sm text-gray-400">{emptyMessage}</div>
         ) : (
           <ul className="divide-y divide-white/5">
             {filteredItems.map((item) => (
@@ -97,20 +88,10 @@ export default function SearchableCheckboxList({
                   />
                   <div className="ml-3 flex-grow">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-white">
-                        {item.label}
-                      </p>
-                      {showBadges && item.badge && (
-                        <div className="text-xs px-2 py-0.5 rounded bg-white/5 text-gray-400">
-                          {item.badge}
-                        </div>
-                      )}
+                      <p className="text-sm font-medium text-white">{item.label}</p>
+                      {showBadges && item.badge && <div className="text-xs px-2 py-0.5 rounded bg-white/5 text-gray-400">{item.badge}</div>}
                     </div>
-                    {item.description && (
-                      <p className="text-xs text-white/60 mt-0.5">
-                        {item.description}
-                      </p>
-                    )}
+                    {item.description && <p className="text-xs text-white/60 mt-0.5">{item.description}</p>}
                   </div>
                 </label>
               </li>
@@ -120,16 +101,12 @@ export default function SearchableCheckboxList({
       </div>
 
       {/* Footer with count and clear button */}
-      {selectedIds.length > 0 && (
+      {selectedIds.length > 0 && showClearButton && (
         <div className="px-4 py-2 border-t border-white/5 flex justify-between bg-[#191919]">
           <span className="text-xs text-gray-400">
-            {selectedIds.length} item{selectedIds.length !== 1 ? "s" : ""}{" "}
-            selected
+            {selectedIds.length} item{selectedIds.length !== 1 ? "s" : ""} selected
           </span>
-          <button
-            onClick={() => setSelectedIds([])}
-            className="text-xs text-indigo-400 hover:text-indigo-300"
-          >
+          <button onClick={() => setSelectedIds([])} className="text-xs text-indigo-400 hover:text-indigo-300">
             Clear all
           </button>
         </div>

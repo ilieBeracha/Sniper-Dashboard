@@ -7,23 +7,14 @@ type BasicInfoSectionProps = {
   setDate: (value: string) => void;
 };
 
-export default function BasicInfoSection({
-  sessionName,
-  setSessionName,
-  location,
-  setLocation,
-  date,
-  setDate,
-}: BasicInfoSectionProps) {
+export default function BasicInfoSection({ sessionName, setSessionName, location, setLocation, date, setDate }: BasicInfoSectionProps) {
   return (
     <div className="bg-[#1A1A1A] rounded-lg border border-white/5 p-6">
       <h3 className="text-sm font-medium text-white mb-4">Basic Information</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-400 mb-1.5">
-            Session Name
-          </label>
+          <label className="block text-sm font-medium text-gray-400 mb-1.5">Session Name</label>
           <input
             type="text"
             value={sessionName}
@@ -34,9 +25,7 @@ export default function BasicInfoSection({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-400 mb-1.5">
-            Location
-          </label>
+          <label className="block text-sm font-medium text-gray-400 mb-1.5">Location</label>
           <input
             type="text"
             value={location}
@@ -48,9 +37,7 @@ export default function BasicInfoSection({
       </div>
 
       <div className="mt-6">
-        <label className="block text-sm font-medium text-gray-400 mb-1.5">
-          Date & Time
-        </label>
+        <label className="block text-sm font-medium text-gray-400 mb-1.5">Date & Time</label>
         <input
           type="datetime-local"
           value={date}

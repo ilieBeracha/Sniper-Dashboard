@@ -7,14 +7,10 @@ interface BaseModalProps {
   isLoading?: boolean;
   onClose: () => void;
   children: ReactNode;
+  width?: string;
 }
 
-export default function BaseModal({
-  isOpen = true,
-  isLoading = false,
-  onClose,
-  children,
-}: BaseModalProps) {
+export default function BaseModal({ isOpen = true, isLoading = false, onClose, children, width = "max-w-6xl" }: BaseModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -27,7 +23,7 @@ export default function BaseModal({
           aria-modal="true"
         >
           <motion.div
-            className="bg-[#1E1E1E] text-white dark:bg-[#1E1E1E] rounded-3xl shadow-2xl w-full max-w-4xl p-8 relative overflow-hidden"
+            className={`bg-[#1E1E1E] text-white dark:bg-[#1E1E1E] rounded-3xl shadow-2xl w-full ${width} p-8 relative overflow-hidden`}
             initial={{ scale: 0.85, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.85, opacity: 0 }}
@@ -35,11 +31,7 @@ export default function BaseModal({
           >
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/5 to-white/0 opacity-10 pointer-events-none" />
             {!isLoading && (
-              <button
-                onClick={onClose}
-                className="absolute top-1 right-1 text-gray-500 hover:text-white transition"
-                aria-label="Close modal"
-              >
+              <button onClick={onClose} className="absolute top-1 right-1 text-gray-500 hover:text-white transition" aria-label="Close modal">
                 <XCircle className="w-6 h-6" />
               </button>
             )}

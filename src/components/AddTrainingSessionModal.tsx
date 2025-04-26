@@ -7,6 +7,7 @@ import { Assignment } from "@/types/training";
 import BasicInfoSection from "./AddTrainingSessionModalBasicInfo";
 import AssignmentsSection from "./AddTrainingSessionModalAssignments";
 import TeamMembersSection from "./AddTrainingSessionModalMembers";
+import PreviewSection from "./AddTrainingSessionModalPreview";
 
 export default function TrainingAddTrainingSessionModal({
   isOpen,
@@ -57,9 +58,7 @@ export default function TrainingAddTrainingSessionModal({
         participant_id: memberId,
       }));
 
-      const { error: participantsError } = await supabase
-        .from("trainings_participants")
-        .insert(participants);
+      const { error: participantsError } = await supabase.from("trainings_participants").insert(participants);
 
       if (participantsError) {
         console.error("Assigning participants failed:", participantsError);
@@ -73,15 +72,10 @@ export default function TrainingAddTrainingSessionModal({
         assignment_id: assignmentId,
       }));
 
-      const { error: assignmentError } = await supabase
-        .from("assignments_trainings")
-        .insert(assignmentData);
+      const { error: assignmentError } = await supabase.from("assignments_trainings").insert(assignmentData);
 
       if (assignmentError) {
-        console.error(
-          "Assigning training assignments failed:",
-          assignmentError
-        );
+        console.error("Assigning training assignments failed:", assignmentError);
         return alert("Training created, but assignment linking failed.");
       }
     }
@@ -100,61 +94,60 @@ export default function TrainingAddTrainingSessionModal({
   };
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose}>
-      <div className=" text-white max-w-4xl mx-auto">
-        {/* Header Section */}
-        <div className="border-b border-white/10 pb-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">
-              New Training Session
-            </h2>
-            <div className="bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full text-xs font-medium">
-              Planning
-            </div>
-          </div>
-          <p className="mt-2 text-sm text-gray-400">
-            Plan a session, select assignments, and assign team members to
-            participate.
-          </p>
+    <BaseModal isOpen={isOpen} onClose={onClose} width="max-w-6xl">
+      {/* Header Section */}
+      <div className="border-b border-white/10 pb-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-white">New Training Session</h2>
+          <div className="bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full text-xs font-medium">Planning</div>
+        </div>
+        <p className="mt-1 text-sm text-gray-400">Plan a session, select assignments, and assign team members to participate.</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
+        {/* Left Column - Form Sections */}
+        <div>
+          <BasicInfoSection
+            sessionName={sessionName}
+            setSessionName={setSessionName}
+            location={location}
+            setLocation={setLocation}
+            date={date}
+            setDate={setDate}
+          />
+
+          <AssignmentsSection assignments={assignments} assignmentIds={assignmentIds} setAssignmentIds={setAssignmentIds} />
+
+          <TeamMembersSection teamMembers={teamMembers} members={members} setMembers={setMembers} />
         </div>
 
-        <BasicInfoSection
+        {/* Right Column - Preview */}
+        <PreviewSection
           sessionName={sessionName}
-          setSessionName={setSessionName}
           location={location}
-          setLocation={setLocation}
           date={date}
-          setDate={setDate}
-        />
-
-        <AssignmentsSection
           assignments={assignments}
           assignmentIds={assignmentIds}
-          setAssignmentIds={setAssignmentIds}
-        />
-
-        <TeamMembersSection
           teamMembers={teamMembers}
           members={members}
-          setMembers={setMembers}
         />
+      </div>
 
-        <div className="flex items-center justify-end gap-x-4 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 bg-white/5 hover:bg-white/10 transition-colors rounded-md text-sm font-medium text-white"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={!sessionName || !location || !date}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
-          >
-            Create Session
-          </button>
-        </div>
+      <div className="flex items-center justify-end gap-x-4 pt-4 border-t border-white/10 mt-4">
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-4 py-1.5 bg-white/5 hover:bg-white/10 transition-colors rounded-md text-sm font-medium text-white"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSubmit}
+          disabled={!sessionName || !location || !date}
+          className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
+        >
+          Create Session
+        </button>
       </div>
     </BaseModal>
   );
