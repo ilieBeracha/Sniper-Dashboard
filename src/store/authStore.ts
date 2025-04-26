@@ -12,7 +12,7 @@ interface props {
   logout: () => void;
   checkAuth: () => void;
   registerSoldier: (user: RegisterUserData) => Promise<string | Error>;
-
+  registerSquadCommander: (user: RegisterUserData) => Promise<string | Error>;
   supabaseLogin: (session: { access_token: string; refresh_token: string }) => void;
   error: string;
   resetError: () => void;

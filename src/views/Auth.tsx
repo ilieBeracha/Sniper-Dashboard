@@ -9,22 +9,11 @@ import { LoginUserData, RegisterUserData } from "../types/auth";
 import Login from "@/components/Auth/LoginForm";
 import AuthHero from "@/components/Auth/AuthHero";
 
-type AuthType =
-  | "login"
-  | "team_manager_register"
-  | "squad_manager_register"
-  | "soldier_register";
+type AuthType = "login" | "team_manager_register" | "squad_manager_register" | "soldier_register";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const {
-    login,
-    registerCommander,
-    registerSquadCommander,
-    registerSoldier,
-    error,
-    resetError,
-  } = useStore(authStore);
+  const { login, registerCommander, registerSquadCommander, registerSoldier, error, resetError } = useStore(authStore);
 
   const [authType, setAuthType] = useState<AuthType>("login");
   const [isLoading, setIsLoading] = useState(false);
@@ -86,7 +75,7 @@ export default function Auth() {
   return (
     <div className="flex h-screen bg-[#121212]">
       <AuthHero />
-      <div className="w-full md:w-4/5 flex items-center justify-center p-8">
+      <div className="w-full md:w-3/5 flex items-center justify-center p-8">
         <div className="w-full max-w-lg">
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-white">{getAuthTitle()}</h2>
@@ -105,9 +94,7 @@ export default function Auth() {
                 key={type}
                 onClick={() => setAuthType(type as AuthType)}
                 className={`pb-2 px-4 text-sm font-medium transition-all duration-200 ${
-                  authType === type
-                    ? "border-b-2 border-[#7F5AF0] text-[#7F5AF0]"
-                    : "text-gray-500 hover:text-[#7F5AF0]"
+                  authType === type ? "border-b-2 border-[#7F5AF0] text-[#7F5AF0]" : "text-gray-500 hover:text-[#7F5AF0]"
                 }`}
               >
                 {label}
@@ -120,20 +107,8 @@ export default function Auth() {
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-10 rounded-xl backdrop-blur-sm">
                 <div className="flex flex-col items-center">
-                  <svg
-                    className="animate-spin h-8 w-8 text-[#7F5AF0] mb-2"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
+                  <svg className="animate-spin h-8 w-8 text-[#7F5AF0] mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path
                       className="opacity-75"
                       fill="currentColor"
@@ -146,24 +121,13 @@ export default function Auth() {
             )}
 
             {authType === "login" && <Login AuthSubmit={AuthSubmit} />}
-            {authType === "team_manager_register" && (
-              <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />
-            )}
-            {authType === "squad_manager_register" && (
-              <TeamMemberRegisterForm AuthSubmit={AuthSubmit} />
-            )}
-            {authType === "soldier_register" && (
-              <SoldierRegisterForm AuthSubmit={AuthSubmit} />
-            )}
+            {authType === "team_manager_register" && <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />}
+            {authType === "squad_manager_register" && <TeamMemberRegisterForm AuthSubmit={AuthSubmit} />}
+            {authType === "soldier_register" && <SoldierRegisterForm AuthSubmit={AuthSubmit} />}
 
             {error && (
               <div className="mt-4 p-3 bg-[#F25F4C]/10 border border-[#F25F4C]/30 rounded-md flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-[#F25F4C] mr-2"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#F25F4C] mr-2" viewBox="0 0 20 20" fill="currentColor">
                   <path
                     fillRule="evenodd"
                     d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
@@ -187,10 +151,7 @@ export default function Auth() {
             ) : (
               <p>
                 Already have an account?{" "}
-                <button
-                  onClick={() => setAuthType("login")}
-                  className="text-[#7F5AF0] hover:text-[#7F5AF0]/80"
-                >
+                <button onClick={() => setAuthType("login")} className="text-[#7F5AF0] hover:text-[#7F5AF0]/80">
                   Sign in
                 </button>
               </p>
