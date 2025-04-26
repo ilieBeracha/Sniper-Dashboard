@@ -23,7 +23,7 @@ export default function BaseModal({ isOpen = true, isLoading = false, onClose, c
           aria-modal="true"
         >
           <motion.div
-            className={`bg-[#1E1E1E] text-white dark:bg-[#1E1E1E] rounded-3xl shadow-2xl w-full ${width} p-8 relative`}
+            className={`bg-[#1E1E1E] text-white  rounded-3xl shadow-2xl w-full ${width} p-8 relative`}
             initial={{ scale: 0.85, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.85, opacity: 0 }}
