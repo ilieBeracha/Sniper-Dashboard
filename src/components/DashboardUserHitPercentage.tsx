@@ -7,7 +7,7 @@ export default function UserHitPercentage() {
 
   if (!userHitPercentage) {
     return (
-      <div className="h-full flex justify-center items-center">
+      <div className="h-full flex justify-center items-center w-full">
         <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-indigo-500"></div>
       </div>
     );
@@ -30,7 +30,7 @@ export default function UserHitPercentage() {
 
   if (!userHitPercentage.hit_percentage || userHitPercentage.total_shots === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center text-white bg-[#161616] rounded-lg p-4">
+      <div className="h-full flex w-full flex-col items-center justify-center text-white bg-[#161616] rounded-lg p-4">
         <div className="bg-[#1E1E1E] p-3 rounded-full mb-3">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
@@ -48,7 +48,7 @@ export default function UserHitPercentage() {
   }
 
   return (
-    <div className="flex flex-col h-full justify-evenly">
+    <div className="flex w-full flex-col h-full justify-evenly">
       <div className=" relative justify-between flex">
         <ResponsiveContainer width="100%" height={200}>
           <PieChart>
@@ -70,7 +70,7 @@ export default function UserHitPercentage() {
           </PieChart>
         </ResponsiveContainer>
 
-        <div className="absolute inset-0 flex flex-col -mt-2">
+        <div className="absolute inset-0 flex flex-col mt-1">
           <span className="text-3xl font-bold text-white">{percentage.toFixed(1)}%</span>
           <span className="text-xs text-gray-400 uppercase tracking-wider">Accuracy</span>
         </div>

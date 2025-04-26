@@ -21,7 +21,7 @@ export default function BaseDashboardCard({
       }`}
     >
       <div className="px-4 pt-4 pb-2 border-b border-white/5 mb-2">
-        <div className="flex justify-between relative">
+        <div className="flex justify-between relative h-full items-center">
           {tooltipContent && (
             <BiInfoCircle
               className="absolute -top-1 -right-1 text-indigo-400/80 hover:text-indigo-400 cursor-help transition-colors duration-200"

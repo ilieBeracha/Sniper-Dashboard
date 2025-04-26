@@ -1,5 +1,5 @@
 import { TrainingStatus } from "@/types/training";
-import { Clock, PlayCircle, CheckCircle2 } from "lucide-react";
+import { Clock, PlayCircle, CheckCircle2, XCircle } from "lucide-react";
 
 type TrainingPageStatusProps = {
   status: TrainingStatus;
@@ -28,6 +28,13 @@ export default function TrainingPageStatus({ status, date }: TrainingPageStatusP
       bgColor: "bg-purple-400/10",
       label: "Completed",
       description: "Training session has been completed",
+    },
+    [TrainingStatus.Canceled]: {
+      icon: XCircle,
+      color: "text-red-400",
+      bgColor: "bg-red-400/10",
+      label: "Canceled",
+      description: "Training session has been canceled",
     },
   };
 

@@ -48,10 +48,8 @@ export default function Training() {
 
   return (
     <div className="text-gray-100 px-6 md:px-16 lg:px-28 py-8 md:py-12">
-      {/* Header with title and action button */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <div className="mb-4 md:mb-0">
-          <h1 className="text-lg md:text-xl font-bold text-white mb-2">Training Sessions</h1>
+        <div className="mb-2 md:mb-0">
           <p className="text-gray-400">Manage and track your team's training progress</p>
         </div>
         {isCommander(userRole) && (
@@ -89,7 +87,7 @@ export default function Training() {
                 </div>
               </div>
 
-              <div className="p-6">
+              <div className="pt-2 px-6 pb-6">
                 <TrainingList trainings={trainings} />
               </div>
             </div>

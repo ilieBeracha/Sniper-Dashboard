@@ -31,7 +31,6 @@ export default function Dashboard() {
     console.log(user);
     const load = async () => {
       if (user?.team_id) {
-        // await fetchMembers(user.team_id);
         await getUserGroupingSummaryRpc(user.id);
         await getUserHitPercentage(user.id);
         await loadNextAndLastTraining(user.team_id);

@@ -8,7 +8,7 @@ type TrainingPageAssignmentsProps = {
 export default function TrainingPageAssignments({ training }: TrainingPageAssignmentsProps) {
   return (
     <BaseDashboardCard title="Current Assignments" tooltipContent="List of assignments for this training session">
-      <div className="space-y-3">
+      <div className="space-y-3 max-h-[300px] overflow-y-auto">
         {training?.training_assignments &&
           training?.training_assignments?.map((assignment: Assignment) => (
             <div key={assignment.id} className="flex justify-between items-center p-3 bg-[#1A1A1A] rounded-lg">

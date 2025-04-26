@@ -24,6 +24,7 @@ export enum TrainingStatus {
   Scheduled = "scheduled",
   InProgress = "in_progress",
   Completed = "completed",
+  Canceled = "canceled",
 }
 
 export interface TrainingSession {

@@ -117,16 +117,6 @@ export default function TrainingAddTrainingSessionModal({
             <TeamMembersSection teamMembers={teamMembers} members={members} setMembers={setMembers} />
           </div>
         </div>
-
-        {/* <PreviewSection
-          sessionName={sessionName}
-          location={location}
-          date={date}
-          assignments={assignments}
-          assignmentIds={assignmentIds}
-          teamMembers={teamMembers}
-          members={members}
-        /> */}
       </div>
 
       <div className="flex items-center justify-end gap-x-4 pt-4 border-t border-white/10 mt-4">

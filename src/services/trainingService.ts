@@ -43,8 +43,6 @@ export async function getTrainingById(trainingId: string) {
 }
 
 export async function getTrainingByTeamId(teamId: string) {
-  const now = new Date().toISOString();
-
   const { data: trainings, error } = await supabase
     .from("training_sessions")
     .select(
@@ -53,6 +51,7 @@ export async function getTrainingByTeamId(teamId: string) {
       date,
       session_name,
       location,
+      status,
       assignments_trainings (
         assignments (
           id,
@@ -62,15 +61,14 @@ export async function getTrainingByTeamId(teamId: string) {
     `
     )
     .eq("team_id", teamId)
-    .gte("date", now)
-    .order("date", { ascending: true });
+    .order("date", { ascending: false })
+    .limit(30);
 
   if (error) {
     console.error("Error fetching trainings:", error);
     return [];
   }
 
-  // 🔥 Transform the nested assignments structure here
   const flattenedTrainings = (trainings || []).map((t) => ({
     ...t,
     assignments_trainings: t.assignments_trainings.map((a: any) => a.assignments).filter(Boolean),
