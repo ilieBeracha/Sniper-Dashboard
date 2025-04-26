@@ -12,23 +12,17 @@ export default function TrainingCalendar({ trainings }: { trainings: TrainingSes
 
   return (
     <div>
-      {/* Month display */}
       <div className="flex justify-center items-center mb-6">
-        <h3 className="text-lg font-bold text-white bg-gradient-to-r from-indigo-500 to-indigo-400 bg-clip-text text-transparent">
-          {format(today, "MMMM yyyy")}
-        </h3>
+        <h3 className="text-lg font-bold text-white bg-gradient-to-r from-indigo-500 to-indigo-400 bg-clip-text ">{format(today, "MMMM yyyy")}</h3>
       </div>
 
-      {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-2">
-        {/* Day Labels */}
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
           <div key={day} className="text-xs font-medium text-gray-400 text-center pb-2">
             {day}
           </div>
         ))}
 
-        {/* Calendar Days */}
         {monthDays.map((day, index) => {
           const isTraining = isTrainingDay(day);
           const trainingCount = getTrainingCount(day);
