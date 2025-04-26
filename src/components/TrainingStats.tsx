@@ -1,5 +1,5 @@
 import { TrainingSession } from "@/types/training";
-import { format, parseISO, isPast, isFuture } from "date-fns";
+import { parseISO, isPast, isFuture } from "date-fns";
 import { Users, Calendar, Target, Trophy } from "lucide-react";
 
 interface TrainingStatsProps {
@@ -11,7 +11,6 @@ export default function TrainingStats({ trainings }: TrainingStatsProps) {
   const upcomingSessions = trainings.filter((s) => isFuture(parseISO(s.date))).length;
   const completedSessions = trainings.filter((s) => isPast(parseISO(s.date))).length;
 
-  // Calculate average participants per session
   const totalParticipants = trainings.reduce((acc, session) => {
     return acc + (session.participants?.length || 0);
   }, 0);

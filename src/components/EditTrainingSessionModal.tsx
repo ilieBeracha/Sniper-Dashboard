@@ -1,110 +1,107 @@
 import BaseModal from "./BaseModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/services/supabaseClient";
-import { userStore } from "@/store/userStore";
 import { User } from "@/types/user";
-import { Assignment } from "@/types/training";
+import { Assignment, TrainingSession } from "@/types/training";
 import BasicInfoSection from "./AddTrainingSessionModalBasicInfo";
 import AssignmentsSection from "./AddTrainingSessionModalAssignments";
 import TeamMembersSection from "./AddTrainingSessionModalMembers";
 import PreviewSection from "./AddTrainingSessionModalPreview";
 
-export default function TrainingAddTrainingSessionModal({
-  isOpen,
-  onClose,
-  onSuccess,
-  teamMembers,
-  assignments,
-}: {
+type EditTrainingSessionModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   teamMembers: User[];
   assignments: Assignment[];
-}) {
+  training: TrainingSession | null;
+};
+
+export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, teamMembers, assignments, training }: EditTrainingSessionModalProps) {
   const [sessionName, setSessionName] = useState("");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
   const [members, setMembers] = useState<string[]>([]);
   const [assignmentIds, setAssignmentIds] = useState<string[]>([]);
 
+  useEffect(() => {
+    if (training) {
+      setSessionName(training.session_name);
+      setLocation(training.location);
+      const trainingDate = new Date(training.date);
+      const formattedDate = trainingDate.toISOString().slice(0, 16);
+      setDate(formattedDate);
+      setMembers(training.participants?.map((p) => p.participant_id) || []);
+      setAssignmentIds(training.training_assignments?.map((a) => a.assignment.id) || []);
+    }
+  }, [training]);
+
   async function handleSubmit() {
-    const user = userStore.getState().user;
-    if (!user?.team_id) return alert("Missing team ID");
+    if (!training?.id) return;
 
-    const { data: newTraining, error: sessionError } = await supabase
+    const { error: sessionError } = await supabase
       .from("training_sessions")
-      .insert([
-        {
-          session_name: sessionName,
-          location,
-          date: new Date(date).toISOString(),
-          team_id: user.team_id,
-        },
-      ])
-      .select("id")
-      .maybeSingle();
+      .update({
+        session_name: sessionName,
+        location,
+        date: new Date(date).toISOString(),
+      })
+      .eq("id", training.id);
 
-    if (sessionError || !newTraining?.id) {
-      console.error("Error creating training session:", sessionError);
-      return alert("Failed to create training session.");
+    if (sessionError) {
+      console.error("Error updating training session:", sessionError);
+      return alert("Failed to update training session.");
     }
 
-    const trainingId = newTraining.id;
-
     if (members.length > 0) {
+      await supabase.from("trainings_participants").delete().eq("training_id", training.id);
+
       const participants = members.map((memberId) => ({
-        training_id: trainingId,
+        training_id: training.id,
         participant_id: memberId,
       }));
 
       const { error: participantsError } = await supabase.from("trainings_participants").insert(participants);
 
       if (participantsError) {
-        console.error("adding participants failed:", participantsError);
-        return alert("Training created, but adding participants failed.");
+        console.error("Updating participants failed:", participantsError);
+        return alert("Training updated, but assigning participants failed.");
       }
     }
 
     if (assignmentIds.length) {
+      await supabase.from("assignments_trainings").delete().eq("training_id", training.id);
+
       const assignmentData = assignmentIds.map((assignmentId) => ({
-        training_id: trainingId,
+        training_id: training.id,
         assignment_id: assignmentId,
       }));
 
       const { error: assignmentError } = await supabase.from("assignments_trainings").insert(assignmentData);
 
       if (assignmentError) {
-        console.error("Assigning training assignments failed:", assignmentError);
-        return alert("Training created, but assignment linking failed.");
+        console.error("Updating training assignments failed:", assignmentError);
+        return alert("Training updated, but assignment linking failed.");
       }
     }
 
-    resetForm();
     onSuccess();
     onClose();
   }
-
-  const resetForm = () => {
-    setSessionName("");
-    setLocation("");
-    setDate("");
-    setMembers([]);
-    setAssignmentIds([]);
-  };
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} width="max-w-6xl">
       {/* Header Section */}
       <div className="border-b border-white/10 pb-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">New Training Session</h2>
-          <div className="bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full text-xs font-medium">Planning</div>
+          <h2 className="text-xl font-semibold text-white">Edit Training Session</h2>
+          <div className="bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full text-xs font-medium">Editing</div>
         </div>
-        <p className="mt-1 text-sm text-gray-400">Plan a session, select assignments, and assign team members to participate.</p>
+        <p className="mt-1 text-sm text-gray-400">Update session details, assignments, and participants.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
+        {/* Left Column - Form Sections */}
         <div>
           <BasicInfoSection
             sessionName={sessionName}
@@ -120,6 +117,7 @@ export default function TrainingAddTrainingSessionModal({
           <TeamMembersSection teamMembers={teamMembers} members={members} setMembers={setMembers} />
         </div>
 
+        {/* Right Column - Preview */}
         <PreviewSection
           sessionName={sessionName}
           location={location}
@@ -144,7 +142,7 @@ export default function TrainingAddTrainingSessionModal({
           disabled={!sessionName || !location || !date}
           className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
         >
-          Create Session
+          Save Changes
         </button>
       </div>
     </BaseModal>

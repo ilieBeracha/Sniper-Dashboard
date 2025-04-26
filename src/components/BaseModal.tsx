@@ -10,7 +10,7 @@ interface BaseModalProps {
   width?: string;
 }
 
-export default function BaseModal({ isOpen = true, isLoading = false, onClose, children, width = "max-w-6xl" }: BaseModalProps) {
+export default function BaseModal({ isOpen = true, isLoading = false, onClose, children, width = "max-w-8xl" }: BaseModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (

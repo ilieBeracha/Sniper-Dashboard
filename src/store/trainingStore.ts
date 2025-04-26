@@ -12,6 +12,7 @@ interface TrainingStore {
   loadAssignments: () => Promise<Assignment[] | any>;
   createTraining: (payload: TrainingSession) => Promise<TrainingSession | any>;
   loadTrainingById: (trainingId: string) => Promise<void>;
+  resetTraining: () => void;
 }
 
 export const TrainingStore = create<TrainingStore>((set) => ({
@@ -57,5 +58,9 @@ export const TrainingStore = create<TrainingStore>((set) => ({
   createTraining: async (sessionData: TrainingSession) => {
     const { data, error } = await insertTraining(sessionData);
     if (error || !data?.id) return data;
+  },
+
+  resetTraining: () => {
+    set({ training: null, trainings: [], assignments: [], trainingsChartDisplay: { next: null, last: null } });
   },
 }));

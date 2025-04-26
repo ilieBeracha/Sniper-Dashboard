@@ -1,8 +1,8 @@
 import BaseDashboardCard from "./BaseDashboardCard";
-import { Training } from "@/types/training";
+import { TrainingParticipant, TrainingSession } from "@/types/training";
 
 type TrainingPageParticipantsProps = {
-  training: Training | null;
+  training: TrainingSession | null;
 };
 
 export default function TrainingPageParticipants({ training }: TrainingPageParticipantsProps) {
@@ -10,7 +10,7 @@ export default function TrainingPageParticipants({ training }: TrainingPageParti
     <BaseDashboardCard title="Training Participants" tooltipContent="List of participants and their progress">
       <div className="space-y-3">
         {training?.participants &&
-          training?.participants?.map((participant) => (
+          training?.participants?.map((participant: TrainingParticipant) => (
             <div key={participant.id} className="flex justify-between items-center p-3 bg-[#1A1A1A] rounded-lg">
               <div>
                 <h3 className="font-medium">

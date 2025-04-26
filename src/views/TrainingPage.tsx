@@ -5,7 +5,7 @@ import { useStore } from "zustand";
 import TrainingPageOverview from "@/components/TrainingPageOverview";
 import TrainingPageAssignments from "@/components/TrainingPageAssignments";
 import TrainingPageParticipants from "@/components/TrainingPageParticipants";
-import TrainingPageProgress from "@/components/TrainingPageProgress";
+import TrainingPageParticipantsScore from "@/components/TrainingPageParticipantsScore";
 
 export default function TrainingPage() {
   const params = useParams();
@@ -24,7 +24,7 @@ export default function TrainingPage() {
           <TrainingPageAssignments training={training} />
           <TrainingPageParticipants training={training} />
         </div>
-        <TrainingPageProgress />
+        <TrainingPageParticipantsScore />
       </div>
     </div>
   );
