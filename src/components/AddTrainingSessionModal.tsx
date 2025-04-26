@@ -99,7 +99,6 @@ export default function TrainingAddTrainingSessionModal({
       <div className="border-b border-white/10 pb-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-white">New Training Session</h2>
-          <div className="bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full text-xs font-medium">Planning</div>
         </div>
         <p className="mt-1 text-sm text-gray-400">Plan a session, select assignments, and assign team members to participate.</p>
       </div>

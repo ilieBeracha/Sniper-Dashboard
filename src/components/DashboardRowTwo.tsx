@@ -6,21 +6,23 @@ import UserGroupingSummary from "./DashboardUserGroupingSummary";
 export default function DashboardRowTwo() {
   return (
     <section>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-6 min-w-32">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-3">
           <BaseDashboardCard title="User Hit Percentage" tooltipContent="Your overall hit accuracy and performance metrics">
-            <div className="items-center justify-center h-full w-full">
+            <div className="h-full flex items-center justify-center">
               <UserHitPercentage />
             </div>
           </BaseDashboardCard>
         </div>
-        <div className="lg:col-span-3">
+
+        <div className="lg:col-span-5">
           <BaseDashboardCard title="User Group Score" tooltipContent="Your performance compared to your group and squad">
             <UserGroupingSummary />
           </BaseDashboardCard>
         </div>
-        <div className="xl:col-span-3 lg:col-span-2">
-          <BaseDashboardCard title="Weapon Performance By Squad" tooltipContent="Detailed weapon performance metrics across different squads">
+
+        <div className="lg:col-span-4">
+          <BaseDashboardCard title="Weapon Performance" tooltipContent="Detailed weapon performance metrics across different squads">
             <DashboardSquadWeaponPerformance />
           </BaseDashboardCard>
         </div>

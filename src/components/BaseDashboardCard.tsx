@@ -46,7 +46,7 @@ export default function BaseDashboardCard({
       <Tooltip
         id={`${title}-tooltip`}
         place="top"
-        className="!bg-[#1A1A1A] !text-gray-300 !opacity-100 !border !border-indigo-500/20 !rounded-lg !p-3 !text-sm !shadow-lg !shadow-indigo-900/10 !max-w-xs"
+        className="!bg-[#1A1A1A] !text-gray-300 !opacity-100 !border !border-white/10 !rounded-lg !p-3 !text-sm !max-w-xs"
         style={{
           zIndex: 1000,
         }}
