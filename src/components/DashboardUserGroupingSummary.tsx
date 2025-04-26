@@ -48,7 +48,7 @@ const UserGroupingSummary = () => {
 
   // Format data for charts
   const recentData = groupingSummary.last_five_groups
-    .map((item) => {
+    ?.map((item) => {
       const date = new Date(item.created_at);
       const month = date.toLocaleString("default", { month: "short" });
       const day = date.getDate();
@@ -61,6 +61,28 @@ const UserGroupingSummary = () => {
     .reverse();
 
   const weaponData = groupingSummary.weapon_breakdown;
+
+  if (!groupingSummary || (!groupingSummary.last_five_groups?.length && !groupingSummary.weapon_breakdown?.length)) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center text-white bg-[#161616] rounded-lg p-6">
+        <div className="bg-[#1E1E1E] p-4 rounded-full mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+        </div>
+        <h3 className="text-white text-lg font-medium mb-2">No Grouping Data Available</h3>
+        <p className="text-gray-400 text-sm text-center max-w-xs">
+          Complete shooting exercises with grouping targets to see your performance metrics here.
+        </p>
+        <div className="mt-6 bg-indigo-500/10 text-indigo-400 px-4 py-2 rounded-lg text-sm">Grouping data tracks your shot placement accuracy</div>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} style={{ height: "100%" }} className="flex flex-col">

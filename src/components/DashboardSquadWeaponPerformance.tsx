@@ -17,12 +17,12 @@ export default function DashboardSquadWeaponPerformance() {
 
   useEffect(() => {
     if (squadWeaponPerformance?.length > 0) {
-      const squads = [...new Set(squadWeaponPerformance.map((item) => item.squad))];
+      const squads = [...new Set(squadWeaponPerformance?.map((item) => item.squad))];
       setActiveSquad(squads[0]);
     }
   }, [squadWeaponPerformance]);
 
-  const squads = [...new Set((squadWeaponPerformance || []).map((item) => item.squad))];
+  const squads = [...new Set((squadWeaponPerformance || [])?.map((item) => item.squad))];
   const activeSquadData = (squadWeaponPerformance || []).filter((item) => item.squad === activeSquad);
 
   const radarData = [
@@ -81,7 +81,7 @@ export default function DashboardSquadWeaponPerformance() {
     <div className="h-full flex flex-col">
       {/* Squad Tabs */}
       <div className="flex overflow-x-auto mb-2 bg-[#1A1A1A] rounded-lg p-1 w-fit">
-        {squads.map((squad) => (
+        {squads?.map((squad) => (
           <button
             key={squad}
             onClick={() => setActiveSquad(squad)}
@@ -103,7 +103,7 @@ export default function DashboardSquadWeaponPerformance() {
               <PolarAngleAxis dataKey="attribute" tick={{ fill: "#9CA3AF", fontSize: 10 }} />
 
               {/* Render each weapon type */}
-              {activeSquadData.map((item, index) => (
+              {activeSquadData?.map((item, index) => (
                 <Radar
                   key={item.weapon_type}
                   name={item.weapon_type}

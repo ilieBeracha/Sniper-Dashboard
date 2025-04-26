@@ -28,6 +28,25 @@ export default function UserHitPercentage() {
 
   const hitColor = getColor(percentage);
 
+  if (!userHitPercentage.hit_percentage || userHitPercentage.total_shots === 0) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center text-white bg-[#161616] rounded-lg p-4">
+        <div className="bg-[#1E1E1E] p-3 rounded-full mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <h3 className="text-white text-sm font-medium mb-1">No Hit Data</h3>
+        <p className="text-gray-400 text-xs text-center">Complete target shooting exercises to track your accuracy</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full justify-evenly">
       <div className=" relative justify-between flex">
