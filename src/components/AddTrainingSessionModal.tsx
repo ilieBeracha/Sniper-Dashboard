@@ -94,16 +94,15 @@ export default function TrainingAddTrainingSessionModal({
   };
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} width="max-w-6xl">
-      {/* Header Section */}
-      <div className="border-b border-white/10 pb-4">
+    <BaseModal isOpen={isOpen} onClose={onClose}>
+      <div className="border-b border-white/10 pb-4 w-full">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-white">New Training Session</h2>
         </div>
         <p className="mt-1 text-sm text-gray-400">Plan a session, select assignments, and assign team members to participate.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 mt-4">
         <div>
           <BasicInfoSection
             sessionName={sessionName}
@@ -113,13 +112,13 @@ export default function TrainingAddTrainingSessionModal({
             date={date}
             setDate={setDate}
           />
-
-          <AssignmentsSection assignments={assignments} assignmentIds={assignmentIds} setAssignmentIds={setAssignmentIds} />
-
-          <TeamMembersSection teamMembers={teamMembers} members={members} setMembers={setMembers} />
+          <div className="mt-6 space-y-6">
+            <AssignmentsSection assignments={assignments} assignmentIds={assignmentIds} setAssignmentIds={setAssignmentIds} />
+            <TeamMembersSection teamMembers={teamMembers} members={members} setMembers={setMembers} />
+          </div>
         </div>
 
-        <PreviewSection
+        {/* <PreviewSection
           sessionName={sessionName}
           location={location}
           date={date}
@@ -127,7 +126,7 @@ export default function TrainingAddTrainingSessionModal({
           assignmentIds={assignmentIds}
           teamMembers={teamMembers}
           members={members}
-        />
+        /> */}
       </div>
 
       <div className="flex items-center justify-end gap-x-4 pt-4 border-t border-white/10 mt-4">

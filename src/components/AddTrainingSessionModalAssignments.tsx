@@ -33,9 +33,9 @@ export default function AssignmentsSection({ assignments, assignmentIds, setAssi
         searchTerm={searchTerm}
         showClearButton={false}
         setSearchTerm={setSearchTerm}
-        searchPlaceholder="Search assignments..."
+        searchPlaceholder="Select assignments..."
         emptyMessage="No assignments found"
-        maxHeight={176} // 44px × 4 items
+        maxHeight={180} // Reduced height to fit better
       />
     </div>
   );

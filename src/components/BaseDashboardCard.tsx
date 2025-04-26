@@ -41,7 +41,7 @@ export default function BaseDashboardCard({
           )}
         </div>
       </div>
-      <div className="px-4 pb-4 pt-2 flex-1 h-full">{children}</div>
+      <div className="px-4 pb-4 flex-1 h-full">{children}</div>
 
       <Tooltip
         id={`${title}-tooltip`}

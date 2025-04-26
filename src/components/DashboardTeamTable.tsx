@@ -1,11 +1,6 @@
 import { useState } from "react";
 import Checkbox from "./Checkbox";
-import {
-  BiTrash,
-  BiDotsHorizontalRounded,
-  BiPencil,
-  BiTargetLock,
-} from "react-icons/bi";
+import { BiTrash, BiDotsHorizontalRounded, BiPencil, BiTargetLock } from "react-icons/bi";
 import { useStore } from "zustand";
 import { teamStore } from "@/store/teamStore";
 import { User } from "@/types/user";
@@ -30,11 +25,7 @@ export default function TeamTable() {
   };
 
   const handleRowSelect = (id: string) => {
-    setSelectedRows((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((rowId) => rowId !== id)
-        : [...prevSelected, id]
-    );
+    setSelectedRows((prevSelected) => (prevSelected.includes(id) ? prevSelected.filter((rowId) => rowId !== id) : [...prevSelected, id]));
   };
 
   const RoleBadge = ({ role }: { role: string }) => {
@@ -49,20 +40,14 @@ export default function TeamTable() {
       }
     };
 
-    return (
-      <div
-        className={`px-3 py-1 rounded-md text-xs inline-block border ${getBadgeColor()}`}
-      >
-        {role}
-      </div>
-    );
+    return <div className={`px-3 py-1 rounded-md text-xs inline-block border ${getBadgeColor()}`}>{role}</div>;
   };
 
   return (
     <>
       <div className="flex justify-between items-center "></div>
       <div className="overflow-hidden rounded-sm  bg-dashboard-card">
-        {selectedRows.length > 0 && (
+        {/* {selectedRows.length > 0 && (
           <div className="flex items-center justify-between p-4 bg-white/5 border-b border-dashboard-border">
             <span className="text-sm text-dashboard-text-muted">
               {selectedRows.length}{" "}
@@ -73,49 +58,40 @@ export default function TeamTable() {
                 <BiTrash className="mr-1.5" /> Remove
               </button>
             </div>
-          </div>
-        )}
+          </div> */}
+        {/* )} */}
 
-        <div className="max-w-full overflow-x-auto ">
+        <div
+          className="max-w-full overflow-x-auto 
+"
+        >
           <table className="min-w-full divide-y divide-dashboard-border">
             <thead className="bg-dashboard-card ">
               <tr>
-                {["ID", "Operative", "Squad", "Role", "Actions"].map(
-                  (header, i) => (
-                    <th
-                      key={i}
-                      className="px-6 py-3 text-left text-xs font-semibold text-white/70 uppercase tracking-wider bg-white/5"
-                    >
-                      {header === "ID" ? (
-                        <div className="flex items-center gap-3">
-                          <Checkbox
-                            checked={selectAll}
-                            onChange={handleSelectAll}
-                          />
-                          <span>{header}</span>
-                        </div>
-                      ) : (
-                        header
-                      )}
-                    </th>
-                  )
-                )}
+                {["ID", "Operative", "Squad", "Role", "Actions"].map((header, i) => (
+                  <th key={i} className="px-6 py-3 text-left text-xs font-semibold text-white/70 uppercase tracking-wider ">
+                    {header === "ID" ? (
+                      <div className="flex items-center gap-3">
+                        <Checkbox checked={selectAll} onChange={handleSelectAll} />
+                        <span>{header}</span>
+                      </div>
+                    ) : (
+                      header
+                    )}
+                  </th>
+                ))}
               </tr>
             </thead>
 
-            <tbody className="bg-dashboard-card divide-y divide-white/10">
+            <tbody className=" divide-y divide-white/10">
               {members?.map((member: User) => {
                 const rowId = member.id;
-                const initials =
-                  member.first_name?.charAt(0).toUpperCase() +
-                  member.last_name?.charAt(0).toUpperCase();
+                const initials = member.first_name?.charAt(0).toUpperCase() + member.last_name?.charAt(0).toUpperCase();
 
                 return (
                   <tr
                     key={rowId}
-                    className={`transition-colors ${
-                      selectedRows.includes(rowId) ? "bg-white/10" : ""
-                    } ${
+                    className={`transition-colors ${selectedRows.includes(rowId) ? "bg-white/10" : ""} ${
                       hoveredRow === rowId ? "bg-white/10" : "hover:bg-white/10"
                     }`}
                     onMouseEnter={() => setHoveredRow(rowId)}
@@ -123,13 +99,8 @@ export default function TeamTable() {
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-dashboard-text">
                       <div className="flex items-center gap-3">
-                        <Checkbox
-                          checked={selectedRows.includes(rowId)}
-                          onChange={() => handleRowSelect(rowId)}
-                        />
-                        <span className="text-xs text-gray-200">
-                          {rowId.slice(0, 8).toUpperCase()}
-                        </span>
+                        <Checkbox checked={selectedRows.includes(rowId)} onChange={() => handleRowSelect(rowId)} />
+                        <span className="text-xs text-gray-200">{rowId.slice(0, 8).toUpperCase()}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-dashboard-text">
@@ -141,9 +112,7 @@ export default function TeamTable() {
                           <span className="font-medium text-white text-sm">
                             {member.first_name} {member.last_name}
                           </span>
-                          <span className="text-dashboard-text-muted text-xs">
-                            {member.email}
-                          </span>
+                          <span className="text-dashboard-text-muted text-xs">{member.email}</span>
                         </div>
                       </div>
                     </td>
@@ -186,9 +155,7 @@ export default function TeamTable() {
               <BiTargetLock size={24} />
             </div>
             <p className="mb-2">No sniper units available</p>
-            <p className="text-sm text-dashboard-text-soft">
-              Deploy new units to begin tracking
-            </p>
+            <p className="text-sm text-dashboard-text-soft">Deploy new units to begin tracking</p>
           </div>
         )}
       </div>

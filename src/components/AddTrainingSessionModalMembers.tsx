@@ -32,9 +32,9 @@ export default function TeamMembersSection({ teamMembers, members, setMembers }:
         searchTerm={searchTerm}
         showClearButton={false}
         setSearchTerm={setSearchTerm}
-        searchPlaceholder="Search members..."
+        searchPlaceholder="Select members..."
         emptyMessage="No members found"
-        maxHeight={256}
+        maxHeight={180}
         showBadges={true}
       />
     </div>
