@@ -10,12 +10,12 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
 
   if (trainings.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 bg-[#222]/50 rounded-lg text-center border border-white/5">
-        <div className="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center mb-4">
+      <div className="flex flex-col items-center justify-center py-16 bg-[#222]/50 rounded-lg text-center border border-white/5 backdrop-blur-sm">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500/20 to-indigo-600/20 flex items-center justify-center mb-4">
           <Calendar className="w-8 h-8 text-indigo-400" />
         </div>
-        <p className="text-gray-300 font-medium">No training sessions found</p>
-        <p className="text-sm text-gray-500 mt-1 max-w-xs">Schedule a new training session to start tracking your team's progress</p>
+        <p className="text-gray-300 font-medium text-lg">No training sessions found</p>
+        <p className="text-sm text-gray-500 mt-2 max-w-xs">Schedule a new training session to start tracking your team's progress</p>
       </div>
     );
   }
@@ -90,12 +90,12 @@ function TrainingSessionGroup({
   return (
     <div>
       <div className="flex items-center gap-2 mb-4">
-        <div className={`w-2 h-2 rounded-full ${colorMap[color]}`}></div>
-        <h3 className="text-sm font-medium text-white uppercase">{title}</h3>
+        <div className={`w-2 h-2 rounded-full ${colorMap[color]} shadow-[0_0_8px_0px_${colorMap[color]}]`}></div>
+        <h3 className="text-sm font-medium text-white uppercase tracking-wider">{title}</h3>
         <div className="h-px flex-grow bg-white/5"></div>
-        {date && <span className="text-xs text-gray-400">{format(date, "EEEE, MMMM d")}</span>}
+        {date && <span className="text-xs text-gray-400 font-medium">{format(date, "EEEE, MMMM d")}</span>}
       </div>
-      <div className="space-y-2">{children}</div>
+      <div className="space-y-3">{children}</div>
     </div>
   );
 }

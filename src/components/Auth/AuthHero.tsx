@@ -2,18 +2,23 @@ export default function AuthHero() {
   return (
     <div className="hidden md:flex md:w-1/2 bg-[#0A0A0A] relative overflow-hidden">
       {/* Main background elements */}
-      <div className="absolute inset-0 bg-[url('/images/tactical-pattern.svg')] opacity-[0.03]"></div>
+      <div className="absolute inset-0 bg-[url('/images/tactical-pattern.svg')] opacity-[0.02]"></div>
 
       {/* Animated gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#7F5AF0]/5 via-transparent to-transparent"></div>
-      <div className="absolute inset-0 bg-gradient-to-tr from-[#7F5AF0]/5 via-transparent to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-[#7F5AF0]/5 via-transparent to-transparent animate-gradient-x"></div>
+      <div className="absolute inset-0 bg-gradient-to-tr from-[#7F5AF0]/5 via-transparent to-transparent animate-gradient-y"></div>
 
       {/* Content container */}
       <div className="relative z-10 w-full h-full flex flex-col justify-center items-center px-12">
         {/* Logo and title section */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#7F5AF0]/10 border border-[#7F5AF0]/20 mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-[#7F5AF0]" viewBox="0 0 20 20" fill="currentColor">
+        <div className="text-center mb-16 group">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#7F5AF0]/10 border border-[#7F5AF0]/20 mb-6 transition-all duration-300 group-hover:bg-[#7F5AF0]/20 group-hover:scale-105">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-10 w-10 text-[#7F5AF0] transition-transform duration-300 group-hover:rotate-12"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
               <path
                 fillRule="evenodd"
                 d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
@@ -21,8 +26,8 @@ export default function AuthHero() {
               />
             </svg>
           </div>
-          <h1 className="text-6xl font-bold text-white mb-4">Scopeon</h1>
-          <p className="text-xl text-gray-400 max-w-md mx-auto">Tactical Operations Platform</p>
+          <h1 className="text-6xl font-bold text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">Scopeon</h1>
+          <p className="text-xl text-gray-400 max-w-md mx-auto font-light">Tactical Operations Platform</p>
         </div>
 
         {/* Feature highlights */}
@@ -61,18 +66,18 @@ export default function AuthHero() {
             },
           ].map((feature, i) => (
             <div key={i} className="text-center group">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#7F5AF0]/10 border border-[#7F5AF0]/20 mb-4 group-hover:bg-[#7F5AF0]/20 transition-colors duration-300">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#7F5AF0]/10 border border-[#7F5AF0]/20 mb-4 group-hover:bg-[#7F5AF0]/20 group-hover:scale-110 transition-all duration-300">
                 {feature.icon}
               </div>
-              <h3 className="text-[#7F5AF0] font-medium mb-1">{feature.title}</h3>
-              <p className="text-sm text-gray-400">{feature.description}</p>
+              <h3 className="text-[#7F5AF0] font-medium mb-1 group-hover:text-white transition-colors duration-300">{feature.title}</h3>
+              <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">{feature.description}</p>
             </div>
           ))}
         </div>
 
         {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-[#7F5AF0]/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#7F5AF0]/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-[#7F5AF0]/5 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#7F5AF0]/5 rounded-full blur-3xl animate-pulse-slow"></div>
       </div>
     </div>
   );

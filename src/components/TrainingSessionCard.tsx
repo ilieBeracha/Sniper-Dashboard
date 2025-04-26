@@ -37,7 +37,7 @@ export function TrainingSessionCard({
     <div
       onClick={handleSessionClick}
       className={`
-        border border-white/5 rounded-lg p-3
+        border border-white/5 rounded-lg p-3 min-h-[50px]
         ${highlight ? "bg-indigo-500/5 border-indigo-500/20" : isPast ? "bg-[#1A1A1A]" : "bg-[#1E1E1E]"}
         hover:bg-[#252525] transition-all duration-200 
         ${highlight ? "shadow-md shadow-indigo-900/10" : ""}
