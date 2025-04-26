@@ -57,7 +57,7 @@ export default function UserHitPercentage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mt-2">
+      <div className="grid grid-cols-1 gap-3 mt-2">
         <div className="bg-[#1A1A1A] p-2 rounded-lg">
           <div className="flex justify-between">
             <span className="text-xs text-gray-400">Total Shots</span>

@@ -1,4 +1,3 @@
-import { teamStore } from "@/store/teamStore";
 import { userStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
 import { useStore } from "zustand";
@@ -12,10 +11,11 @@ import InviteModal from "@/components/InviteModal";
 import { TrainingStore } from "@/store/trainingStore";
 import { squadStore } from "@/store/squadStore";
 import { performanceStore } from "@/store/performance";
+import { getUserGroupingSummaryRpc } from "@/services/performance";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
-  const { getUserHitPercentage, getUserGroupingScores } = useStore(performanceStore);
+  const { getUserHitPercentage } = useStore(performanceStore);
 
   const { getSquadMetricsByRole } = useStore(squadStore);
   const { loadNextAndLastTraining } = useStore(TrainingStore);
@@ -32,7 +32,7 @@ export default function Dashboard() {
     const load = async () => {
       if (user?.team_id) {
         // await fetchMembers(user.team_id);
-        await getUserGroupingScores(user.id);
+        await getUserGroupingSummaryRpc(user.id);
         await getUserHitPercentage(user.id);
         await loadNextAndLastTraining(user.team_id);
         await getSquadMetricsByRole(user.id);

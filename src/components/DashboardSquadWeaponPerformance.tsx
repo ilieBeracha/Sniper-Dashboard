@@ -25,7 +25,6 @@ export default function DashboardSquadWeaponPerformance() {
   const squads = [...new Set((squadWeaponPerformance || []).map((item) => item.squad))];
   const activeSquadData = (squadWeaponPerformance || []).filter((item) => item.squad === activeSquad);
 
-  // Transform data for radar chart
   const radarData = [
     { attribute: "Accuracy", fullMark: 100 },
     { attribute: "Hit Rate", fullMark: 100 },
@@ -33,18 +32,14 @@ export default function DashboardSquadWeaponPerformance() {
     { attribute: "Effective Range", fullMark: 100 },
   ];
 
-  // Add weapon data to the radar chart
   activeSquadData.forEach((item) => {
     const weaponKey = item.weapon_type;
     const hitRate = Math.round((item.confirmed / item.potential) * 100);
 
-    // Calculate scaled values for radar
-    const scaledHits = Math.min(100, item.confirmed * 5); // Scale hits to 0-100 range
+    const scaledHits = Math.min(100, item.confirmed * 5);
 
-    // Add range for each weapon type
-    const effectiveRange = weaponKey === "HTR2000" ? 85 : 65; // HTR2000 has better range
+    const effectiveRange = weaponKey === "HTR2000" ? 85 : 65;
 
-    // Update radarData with this weapon's values
     radarData.forEach((dataPoint: any) => {
       if (dataPoint.attribute === "Accuracy") {
         dataPoint[weaponKey] = item.accuracy;
@@ -85,7 +80,7 @@ export default function DashboardSquadWeaponPerformance() {
   return (
     <div className="h-full flex flex-col">
       {/* Squad Tabs */}
-      <div className="flex overflow-x-auto mb-2 bg-[#1A1A1A] rounded-lg p-1">
+      <div className="flex overflow-x-auto mb-2 bg-[#1A1A1A] rounded-lg p-1 w-fit">
         {squads.map((squad) => (
           <button
             key={squad}

@@ -1,8 +1,9 @@
 // src/store/performanceStore.ts
 import { create } from "zustand";
 import { HitPercentageData, SquadWeaponPerformance } from "@/types/performance";
-import { GroupingScore } from "@/types/groupingScore";
-import { getUserGroupingScoresRpc, getUserHitPercentageRpc, getWeaponPerformanceBySquadAndWeapon } from "@/services/performance";
+import { GroupingSummary } from "@/types/groupingScore";
+import { getUserHitPercentageRpc, getWeaponPerformanceBySquadAndWeapon, getUserGroupingSummaryRpc } from "@/services/performance";
+import { userStore } from "./userStore";
 
 interface PerformanceStore {
   squadWeaponPerformance: SquadWeaponPerformance[];
@@ -12,8 +13,10 @@ interface PerformanceStore {
   userHitPercentage: HitPercentageData | null;
   getUserHitPercentage: (userId: string) => Promise<HitPercentageData>;
 
-  userGroupingScores: GroupingScore[];
-  getUserGroupingScores: (userId: string) => Promise<GroupingScore[]>;
+  // New grouping summary state and methods
+  groupingSummary: GroupingSummary | null;
+  groupingSummaryLoading: boolean;
+  getGroupingSummary: () => Promise<void>;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
@@ -44,15 +47,24 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     }
   },
 
-  userGroupingScores: [],
-  getUserGroupingScores: async (userId: string) => {
+  groupingSummary: null,
+  groupingSummaryLoading: false,
+  getGroupingSummary: async () => {
     try {
-      const data = await getUserGroupingScoresRpc(userId);
-      set({ userGroupingScores: data });
-      return data;
+      set({ groupingSummaryLoading: true });
+      const userId = userStore.getState().user?.id;
+      if (!userId) {
+        console.error("No user ID available");
+        return;
+      }
+
+      const data = await getUserGroupingSummaryRpc(userId);
+      set({ groupingSummary: data });
     } catch (error) {
-      console.error("Failed to load user grouping scores:", error);
-      throw error;
+      console.error("Failed to load grouping summary:", error);
+      set({ groupingSummary: null });
+    } finally {
+      set({ groupingSummaryLoading: false });
     }
   },
 }));

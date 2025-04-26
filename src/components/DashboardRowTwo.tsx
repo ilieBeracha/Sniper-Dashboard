@@ -1,7 +1,7 @@
-import UserGroupScore from "./DashboardUserGroupinScore";
 import DashboardSquadWeaponPerformance from "./DashboardSquadWeaponPerformance";
 import BaseDashboardCard from "./BaseDashboardCard";
 import UserHitPercentage from "./DashboardUserHitPercentage";
+import UserGroupingSummary from "./DashboardUserGroupingSummary";
 
 export default function DashboardRowTwo() {
   return (
@@ -16,7 +16,7 @@ export default function DashboardRowTwo() {
         </div>
         <div className="lg:col-span-3">
           <BaseDashboardCard title="User Group Score">
-            <UserGroupScore />
+            <UserGroupingSummary />
           </BaseDashboardCard>
         </div>
         <div className="xl:col-span-3 lg:col-span-2">
