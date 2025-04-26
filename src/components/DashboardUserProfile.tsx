@@ -3,14 +3,16 @@ import { BiCalendar, BiMailSend } from "react-icons/bi";
 
 export default function UserProfile({ user }: { user: User }) {
   return (
-    <div className="w-full text-white ">
+    <div className="w-full text-white">
       <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
         <h2 className="text-lg font-bold">
           Welcome Back {user?.first_name} {user.last_name}
         </h2>
-        <span className="text-xs px-3 py-1 rounded-full border border-white/10 bg-[#2CB67D]/20 text-[#2CB67D] font-semibold tracking-wide">
-          {user.user_role}
-        </span>
+        <div className="relative">
+          <span className="text-xs px-3 py-1 rounded-full border border-white/10 bg-[#2CB67D]/20 text-[#2CB67D] font-semibold tracking-wide">
+            {user.user_role}
+          </span>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 text-sm text-gray-300">

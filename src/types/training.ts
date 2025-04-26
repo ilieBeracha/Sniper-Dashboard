@@ -3,6 +3,20 @@ export interface Assignment {
   assignment_name: string;
 }
 
+export interface TrainingParticipant {
+  id: string;
+  training_id: string;
+  participant_id: string;
+  created_at: string;
+  user?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    user_role: string;
+  };
+}
+
 export interface TrainingSession {
   id?: string;
   date: string; // ISO string
@@ -10,6 +24,7 @@ export interface TrainingSession {
   location: string;
   team_id?: string;
   assignments_trainings?: Assignment[];
+  trainings_participants?: TrainingParticipant[];
 }
 
 export interface TrainingSessionChart {

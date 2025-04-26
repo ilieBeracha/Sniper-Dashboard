@@ -1,8 +1,4 @@
-export default function Header({
-  setIsOpen,
-}: {
-  setIsOpen: (open: boolean) => void;
-}) {
+export default function Header({ setIsOpen }: { setIsOpen: (open: boolean) => void }) {
   return (
     <div className=" mb-12 w-full">
       <div className="flex space-x-4 w-full justify-between items-center">

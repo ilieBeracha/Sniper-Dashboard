@@ -8,6 +8,7 @@ import Training from "./Training";
 import { useEffect } from "react";
 import { userStore } from "@/store/userStore";
 import { teamStore } from "@/store/teamStore";
+import TrainingPage from "./TrainingPage";
 
 export default function Home() {
   const { token } = useStore(authStore);
@@ -34,6 +35,7 @@ export default function Home() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/training" element={<Training />}></Route>
+          <Route path="/training/:id" element={<TrainingPage />}></Route>
           <Route path="/*" element={<ErrorPage />}></Route>
         </Routes>
       </main>

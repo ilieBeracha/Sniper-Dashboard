@@ -32,9 +32,7 @@ export async function getTrainingByTeamId(teamId: string) {
   // 🔥 Transform the nested assignments structure here
   const flattenedTrainings = (trainings || []).map((t) => ({
     ...t,
-    assignments_trainings: t.assignments_trainings
-      .map((a: any) => a.assignments)
-      .filter(Boolean),
+    assignments_trainings: t.assignments_trainings.map((a: any) => a.assignments).filter(Boolean),
   }));
 
   return flattenedTrainings;
@@ -93,25 +91,16 @@ export async function getNextAndLastTraining(team_id: string) {
 }
 
 export async function insertTraining(payload: any) {
-  return supabase
-    .from("training_sessions")
-    .insert([payload])
-    .select("id")
-    .maybeSingle();
+  return supabase.from("training_sessions").insert([payload]).select("id").maybeSingle();
 }
 
-export async function assignParticipantsToTraining(
-  training_id: string,
-  participantIds: string[]
-) {
+export async function assignParticipantsToTraining(training_id: string, participantIds: string[]) {
   const participants = participantIds.map((participant_id) => ({
     training_id,
     participant_id,
   }));
 
-  const { error } = await supabase
-    .from("trainings_participants")
-    .insert(participants);
+  const { error } = await supabase.from("trainings_participants").insert(participants);
 
   if (error) throw new Error(error.message);
 }
