@@ -2,6 +2,7 @@ import { TrainingSession, Assignment } from "@/types/training";
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { ChevronRight, Clock, MapPin, Bookmark, Lock, UserCheck, Edit } from "lucide-react";
+import TrainingParticipantBadge from "./TrainingParticipantBadge";
 
 export function TrainingSessionCard({
   session,
@@ -57,6 +58,8 @@ export function TrainingSessionCard({
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h4 className="font-medium text-white text-sm">{session.session_name}</h4>
+            {isParticipant && <TrainingParticipantBadge />}
+
             {isPast &&
               (isParticipant ? <div className="w-3.5 h-3.5 bg-green-500 rounded-full"></div> : <Lock className="w-3.5 h-3.5 text-gray-500" />)}
           </div>

@@ -1,9 +1,11 @@
 import { TrainingSession, TrainingStatus } from "@/types/training";
-import { format, parseISO, isToday, isPast, isFuture, isThisWeek } from "date-fns";
-import { Calendar, UserCheck } from "lucide-react";
+import { parseISO, isToday, isPast, isFuture, isThisWeek } from "date-fns";
 import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
 import { TrainingSessionCard } from "./TrainingSessionCard";
+import TrainingSessionGroup from "./TrainingSessionGroup";
+import TrainingListEmpty from "./TrainingListEmpty";
+import TrainingParticipantBadge from "./TrainingParticipantBadge";
 import { useState } from "react";
 
 type Tab = "active" | "canceled";
@@ -13,15 +15,7 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
   const [activeTab, setActiveTab] = useState<Tab>("active");
 
   if (trainings.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 bg-[#222]/50 rounded-lg text-center border border-white/5 backdrop-blur-sm">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500/20 to-indigo-600/20 flex items-center justify-center mb-4">
-          <Calendar className="w-8 h-8 text-indigo-400" />
-        </div>
-        <p className="text-gray-300 font-medium text-lg">No training sessions found</p>
-        <p className="text-sm text-gray-500 mt-2 max-w-xs">Schedule a new training session to start tracking your team's progress</p>
-      </div>
-    );
+    return <TrainingListEmpty />;
   }
 
   const sortedTrainings = [...trainings].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -36,6 +30,7 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
   const pastSessions = activeTrainings.filter((s) => isPast(parseISO(s.date)) && !isToday(parseISO(s.date))).reverse();
 
   const isParticipating = (training: TrainingSession) => {
+    console.log(training);
     return training.participants?.some((p) => p.participant_id === user?.id);
   };
 
@@ -69,12 +64,6 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
                 {todaySessions.map((s) => (
                   <div key={s.id} className="relative group">
                     <TrainingSessionCard key={s.id} session={s} currentUserId={user?.id} showDate={false} highlight />
-                    {isParticipating(s) && (
-                      <div className="absolute -top-3 -right-3 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg shadow-green-500/30 animate-bounce">
-                        <UserCheck className="w-5 h-5 text-white" />
-                        <span className="text-sm font-bold text-white">YOU'RE IN!</span>
-                      </div>
-                    )}
                   </div>
                 ))}
               </TrainingSessionGroup>
@@ -86,12 +75,6 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
                 {thisWeekSessions.map((s) => (
                   <div key={s.id} className="relative group">
                     <TrainingSessionCard key={s.id} session={s} currentUserId={user?.id} />
-                    {isParticipating(s) && (
-                      <div className="absolute -top-3 -right-3 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg shadow-green-500/30 animate-bounce">
-                        <UserCheck className="w-5 h-5 text-white" />
-                        <span className="text-sm font-bold text-white">YOU'RE IN!</span>
-                      </div>
-                    )}
                   </div>
                 ))}
               </TrainingSessionGroup>
@@ -103,12 +86,6 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
                 {upcomingSessions.map((s) => (
                   <div key={s.id} className="relative group">
                     <TrainingSessionCard key={s.id} session={s} currentUserId={user?.id} />
-                    {isParticipating(s) && (
-                      <div className="absolute -top-3 -right-3 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg shadow-green-500/30 animate-bounce">
-                        <UserCheck className="w-5 h-5 text-white" />
-                        <span className="text-sm font-bold text-white">YOU'RE IN!</span>
-                      </div>
-                    )}
                   </div>
                 ))}
               </TrainingSessionGroup>
@@ -119,12 +96,6 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
                 {pastSessions.map((s) => (
                   <div key={s.id} className="relative group">
                     <TrainingSessionCard key={s.id} session={s} currentUserId={user?.id} isPast />
-                    {isParticipating(s) && (
-                      <div className="absolute -top-3 -right-3 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg shadow-green-500/30 animate-bounce">
-                        <UserCheck className="w-5 h-5 text-white" />
-                        <span className="text-sm font-bold text-white">YOU'RE IN!</span>
-                      </div>
-                    )}
                   </div>
                 ))}
               </TrainingSessionGroup>
@@ -135,49 +106,11 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
             {canceledTrainings.map((s) => (
               <div key={s.id} className="relative group">
                 <TrainingSessionCard key={s.id} session={s} currentUserId={user?.id} isPast />
-                {isParticipating(s) && (
-                  <div className="absolute -top-3 -right-3 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg shadow-green-500/30 animate-bounce">
-                    <UserCheck className="w-5 h-5 text-white" />
-                    <span className="text-sm font-bold text-white">YOU'RE IN!</span>
-                  </div>
-                )}
               </div>
             ))}
           </TrainingSessionGroup>
         )}
       </div>
-    </div>
-  );
-}
-
-function TrainingSessionGroup({
-  title,
-  color,
-  date,
-  children,
-}: {
-  title: string;
-  color: "indigo" | "green" | "blue" | "gray" | "red";
-  date?: Date;
-  children: React.ReactNode;
-}) {
-  const colorMap = {
-    indigo: "bg-indigo-500",
-    green: "bg-green-500",
-    blue: "bg-blue-500",
-    gray: "bg-gray-500",
-    red: "bg-red-500",
-  };
-
-  return (
-    <div>
-      <div className="flex items-center gap-2 mb-4">
-        <div className={`w-2 h-2 rounded-full ${colorMap[color]} shadow-[0_0_8px_0px_${colorMap[color]}]`}></div>
-        <h3 className="text-sm font-medium text-white uppercase tracking-wider">{title}</h3>
-        <div className="h-px flex-grow bg-white/5"></div>
-        {date && <span className="text-xs text-gray-400 font-medium">{format(date, "EEEE, MMMM d")}</span>}
-      </div>
-      <div className="space-y-3">{children}</div>
     </div>
   );
 }

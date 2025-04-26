@@ -42,7 +42,7 @@ export async function getTrainingById(trainingId: string) {
   return data;
 }
 
-export async function getTrainingByTeamId(teamId: string) {
+export async function getTrainingByTeamId(teamId: string, currentUserId?: string) {
   const { data: trainings, error } = await supabase
     .from("training_sessions")
     .select(
@@ -59,16 +59,19 @@ export async function getTrainingByTeamId(teamId: string) {
           assignment_name,
           created_at
         )
-      )
+      ),
       participants:trainings_participants(
         id,
         participant_id,
         created_at,
         user:participant_id(
           id, 
-          first_name, 
-      
-    `
+          first_name,
+          last_name,
+          email
+        )
+      )
+      `
     )
     .eq("team_id", teamId)
     .order("date", { ascending: true })
@@ -79,7 +82,21 @@ export async function getTrainingByTeamId(teamId: string) {
     return [];
   }
 
-  return trainings;
+  const processedTrainings = (trainings || []).map((training) => {
+    const assignments = training.assignments_trainings.map((item) => item.assignment).filter(Boolean);
+    const participantsCount = training.participants ? training.participants.length : 0;
+    const isParticipating = currentUserId && training.participants ? training.participants.some((p) => p.participant_id === currentUserId) : false;
+
+    return {
+      ...training,
+      assignments,
+      participantsCount,
+      isParticipating,
+      assignments_trainings: undefined,
+    };
+  });
+
+  return processedTrainings;
 }
 
 export async function getNextAndLastTraining(team_id: string) {
