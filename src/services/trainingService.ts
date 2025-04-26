@@ -1,6 +1,47 @@
 import { Assignment } from "@/types/training";
 import { supabase } from "./supabaseClient";
 
+export async function getTrainingById(trainingId: string) {
+  const { data, error } = await supabase
+    .from("training_sessions")
+    .select(
+      `
+      *,
+      participants:trainings_participants(
+        id,
+        participant_id,
+        created_at,
+        user:participant_id(
+          id, 
+          first_name, 
+          last_name, 
+          email, 
+          user_role,
+          team_id,
+          squad_id
+        )
+      ),
+      training_assignments:assignments_trainings(
+        id,
+        assignment:assignment_id(
+          id,
+          assignment_name,
+          created_at
+        )
+      )
+    `
+    )
+    .eq("id", trainingId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching training with details:", error);
+    return null;
+  }
+
+  return data;
+}
+
 export async function getTrainingByTeamId(teamId: string) {
   const now = new Date().toISOString();
 

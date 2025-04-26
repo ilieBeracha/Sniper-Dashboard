@@ -1,6 +1,9 @@
 export interface Assignment {
-  id: string;
-  assignment_name: string;
+  assignment: {
+    id: string;
+    assignment_name: string;
+    created_at: string;
+  };
 }
 
 export interface TrainingParticipant {
@@ -17,14 +20,21 @@ export interface TrainingParticipant {
   };
 }
 
+export enum TrainingStatus {
+  Scheduled = "scheduled",
+  InProgress = "in_progress",
+  Completed = "completed",
+}
+
 export interface TrainingSession {
   id?: string;
   date: string; // ISO string
   session_name: string;
   location: string;
   team_id?: string;
-  assignments_trainings?: Assignment[];
-  trainings_participants?: TrainingParticipant[];
+  training_assignments?: Assignment[];
+  participants?: TrainingParticipant[];
+  status: TrainingStatus;
 }
 
 export interface TrainingSessionChart {

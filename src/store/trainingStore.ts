@@ -1,17 +1,9 @@
 import { create } from "zustand";
-import {
-  getAssignments,
-  getNextAndLastTraining,
-  getTrainingByTeamId,
-  insertTraining,
-} from "@/services/trainingService";
-import {
-  TrainingsNextLastChart,
-  TrainingSession,
-  Assignment,
-} from "@/types/training";
+import { getAssignments, getNextAndLastTraining, getTrainingById, getTrainingByTeamId, insertTraining } from "@/services/trainingService";
+import { TrainingsNextLastChart, TrainingSession, Assignment } from "@/types/training";
 
 interface TrainingStore {
+  training: TrainingSession | null;
   trainings: TrainingSession[] | [];
   assignments: Assignment[] | [];
   trainingsChartDisplay: TrainingsNextLastChart;
@@ -19,9 +11,11 @@ interface TrainingStore {
   loadTrainingByTeamId: (team_id: string) => Promise<void>;
   loadAssignments: () => Promise<Assignment[] | any>;
   createTraining: (payload: TrainingSession) => Promise<TrainingSession | any>;
+  loadTrainingById: (trainingId: string) => Promise<void>;
 }
 
 export const TrainingStore = create<TrainingStore>((set) => ({
+  training: null,
   trainings: [],
   assignments: [],
   trainingsChartDisplay: {
@@ -29,16 +23,19 @@ export const TrainingStore = create<TrainingStore>((set) => ({
     last: null,
   },
 
+  loadTrainingById: async (trainingId: string) => {
+    const res = await getTrainingById(trainingId);
+    set({ training: res });
+  },
+
   loadTrainingByTeamId: async (teamId: string) => {
     const res = await getTrainingByTeamId(teamId);
-    set({ trainings: res });
+    set({ trainings: res as any });
   },
 
   loadNextAndLastTraining: async (team_id: string) => {
     try {
-      const { nextTraining, lastTraining } = await getNextAndLastTraining(
-        team_id
-      );
+      const { nextTraining, lastTraining } = await getNextAndLastTraining(team_id);
       set({
         trainingsChartDisplay: { next: nextTraining, last: lastTraining },
       });
