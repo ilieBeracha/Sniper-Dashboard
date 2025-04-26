@@ -4,11 +4,11 @@ import { authStore } from "../store/authStore";
 import { useStore } from "zustand";
 import SidebarT from "@/components/Sidebar";
 import ErrorPage from "./404";
-import Training from "./Training";
+import Training from "./Trainings";
 import { useEffect } from "react";
 import { userStore } from "@/store/userStore";
 import { teamStore } from "@/store/teamStore";
-import TrainingPage from "./TrainingPage";
+import TrainingPage from "./Training";
 
 export default function Home() {
   const { token } = useStore(authStore);

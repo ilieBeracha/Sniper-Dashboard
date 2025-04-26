@@ -10,8 +10,6 @@ import { isCommander } from "@/utils/permissions";
 import { userStore } from "@/store/userStore";
 import TrainingStats from "./TrainingStats";
 
-import TrainingPageAssignments from "./TrainingPageAssignments";
-import TrainingPageParticipants from "./TrainingPageParticipants";
 type TrainingPageOverviewProps = {
   training: TrainingSession | null;
 };
@@ -27,11 +25,6 @@ export default function TrainingPageOverview({ training }: TrainingPageOverviewP
     if (training?.id) {
       loadTrainingById(training.id);
     }
-  };
-
-  const handleManageSafety = () => {
-    // TODO: Implement safety management
-    console.log("Manage safety requirements");
   };
 
   return (

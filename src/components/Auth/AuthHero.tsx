@@ -1,6 +1,6 @@
 export default function AuthHero() {
   return (
-    <div className="hidden md:flex md:w-1/2 bg-[#0A0A0A] relative overflow-hidden">
+    <div className="hidden md:flex md:w-2/2 bg-[#0A0A0A] relative overflow-hidden">
       {/* Main background elements */}
       <div className="absolute inset-0 bg-[url('/images/tactical-pattern.svg')] opacity-[0.02]"></div>
 
@@ -26,7 +26,7 @@ export default function AuthHero() {
               />
             </svg>
           </div>
-          <h1 className="text-6xl font-bold text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">Scopeon</h1>
+          <h1 className="text-6xl font-bold text-white mb-4 bg-clip-text bg-gradient-to-r from-white to-gray-300">Scopeon</h1>
           <p className="text-xl text-gray-400 max-w-md mx-auto font-light">Tactical Operations Platform</p>
         </div>
 

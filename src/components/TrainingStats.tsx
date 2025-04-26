@@ -1,6 +1,6 @@
 import { TrainingSession } from "@/types/training";
 import { parseISO, isPast, isFuture } from "date-fns";
-import { Users, Calendar, Target, Trophy, BarChart } from "lucide-react";
+import { Users, Calendar, Target, Trophy } from "lucide-react";
 
 interface TrainingStatsProps {
   trainings: TrainingSession[];

@@ -75,8 +75,8 @@ export default function Auth() {
   return (
     <div className="flex h-screen bg-[#121212]">
       <AuthHero />
-      <div className="w-full md:w-3/5 flex items-center justify-center p-8">
-        <div className="w-full max-w-lg">
+      <div className="w-full md:w-5/5 flex items-center justify-center p-8">
+        <div className="w-full max-w-xl">
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-white">{getAuthTitle()}</h2>
             <p className="mt-2 text-gray-400">{getAuthDescription()}</p>

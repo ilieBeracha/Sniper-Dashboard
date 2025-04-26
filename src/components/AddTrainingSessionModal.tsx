@@ -7,7 +7,6 @@ import { Assignment } from "@/types/training";
 import BasicInfoSection from "./AddTrainingSessionModalBasicInfo";
 import AssignmentsSection from "./AddTrainingSessionModalAssignments";
 import TeamMembersSection from "./AddTrainingSessionModalMembers";
-import PreviewSection from "./AddTrainingSessionModalPreview";
 
 export default function TrainingAddTrainingSessionModal({
   isOpen,

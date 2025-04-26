@@ -12,10 +12,7 @@ export default function Login({ AuthSubmit }: { AuthSubmit: any }) {
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
       <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-gray-400"
-        >
+        <label htmlFor="email" className="block text-sm font-medium text-gray-400">
           Email address
         </label>
         <div className="mt-2">
@@ -31,10 +28,7 @@ export default function Login({ AuthSubmit }: { AuthSubmit: any }) {
       </div>
 
       <div>
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-gray-400"
-        >
+        <label htmlFor="password" className="block text-sm font-medium text-gray-400">
           Password
         </label>
         <div className="mt-2">
