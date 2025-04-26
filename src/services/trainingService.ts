@@ -21,7 +21,7 @@ export async function getTrainingById(trainingId: string) {
           squad_id
         )
       ),
-      training_assignments:assignments_trainings(
+      assignments_trainings:assignments_trainings(
         id,
         assignment:assignment_id(
           id,
@@ -52,16 +52,26 @@ export async function getTrainingByTeamId(teamId: string) {
       session_name,
       location,
       status,
-      assignments_trainings (
-        assignments (
+      assignments_trainings:assignments_trainings(
+        id,
+        assignment:assignment_id(
           id,
-          assignment_name
+          assignment_name,
+          created_at
         )
       )
+      participants:trainings_participants(
+        id,
+        participant_id,
+        created_at,
+        user:participant_id(
+          id, 
+          first_name, 
+      
     `
     )
     .eq("team_id", teamId)
-    .order("date", { ascending: false })
+    .order("date", { ascending: true })
     .limit(30);
 
   if (error) {
@@ -69,12 +79,7 @@ export async function getTrainingByTeamId(teamId: string) {
     return [];
   }
 
-  const flattenedTrainings = (trainings || []).map((t) => ({
-    ...t,
-    assignments_trainings: t.assignments_trainings.map((a: any) => a.assignments).filter(Boolean),
-  }));
-
-  return flattenedTrainings;
+  return trainings;
 }
 
 export async function getNextAndLastTraining(team_id: string) {

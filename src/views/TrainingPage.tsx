@@ -23,6 +23,7 @@ export default function TrainingPage() {
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
 
   useEffect(() => {
+    // load assignments
     loadAssignments();
     loadTrainingById(id as string);
   }, [id]);
@@ -35,6 +36,7 @@ export default function TrainingPage() {
   const handleConfirmStatusChange = async () => {
     try {
       const { data, error } = await supabase.from("training_sessions").update({ status: pendingStatus }).eq("id", training?.id);
+      console.log(data, error);
       if (error) {
         console.error("Error updating training status:", error);
       } else {

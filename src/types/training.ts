@@ -33,7 +33,7 @@ export interface TrainingSession {
   session_name: string;
   location: string;
   team_id?: string;
-  training_assignments?: Assignment[];
+  assignments_trainings?: Assignment[];
   participants?: TrainingParticipant[];
   status: TrainingStatus;
 }

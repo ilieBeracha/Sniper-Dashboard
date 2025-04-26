@@ -1,4 +1,4 @@
-import { TrainingSession } from "@/types/training";
+import { TrainingSession, Assignment } from "@/types/training";
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { ChevronRight, Clock, MapPin, Bookmark, Lock, UserCheck, Edit } from "lucide-react";
@@ -19,7 +19,7 @@ export function TrainingSessionCard({
   const navigate = useNavigate();
   const sessionDate = parseISO(session.date);
 
-  const participants = session.trainings_participants || [];
+  const participants = session.participants || [];
   const assignments = session.assignments_trainings || [];
 
   const isParticipant = participants.some((p) => p.participant_id === currentUserId);
@@ -57,7 +57,8 @@ export function TrainingSessionCard({
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h4 className="font-medium text-white text-sm">{session.session_name}</h4>
-            {isPast && (isParticipant ? <UserCheck className="w-3.5 h-3.5 text-green-400" /> : <Lock className="w-3.5 h-3.5 text-gray-500" />)}
+            {isPast &&
+              (isParticipant ? <div className="w-3.5 h-3.5 bg-green-500 rounded-full"></div> : <Lock className="w-3.5 h-3.5 text-gray-500" />)}
           </div>
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-gray-400 text-xs">
@@ -117,9 +118,9 @@ export function TrainingSessionCard({
       {/* Assignments Preview */}
       {assignments.length > 0 && (
         <div className="mt-2 pl-16 flex flex-wrap gap-1">
-          {assignments.slice(0, 3).map((assignment) => (
+          {assignments.slice(0, 3).map((assignment: Assignment) => (
             <span key={assignment.id} className="inline-block px-1.5 py-0.5 bg-[#161616] rounded text-xs text-gray-400">
-              {assignment.assignment_name}
+              {assignment.assignment.assignment_name}
             </span>
           ))}
           {assignments.length > 3 && <span className="inline-block px-1.5 py-0.5 text-xs text-gray-500">+{assignments.length - 3} more</span>}

@@ -8,8 +8,8 @@ import { teamStore } from "@/store/teamStore";
 import { TrainingStore } from "@/store/trainingStore";
 import { isCommander } from "@/utils/permissions";
 import { userStore } from "@/store/userStore";
-import { Calendar, Users, Target, FileText, Clock, MapPin, TrendingUp, Award, Star, CheckCircle2, AlertCircle, Shield } from "lucide-react";
-import { format } from "date-fns";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { Shield } from "lucide-react";
 
 type TrainingPageOverviewProps = {
   training: TrainingSession | null;
@@ -53,7 +53,7 @@ export default function TrainingPageOverview({ training }: TrainingPageOverviewP
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-[#1A1A1A] px-3 py-6 h-full rounded-lg text-center">
                   <div className="text-2xl font-medium text-indigo-400">
-                    {training?.training_assignments && training?.training_assignments?.length}
+                    {training?.assignments_trainings && training?.assignments_trainings?.length}
                   </div>
                   <div className="text-xs text-gray-400">Assignments</div>
                 </div>

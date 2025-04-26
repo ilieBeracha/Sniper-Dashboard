@@ -49,9 +49,7 @@ export default function Training() {
   return (
     <div className="text-gray-100 px-6 md:px-16 lg:px-28 py-8 md:py-12">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <div className="mb-2 md:mb-0">
-          <p className="text-gray-400">Manage and track your team's training progress</p>
-        </div>
+        <div className="mb-2 md:mb-0"></div>
         {isCommander(userRole) && (
           <button
             onClick={handleAddTrainingModal}
