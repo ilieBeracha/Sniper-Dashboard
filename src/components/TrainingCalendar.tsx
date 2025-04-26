@@ -32,7 +32,7 @@ export default function TrainingCalendar({ trainings }: { trainings: TrainingSes
             <div
               key={index}
               className={`
-                h-16 flex flex-col items-center justify-center rounded-md border transition-all
+                h-12 flex flex-col items-center justify-center rounded-md border transition-all
                 ${isTraining ? "border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20" : "border-white/5 bg-[#222] hover:bg-[#2A2A2A]"}
                 ${isCurrentDay ? "ring-2 ring-green-500 ring-offset-1 ring-offset-[#1A1A1A]" : ""}
                 hover:scale-[1.02] active:scale-[0.98]

@@ -4,15 +4,15 @@ import { TrainingStore } from "@/store/trainingStore";
 import { useStore } from "zustand";
 import TrainingPageOverview from "@/components/TrainingPageOverview";
 import TrainingPageAssignments from "@/components/TrainingPageAssignments";
-import TrainingPageParticipants from "@/components/TrainingPageParticipants";
 import TrainingPageParticipantsScore from "@/components/TrainingPageParticipantsScore";
-import BaseDashboardCard from "@/components/BaseDashboardCard";
-import { TrainingStatus } from "@/types/training";
+import { TrainingSession, TrainingStatus } from "@/types/training";
 import { isCommander } from "@/utils/permissions";
 import { userStore } from "@/store/userStore";
-import TrainingStatusButtons from "@/components/TrainingStatusButtons";
 import ConfirmStatusChangeModal from "@/components/ConfirmStatusChangeModal";
 import { supabase } from "@/services/supabaseClient";
+import EditTrainingSessionModal from "@/components/EditTrainingSessionModal";
+import { teamStore } from "@/store/teamStore";
+import TrainingPageChangeStatus from "@/components/TrainingPageChangeStatus";
 
 export default function TrainingPage() {
   const params = useParams();
@@ -21,9 +21,12 @@ export default function TrainingPage() {
   const { userRole } = useStore(userStore);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const { members } = useStore(teamStore);
+  const { assignments } = useStore(TrainingStore);
 
   useEffect(() => {
-    // load assignments
     loadAssignments();
     loadTrainingById(id as string);
   }, [id]);
@@ -50,35 +53,43 @@ export default function TrainingPage() {
     setPendingStatus(null);
   };
 
+  const handleEditSuccess = () => {
+    if (training?.id) {
+      loadTrainingById(training.id);
+    }
+  };
+
   return (
     <div className="min-h-screen from-[#1E1E20] text-gray-100 px-6 md:px-16 lg:px-28 py-8 md:py-12">
-      <div className="space-y-8">
-        <TrainingPageOverview training={training} />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <TrainingPageAssignments training={training} />
-          <TrainingPageParticipants training={training} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <TrainingPageOverview training={training} />
         </div>
-        <TrainingPageParticipantsScore training={training} />
+        <div className="lg:col-span-1">
+          <TrainingPageAssignments training={training} />
+        </div>
 
-        {isCommander(userRole) && (
-          <BaseDashboardCard title="Training Status" tooltipContent="Change the status of this training session">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-400">Current Status:</span>
-                <span className="text-sm font-medium">{training?.status}</span>
-              </div>
-              <TrainingStatusButtons currentStatus={training?.status as TrainingStatus} onStatusChange={handleStatusChange} />
-            </div>
-          </BaseDashboardCard>
-        )}
+        <div className="lg:col-span-3">
+          {isCommander(userRole) ? <TrainingPageChangeStatus training={training as TrainingSession} onStatusChange={handleStatusChange} /> : <></>}
+        </div>
+
+        <div className="lg:col-span-3">
+          <TrainingPageParticipantsScore training={training} />
+        </div>
       </div>
+
+      <EditTrainingSessionModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSuccess={handleEditSuccess}
+        teamMembers={members}
+        assignments={assignments}
+        training={training}
+      />
 
       <ConfirmStatusChangeModal
         isOpen={isConfirmModalOpen}
-        onClose={() => {
-          setIsConfirmModalOpen(false);
-          setPendingStatus(null);
-        }}
+        onClose={() => setIsConfirmModalOpen(false)}
         onConfirm={handleConfirmStatusChange}
         newStatus={pendingStatus as TrainingStatus}
       />

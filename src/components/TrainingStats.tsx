@@ -1,6 +1,6 @@
 import { TrainingSession } from "@/types/training";
 import { parseISO, isPast, isFuture } from "date-fns";
-import { Users, Calendar, Target, Trophy } from "lucide-react";
+import { Users, Calendar, Target, Trophy, BarChart } from "lucide-react";
 
 interface TrainingStatsProps {
   trainings: TrainingSession[];
@@ -45,12 +45,6 @@ export default function TrainingStats({ trainings }: TrainingStatsProps) {
 
   return (
     <div className="bg-[#1A1A1A] rounded-xl shadow-xl border border-white/5 overflow-hidden backdrop-blur-sm">
-      <div className="border-b border-white/5 p-6">
-        <div className="flex items-center">
-          <h2 className="text-xl font-bold text-white">Training Statistics</h2>
-        </div>
-      </div>
-
       <div className="p-6">
         <div className="grid grid-cols-2 gap-4">
           {stats.map((stat) => {

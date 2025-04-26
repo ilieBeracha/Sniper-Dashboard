@@ -32,7 +32,7 @@ export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, t
       const formattedDate = trainingDate.toISOString().slice(0, 16);
       setDate(formattedDate);
       setMembers(training.participants?.map((p) => p.participant_id) || []);
-      setAssignmentIds(training.training_assignments?.map((a) => a.assignment.id) || []);
+      setAssignmentIds(training.assignments_trainings?.map((a) => a.assignment.id) || []);
     }
   }, [training]);
 
