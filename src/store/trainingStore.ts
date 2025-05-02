@@ -7,13 +7,11 @@ import {
   insertTraining,
   getWeeklyAssignmentsStats,
 } from "@/services/trainingService";
-import { TrainingsNextLastChart, TrainingSession, Assignment, WeeklyAssignmentStats, Score, SquadScore, SquadScoresGrouped } from "@/types/training";
-import { getScoresGroupedBySquad } from "@/services/scoreService";
+import { TrainingsNextLastChart, TrainingSession, Assignment, WeeklyAssignmentStats } from "@/types/training";
 interface TrainingStore {
   training: TrainingSession | null;
   trainings: TrainingSession[] | [];
   assignments: Assignment[] | [];
-  scoresGroupedBySquad: SquadScore[] | [];
   trainingsChartDisplay: TrainingsNextLastChart;
   weeklyAssignmentsStats: WeeklyAssignmentStats[] | [];
   loadNextAndLastTraining: (team_id: string) => Promise<void>;
@@ -21,16 +19,13 @@ interface TrainingStore {
   loadAssignments: () => Promise<Assignment[] | any>;
   createTraining: (payload: TrainingSession) => Promise<TrainingSession | any>;
   loadTrainingById: (trainingId: string) => Promise<void>;
-  loadWeeklyAssignmentsStats: (team_id: string) => Promise<WeeklyAssignmentStats[] | any>;
+  loadWeeklyAssignmentsStats: (team_id: string) => Promise<void>;
   resetTraining: () => void;
-  getScoresGroupedBySquad: (trainingId: string) =>  Promise<SquadScore[] | any>;
 }
 
 export const TrainingStore = create<TrainingStore>((set) => ({
   training: null,
   trainings: [] as TrainingSession[],
-  scores: [] as Score[],
-  scoresGroupedBySquad: [] as SquadScoresGrouped[] | any,
   assignments: [] as Assignment[],
   weeklyAssignmentsStats: [] as WeeklyAssignmentStats[],
   trainingsChartDisplay: {
@@ -57,13 +52,6 @@ export const TrainingStore = create<TrainingStore>((set) => ({
     } catch (err) {
       console.error("Failed to load trainings:", err);
     }
-  },
-
-  getScoresGroupedBySquad: async (trainingId: string) => {
-    const res = await getScoresGroupedBySquad(trainingId);
-    console.log("res", res);
-    set({ scoresGroupedBySquad: res as SquadScoresGrouped[] | any   });
-    return res;
   },
 
   loadWeeklyAssignmentsStats: async (team_id: string) => {

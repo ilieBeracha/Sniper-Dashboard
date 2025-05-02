@@ -10,38 +10,3 @@ export async function getUserGroupingScoresRpc(userId: string) {
   }
   return data;
 }
-
-export async function getScoresByAssignmentSessionId(assignmentSessionId: string) {
-  const { data, error } = await supabase.from("score").select("*").eq("assignment_session_id", assignmentSessionId);
-  if (error) {
-    console.error("Error fetching scores by assignment ID:", error);
-    throw error;
-  }
-
-  return data;
-}
-
-export async function getScoresByTrainingId(trainingId: string) {
-  const { data, error } = await supabase.rpc("get_scores_by_training_session", {
-    training_session_id: trainingId,
-  });
-
-  if (error) {
-    console.error("Error fetching scores by training ID:", error);
-    throw error;
-  }
-  return data;
-}
-
-export async function getScoresGroupedBySquad(trainingId: string) {
-  const { data, error } = await supabase.rpc("get_scores_grouped_by_squad", {
-    training_session_id: trainingId,
-  });
-
-  console.log("data", data);
-  if (error) {
-    console.error("Error fetching scores by training ID:", error);
-    throw error;
-  }
-  return data;
-}
