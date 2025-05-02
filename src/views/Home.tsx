@@ -9,18 +9,21 @@ import { useEffect } from "react";
 import { userStore } from "@/store/userStore";
 import { teamStore } from "@/store/teamStore";
 import TrainingPage from "./Training";
+import { squadStore } from "@/store/squadStore";
 
 export default function Home() {
   const { token } = useStore(authStore);
   const useUserStore = useStore(userStore);
   const { fetchMembers } = useStore(teamStore);
+  const { getSquadUsersBySquadId } = useStore(squadStore);
 
   const user = useUserStore.user;
 
   useEffect(() => {
     const load = async () => {
-      if (user?.team_id) {
+      if (user?.team_id && user?.squad_id) {
         await fetchMembers(user.team_id);
+        await getSquadUsersBySquadId(user?.squad_id);
       }
     };
 

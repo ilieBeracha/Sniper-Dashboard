@@ -41,9 +41,8 @@ export async function getScoresByTrainingId(training_id: string): Promise<any[]>
           user:user_id (
             id,
             squad_id,
-            squad:squad_id (
-              squad_name
-            )
+            first_name,
+            last_name
           )
         )
       `)

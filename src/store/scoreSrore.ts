@@ -4,7 +4,7 @@ import { create } from "zustand";
 
 interface ScoreStore {
     scores: Score[];
-    createScore: (score: Score) => Promise<Score>;
+    createScore: (score: Score) => Promise<void>;
     getScoresByTrainingId: (training_id: string) => Promise<void>;
 }
 
@@ -13,7 +13,7 @@ export const scoreStore = create<ScoreStore>((set) => ({
     
     async createScore(store: Score){
         const res = await createScore(store)
-        return res
+        console.log(res)
     },    
 
     async getScoresByTrainingId(training_id: string){

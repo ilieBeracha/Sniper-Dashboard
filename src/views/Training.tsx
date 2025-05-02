@@ -14,6 +14,7 @@ import { teamStore } from "@/store/teamStore";
 import TrainingPageChangeStatus from "@/components/TrainingPageChangeStatus";
 import TrainingPageScore from "@/components/TrainingPageScore";
 import { scoreStore } from "@/store/scoreSrore";
+import { weaponsStore } from "@/store/weaponsStore";
 
 export default function TrainingPage() {
   const params = useParams();
@@ -25,6 +26,7 @@ export default function TrainingPage() {
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  const { getWeapons } = useStore(weaponsStore);
   const { members } = useStore(teamStore);
   const { assignments } = useStore(TrainingStore);
 
@@ -35,6 +37,7 @@ export default function TrainingPage() {
       await loadAssignments();
       await loadTrainingById(id as string);
       await getScoresByTrainingId(id as string);
+      await getWeapons();
     };
 
     load();

@@ -26,9 +26,9 @@ export async function getTeamMembers(
   if (!data) return [];
 
   // ✅ Filter logic based on role
-  if (["squad_commander", "soldier"].includes(currentUser.user_role)) {
-    return data.filter((user) => user.squad_id === currentUser.squad_id);
-  }
+  // if (["squad_commander", "soldier"].includes(currentUser.user_role)) {
+  //   return data.filter((user) => user.squad_id === currentUser.squad_id);
+  // }
 
   return data; // commander sees all
 }
