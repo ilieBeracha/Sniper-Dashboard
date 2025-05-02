@@ -2,14 +2,18 @@ import { TrainingStore } from "@/store/trainingStore";
 import BaseDashboardCard from "./BaseDashboardCard";
 import { useStore } from "zustand";
 import { Score } from "@/types/training";
-import { Target, Users, Clock, ChevronRight, Pencil, Plus } from "lucide-react";
-import ScoreFormModal from "./ScoreFormModal";
+import { Target, Plus } from "lucide-react";
+import ScoreFormModal from "./TrainingPageScoreFormModal";
 import { useState } from "react";
+
+import { userStore } from "@/store/userStore";
+import TrainingPageSquadScoreTable from "./TrainingPageSquadScoreTable";
 
 export default function TrainingPageScores() {
   const { scores } = useStore(TrainingStore);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingScore, setEditingScore] = useState<Score | null>(null);
+  const { user } = useStore(userStore);
 
   const handleSubmit = () => {
     setIsModalOpen(false);
@@ -48,12 +52,32 @@ export default function TrainingPageScores() {
     return acc;
   }, {} as Record<string, Score[]>);
 
+  // Calculate summary stats
+  const totalShots = scores.reduce((sum, s) => sum + (s.shots_fired || 0), 0);
+  const totalHits = scores.reduce((sum, s) => sum + (s.target_hit || 0), 0);
+  const avgAccuracy = totalShots ? Math.round((totalHits / totalShots) * 100) : 0;
+
   return (
     <BaseDashboardCard title="Training Score Registry" tooltipContent="Comprehensive training performance data registry">
       <div className="space-y-4">
+        {/* Summary Row */}
+        <div className="flex flex-wrap gap-4 justify-between items-center bg-gray-800/60 rounded-lg px-6 py-4 mb-2 border border-white/10">
+          <div className="flex flex-col items-center">
+            <span className="text-xs text-gray-400">Total Shots</span>
+            <span className="text-lg font-bold">{totalShots}</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="text-xs text-gray-400">Total Hits</span>
+            <span className="text-lg font-bold">{totalHits}</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="text-xs text-gray-400">Avg. Accuracy</span>
+            <span className="text-lg font-bold">{avgAccuracy}%</span>
+          </div>
+        </div>
+
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-base font-normal text-gray-300">{scores.length > 0 ? `Total Records: ${scores.length}` : "No Records Available"}</h3>
-
           <button
             onClick={() => {
               setEditingScore(null);
@@ -85,48 +109,16 @@ export default function TrainingPageScores() {
         ) : (
           <div className="space-y-6">
             {Object.entries(scoresBySquad).map(([squadId, squadScores]) => (
-              <div key={squadId} className="bg-[#1A1A1A] rounded border border-white/10">
-                <div className="px-4 py-3 bg-gray-750 border-b border-white/10 flex items-center">
-                  <Users className="w-4 h-4 text-gray-400 mr-2" />
-                  <h3 className="text-gray-200 font-medium text-sm">{squadId}</h3>
-                </div>
-
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-white/10 text-xs text-gray-400">
-                      <th className="text-left font-normal px-4 py-2">Assignment ID</th>
-                      <th className="text-left font-normal px-4 py-2">Date</th>
-                      <th className="text-right font-normal px-4 py-2">Shots</th>
-                      <th className="text-right font-normal px-4 py-2">Hits</th>
-                      <th className="text-right font-normal px-4 py-2">Accuracy</th>
-                      <th className="px-4 py-2 w-10"></th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-sm">
-                    {squadScores.map((score) => {
-                      const accuracy = getAccuracy(score.target_hit, score.shots_fired);
-
-                      return (
-                        <tr key={score.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
-                          <td className="px-4 py-3 text-gray-300 font-mono">{score.assignment_session_id?.substring(0, 8) || "N/A"}</td>
-                          <td className="px-4 py-3 text-gray-400">
-                            <div>{formatDate(score.created_at)}</div>
-                            <div className="text-xs text-gray-500">{formatTime(score.created_at)}</div>
-                          </td>
-                          <td className="px-4 py-3 text-right text-gray-300">{score.shots_fired}</td>
-                          <td className="px-4 py-3 text-right text-gray-300">{score.target_hit}</td>
-                          <td className="px-4 py-3 text-right font-medium text-gray-200">{accuracy}%</td>
-                          <td className="px-4 py-3 text-right">
-                            <button onClick={() => handleEdit(score)} className="p-1 hover:bg-white/10 rounded transition-colors" title="Edit record">
-                              <Pencil className="w-4 h-4 text-gray-400" />
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <TrainingPageSquadScoreTable
+                key={squadId}
+                squadId={squadId}
+                squadScores={squadScores}
+                user={user}
+                handleEdit={handleEdit}
+                getAccuracy={getAccuracy}
+                formatDate={formatDate}
+                formatTime={formatTime}
+              />
             ))}
           </div>
         )}

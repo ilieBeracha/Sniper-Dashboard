@@ -1,7 +1,7 @@
 import TrainingAddTrainingSessionModal from "@/components/AddTrainingSessionModal";
 import TrainingCalendar from "@/components/TrainingCalendar";
 import TrainingList from "@/components/TrainingList";
-import TrainingStats from "@/components/TrainingStats";
+import TrainingStats from "@/components/TrainingsStats";
 import { teamStore } from "@/store/teamStore";
 import { TrainingStore } from "@/store/trainingStore";
 import { userStore } from "@/store/userStore";

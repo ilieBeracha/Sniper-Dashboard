@@ -121,56 +121,69 @@ export default function ScoreFormModal({
 
             <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-400 mb-1.5">Shots Fired</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                  Shots Fired
+                </label>
                 <input
-                  className="block w-full rounded-md bg-white/5 px-3 py-2.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full rounded-md bg-white/10 px-3 py-2.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm"
                   type="number"
+                  placeholder="Enter shots fired"
                   value={score?.shots_fired || ""}
                   onChange={(e) => setScore({ ...score, shots_fired: parseInt(e.target.value) })}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-400 mb-1.5">Time Until First Shot</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                  Time Until First Shot
+                </label>
                 <input
-                  className="block w-full rounded-md bg-white/5 px-3 py-2.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full rounded-md bg-white/10 px-3 py-2.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm"
                   type="number"
+                  placeholder="Seconds until first shot"
                   value={score?.time_until_first_shot || ""}
                   onChange={(e) => setScore({ ...score, time_until_first_shot: parseInt(e.target.value) })}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-400 mb-1.5">Distance</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                  Distance
+                </label>
                 <input
-                  className="block w-full rounded-md bg-white/5 px-3 py-2.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full rounded-md bg-white/10 px-3 py-2.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm"
                   type="number"
+                  placeholder="Distance (meters)"
                   value={score?.distance || ""}
                   onChange={(e) => setScore({ ...score, distance: parseInt(e.target.value) })}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-400 mb-1.5">Target Hit</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                  Target Hit
+                </label>
                 <input
-                  className="block w-full rounded-md bg-white/5 px-3 py-2.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full rounded-md bg-white/10 px-3 py-2.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm"
                   type="number"
+                  placeholder="Number of targets hit"
                   value={score?.target_hit || ""}
                   onChange={(e) => setScore({ ...score, target_hit: parseInt(e.target.value) })}
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-400 mb-1.5">Day/Night</label>
-
-                <div className="flex items-center gap-2">
+              <div className="space-y-2 col-span-2">
+                <label className="block text-sm font-medium text-gray-400 mb-1.5">
+                  Day/Night
+                </label>
+                <div className="flex items-center gap-4 justify-center">
                   <button
                     type="button"
                     onClick={() => handleDayNightToggle("day")}
-                    className={`flex-1 rounded-md px-3 py-2.5 text-sm transition-colors duration-200 ${
+                    className={`flex-1 rounded-md px-4 py-2 text-base font-medium border ${
                       score.day_night === "day"
-                        ? "bg-indigo-500 text-white font-semibold hover:bg-indigo-600"
-                        : "bg-white/5 text-white hover:bg-white/10"
+                        ? "bg-indigo-600 text-white border-indigo-600"
+                        : "bg-white/10 text-white border-white/20"
                     }`}
                   >
                     Day
@@ -178,10 +191,10 @@ export default function ScoreFormModal({
                   <button
                     type="button"
                     onClick={() => handleDayNightToggle("night")}
-                    className={`flex-1 rounded-md px-3 py-2.5 text-sm transition-colors duration-200 ${
+                    className={`flex-1 rounded-md px-4 py-2 text-base font-medium border ${
                       score.day_night === "night"
-                        ? "bg-indigo-500 text-white font-semibold hover:bg-indigo-600"
-                        : "bg-white/5 text-white hover:bg-white/10"
+                        ? "bg-indigo-600 text-white border-indigo-600"
+                        : "bg-white/10 text-white border-white/20"
                     }`}
                   >
                     Night
