@@ -13,6 +13,7 @@ import EditTrainingSessionModal from "@/components/EditTrainingSessionModal";
 import { teamStore } from "@/store/teamStore";
 import TrainingPageChangeStatus from "@/components/TrainingPageChangeStatus";
 import TrainingPageScore from "@/components/TrainingPageScore";
+import { scoreStore } from "@/store/scoreSrore";
 
 export default function TrainingPage() {
   const params = useParams();
@@ -27,10 +28,13 @@ export default function TrainingPage() {
   const { members } = useStore(teamStore);
   const { assignments } = useStore(TrainingStore);
 
+  const { getScoresByTrainingId } = useStore(scoreStore);
+
   useEffect(() => {
     const load = async () => {
       await loadAssignments();
       await loadTrainingById(id as string);
+      await getScoresByTrainingId(id as string);
     };
 
     load();
