@@ -9,8 +9,8 @@ export default function TrainingPageAssignments({ training }: TrainingPageAssign
   return (
     <BaseDashboardCard title="Current Assignments" tooltipContent="List of assignments for this training session">
       <div className="space-y-3 max-h-[300px] overflow-y-auto">
-        {training?.assignments_trainings &&
-          training?.assignments_trainings?.map((assignment: Assignment) => (
+        {training?.assignment_session &&
+          training?.assignment_session?.map((assignment: Assignment) => (
             <div key={assignment.id} className="flex justify-between items-center p-3 bg-[#1A1A1A] rounded-lg">
               <div>
                 <h3 className="font-medium">{assignment.assignment.assignment_name}</h3>

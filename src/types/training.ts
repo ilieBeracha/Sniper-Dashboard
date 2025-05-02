@@ -53,7 +53,7 @@ export interface TrainingSession {
   session_name: string;
   location: string;
   team_id?: string;
-  assignments_trainings?: Assignment[];
+  assignment_session?: Assignment[];
   participants?: TrainingParticipant[];
   status: TrainingStatus;
 }
@@ -123,4 +123,24 @@ export enum ScorePosition {
   Squatting = "Squatting",
   Kneeling = "Kneeling",
   Sitting = "Sitting",
+}
+
+export interface Score {
+  assignment_session_id: string;
+  created_at: string;
+  day_night: string;
+  distance: number;
+  hits: number;
+  id: string;
+  shots_fired: number;
+  squad_id: string;
+  target_hit: number;
+  time_until_first_shot: number;
+  training_id: string;
+  user_participants: {
+    user_id: string;
+    weapon_id: string;
+    equipment_id: string;
+    position: string;
+  }[];
 }

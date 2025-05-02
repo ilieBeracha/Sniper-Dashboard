@@ -32,7 +32,7 @@ export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, t
       const formattedDate = trainingDate.toISOString().slice(0, 16);
       setDate(formattedDate);
       setMembers(training.participants?.map((p) => p.participant_id) || []);
-      setAssignmentIds(training.assignments_trainings?.map((a) => a.assignment.id) || []);
+      setAssignmentIds(training.assignment_session?.map((a) => a.assignment.id) || []);
     }
   }, [training]);
 
@@ -40,7 +40,7 @@ export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, t
     if (!training?.id) return;
 
     const { error: sessionError } = await supabase
-      .from("training_sessions")
+      .from("training_session")
       .update({
         session_name: sessionName,
         location,
@@ -70,14 +70,14 @@ export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, t
     }
 
     if (assignmentIds.length) {
-      await supabase.from("assignments_trainings").delete().eq("training_id", training.id);
+      await supabase.from("assignment_session").delete().eq("training_id", training.id);
 
       const assignmentData = assignmentIds.map((assignmentId) => ({
         training_id: training.id,
         assignment_id: assignmentId,
       }));
 
-      const { error: assignmentError } = await supabase.from("assignments_trainings").insert(assignmentData);
+      const { error: assignmentError } = await supabase.from("assignment_session").insert(assignmentData);
 
       if (assignmentError) {
         console.error("Updating training assignments failed:", assignmentError);

@@ -21,7 +21,7 @@ export function TrainingSessionCard({
   const sessionDate = parseISO(session.date);
 
   const participants = session.participants || [];
-  const assignments = session.assignments_trainings || [];
+  const assignments = session.assignment_session || [];
 
   const isParticipant = participants.some((p) => p.participant_id === currentUserId);
   const canAccess = !isPast || (isPast && isParticipant);

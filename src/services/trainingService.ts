@@ -3,7 +3,7 @@ import { supabase } from "./supabaseClient";
 
 export async function getTrainingById(trainingId: string) {
   const { data, error } = await supabase
-    .from("training_sessions")
+    .from("training_session")
     .select(
       `
       *,
@@ -21,13 +21,14 @@ export async function getTrainingById(trainingId: string) {
           squad_id
         )
       ),
-      assignments_trainings:assignments_trainings(
+      assignment_session:assignment_session(
         id,
         assignment:assignment_id(
           id,
           assignment_name,
           created_at
         )
+        
       )
     `
     )
@@ -44,7 +45,7 @@ export async function getTrainingById(trainingId: string) {
 
 export async function getTrainingByTeamId(teamId: string, currentUserId?: string) {
   const { data: trainings, error } = await supabase
-    .from("training_sessions")
+    .from("training_session")
     .select(
       `
       id,
@@ -52,7 +53,7 @@ export async function getTrainingByTeamId(teamId: string, currentUserId?: string
       session_name,
       location,
       status,
-      assignments_trainings:assignments_trainings(
+      assignment_session:assignment_session(
         id,
         assignment:assignment_id(
           id,
@@ -83,7 +84,7 @@ export async function getTrainingByTeamId(teamId: string, currentUserId?: string
   }
 
   const processedTrainings = (trainings || []).map((training) => {
-    const assignments = training.assignments_trainings.map((item) => item.assignment).filter(Boolean);
+    const assignments = training.assignment_session.map((item) => item.assignment).filter(Boolean);
     const participantsCount = training.participants ? training.participants.length : 0;
     const isParticipating = currentUserId && training.participants ? training.participants.some((p) => p.participant_id === currentUserId) : false;
 
@@ -92,7 +93,7 @@ export async function getTrainingByTeamId(teamId: string, currentUserId?: string
       assignments,
       participantsCount,
       isParticipating,
-      assignments_trainings: undefined,
+      assignment_session: undefined,
     };
   });
 
@@ -101,15 +102,15 @@ export async function getTrainingByTeamId(teamId: string, currentUserId?: string
 
 export async function getNextAndLastTraining(team_id: string) {
   const { data: nextTraining, error: nextError } = await supabase
-    .from("training_sessions")
+    .from("training_session")
     .select(
       `
       id,
       date,
       session_name,
-      assignments_trainings (
+      assignment_session (
         assignment_id,
-        assignments (
+        assignment (
           id,
           assignment_name
         )
@@ -123,15 +124,15 @@ export async function getNextAndLastTraining(team_id: string) {
     .maybeSingle();
 
   const { data: lastTraining, error: lastError } = await supabase
-    .from("training_sessions")
+    .from("training_session")
     .select(
       `
       id,
       date,
       session_name,
-      assignments_trainings (
+      assignment_session (
         assignment_id,
-        assignments (
+        assignment (
           id,
           assignment_name
         )
@@ -152,7 +153,8 @@ export async function getNextAndLastTraining(team_id: string) {
 }
 
 export async function insertTraining(payload: any) {
-  return supabase.from("training_sessions").insert([payload]).select("id").maybeSingle();
+  console.log(payload);
+  return supabase.from("training_session").insert([payload]).select("id").maybeSingle();
 }
 
 export async function assignParticipantsToTraining(training_id: string, participantIds: string[]) {
@@ -167,7 +169,7 @@ export async function assignParticipantsToTraining(training_id: string, particip
 }
 
 export async function getAssignments(): Promise<Assignment[] | []> {
-  const { data, error } = await supabase.from("assignments").select("*");
+  const { data, error } = await supabase.from("assignment").select("*");
 
   if (error) {
     console.error("Failed to fetch assignments:", error.message);

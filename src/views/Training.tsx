@@ -4,7 +4,6 @@ import { TrainingStore } from "@/store/trainingStore";
 import { useStore } from "zustand";
 import TrainingPageOverview from "@/components/TrainingPageOverview";
 import TrainingPageAssignments from "@/components/TrainingPageAssignments";
-import TrainingPageParticipantsScore from "@/components/TrainingPageParticipantsScore";
 import { TrainingSession, TrainingStatus } from "@/types/training";
 import { isCommander } from "@/utils/permissions";
 import { userStore } from "@/store/userStore";
@@ -13,11 +12,13 @@ import { supabase } from "@/services/supabaseClient";
 import EditTrainingSessionModal from "@/components/EditTrainingSessionModal";
 import { teamStore } from "@/store/teamStore";
 import TrainingPageChangeStatus from "@/components/TrainingPageChangeStatus";
+import TrainingPageScores from "@/components/TrainingPageScores";
 
 export default function TrainingPage() {
   const params = useParams();
   const { id } = params;
-  const { training, loadTrainingById, loadAssignments } = useStore(TrainingStore);
+  const { training, loadTrainingById, loadAssignments, getScoresByTrainingId } = useStore(TrainingStore);
+
   const { userRole } = useStore(userStore);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
@@ -27,8 +28,13 @@ export default function TrainingPage() {
   const { assignments } = useStore(TrainingStore);
 
   useEffect(() => {
-    loadAssignments();
-    loadTrainingById(id as string);
+    const load = async () => {
+      await loadAssignments();
+      await loadTrainingById(id as string);
+      await getScoresByTrainingId(id as string);
+    };
+
+    load();
   }, [id]);
 
   const handleStatusChange = async (newStatus: TrainingStatus) => {
@@ -38,7 +44,7 @@ export default function TrainingPage() {
 
   const handleConfirmStatusChange = async () => {
     try {
-      const { data, error } = await supabase.from("training_sessions").update({ status: pendingStatus }).eq("id", training?.id);
+      const { data, error } = await supabase.from("training_session").update({ status: pendingStatus }).eq("id", training?.id);
       console.log(data, error);
       if (error) {
         console.error("Error updating training status:", error);
@@ -74,7 +80,7 @@ export default function TrainingPage() {
         </div>
 
         <div className="lg:col-span-3">
-          <TrainingPageParticipantsScore training={training} />
+          <TrainingPageScores />
         </div>
       </div>
 

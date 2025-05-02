@@ -32,7 +32,7 @@ export default function TrainingAddTrainingSessionModal({
     if (!user?.team_id) return alert("Missing team ID");
 
     const { data: newTraining, error: sessionError } = await supabase
-      .from("training_sessions")
+      .from("training_session")
       .insert([
         {
           session_name: sessionName,
@@ -71,7 +71,7 @@ export default function TrainingAddTrainingSessionModal({
         assignment_id: assignmentId,
       }));
 
-      const { error: assignmentError } = await supabase.from("assignments_trainings").insert(assignmentData);
+      const { error: assignmentError } = await supabase.from("assignment_session").insert(assignmentData);
 
       if (assignmentError) {
         console.error("Assigning training assignments failed:", assignmentError);
