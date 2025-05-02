@@ -144,3 +144,31 @@ export interface Score {
     position: string;
   }[];
 }
+
+export interface SquadScoreMember {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  weapon_id: string | null;
+  equipment_id: string | null;
+  position: string | null;
+}
+
+export interface SquadScore {
+  score_id: string;
+  assignment_session_id: string;
+  time_until_first_shot: number;
+  distance: number;
+  target_hit: number;
+  day_night: string;
+  shots_fired: number;
+  hits: number;
+  created_at: string;
+  squad_members: SquadScoreMember[];
+}
+
+export interface SquadScoresGrouped {
+  squad_id: string;
+  squad_name: string;
+  scores: SquadScore[];
+}

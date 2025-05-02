@@ -32,3 +32,16 @@ export async function getScoresByTrainingId(trainingId: string) {
   }
   return data;
 }
+
+export async function getScoresGroupedBySquad(trainingId: string) {
+  const { data, error } = await supabase.rpc("get_scores_grouped_by_squad", {
+    training_session_id: trainingId,
+  });
+
+  console.log("data", data);
+  if (error) {
+    console.error("Error fetching scores by training ID:", error);
+    throw error;
+  }
+  return data;
+}

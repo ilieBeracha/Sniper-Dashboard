@@ -3,13 +3,13 @@ import { useState, useEffect } from "react";
 import SearchableCheckboxList from "./SearchableCheckboxList";
 import { TrainingStore } from "@/store/trainingStore";
 import { useStore } from "zustand";
-import { Score } from "@/types/training";
+import { SquadScore } from "@/types/training";
 import { squadStore } from "@/store/squadStore";
 import { isCommander } from "@/utils/permissions";
 import { userStore } from "@/store/userStore";
-import { UserRole } from "@/types/user";
 import { teamStore } from "@/store/teamStore";
 import { supabase } from "@/services/supabaseClient";
+import { UserRole } from "@/types/user";
 
 export default function ScoreFormModal({
   isOpen,
@@ -20,22 +20,22 @@ export default function ScoreFormModal({
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  editingScore: Score | null;
+  editingScore: SquadScore | null;
 }) {
   const [assignmentId, setAssignmentId] = useState<string>();
-  const [score, setScore] = useState<Score>({} as Score);
+  const [score, setScore] = useState<SquadScore>({} as SquadScore);
   const { squadsWithMembers } = useStore(squadStore);
   const { members: teamMembers } = useStore(teamStore);
-  const { getScoresByTrainingId } = useStore(TrainingStore);
   const { user } = useStore(userStore);
   const { training } = useStore(TrainingStore);
 
   useEffect(() => {
+    console.log("editingScore:", editingScore);
     if (editingScore) {
       setScore(editingScore);
       setAssignmentId(editingScore.assignment_session_id);
     } else {
-      setScore({} as Score);
+      setScore({} as SquadScore);
       setAssignmentId(undefined);
     }
   }, [editingScore]);
@@ -50,11 +50,10 @@ export default function ScoreFormModal({
     const assignmentSession = training?.assignment_session?.find((assignment) => assignment.assignment.id === assignmentId);
 
     if (editingScore) {
-      // Update existing score
       const res = await supabase
         .from("score")
         .update({
-          assignment_session_id: assignmentSession?.id,
+          assignment_session_id: assignmentSession?.id || null,
           squad_id: user?.squads?.id || null,
           shots_fired: score.shots_fired,
           time_until_first_shot: score.time_until_first_shot,
@@ -62,13 +61,12 @@ export default function ScoreFormModal({
           target_hit: score.target_hit,
           day_night: score.day_night,
         })
-        .eq("id", editingScore.id);
+        .eq("id", editingScore.score_id);
 
       if (res.error) {
         console.log(res.error);
       }
     } else {
-      // Create new score
       const res = await supabase.from("score").insert({
         assignment_session_id: assignmentSession?.id,
         squad_id: user?.squads?.id || null,
@@ -84,7 +82,6 @@ export default function ScoreFormModal({
       }
     }
 
-    getScoresByTrainingId(training?.id || "");
     onSubmit();
   }
 
@@ -180,22 +177,20 @@ export default function ScoreFormModal({
                   <button
                     type="button"
                     onClick={() => handleDayNightToggle("day")}
-                    className={`flex-1 rounded-md px-4 py-2 text-base font-medium border ${
-                      score.day_night === "day"
-                        ? "bg-indigo-600 text-white border-indigo-600"
-                        : "bg-white/10 text-white border-white/20"
-                    }`}
+                    className={`flex-1 rounded-md px-4 py-2 text-base font-medium border ${score.day_night === "day"
+                      ? "bg-indigo-600 text-white border-indigo-600"
+                      : "bg-white/10 text-white border-white/20"
+                      }`}
                   >
                     Day
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDayNightToggle("night")}
-                    className={`flex-1 rounded-md px-4 py-2 text-base font-medium border ${
-                      score.day_night === "night"
-                        ? "bg-indigo-600 text-white border-indigo-600"
-                        : "bg-white/10 text-white border-white/20"
-                    }`}
+                    className={`flex-1 rounded-md px-4 py-2 text-base font-medium border ${score.day_night === "night"
+                      ? "bg-indigo-600 text-white border-indigo-600"
+                      : "bg-white/10 text-white border-white/20"
+                      }`}
                   >
                     Night
                   </button>
@@ -220,16 +215,9 @@ export default function ScoreFormModal({
               <>
                 <label className="block text-sm font-medium text-gray-400 mb-1.5">Participants</label>
                 <div className="space-y-4 flex flex-col gap-2">
-                  {squadsWithMembers?.map((squad) => (
-                    <div key={squad.id}>
-                      <div className="text-sm font-medium text-white">{squad.squad_name}</div>
-                      <div className="flex flex-col gap-2">
-                        {squad.users?.map((user) => (
-                          <div key={user.id} className="text-sm text-white">
-                            {user.first_name} {user.last_name}
-                          </div>
-                        ))}
-                      </div>
+                  {editingScore?.squad_members?.map((squadMember) => (
+                    <div key={squadMember.user_id}>
+                      <div className="text-sm font-medium text-white">{squadMember.first_name} {squadMember.last_name}</div>
                     </div>
                   ))}
                 </div>

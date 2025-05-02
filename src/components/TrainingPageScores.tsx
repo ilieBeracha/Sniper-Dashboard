@@ -1,26 +1,30 @@
 import { TrainingStore } from "@/store/trainingStore";
 import BaseDashboardCard from "./BaseDashboardCard";
 import { useStore } from "zustand";
-import { Score } from "@/types/training";
+import { SquadScore, SquadScoresGrouped } from "@/types/training";
 import { Target, Plus } from "lucide-react";
 import ScoreFormModal from "./TrainingPageScoreFormModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { userStore } from "@/store/userStore";
 import TrainingPageSquadScoreTable from "./TrainingPageSquadScoreTable";
 
 export default function TrainingPageScores() {
-  const { scores } = useStore(TrainingStore);
+  const { scoresGroupedBySquad } = useStore(TrainingStore);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingScore, setEditingScore] = useState<Score | null>(null);
+  const [editingScore, setEditingScore] = useState<SquadScore | null>(null);
   const { user } = useStore(userStore);
+
+  useEffect(() => {
+    console.log("scoresGroupedBySquad", scoresGroupedBySquad);
+  }, [scoresGroupedBySquad]);
 
   const handleSubmit = () => {
     setIsModalOpen(false);
     setEditingScore(null);
   };
 
-  const handleEdit = (score: Score) => {
+  const handleEdit = (score: SquadScore) => {
     setEditingScore(score);
     setIsModalOpen(true);
   };
@@ -45,39 +49,11 @@ export default function TrainingPageScores() {
     });
   };
 
-  const scoresBySquad = scores.reduce((acc, score) => {
-    const squadId = score.squad_id || "Unassigned";
-    if (!acc[squadId]) acc[squadId] = [];
-    acc[squadId].push(score);
-    return acc;
-  }, {} as Record<string, Score[]>);
-
-  // Calculate summary stats
-  const totalShots = scores.reduce((sum, s) => sum + (s.shots_fired || 0), 0);
-  const totalHits = scores.reduce((sum, s) => sum + (s.target_hit || 0), 0);
-  const avgAccuracy = totalShots ? Math.round((totalHits / totalShots) * 100) : 0;
-
   return (
     <BaseDashboardCard title="Training Score Registry" tooltipContent="Comprehensive training performance data registry">
       <div className="space-y-4">
-        {/* Summary Row */}
-        <div className="flex flex-wrap gap-4 justify-between items-center bg-gray-800/60 rounded-lg px-6 py-4 mb-2 border border-white/10">
-          <div className="flex flex-col items-center">
-            <span className="text-xs text-gray-400">Total Shots</span>
-            <span className="text-lg font-bold">{totalShots}</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-xs text-gray-400">Total Hits</span>
-            <span className="text-lg font-bold">{totalHits}</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-xs text-gray-400">Avg. Accuracy</span>
-            <span className="text-lg font-bold">{avgAccuracy}%</span>
-          </div>
-        </div>
-
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-base font-normal text-gray-300">{scores.length > 0 ? `Total Records: ${scores.length}` : "No Records Available"}</h3>
+          <h3 className="text-base font-normal text-gray-300">{scoresGroupedBySquad.length > 0 ? `Total Records: ${scoresGroupedBySquad.length}` : "No Records Available"}</h3>
           <button
             onClick={() => {
               setEditingScore(null);
@@ -100,7 +76,7 @@ export default function TrainingPageScores() {
           editingScore={editingScore}
         />
 
-        {Object.keys(scoresBySquad).length === 0 ? (
+        {Object.keys(scoresGroupedBySquad).length === 0 ? (
           <div className="text-center py-12 rounded bg-[#1A1A1A] border border-white/10">
             <Target className="mx-auto h-10 w-10 text-gray-600 mb-3" />
             <p className="text-gray-400">No performance data available</p>
@@ -108,12 +84,10 @@ export default function TrainingPageScores() {
           </div>
         ) : (
           <div className="space-y-6">
-            {Object.entries(scoresBySquad).map(([squadId, squadScores]) => (
+            {scoresGroupedBySquad.map((squadScores: SquadScoresGrouped | any, index: number) => (
               <TrainingPageSquadScoreTable
-                key={squadId}
-                squadId={squadId}
+                key={index}
                 squadScores={squadScores}
-                user={user}
                 handleEdit={handleEdit}
                 getAccuracy={getAccuracy}
                 formatDate={formatDate}

@@ -17,7 +17,7 @@ import TrainingPageScores from "@/components/TrainingPageScores";
 export default function TrainingPage() {
   const params = useParams();
   const { id } = params;
-  const { training, loadTrainingById, loadAssignments, getScoresByTrainingId } = useStore(TrainingStore);
+  const { training, loadTrainingById, loadAssignments, getScoresGroupedBySquad } = useStore(TrainingStore);
 
   const { userRole } = useStore(userStore);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -31,7 +31,7 @@ export default function TrainingPage() {
     const load = async () => {
       await loadAssignments();
       await loadTrainingById(id as string);
-      await getScoresByTrainingId(id as string);
+      await getScoresGroupedBySquad(id as string);
     };
 
     load();
@@ -92,6 +92,7 @@ export default function TrainingPage() {
         assignments={assignments}
         training={training}
       />
+
 
       <ConfirmStatusChangeModal
         isOpen={isConfirmModalOpen}

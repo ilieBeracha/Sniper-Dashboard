@@ -7,13 +7,13 @@ import {
   insertTraining,
   getWeeklyAssignmentsStats,
 } from "@/services/trainingService";
-import { TrainingsNextLastChart, TrainingSession, Assignment, WeeklyAssignmentStats, Score } from "@/types/training";
-import { getScoresByTrainingId } from "@/services/scoreService";
+import { TrainingsNextLastChart, TrainingSession, Assignment, WeeklyAssignmentStats, Score, SquadScore, SquadScoresGrouped } from "@/types/training";
+import { getScoresGroupedBySquad } from "@/services/scoreService";
 interface TrainingStore {
   training: TrainingSession | null;
   trainings: TrainingSession[] | [];
   assignments: Assignment[] | [];
-  scores: Score[] | [];
+  scoresGroupedBySquad: SquadScore[] | [];
   trainingsChartDisplay: TrainingsNextLastChart;
   weeklyAssignmentsStats: WeeklyAssignmentStats[] | [];
   loadNextAndLastTraining: (team_id: string) => Promise<void>;
@@ -23,13 +23,14 @@ interface TrainingStore {
   loadTrainingById: (trainingId: string) => Promise<void>;
   loadWeeklyAssignmentsStats: (team_id: string) => Promise<WeeklyAssignmentStats[] | any>;
   resetTraining: () => void;
-  getScoresByTrainingId: (trainingId: string) => Promise<any[] | any>;
+  getScoresGroupedBySquad: (trainingId: string) =>  Promise<SquadScore[] | any>;
 }
 
 export const TrainingStore = create<TrainingStore>((set) => ({
   training: null,
   trainings: [] as TrainingSession[],
   scores: [] as Score[],
+  scoresGroupedBySquad: [] as SquadScoresGrouped[] | any,
   assignments: [] as Assignment[],
   weeklyAssignmentsStats: [] as WeeklyAssignmentStats[],
   trainingsChartDisplay: {
@@ -58,6 +59,13 @@ export const TrainingStore = create<TrainingStore>((set) => ({
     }
   },
 
+  getScoresGroupedBySquad: async (trainingId: string) => {
+    const res = await getScoresGroupedBySquad(trainingId);
+    console.log("res", res);
+    set({ scoresGroupedBySquad: res as SquadScoresGrouped[] | any   });
+    return res;
+  },
+
   loadWeeklyAssignmentsStats: async (team_id: string) => {
     try {
       const res = await getWeeklyAssignmentsStats(team_id);
@@ -76,12 +84,6 @@ export const TrainingStore = create<TrainingStore>((set) => ({
     } catch (error) {
       console.error("Failed to load getAssignments:", error);
     }
-  },
-
-  getScoresByTrainingId: async (trainingId: string) => {
-    const res = await getScoresByTrainingId(trainingId);
-    set({ scores: res });
-    return res;
   },
 
   createTraining: async (sessionData: TrainingSession) => {
