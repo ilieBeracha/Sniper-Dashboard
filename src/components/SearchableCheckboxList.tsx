@@ -73,7 +73,7 @@ export default function SearchableCheckboxList({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2.5 bg-white/5 text-white text-sm border border-white/10 rounded-md hover:bg-white/10 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        className="w-full flex items-center justify-between px-3 py-3 bg-white/5 text-white text-sm border border-white/10 rounded-md hover:bg-white/10 focus:outline-none focus:ring-1 focus:ring-indigo-500"
       >
         <div className="flex items-center gap-2 min-w-0">
           {selectedItems.length > 0 ? (
