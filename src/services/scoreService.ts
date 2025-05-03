@@ -1,4 +1,4 @@
-import { Score, ScoreParticipant } from "@/types/score";
+import { ScoreParticipant } from "@/types/score";
 import { supabase } from "./supabaseClient";
 import { ScoreFormValues } from "@/hooks/useScoreForm";
 
@@ -86,20 +86,6 @@ export async function createScore(scoreData: ScoreFormValues) {
   console.log("Creating score with data:", scoreData);
 
   try {
-    // First, validate the assignment_session_id exists
-    if (scoreData.assignment_session_id) {
-      const { data: sessionCheck, error: sessionError } = await supabase
-        .from("assignment_session")
-        .select("id")
-        .eq("id", scoreData.assignment_session_id)
-        .single();
-
-      if (sessionError || !sessionCheck) {
-        throw new Error(`Assignment session with ID ${scoreData.assignment_session_id} does not exist`);
-      }
-    }
-
-    // Now insert the score
     const { data, error } = await supabase.from("score").insert([scoreData]).select("*").single();
 
     if (error) throw new Error(error.message);

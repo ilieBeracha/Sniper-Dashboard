@@ -28,6 +28,7 @@ export default function ScoreFormModal({
     validateForm,
     handleAssignmentErrors,
     teamMembers,
+    resetForm,
   } = useScoreForm({ isOpen, editingScore, assignmentSessions });
 
   const handleSubmit = () => {
@@ -55,6 +56,11 @@ export default function ScoreFormModal({
     } else {
       setErrors([]);
       setStep((prevStep) => (prevStep === 1 ? 2 : 1));
+    }
+    if (step === 2) {
+      setTimeout(() => {
+        resetForm();
+      }, 1000);
     }
   };
 

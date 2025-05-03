@@ -14,6 +14,7 @@ import { teamStore } from "@/store/teamStore";
 import TrainingPageChangeStatus from "@/components/TrainingPageChangeStatus";
 import TrainingPageScore from "@/components/TrainingPageScore";
 import { scoreStore } from "@/store/scoreSrore";
+import { loaderStore } from "@/store/loaderStore";
 
 export default function TrainingPage() {
   const params = useParams();
@@ -25,6 +26,7 @@ export default function TrainingPage() {
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  const { isLoading } = useStore(loaderStore);
   const { members } = useStore(teamStore);
   const { assignments } = useStore(TrainingStore);
 
@@ -40,7 +42,7 @@ export default function TrainingPage() {
     };
 
     load();
-  }, [id]);
+  }, [id, isLoading]);
 
   const handleStatusChange = async (newStatus: TrainingStatus) => {
     setPendingStatus(newStatus);

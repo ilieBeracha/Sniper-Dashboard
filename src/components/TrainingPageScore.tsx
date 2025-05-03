@@ -3,14 +3,15 @@ import ScoreFormModal from "./TrainingPageScoreFormModal";
 import { useState, useEffect } from "react";
 import { useStore } from "zustand";
 import { scoreStore } from "@/store/scoreSrore";
-import { Edit2Icon, Plus, Users, Moon, Sun, Clock, Target, ChevronDown, ChevronUp } from "lucide-react";
+import { Edit2Icon, Plus, Users, Moon, Sun, Clock, Target, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { userStore } from "@/store/userStore";
 import { isCommander } from "@/utils/permissions";
 
 import { Score } from "@/types/score";
 import ScoreParticipantsDisplay from "./TrainingPageScoreParticipantsDisplay";
 import { TrainingStore } from "@/store/trainingStore";
-
+import { getScoresByTrainingId } from "@/services/scoreService";
+import { loaderStore } from "@/store/loaderStore";
 export default function TrainingPageScore() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expandedSquads, setExpandedSquads] = useState<any>({});
@@ -19,6 +20,8 @@ export default function TrainingPageScore() {
   const { scores, createScore } = useStore(scoreStore);
   const { user } = useStore(userStore);
   const { training } = useStore(TrainingStore);
+  const { isLoading, setIsLoading } = useStore(loaderStore);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (scores.length > 0) {
@@ -40,15 +43,20 @@ export default function TrainingPageScore() {
   };
 
   const submitScore = async (formValues: any) => {
+    setIsSubmitting(true);
     try {
       if (!user?.squad_id) {
         formValues.squad_id = user?.squad_id;
       }
-
       await createScore(formValues);
       setIsModalOpen(false);
+      setIsLoading(true);
+      await getScoresByTrainingId(training?.id || "");
     } catch (error) {
       console.error("Error submitting score:", error);
+    } finally {
+      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
@@ -94,6 +102,16 @@ export default function TrainingPageScore() {
   return (
     <BaseDashboardCard title="Training Score Dashboard" tooltipContent="Performance overview across all squads">
       <div className="relative">
+        {/* Loading overlay for fetching data */}
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/50 backdrop-blur-sm z-10">
+            <div className="bg-zinc-800 rounded-lg p-4 flex items-center space-x-3 border border-zinc-700">
+              <Loader2 className="h-6 w-6 text-zinc-400 animate-spin" />
+              <span className="text-zinc-300 font-medium">Updating scores...</span>
+            </div>
+          </div>
+        )}
+
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center space-x-2">
             <Target className="h-5 w-5 text-zinc-400" />
@@ -102,8 +120,10 @@ export default function TrainingPageScore() {
 
           <button
             onClick={() => setIsModalOpen(true)}
+            disabled={isLoading}
             className="px-4 py-2 text-sm font-medium text-white bg-zinc-800 hover:bg-zinc-700 
-                            active:bg-zinc-900 rounded flex items-center gap-2 border border-zinc-700 transition-colors"
+                            active:bg-zinc-900 rounded flex items-center gap-2 border border-zinc-700 
+                            transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus size={16} />
             Record Score

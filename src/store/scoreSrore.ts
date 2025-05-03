@@ -33,8 +33,6 @@ export const scoreStore = create<ScoreStore>((set) => ({
     if (scoreForm.squad_id) score.squad_id = scoreForm.squad_id;
     const res = await createScore(score);
 
-    console.log(res);
-
     if (res) {
       await createScoreParticipant(scoreForm.score_participants, res.id);
     }

@@ -9,7 +9,7 @@ export interface ScoreFormValues {
   time_until_first_shot: string;
   distance: string;
   target_hit: string;
-  day_night: 'day' | 'night';
+  day_night: "day" | "night";
   participants: string[];
   wind_strength: number | null;
   wind_direction: number | null;
@@ -55,8 +55,7 @@ export function useScoreForm({ editingScore, assignmentSessions = [] }: UseScore
   const [step, setStep] = useState<1 | 2>(1);
   const [errors, setErrors] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  
-  console.log(editingScore)
+
   useEffect(() => {
     if (editingScore) {
       setFormValues({
@@ -76,7 +75,7 @@ export function useScoreForm({ editingScore, assignmentSessions = [] }: UseScore
         target_eliminated: editingScore.target_eliminated || null,
         position: editingScore.position || null,
       });
-    } 
+    }
   }, [editingScore]);
 
   // Validation logic
@@ -113,7 +112,7 @@ export function useScoreForm({ editingScore, assignmentSessions = [] }: UseScore
     }
 
     setErrors(newErrors);
-  } 
+  }
 
   // Handlers
   function handleChange<K extends keyof ScoreFormValues>(key: K, value: ScoreFormValues[K]) {
