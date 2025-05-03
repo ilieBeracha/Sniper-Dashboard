@@ -49,28 +49,10 @@ export interface TrainingEffectiveness {
   current_gap_days: number;
 }
 
-export interface UserPerformanceConfig {
-  user_id: string;
-  user_name: string;
-  duty: string;
-  weapon_type: string;
-  equipment_type: string;
-  total_missions: number;
-  avg_accuracy: number;
-  avg_reaction_time: number;
-  first_shot_success_rate: number;
-  elimination_rate: number;
-  performance_score: number;
-  configuration_rank: number;
-}
-
-export interface BestSquadConfig {
-  squad_id: string;
-  squad_name: string;
-  configuration_description: string;
-  total_missions: number;
-  avg_squad_accuracy: number;
-  avg_squad_elimination_rate: number;
-  coordination_score: number;
-  overall_performance_score: number;
+export interface SquadStats {
+  out_name: string;
+  out_performance: number;
+  out_accuracy: number;
+  out_elimination: number;
+  out_coordination: number;
 }

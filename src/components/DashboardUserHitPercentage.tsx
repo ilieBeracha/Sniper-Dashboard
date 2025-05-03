@@ -27,7 +27,7 @@ export default function UserHitPercentage() {
 
   const hitColor = getColor(percentage);
 
-  if (!userHitPercentage.hit_percentage || userHitPercentage.total_shots === 0) {
+  if (!userHitPercentage.hit_percentage && userHitPercentage.total_shots === 0) {
     return (
       <div className="h-full flex w-full flex-col items-center justify-center text-white bg-[#161616] rounded-lg p-4">
         <div className=" p-3 rounded-full mb-3">
@@ -70,7 +70,7 @@ export default function UserHitPercentage() {
         </ResponsiveContainer>
 
         <div className="absolute inset-0 flex flex-col mt-1">
-          <span className="text-3xl font-bold text-white">{percentage.toFixed(1)}%</span>
+          <span className="text-3xl font-bold text-white">{percentage ? percentage.toFixed(1) : 0}%</span>
           <span className="text-xs text-gray-400 uppercase tracking-wider">Accuracy</span>
         </div>
       </div>

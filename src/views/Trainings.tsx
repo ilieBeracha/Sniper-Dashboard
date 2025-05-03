@@ -86,15 +86,14 @@ export default function Training() {
           </div>
 
           <div className="xl:col-span-2 order-1 xl:order-2 space-y-8 ">
-            {isCommanderOrSquadCommander(userRole) && (
-              <button
-                onClick={handleAddTrainingModal}
-                className="mt-4 md:mt-0 flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 px-4 py-2.5 rounded-lg text-white text-lg font-medium shadow-lg shadow-indigo-900/20 transition-all hover:shadow-indigo-900/30 hover:scale-[1.02] active:scale-[0.98]"
-              >
-                <Plus size={18} />
-                Add Training
-              </button>
-            )}
+            <button
+              onClick={handleAddTrainingModal}
+              className="mt-4 md:mt-0 flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 px-4 py-2.5 rounded-lg text-white text-lg font-medium shadow-lg shadow-indigo-900/20 transition-all hover:shadow-indigo-900/30 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Plus size={18} />
+              Add Training
+            </button>
+
             <div className="bg-[#1A1A1A] rounded-xl shadow-xl border border-white/5 overflow-hidden backdrop-blur-sm">
               <div className="border-b border-white/5 p-4">
                 <div className="flex items-center">

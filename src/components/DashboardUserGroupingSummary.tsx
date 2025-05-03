@@ -17,7 +17,7 @@ const UserGroupingSummary = () => {
     if (containerRef.current) {
       const updateHeight = () => {
         const containerHeight = containerRef?.current?.offsetHeight;
-        const statsAndTabsHeight = 120;
+        const statsAndTabsHeight = 60;
         const newChartHeight: number = Math.max((containerHeight as number) - statsAndTabsHeight - 100, 180);
         setChartHeight(newChartHeight);
       };
@@ -121,16 +121,16 @@ const UserGroupingSummary = () => {
       </div>
 
       {/* Chart area with auto height */}
-      <div className="flex-1 bg-[#161616] rounded-md py-2 w-full h-full">
+      <div className="flex-1  rounded-md py-2 w-full h-full">
         {activeTab === "recent" && (
           <ResponsiveContainer width="100%" height={chartHeight}>
-            <LineChart data={recentData} margin={{ top: 10, right: 50, left: 0, bottom: 0 }}>
+            <LineChart data={recentData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis dataKey="formattedDate" />
-              <YAxis />
+
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#222222",
+                  backgroundColor: "#161616",
                   borderColor: "#444444",
                   border: "1px solid #444444",
                   boxShadow: "none",
@@ -141,7 +141,7 @@ const UserGroupingSummary = () => {
                 cursor={{ stroke: "#444444", strokeWidth: 1 }}
               />
               <Line
-                type="monotone"
+                type="natural"
                 dataKey="cm_dispersion"
                 stroke="#7F5AF0"
                 strokeWidth={2}
@@ -158,13 +158,13 @@ const UserGroupingSummary = () => {
 
         {activeTab === "weapons" && (
           <ResponsiveContainer width="100%" height={chartHeight}>
-            <BarChart data={weaponData} margin={{ top: 10, right: 50, left: 0, bottom: 0 }}>
+            <BarChart data={weaponData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="weapon_type" />
-              <YAxis />
+              <XAxis dataKey="weapon_type" tick={{ fill: "#a1a1aa", fontSize: 10 }} axisLine={{ stroke: "#3f3f46" }} />
+
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#222222",
+                  backgroundColor: "#161616",
                   borderColor: "#444444",
                   border: "1px solid #444444",
                   boxShadow: "none",

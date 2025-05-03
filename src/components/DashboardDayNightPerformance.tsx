@@ -33,7 +33,7 @@ export default function DashboardDayNightPerformance({ dayNightPerformance }: { 
 
   return (
     <>
-      <div className="flex gap-1 mb-4 p-1 bg-zinc-900/50 rounded-lg">
+      <div className="flex gap-1 mb-4  p-1 bg-zinc-900/50 rounded-lg">
         {tabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
@@ -49,10 +49,10 @@ export default function DashboardDayNightPerformance({ dayNightPerformance }: { 
       </div>
 
       {/* Chart */}
-      <div className="h-48">
+      <div className="h-full max-h-[300px] pt-2 max-w-[600px] mx-auto">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <XAxis dataKey="name" tick={{ fill: "#a1a1aa", fontSize: 12 }} axisLine={{ stroke: "#3f3f46" }} />
+          <BarChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+            <XAxis dataKey="name" tick={{ fill: "#a1a1aa", fontSize: 12, spreadMethod: "align" }} axisLine={{ stroke: "#3f3f46" }} />
             <YAxis
               tick={{ fill: "#a1a1aa", fontSize: 12 }}
               axisLine={{ stroke: "#3f3f46" }}
@@ -60,7 +60,7 @@ export default function DashboardDayNightPerformance({ dayNightPerformance }: { 
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#27272a",
+                backgroundColor: "#18181818",
                 border: "1px solid #3f3f46",
                 borderRadius: "0.5rem",
                 padding: "0.5rem",
@@ -78,13 +78,13 @@ export default function DashboardDayNightPerformance({ dayNightPerformance }: { 
       </div>
 
       {/* Summary Stats */}
-      <div className="flex justify-between mt-4 pt-3 border-t border-zinc-700/50">
+      <div className="flex justify-between border-t pt-2 border-zinc-700/50">
         <div className="flex items-center gap-2">
-          <Sun size={14} className="text-amber-400" />
+          <Sun size={22} className="text-amber-400" />
           <span className="text-sm text-zinc-400">{dayData?.total_missions || 0} missions</span>
         </div>
         <div className="flex items-center gap-2">
-          <Moon size={14} className="text-blue-400" />
+          <Moon size={22} className="text-blue-400" />
           <span className="text-sm text-zinc-400">{nightData?.total_missions || 0} missions</span>
         </div>
       </div>

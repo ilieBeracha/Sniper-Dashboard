@@ -3,6 +3,7 @@ import { supabase } from "./supabaseClient";
 import { HitPercentageData, SquadWeaponPerformance } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { User } from "@supabase/supabase-js";
+import { ScorePosition } from "@/types/training";
 
 export async function getUserHitPercentageRpc(userId: string): Promise<HitPercentageData> {
   const { data, error } = await supabase.rpc("get_user_hit_percentage_by_single_sniper", {
@@ -95,41 +96,15 @@ export async function getTrainingEffectivenessByTeam(teamId: string) {
   return data;
 }
 
-export async function getSquadPerformanceByTeam(teamId: string) {
-  const { data, error } = await supabase.rpc("get_squad_performance_by_team", {
+export async function getSquadStatByTeamId(teamId: string, position: ScorePosition | null) {
+  const { data, error } = await supabase.rpc("get_squads_stats_by_team_id", {
+    p_position: position ? (position as string) : null,
     p_team_id: teamId,
   });
 
   if (error) {
-    console.error("Error fetching squad performance:", error);
-    throw error;
+    console.error("Error fetching squad stats:", error);
+    return;
   }
-
   return data;
-}
-
-export async function getUserPerformanceByConfiguration(teamId: string) {
-  const { data, error } = await supabase.rpc("get_user_performance_by_configuration", {
-    p_team_id: teamId,
-  });
-
-  if (error) {
-    console.error("Error fetching user performance by configuration:", error);
-    throw error;
-  }
-
-  return data || [];
-}
-
-export async function getBestSquadConfigurations(teamId: string) {
-  const { data, error } = await supabase.rpc("get_best_squad_configurations", {
-    p_team_id: teamId,
-  });
-
-  if (error) {
-    console.error("Error fetching best squad configurations:", error);
-    throw error;
-  }
-
-  return data || [];
 }

@@ -74,8 +74,9 @@ export default function TeamTable() {
                 return (
                   <tr
                     key={rowId}
-                    className={`transition-colors ${selectedRows.includes(rowId) ? "bg-white/10" : ""} ${hoveredRow === rowId ? "bg-white/10" : "hover:bg-white/10"
-                      }`}
+                    className={`transition-colors ${selectedRows.includes(rowId) ? "bg-white/10" : ""} ${
+                      hoveredRow === rowId ? "bg-white/10" : "hover:bg-white/10"
+                    }`}
                     onMouseEnter={() => setHoveredRow(rowId)}
                     onMouseLeave={() => setHoveredRow(null)}
                   >

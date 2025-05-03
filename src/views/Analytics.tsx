@@ -4,20 +4,17 @@ import { performanceStore } from "@/store/performance";
 import { useEffect } from "react";
 import { userStore } from "@/store/userStore";
 import DashboardDayNightPerformance from "@/components/DashboardDayNightPerformance";
-import AnalyticsSquadPerformance from "@/components/AnalyticsSquadPerformance";
 import BaseDashboardCard from "@/components/BaseDashboardCard";
 import DashboardSquadWeaponPerformance from "@/components/DashboardSquadWeaponPerformance";
 
 export default function Analytics() {
-  const { trainingEffectiveness, getTrainingEffectiveness, getSquadPerformance, dayNightPerformance, squadPerformance, userPerformanceConfig } =
-    useStore(performanceStore);
+  const { trainingEffectiveness, getTrainingEffectiveness, dayNightPerformance } = useStore(performanceStore);
   const { user } = useStore(userStore);
 
   useEffect(() => {
     const load = async () => {
       if (user?.team_id) {
         await getTrainingEffectiveness(user.team_id);
-        await getSquadPerformance(user.team_id);
       }
     };
 
@@ -33,9 +30,7 @@ export default function Analytics() {
         <div className="col-span-2">
           <DashboardDayNightPerformance dayNightPerformance={dayNightPerformance} />
         </div>
-        <div className="col-span-2">
-          <AnalyticsSquadPerformance squadPerformance={squadPerformance} />
-        </div>
+
         <div className="col-span-2">
           <BaseDashboardCard title="Weapon Performance" tooltipContent="Detailed weapon performance metrics across different squads">
             <DashboardSquadWeaponPerformance />

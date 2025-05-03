@@ -2,8 +2,12 @@ import DashboardSquadWeaponPerformance from "./DashboardSquadWeaponPerformance";
 import BaseDashboardCard from "./BaseDashboardCard";
 import UserHitPercentage from "./DashboardUserHitPercentage";
 import UserGroupingSummary from "./DashboardUserGroupingSummary";
+import DashboardDayNightPerformance from "./DashboardDayNightPerformance";
+import { performanceStore } from "@/store/performance";
+import { useStore } from "zustand";
 
 export default function DashboardRowTwo() {
+  const { dayNightPerformance } = useStore(performanceStore);
   return (
     <section>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
@@ -14,8 +18,8 @@ export default function DashboardRowTwo() {
         </div>
 
         <div className="lg:col-span-6">
-          <BaseDashboardCard title="Weapon Performance" tooltipContent="Detailed weapon performance metrics across different squads">
-            <DashboardSquadWeaponPerformance />
+          <BaseDashboardCard title="Day/Night Performance" tooltipContent="Your performance in day and night">
+            <DashboardDayNightPerformance dayNightPerformance={dayNightPerformance} />
           </BaseDashboardCard>
         </div>
       </div>
