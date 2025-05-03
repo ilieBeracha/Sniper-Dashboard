@@ -30,7 +30,7 @@ export default function UserHitPercentage() {
   if (!userHitPercentage.hit_percentage || userHitPercentage.total_shots === 0) {
     return (
       <div className="h-full flex w-full flex-col items-center justify-center text-white bg-[#161616] rounded-lg p-4">
-        <div className="bg-[#1E1E1E] p-3 rounded-full mb-3">
+        <div className=" p-3 rounded-full mb-3">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
               strokeLinecap="round"

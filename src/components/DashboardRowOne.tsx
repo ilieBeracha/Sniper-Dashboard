@@ -8,7 +8,6 @@ type DashboardRowOneProps = {
 };
 
 export default function DashboardRowOne({ user }: DashboardRowOneProps) {
-
   if (!user) return null;
 
   return (
@@ -19,7 +18,6 @@ export default function DashboardRowOne({ user }: DashboardRowOneProps) {
             <UserProfile user={user} />
           </BaseDashboardCard>
         </div>
-
 
         <div className="lg:col-span-2">
           <BaseDashboardCard title="Calendar" tooltipContent="View and manage your schedule and events">

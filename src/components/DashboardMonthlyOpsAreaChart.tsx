@@ -1,13 +1,4 @@
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 
 const hitsOverTime = [
   { month: "Jan", userHits: 25, squadHits: 78, teamHits: 230 },
@@ -20,12 +11,8 @@ const hitsOverTime = [
 export default function DashboardMonthlyOpsAreaChart() {
   return (
     <ResponsiveContainer width="100%" height={350}>
-      <AreaChart
-        data={hitsOverTime}
-        margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-      >
+      <AreaChart data={hitsOverTime} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
         <defs>
-          {/* Gradient for User */}
           <linearGradient id="strokeUser" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#7F5AF0" />
             <stop offset="100%" stopColor="#2CB67D" />
@@ -35,7 +22,6 @@ export default function DashboardMonthlyOpsAreaChart() {
             <stop offset="100%" stopColor="#2CB67D" stopOpacity={0.05} />
           </linearGradient>
 
-          {/* Gradient for Squad */}
           <linearGradient id="strokeSquad" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#2CB67D" />
             <stop offset="100%" stopColor="#7F5AF0" />
@@ -45,7 +31,6 @@ export default function DashboardMonthlyOpsAreaChart() {
             <stop offset="100%" stopColor="#7F5AF0" stopOpacity={0.05} />
           </linearGradient>
 
-          {/* Gradient for Team */}
           <linearGradient id="strokeTeam" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#F25F4C" />
             <stop offset="100%" stopColor="#FF8906" />
@@ -75,30 +60,9 @@ export default function DashboardMonthlyOpsAreaChart() {
         />
         <Legend wrapperStyle={{ paddingTop: "10px", color: "#F3F4F6" }} />
 
-        <Area
-          type="monotone"
-          dataKey="userHits"
-          name="User Hits"
-          stroke="url(#strokeUser)"
-          fill="url(#fillUser)"
-          strokeWidth={2}
-        />
-        <Area
-          type="monotone"
-          dataKey="squadHits"
-          name="Squad Hits"
-          stroke="url(#strokeSquad)"
-          fill="url(#fillSquad)"
-          strokeWidth={2}
-        />
-        <Area
-          type="monotone"
-          dataKey="teamHits"
-          name="Team Hits"
-          stroke="url(#strokeTeam)"
-          fill="url(#fillTeam)"
-          strokeWidth={2}
-        />
+        <Area type="monotone" dataKey="userHits" name="User Hits" stroke="url(#strokeUser)" fill="url(#fillUser)" strokeWidth={2} />
+        <Area type="monotone" dataKey="squadHits" name="Squad Hits" stroke="url(#strokeSquad)" fill="url(#fillSquad)" strokeWidth={2} />
+        <Area type="monotone" dataKey="teamHits" name="Team Hits" stroke="url(#strokeTeam)" fill="url(#fillTeam)" strokeWidth={2} />
       </AreaChart>
     </ResponsiveContainer>
   );

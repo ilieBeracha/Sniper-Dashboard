@@ -29,6 +29,7 @@ export default function Home() {
         await fetchMembers(user.team_id);
         await getEqipmentsByTeamId(user.team_id);
         await getWeapons(user.team_id);
+
         if (user?.squad_id) {
           await getSquadUsersBySquadId(user.squad_id);
         }

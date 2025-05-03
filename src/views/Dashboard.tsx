@@ -11,13 +11,21 @@ import InviteModal from "@/components/InviteModal";
 import { TrainingStore } from "@/store/trainingStore";
 import { squadStore } from "@/store/squadStore";
 import { performanceStore } from "@/store/performance";
-import { getUserGroupingSummaryRpc } from "@/services/performance";
+import { getSquadPerformanceByTeam, getUserGroupingSummaryRpc } from "@/services/performance";
 import DashboardRowKPI from "@/components/DashboardRowKPI";
 import { isCommander } from "@/utils/permissions";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
-  const { getUserHitPercentage, getTopAccurateSnipers } = useStore(performanceStore);
+  const {
+    getUserHitPercentage,
+    getTopAccurateSnipers,
+    getDayNightPerformance,
+    getUserPerformanceConfig,
+    getBestSquadConfigurations,
+    userPerformanceConfig,
+    bestSquadConfigurations,
+  } = useStore(performanceStore);
 
   const { getSquadMetricsByRole } = useStore(squadStore);
   const { loadNextAndLastTraining } = useStore(TrainingStore);
@@ -38,6 +46,10 @@ export default function Dashboard() {
         await loadNextAndLastTraining(user.team_id);
         await getSquadMetricsByRole(user.id);
         await getTopAccurateSnipers(user.team_id);
+        await getDayNightPerformance(user.team_id);
+        await getUserPerformanceConfig(user.team_id);
+        await getBestSquadConfigurations(user.team_id);
+        await getSquadPerformanceByTeam(user.team_id);
       }
 
       setLoading(false);
@@ -47,17 +59,11 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen from-[#1E1E20] text-gray-100 px-6 md:px-16 lg:px-28 py-8 md:py-12">
+    <div className="min-h-screen from-[#1E1E20] text-gray-100 md:px-16 lg:px-20 py-8 md:py-12">
       {userRole !== "soldier" && <Header setIsOpen={setIsInviteModalOpen} />}
       <div className="space-y-8">
-        {/* {
-          isCommander(userRole) ? (
-            <DashboardRowKPI />
-          ) : (
-            <></>
-          )
-        } */}
         <DashboardRowOne user={user} />
+        {isCommander(userRole) ? <DashboardRowKPI /> : <></>}
         <DashboardRowTwo />
         <DashboardRowThree loading={loading} />
         <DashboardRowFour />

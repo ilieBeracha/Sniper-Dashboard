@@ -55,7 +55,6 @@ export async function getUserGroupingSummaryRpc(userId: string): Promise<Groupin
   throw new Error("No grouping summary data returned");
 }
 
-
 export async function getTopAccurateSnipers(teamId: string): Promise<User[]> {
   const { data, error } = await supabase.rpc("get_top_snipers_by_team", {
     team_uuid: teamId,
@@ -64,6 +63,72 @@ export async function getTopAccurateSnipers(teamId: string): Promise<User[]> {
   if (error) {
     console.error("Error fetching top accurate snipers data:", error.message);
     throw new Error("Failed to fetch top accurate snipers data");
+  }
+
+  return data || [];
+}
+
+// In your service
+export async function getDayNightPerformanceByTeam(teamId: string) {
+  const { data, error } = await supabase.rpc("get_day_night_performance_by_team", {
+    p_team_id: teamId,
+  });
+
+  if (error) {
+    console.error("Error fetching day/night performance for team:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+export async function getTrainingEffectivenessByTeam(teamId: string) {
+  const { data, error } = await supabase.rpc("get_training_effectiveness_by_team", {
+    p_team_id: teamId,
+  });
+
+  if (error) {
+    console.error("Error fetching training effectiveness:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+export async function getSquadPerformanceByTeam(teamId: string) {
+  const { data, error } = await supabase.rpc("get_squad_performance_by_team", {
+    p_team_id: teamId,
+  });
+
+  if (error) {
+    console.error("Error fetching squad performance:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+export async function getUserPerformanceByConfiguration(teamId: string) {
+  const { data, error } = await supabase.rpc("get_user_performance_by_configuration", {
+    p_team_id: teamId,
+  });
+
+  if (error) {
+    console.error("Error fetching user performance by configuration:", error);
+    throw error;
+  }
+
+  return data || [];
+}
+
+export async function getBestSquadConfigurations(teamId: string) {
+  const { data, error } = await supabase.rpc("get_best_squad_configurations", {
+    p_team_id: teamId,
+  });
+
+  if (error) {
+    console.error("Error fetching best squad configurations:", error);
+    throw error;
   }
 
   return data || [];
