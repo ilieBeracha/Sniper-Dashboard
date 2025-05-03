@@ -1,12 +1,10 @@
 import { TrainingSession, Assignment } from "@/types/training";
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
-import { ChevronRight, Clock, MapPin, Bookmark, Lock, UserCheck, Edit } from "lucide-react";
-import TrainingParticipantBadge from "./TrainingParticipantBadge";
+import { ChevronRight, Clock, MapPin, Bookmark, UserCheck } from "lucide-react";
 
 export function TrainingSessionCard({
   session,
-  currentUserId,
   showDate = true,
   highlight = false,
   isPast = false,
@@ -22,7 +20,6 @@ export function TrainingSessionCard({
 
   const participants = session.participants || [];
   const assignments = session.assignment_session || [];
-
 
   const handleSessionClick = () => {
     navigate(`/training/${session.id}`);

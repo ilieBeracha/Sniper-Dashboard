@@ -32,10 +32,11 @@ export default function TrainingPage() {
 
   useEffect(() => {
     const load = async () => {
-      if (!id) return;
-      await loadAssignments();
-      await loadTrainingById(id as string);
-      await getScoresByTrainingId(id as string);
+      if (id) {
+        await loadAssignments();
+        await loadTrainingById(id as string);
+        await getScoresByTrainingId(id as string);
+      }
     };
 
     load();
@@ -96,7 +97,6 @@ export default function TrainingPage() {
         assignments={assignments}
         training={training}
       />
-
 
       <ConfirmStatusChangeModal
         isOpen={isConfirmModalOpen}
