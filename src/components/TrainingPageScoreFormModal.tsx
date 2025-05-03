@@ -46,8 +46,8 @@ export default function ScoreFormModal({
       ...formValues,
       score_participants,
     };
-
     onSubmit(payload);
+    resetForm();
   };
 
   const handleNextStep = () => {
@@ -56,11 +56,6 @@ export default function ScoreFormModal({
     } else {
       setErrors([]);
       setStep((prevStep) => (prevStep === 1 ? 2 : 1));
-    }
-    if (step === 2) {
-      setTimeout(() => {
-        resetForm();
-      }, 1000);
     }
   };
 

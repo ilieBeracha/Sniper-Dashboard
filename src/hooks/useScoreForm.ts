@@ -158,9 +158,10 @@ export function useScoreForm({ editingScore, assignmentSessions = [] }: UseScore
       weapons: {},
       equipments: {},
     });
-    setStep(1);
+
     setErrors([]);
     setSearchTerm("");
+    setStep(1);
   }
 
   return {

@@ -79,18 +79,9 @@ export default function TrainingAddTrainingSessionModal({
       }
     }
 
-    resetForm();
     onSuccess();
     onClose();
   }
-
-  const resetForm = () => {
-    setSessionName("");
-    setLocation("");
-    setDate("");
-    setMembers([]);
-    setAssignmentIds([]);
-  };
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose}>
