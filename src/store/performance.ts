@@ -13,7 +13,7 @@ import {
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { User } from "@supabase/supabase-js";
-import { ScorePosition } from "@/types/training";
+import { PositionScore } from "@/types/score";
 
 interface PerformanceStore {
   squadWeaponPerformance: SquadWeaponPerformance[];
@@ -24,7 +24,7 @@ interface PerformanceStore {
   dayNightPerformance: DayNightPerformance[];
   getDayNightPerformance: (teamId: string) => Promise<void>;
   squadStats: SquadStats[];
-  getSquadStats: (teamId: string, position: ScorePosition | null) => Promise<void>;
+  getSquadStats: (teamId: string, position: PositionScore | null, distance: number | null) => Promise<void>;
   userHitPercentage: HitPercentageData | null;
   getUserHitPercentage: (userId: string) => Promise<HitPercentageData>;
 
@@ -48,10 +48,12 @@ export const performanceStore = create<PerformanceStore>((set) => ({
 
   userPerformanceConfig: [],
   bestSquadConfigurations: [],
-  getSquadStats: async (teamId: string, position: ScorePosition | null) => {
+
+  getSquadStats: async (teamId: string, position: PositionScore | null, distance: number | null) => {
     try {
       set({ isLoading: true });
-      const data = await getSquadStatByTeamId(teamId, position);
+      console.log(teamId, position, distance);
+      const data = await getSquadStatByTeamId(teamId, position, distance);
       set({ squadStats: data });
     } catch (error) {
       console.error("Failed to load squad stats:", error);

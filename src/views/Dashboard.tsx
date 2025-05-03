@@ -38,7 +38,7 @@ export default function Dashboard() {
         await getSquadMetricsByRole(user.id);
         await getTopAccurateSnipers(user.team_id);
         await getDayNightPerformance(user.team_id);
-        await getSquadStats(user.team_id, null);
+        await getSquadStats(user.team_id, null, null);
       }
 
       setLoading(false);

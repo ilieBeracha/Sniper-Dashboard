@@ -60,13 +60,6 @@ export default function UserProfile({ user }: { user: User }) {
           />
         </div>
       </div>
-
-      <div className="w-full text-white flex flex-col gap-4">
-        <h2 className="text-lg font-bold">
-          Welcome Back {user?.first_name} {user.last_name}
-        </h2>
-        <p className="text-sm text-gray-400 mt-1">View and manage your profile information</p>
-      </div>
     </div>
   );
 }

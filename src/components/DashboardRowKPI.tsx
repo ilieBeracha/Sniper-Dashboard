@@ -1,13 +1,12 @@
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
 import DashboardMostAccurate from "./DashboardMostAccurate";
-import DashboardSquadStats from "./DashboardSquadStats";
 import BaseDashboardCard from "./BaseDashboardCard";
 import UserHitPercentage from "./DashboardUserHitPercentage";
+import Chart from "./DashboardSquadStats";
 
 export default function DashboardRowKPI() {
-  const { topAccurateSnipers, squadStats } = useStore(performanceStore);
-
+  const { topAccurateSnipers } = useStore(performanceStore);
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
@@ -23,7 +22,7 @@ export default function DashboardRowKPI() {
         </div>
 
         <div className="col-span-6">
-          <DashboardSquadStats squadStats={squadStats} />
+          <Chart />
         </div>
       </div>
     </>

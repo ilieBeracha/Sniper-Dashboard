@@ -1,35 +1,47 @@
-import type { Config } from "tailwindcss";
+// tailwind.config.js
+const { heroui } = require("@heroui/react");
 
-const config: Config = {
-  content: [
-    "./pages/**/*.{html,js}",
-    "./src/**/*.{js,ts,jsx,tsx}", // Adjust based on your project structure
-  ],
-  theme: {
-    extend: {
-      colors: {
-        dashboard: {
-          background: "#121212",
-          card: "#1E1E1E",
-          border: "rgba(255,255,255,0.05)",
-          text: {
-            base: "#F3F4F6",
-            muted: "#9CA3AF",
-            soft: "#4B5563",
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  plugins: [
+    heroui({
+      themes: {
+        "purple-dark": {
+          extend: "dark", // <- inherit default values from dark theme
+          colors: {
+            background: "#0D001A",
+            foreground: "#ffffff",
+            primary: {
+              50: "#3B096C",
+              100: "#520F83",
+              200: "#7318A2",
+              300: "#9823C2",
+              400: "#c031e2",
+              500: "#DD62ED",
+              600: "#F182F6",
+              700: "#FCADF9",
+              800: "#FDD5F9",
+              900: "#FEECFE",
+              DEFAULT: "#DD62ED",
+              foreground: "#ffffff",
+            },
+            focus: "#F182F6",
           },
-          accent: {
-            purple: "#7F5AF0",
-            green: "#2CB67D",
-            red: "#F25F4C",
+          layout: {
+            disabledOpacity: "0.3",
+            radius: {
+              small: "4px",
+              medium: "6px",
+              large: "8px",
+            },
+            borderWidth: {
+              small: "1px",
+              medium: "2px",
+              large: "3px",
+            },
           },
         },
       },
-      backgroundImage: {
-        "gradient-sniper": "linear-gradient(to right, #7F5AF0, #2CB67D)",
-      },
-    },
-  },
-  plugins: [],
+    }),
+  ],
 };
-
-export default config;

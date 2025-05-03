@@ -117,11 +117,3 @@ export interface TrainingPageParticipantsScoreParticipantScoresProps {
   isSubmitting: boolean;
   training: TrainingSession | null;
 }
-
-export enum ScorePosition {
-  Lying = "Lying",
-  Squatting = "Squatting",
-  Kneeling = "Kneeling",
-  Sitting = "Sitting",
-}
-

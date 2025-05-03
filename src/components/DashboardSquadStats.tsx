@@ -1,280 +1,117 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { useStore } from "zustand";
-import { useState, useEffect } from "react";
-import BaseModal from "@/components/BaseModal";
-import { Info } from "lucide-react";
-import { squadStore } from "@/store/squadStore";
-import { SquadStats } from "@/types/performance";
-import { ScorePosition } from "@/types/training";
-import { getSquadStatByTeamId } from "@/services/performance";
-import { userStore } from "@/store/userStore";
+import { Card, Spacer } from "@heroui/react";
+import BaseTabs from "./BaseTabs";
+import { ResponsiveContainer, BarChart, Bar, XAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { SquadStats, UserPosition } from "@/types/performance";
 import BaseDashboardCard from "./BaseDashboardCard";
-interface SquadDetailModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  squadData: any;
-}
+import { useEffect, useState } from "react";
+import { PositionScore } from "@/types/score";
+import { performanceStore } from "@/store/performance";
+import { userStore } from "@/store/userStore";
+import { useStore } from "zustand";
 
-const SquadDetailModal = ({ isOpen, onClose, squadData }: SquadDetailModalProps) => {
-  const { squadUsers } = useStore(squadStore);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [selectedDuty, setSelectedDuty] = useState<string | null>(null);
-  const [selectedPosition, setSelectedPosition] = useState<ScorePosition | null>(null);
-  const { user } = useStore(userStore);
-
-  useEffect(() => {
-    if (selectedUserId && selectedDuty) {
-      getSquadStatByTeamId(user?.team_id as string, selectedPosition);
-    }
-  }, [selectedPosition]);
-
-  const handleFilterChange = (position: ScorePosition) => {
-    setSelectedPosition(position);
-    getSquadStatByTeamId(user?.team_id as string, position);
-  };
-
-  const dutyConfigurations = {
-    "2S2P": {
-      name: "2 Snipers + 2 Spotters",
-      performance: 95,
-      accuracy: 92,
-      coordination: 98,
-      firstShot: 87,
-      reactionTime: 1.2,
-      coverage: 85,
-      teamwork: 96,
-      pros: ["Excellent coordination", "Balanced firepower", "Better target acquisition"],
-      cons: ["Limited firepower", "Requires good communication"],
-    },
-    "3S1P": {
-      name: "3 Snipers + 1 Spotter",
-      performance: 88,
-      accuracy: 89,
-      coordination: 82,
-      firstShot: 85,
-      reactionTime: 1.5,
-      coverage: 75,
-      teamwork: 78,
-      pros: ["High firepower", "Multiple engagement capability", "Good for static targets"],
-      cons: ["Limited spotting", "Reduced coordination", "Slower target acquisition"],
-    },
-    "1S3P": {
-      name: "1 Sniper + 3 Spotters",
-      performance: 82,
-      accuracy: 96,
-      coordination: 90,
-      firstShot: 92,
-      reactionTime: 0.9,
-      coverage: 95,
-      teamwork: 88,
-      pros: ["Excellent reconnaissance", "Fast target acquisition", "High accuracy support"],
-      cons: ["Limited firepower", "Single point of failure", "Vulnerable to counter-fire"],
-    },
-    "4S0P": {
-      name: "4 Snipers Only",
-      performance: 75,
-      accuracy: 82,
-      coordination: 68,
-      firstShot: 78,
-      reactionTime: 2.1,
-      coverage: 60,
-      teamwork: 65,
-      pros: ["Maximum firepower", "Independent operation", "Multiple simultaneous engagements"],
-      cons: ["Poor coordination", "Slow target acquisition", "No dedicated support"],
-    },
-  };
-
-  return (
-    <BaseModal isOpen={isOpen} onClose={onClose} width="max-w-6xl">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between border-b border-zinc-700 pb-4">
-          <div>
-            <h2 className="text-2xl font-bold text-white">{squadData?.squad_name} - Duty Configuration Analysis</h2>
-            <p className="text-zinc-400 mt-1">Compare different role assignments and their impact on squad performance</p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-4 items-end mb-6">
-          {/* User Select */}
-          <div>
-            <label className="block text-xs text-zinc-400 mb-1">Filter by User</label>
-            <select
-              onChange={(e) => {
-                setSelectedUserId(e.target.value || null);
-                getSquadStatByTeamId(user?.team_id as string, selectedPosition);
-              }}
-              className="bg-zinc-900 text-white text-sm px-3 py-2 rounded-md border border-zinc-700 focus:outline-none"
-            >
-              <option value="">All Users</option>
-              {squadUsers?.[0]?.users?.map((user: any) => (
-                <option key={user.id} value={user.id}>
-                  {user.first_name} {user.last_name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Duty Select */}
-          <div>
-            <label className="block text-xs text-zinc-400 mb-1">Filter by Duty</label>
-            <select
-              value={selectedDuty ?? ""}
-              onChange={(e) => {
-                setSelectedDuty(e.target.value || null);
-                setSelectedPosition(null);
-              }}
-              className="bg-zinc-900 text-white text-sm px-3 py-2 rounded-md border border-zinc-700 focus:outline-none"
-            >
-              <option value="">All Duties</option>
-              <option value="Sniper">Sniper</option>
-              <option value="Spotter">Spotter</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs text-zinc-400 mb-1">Filter by Score Position</label>
-            <select
-              value={selectedPosition ?? ""}
-              onChange={(e) => handleFilterChange(e.target.value as ScorePosition)}
-              className="bg-zinc-900 text-white text-sm px-3 py-2 rounded-md border border-zinc-700 focus:outline-none"
-            >
-              <option value="">All Positions</option>
-              <option value="lying">Lying</option>
-              <option value="sitting">Sitting</option>
-              <option value="standing">Standing</option>
-              <option value="operational">Operational</option>
-            </select>
-          </div>
-
-          {(selectedUserId || selectedDuty) && (
-            <button
-              onClick={() => {
-                setSelectedUserId(null);
-                setSelectedDuty(null);
-                setSelectedPosition(null);
-                console.log("Filters cleared");
-              }}
-              className="ml-auto text-xs text-red-400 hover:text-red-300"
-            >
-              Clear Filters
-            </button>
-          )}
-        </div>
-
-        <div className="col-span-12 lg:col-span-12 space-y-6">
-          <div className="bg-zinc-800/50 rounded-lg border border-zinc-700 p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Configuration Comparison</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={Object.entries(dutyConfigurations).map(([key, config]) => ({
-                    name: key,
-                    performance: config.performance,
-                    accuracy: config.accuracy,
-                    coordination: config.coordination,
-                    teamwork: config.teamwork,
-                  }))}
-                >
-                  <XAxis dataKey="name" stroke="#71717a" />
-                  <YAxis stroke="#71717a" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#18181b",
-                      border: "1px solid #3f3f46",
-                      borderRadius: "0.5rem",
-                    }}
-                  />
-                  <Legend />
-                  <Bar dataKey="performance" name="Performance" fill="#4ade80" />
-                  <Bar dataKey="accuracy" name="Accuracy" fill="#60a5fa" />
-                  <Bar dataKey="coordination" name="Coordination" fill="#a78bfa" />
-                  <Bar dataKey="teamwork" name="Teamwork" fill="#f59e0b" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-        <div className="col-span-12 lg:col-span-5">
-          <div className="bg-zinc-800/50 rounded-lg border border-zinc-700 w-full h-full">
-            <h3 className="text-lg font-semibold text-white mb-4">Squad Performance Comparison</h3>
-          </div>
-        </div>
-
-        {/* Right Panel - Analysis */}
-      </div>
-    </BaseModal>
-  );
+const formatValue = (value: number, type: string | undefined) => {
+  if (type === "number") {
+    if (value >= 1000000) return (value / 1_000_000).toFixed(1) + "M";
+    if (value >= 1000) return (value / 1000).toFixed(0) + "k";
+    return value.toLocaleString();
+  }
+  if (type === "percentage") return `${value}%`;
+  return value;
 };
 
-export default function DashboardSquadStats({ squadStats }: { squadStats: SquadStats[] }) {
-  const [selectedSquad, setSelectedSquad] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export default function DashboardSquadStats() {
+  const { user } = useStore(userStore);
+  const [chartData, setChartData] = useState<SquadStats[]>([]);
+  const { getSquadStats, squadStats } = useStore(performanceStore);
+  const [selectedTab, setSelectedTab] = useState("");
+  const rangeOptions = Array.from({ length: 9 }, (_, i) => ((i + 1) * 100).toString());
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-3 shadow-lg">
-          <p className="text-white font-medium mb-2">{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {entry.value}
-              {entry.dataKey !== "reaction" ? "%" : "s"}
-            </p>
-          ))}
-        </div>
-      );
+  useEffect(() => {
+    if (squadStats.length !== 0) {
+      setChartData(squadStats as any);
+    } else {
+      setChartData([]);
     }
-    return null;
+  }, [squadStats]);
+
+  const tabs = [
+    { name: "Distance", current: selectedTab === "Distance", dropdown: rangeOptions },
+    { name: "Position", current: Object.values(PositionScore).includes(selectedTab as PositionScore), dropdown: Object.values(PositionScore) },
+  ];
+
+  const handleSelectedTabs = async (tab: string) => {
+    setSelectedTab(tab);
+
+    let position: string | null = null;
+    let distance: number | null = null;
+    console.log(Object.values(PositionScore).includes(tab as PositionScore));
+    if (Object.values(PositionScore).includes(tab as PositionScore)) {
+      position = tab;
+    } else if (!isNaN(Number(tab))) {
+      distance = Number(tab);
+    }
+
+    await getSquadStats(user?.team_id as string, position as PositionScore | null, distance as number | null);
   };
 
-  const getSquadChartData = () => {
-    return squadStats.map((stat) => ({
-      name: stat.out_name,
-      performance: stat.out_performance,
-      accuracy: stat.out_accuracy,
-      elimination: stat.out_elimination,
-      coordination: stat.out_coordination,
-    }));
-  };
-
-  const handleBarClick = (data: any) => {
-    if (data) {
-      setSelectedSquad(data);
-      setIsModalOpen(true);
-    }
+  const resetFilters = async () => {
+    setSelectedTab("");
+    await getSquadStats(user?.team_id as string, null, null);
   };
 
   return (
-    <>
-      <BaseDashboardCard title="Squad Performance Comparison" tooltipContent="Compare squad performance">
-        <button onClick={() => setIsModalOpen(true)} className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1">
-          <Info className="w-3 h-3" />
-          Click bars for details
-        </button>
-        <div className="h-[400px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={getSquadChartData()} margin={{ top: 20, right: 50, left: 20, bottom: 5 }}>
-              <XAxis dataKey="name" tick={{ fill: "#71717a", fontSize: 12 }} axisLine={{ stroke: "#3f3f46" }} />
-              {/* <YAxis tick={{ fill: "#71717a", fontSize: 12 }} axisLine={{ stroke: "#3f3f46", strokeWidth: 1 }} /> */}
-              <Tooltip content={<CustomTooltip />} />
-              <Legend />
-              <Bar dataKey="performance" name="Overall Performance" fill="#4ade80" radius={[4, 4, 0, 0]} cursor="pointer" onClick={handleBarClick} />
-              <Bar dataKey="accuracy" name="Accuracy" fill="#60a5fa" radius={[4, 4, 0, 0]} cursor="pointer" onClick={handleBarClick} />
-              <Bar dataKey="elimination" name="Elimination" fill="#f87171" radius={[4, 4, 0, 0]} cursor="pointer" onClick={handleBarClick} />
-              <Bar dataKey="coordination" name="Coordination" fill="#a78bfa" radius={[4, 4, 0, 0]} cursor="pointer" onClick={handleBarClick} />
-            </BarChart>
-          </ResponsiveContainer>
+    <BaseDashboardCard
+      title={
+        <div className="flex flex-row items-center justify-between gap-4">
+          <BaseTabs selectedTab={selectedTab} handleSelectedTab={handleSelectedTabs} tabs={tabs} resetFilters={() => resetFilters()} />
         </div>
-      </BaseDashboardCard>
+      }
+    >
+      <Card className="bg-transparent rounded-xl w-full h-full flex flex-col justify-center gap-4">
+        <ResponsiveContainer width="100%" height={340}>
+          <BarChart data={chartData} barCategoryGap={16} barGap={8} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+            <defs>
+              <linearGradient id="gradientPerformance" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#4ade80" stopOpacity={0.8} />
+                <stop offset="100%" stopColor="#4ade80" stopOpacity={0.2} />
+              </linearGradient>
+              <linearGradient id="gradientAccuracy" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.8} />
+                <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.2} />
+              </linearGradient>
+              <linearGradient id="gradientElimination" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#f87171" stopOpacity={0.8} />
+                <stop offset="100%" stopColor="#f87171" stopOpacity={0.2} />
+              </linearGradient>
+              <linearGradient id="gradientCoordination" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.8} />
+                <stop offset="100%" stopColor="#a78bfa" stopOpacity={0.2} />
+              </linearGradient>
+            </defs>
 
-      <SquadDetailModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedSquad(null);
-        }}
-        squadData={selectedSquad}
-      />
-    </>
+            <CartesianGrid strokeDasharray="3 3" stroke="transparent" />
+            <XAxis dataKey="name" stroke="#9ca3af" style={{ fontSize: "12px" }} />
+            <Tooltip
+              cursor={{ fill: "transparent" }}
+              content={({ label, payload }) => (
+                <div className="bg-zinc-800 text-white p-2 rounded shadow hover:bg-zinc-700">
+                  <p className="text-xs font-semibold">{label}</p>
+                  {payload?.map((p, i) => (
+                    <p key={i} className="text-sm">
+                      {p.name}: {formatValue(p.value as number, "number")}
+                    </p>
+                  ))}
+                </div>
+              )}
+            />
+            <Legend iconType="circle" />
+            <Bar dataKey="performance" name="Performance" fill="url(#gradientPerformance)" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="accuracy" name="Accuracy" fill="url(#gradientAccuracy)" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="elimination" name="Elimination" fill="url(#gradientElimination)" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="coordination" name="Coordination" fill="url(#gradientCoordination)" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+    </BaseDashboardCard>
   );
 }

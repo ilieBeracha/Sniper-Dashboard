@@ -1,9 +1,8 @@
-// src/services/performanceService.ts
 import { supabase } from "./supabaseClient";
 import { HitPercentageData, SquadWeaponPerformance } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { User } from "@supabase/supabase-js";
-import { ScorePosition } from "@/types/training";
+import { PositionScore } from "@/types/score";
 
 export async function getUserHitPercentageRpc(userId: string): Promise<HitPercentageData> {
   const { data, error } = await supabase.rpc("get_user_hit_percentage_by_single_sniper", {
@@ -96,11 +95,13 @@ export async function getTrainingEffectivenessByTeam(teamId: string) {
   return data;
 }
 
-export async function getSquadStatByTeamId(teamId: string, position: ScorePosition | null) {
+export async function getSquadStatByTeamId(teamId: string, position: PositionScore | null, distance: number | null) {
   const { data, error } = await supabase.rpc("get_squads_stats_by_team_id", {
-    p_position: position ? (position as string) : null,
+    p_position: position ? (position as PositionScore) : null,
     p_team_id: teamId,
+    p_distance: distance ? distance : null,
   });
+  console.log(data);
 
   if (error) {
     console.error("Error fetching squad stats:", error);

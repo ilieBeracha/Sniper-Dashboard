@@ -25,7 +25,7 @@ export interface Score {
   squad: {
     squad_name: string;
   };
-  position: Position;
+  position: PositionScore;
 }
 
 export interface ScoreParticipant {
@@ -57,9 +57,9 @@ export interface UserDuty {
   SPOTTER: "spotter";
 }
 
-export interface Position {
-  LYING: "lying";
-  STANDING: "standing";
-  SITTING: "sitting";
-  OPERATIONAL: "operational";
+export enum PositionScore {
+  LYING = "lying",
+  STANDING = "standing",
+  SITTING = "sitting",
+  OPERATIONAL = "operational",
 }

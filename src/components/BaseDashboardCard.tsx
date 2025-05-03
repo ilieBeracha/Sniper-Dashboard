@@ -8,7 +8,7 @@ export default function BaseDashboardCard({
   withBg = true,
   withBtn = false,
 }: {
-  title: string;
+  title: string | React.ReactNode;
   children: React.ReactNode;
   tooltipContent?: string;
   withBg?: boolean;
