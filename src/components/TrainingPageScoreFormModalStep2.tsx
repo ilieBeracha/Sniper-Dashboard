@@ -7,7 +7,7 @@ import { ScoreFormValues } from "@/hooks/useScoreForm";
 
 interface Step2Props {
     formValues: ScoreFormValues;
-    setFormValues: (values: any) => void;
+    setFormValues: (values: ScoreFormValues) => void;
     formattedMembers: { id: string; label: string }[];
     searchTerm: string;
     setSearchTerm: (term: string) => void;
@@ -52,81 +52,82 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
             </div>
 
             <div>
-                <ul className="space-y-3 w-full">
-                    <h2 className="text-lg text-gray-400 my-3">Participant Loadout</h2>
-                    {formValues?.participants?.map((id: string) => {
-                        const member = formattedMembers?.find((m) => m.id === id);
-                        const userDuty = formValues?.duties?.[id];
+                {formValues?.participants?.length > 0 && (
+                    <ul className="space-y-3 w-full">
+                        {formValues?.participants?.map((id: string) => {
+                            <h2 className="text-lg text-gray-400 my-3">Participant Loadout</h2>
+                            const member = formattedMembers?.find((m) => m.id === id);
+                            const userDuty = formValues?.duties?.[id];
 
-                        return (
-                            <li key={id} className="border-b border-white/10 py-6 grid grid-cols-3 items-start gap-6">
-                                <div className="flex flex-col gap-2">
-                                    <p className="text-sm text-white font-medium">{member?.label}</p>
-                                    <select
-                                        value={userDuty || ""}
-                                        onChange={(e) => onChangeUserDuty(e.target.value as any, id)}
-                                        className="w-full rounded-md bg-white/5 px-3 py-2 text-white ring-1 ring-white/10 focus:ring-indigo-500 sm:text-sm"
-                                    >
-                                        <option value="">Select Duty</option>
-                                        <option value="Sniper">Sniper</option>
-                                        <option value="Spotter">Spotter</option>
-                                    </select>
-                                </div>
+                            return (
+                                <li key={id} className="border-b border-white/10 py-6 grid grid-cols-3 items-end gap-6">
 
-                                <div className="col-span-1 flex flex-col gap-2">
-                                    {userDuty === "Sniper" && (
-                                        <>
-                                            <label className="text-sm text-white">Weapon</label>
+                                    <div className="col-span-1 flex flex-col gap-2">
+                                        <div className="flex flex-col gap-2">
+                                            <p className="text-sm text-white font-medium">{member?.label}</p>
                                             <select
-                                                value={formValues?.weapons?.[id] || ""}
-                                                onChange={(e) =>
-                                                    setFormValues((prev: ScoreFormValues) => ({
-                                                        ...prev,
-                                                        weapons: { ...prev.weapons, [id]: e.target.value },
-                                                    }))
-                                                }
+                                                value={userDuty || ""}
+                                                onChange={(e) => onChangeUserDuty(e.target.value as any, id)}
                                                 className="w-full rounded-md bg-white/5 px-3 py-2 text-white ring-1 ring-white/10 focus:ring-indigo-500 sm:text-sm"
                                             >
-                                                <option value="">Select weapon</option>
-                                                {weapons?.map((weapon: any) => (
-                                                    <option key={weapon.id} value={weapon.id}>
-                                                        {weapon.weapon_type} — {weapon.serial_number}
-                                                    </option>
-                                                ))}
+                                                <option value="">Select Duty</option>
+                                                <option value="Sniper">Sniper</option>
+                                                <option value="Spotter">Spotter</option>
                                             </select>
-                                        </>
-                                    )}
+                                        </div>
+                                        {userDuty === "Sniper" && (
+                                            <>
+                                                <label className="text-sm text-white">Weapon</label>
+                                                <select
+                                                    value={formValues?.weapons?.[id] || ""}
+                                                    onChange={e =>
+                                                        setFormValues({
+                                                            ...formValues,
+                                                            weapons: { ...formValues.weapons, [id]: e.target.value },
+                                                        })
+                                                    }
+                                                    className="w-full rounded-md bg-white/5 px-3 py-2 text-white ring-1 ring-white/10 focus:ring-indigo-500 sm:text-sm"
+                                                >
+                                                    <option value="">Select weapon</option>
+                                                    {weapons?.map((weapon: any) => (
+                                                        <option key={weapon.id} value={weapon.id}>
+                                                            {weapon.weapon_type} — {weapon.serial_number}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </>
+                                        )}
 
-                                    {userDuty === "spotter" && (
-                                        <>
-                                            <label className="text-sm text-white">Equipment</label>
-                                            <select
-                                                value={formValues.equipments?.[id] || ""}
-                                                onChange={(e: any) =>
-                                                    setFormValues((prev: ScoreFormValues) => ({
-                                                        ...prev,
-                                                        equipments: { ...prev.equipments, [id]: e.target.value },
-                                                    }))
-                                                }
-                                                className="w-full rounded-md bg-white/5 px-3 py-2 text-white ring-1 ring-white/10 focus:ring-indigo-500 sm:text-sm"
-                                            >
-                                                <option value="">Select equipment</option>
-                                                {eqipments?.map((equipment: any) => (
-                                                    <option key={equipment.id} value={equipment.id}>
-                                                        {equipment.equipment_type} — {equipment.serial_number}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </>
-                                    )}
-                                </div>
+                                        {userDuty === "Spotter" && (
+                                            <>
+                                                <label className="text-sm text-white">Equipment</label>
+                                                <select
+                                                    value={formValues.equipments?.[id] || ""}
+                                                    onChange={e =>
+                                                        setFormValues({
+                                                            ...formValues,
+                                                            equipments: { ...formValues.equipments, [id]: e.target.value },
+                                                        })
+                                                    }
+                                                    className="w-full rounded-md bg-white/5 px-3 py-2 text-white ring-1 ring-white/10 focus:ring-indigo-500 sm:text-sm"
+                                                >
+                                                    <option value="">Select equipment</option>
+                                                    {eqipments?.map((equipment: any) => (
+                                                        <option key={equipment.id} value={equipment.id}>
+                                                            {equipment.equipment_type} — {equipment.serial_number}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </>
+                                        )}
+                                    </div>
 
-                                {/* Right: Placeholder for future (e.g. position, score etc.) */}
-                                <div className="col-span-1"></div>
-                            </li>
-                        );
-                    })}
-                </ul>
+                                    <div className="col-span-1"></div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                )}
             </div>
         </div>
     );

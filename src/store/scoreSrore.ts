@@ -27,7 +27,7 @@ export const scoreStore = create<ScoreStore>((set) => ({
            assignment_session_id: scoreForm.assignment_session_id,
         }
 
-        console.log(scoreForm)
+        console.log("scoreForm",scoreForm)
 
         if(scoreForm.squad_id) score.squad_id = scoreForm.squad_id
         const res = await createScore(score)

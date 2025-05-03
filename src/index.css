@@ -10,7 +10,10 @@
 
   color-scheme: light dark;
 }
-button { -fx-focus-color: transparent; }
+
+button {
+  -fx-focus-color: transparent;
+}
 
 h1 {
   font-size: 3.2em;
@@ -30,6 +33,7 @@ button {
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.15);
   border-radius: 9999px;
@@ -41,6 +45,7 @@ button {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
   }

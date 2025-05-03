@@ -19,6 +19,7 @@ export default function TrainingPageScore() {
     const { scores, createScore } = useStore(scoreStore);
     const { user } = useStore(userStore);
     const { training } = useStore(TrainingStore);
+    const [editingScore, setEditingScore] = useState<Score | null>(null);
 
     useEffect(() => {
         if (scores.length > 0) {
@@ -40,11 +41,15 @@ export default function TrainingPageScore() {
     };
 
     const submitScore = async (formValues: any) => {
-        if (!user?.squad_id) {
-            formValues.squad_id = user?.squad_id;
+        try {
+            if (!user?.squad_id) {
+                formValues.squad_id = user?.squad_id;
+            }
+            await createScore(formValues);
+            setIsModalOpen(false);
+        } catch (error) {
+            console.error("Error submitting score:", error);
         }
-        await createScore(formValues);
-        setIsModalOpen(false);
     };
 
     const scoresBySquad = scores.reduce((acc: any, score: Score) => {
@@ -308,7 +313,6 @@ export default function TrainingPageScore() {
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                     onSubmit={(formValues) => submitScore(formValues)}
-                    editingScore={null}
                     assignmentSessions={training?.assignment_session || []}
                 />
             </div>

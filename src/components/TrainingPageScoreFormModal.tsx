@@ -69,14 +69,14 @@ export default function ScoreFormModal({
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} width="max-w-5xl">
-      <div className="pb-4 w-full">
-        <div className="flex  mb-4 border-b border-white/10 pb-3 w-full">
+      <div className="w-full">
+        <div className="flex  mb-4 border-b border-white/10 pb-3 w-fulSSl">
           <h2 className="text-xl font-semibold text-white">
             {editingScore ? "Edit Score Entry" : "New Score Entry"}
           </h2>
         </div>
 
-        <div className="flex items-center gap-4 mb-6 w-full ">
+        <div className="flex items-center gap-4 mb-2 p-2 w-full ">
           <ol className="flex  w-full max-w-2xl text-sm font-medium text-gray-500 dark:text-gray-400 sm:text-base">
             {['Assignment', 'Participants'].map((label, idx) => {
               const stepIndex = idx + 1;

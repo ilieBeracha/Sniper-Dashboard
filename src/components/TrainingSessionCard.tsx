@@ -23,7 +23,6 @@ export function TrainingSessionCard({
   const participants = session.participants || [];
   const assignments = session.assignment_session || [];
 
-  const isParticipant = participants.some((p) => p.participant_id === currentUserId);
 
   const handleSessionClick = () => {
     navigate(`/training/${session.id}`);
@@ -53,7 +52,6 @@ export function TrainingSessionCard({
         <div className="flex-1 ml-4">
           <div className="flex items-center gap-2">
             <h4 className="font-medium text-white text-sm">{session.session_name}</h4>
-            {isParticipant && <TrainingParticipantBadge />}
           </div>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-gray-400 text-xs">

@@ -47,24 +47,7 @@ export default function TeamTable() {
     <>
       <div className="flex justify-between items-center "></div>
       <div className="overflow-hidden rounded-sm  bg-dashboard-card">
-        {/* {selectedRows.length > 0 && (
-          <div className="flex items-center justify-between p-4 bg-white/5 border-b border-dashboard-border">
-            <span className="text-sm text-dashboard-text-muted">
-              {selectedRows.length}{" "}
-              {selectedRows.length === 1 ? "unit" : "units"} selected
-            </span>
-            <div className="flex items-center space-x-2">
-              <button className="px-3 py-1.5 bg-[#F25F4C]/10 hover:bg-[#F25F4C]/20 text-[#F25F4C] rounded-md text-xs flex items-center">
-                <BiTrash className="mr-1.5" /> Remove
-              </button>
-            </div>
-          </div> */}
-        {/* )} */}
-
-        <div
-          className="max-w-full overflow-x-auto 
-"
-        >
+        <div className="max-w-full overflow-x-auto ">
           <table className="min-w-full divide-y divide-dashboard-border">
             <thead className="bg-dashboard-card ">
               <tr>
@@ -91,9 +74,8 @@ export default function TeamTable() {
                 return (
                   <tr
                     key={rowId}
-                    className={`transition-colors ${selectedRows.includes(rowId) ? "bg-white/10" : ""} ${
-                      hoveredRow === rowId ? "bg-white/10" : "hover:bg-white/10"
-                    }`}
+                    className={`transition-colors ${selectedRows.includes(rowId) ? "bg-white/10" : ""} ${hoveredRow === rowId ? "bg-white/10" : "hover:bg-white/10"
+                      }`}
                     onMouseEnter={() => setHoveredRow(rowId)}
                     onMouseLeave={() => setHoveredRow(null)}
                   >

@@ -3,7 +3,6 @@ import { useStore } from "zustand";
 import { squadStore } from "@/store/squadStore";
 import { teamStore } from "@/store/teamStore";
 import { Assignment } from "@/types/training";
-import { UserDuty } from "@/types/score";
 
 // Types for form state
 export interface ScoreFormValues {
@@ -30,7 +29,7 @@ export interface UseScoreFormProps {
   assignmentSessions?: Assignment[];
 }
 
-export function useScoreForm({ isOpen, editingScore, assignmentSessions = [] }: UseScoreFormProps) {
+export function useScoreForm({ editingScore, assignmentSessions = [] }: UseScoreFormProps) {
   const { squadUsers } = useStore(squadStore);
   const { members: teamMembers } = useStore(teamStore);
 
@@ -53,14 +52,11 @@ export function useScoreForm({ isOpen, editingScore, assignmentSessions = [] }: 
     equipments: {},
   });
 
-  // Modal step
   const [step, setStep] = useState<1 | 2>(1);
-  // Error state
   const [errors, setErrors] = useState<string[]>([]);
-  // Search term for participants
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Populate form on edit or squad user change
+  
+  console.log(editingScore)
   useEffect(() => {
     if (editingScore) {
       setFormValues({
@@ -68,7 +64,7 @@ export function useScoreForm({ isOpen, editingScore, assignmentSessions = [] }: 
         distance: editingScore.distance || "",
         target_hit: editingScore.target_hit || "",
         day_night: editingScore.day_night || "day",
-        participants: editingScore?.participants?.map((p: any) => p) || [],
+        participants: [],
         duties: {},
         assignment_session_id: editingScore.assignment_session_id || "",
         weapons: {},
@@ -80,18 +76,12 @@ export function useScoreForm({ isOpen, editingScore, assignmentSessions = [] }: 
         target_eliminated: editingScore.target_eliminated || null,
         position: editingScore.position || null,
       });
-    } else if (squadUsers?.length) {
-      setFormValues((prev) => ({
-        ...prev,
-        participants: squadUsers.map((u: any) => u.id),
-      }));
-    }
-  }, [editingScore, squadUsers]);
+    } 
+  }, [editingScore]);
 
   // Validation logic
   function validateForm() {
     const isValid =
-      Object.values(formValues.duties).every((duty) => duty !== "") &&
       formValues.assignment_session_id !== "" &&
       formValues.time_until_first_shot !== "" &&
       formValues.distance !== "" &&
