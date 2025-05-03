@@ -41,7 +41,7 @@ export async function getSquadUsersBySquadId(squad_id: string) {
         last_name,
         user_role,
         email
-      )
+      ) 
     `
     )
     .eq("id", squad_id);
@@ -51,7 +51,7 @@ export async function getSquadUsersBySquadId(squad_id: string) {
     throw new Error("Could not fetch squads with users for team");
   }
 
-  return data[0];
+  return data;
 }
 
 export async function getSquadMetricsByRoleRpc(team_id: string) {

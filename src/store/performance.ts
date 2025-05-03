@@ -2,12 +2,15 @@
 import { create } from "zustand";
 import { HitPercentageData, SquadWeaponPerformance } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
-import { getUserHitPercentageRpc, getWeaponPerformanceBySquadAndWeapon, getUserGroupingSummaryRpc } from "@/services/performance";
+import { getUserHitPercentageRpc, getWeaponPerformanceBySquadAndWeapon, getUserGroupingSummaryRpc, getTopAccurateSnipers } from "@/services/performance";
 import { userStore } from "./userStore";
+import { User } from "@supabase/supabase-js";
 
 interface PerformanceStore {
   squadWeaponPerformance: SquadWeaponPerformance[];
   isLoading: boolean;
+  topAccurateSnipers: User[];
+  getTopAccurateSnipers: (teamId: string) => Promise<void>;
   getSquadWeaponPerformance: (teamId: string) => Promise<void>;
 
   userHitPercentage: HitPercentageData | null;
@@ -22,6 +25,21 @@ interface PerformanceStore {
 export const performanceStore = create<PerformanceStore>((set) => ({
   squadWeaponPerformance: [],
   isLoading: false,
+  topAccurateSnipers: [],
+
+  getTopAccurateSnipers: async (teamId: string) => {
+    try {
+      set({ isLoading: true });
+      const data = await getTopAccurateSnipers(teamId);
+      set({ topAccurateSnipers: data });
+    } catch (error) {
+      console.error("Failed to load top accurate snipers:", error);
+      set({ topAccurateSnipers: [] });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
   getSquadWeaponPerformance: async (teamId: string) => {
     try {
       set({ isLoading: true });
@@ -68,3 +86,4 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     }
   },
 }));
+

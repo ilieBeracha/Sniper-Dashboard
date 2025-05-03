@@ -6,7 +6,6 @@ interface ScoreParticipant {
     role: string;
     weapon_id: string;
     equipment_id: string;
-    position: string;
     created_at: string;
     user: {
         id: string;
@@ -49,11 +48,6 @@ const ScoreParticipantsDisplay = ({ participants, equipment }: { participants: S
                                 <div className="flex items-center mb-3">
                                     <Users className="h-5 w-5 text-zinc-400 mr-2" />
                                     <h4 className="text-lg font-medium text-white">{participant.user.first_name} {participant.user.last_name}</h4>
-                                </div>
-
-                                <div className="flex items-center mt-2 bg-zinc-700/30 py-2 px-3 rounded">
-                                    <Target className="h-4 w-4 text-zinc-400 mr-2" />
-                                    <span className="text-zinc-300">{participant.position}</span>
                                 </div>
                             </div>
 

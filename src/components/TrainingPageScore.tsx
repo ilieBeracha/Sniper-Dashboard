@@ -6,42 +6,19 @@ import { scoreStore } from "@/store/scoreSrore";
 import { Edit2Icon, Plus, Users, Moon, Sun, Clock, Target, ChevronDown, ChevronUp } from "lucide-react";
 import { userStore } from "@/store/userStore";
 import { isCommander } from "@/utils/permissions";
-import { getTrainingById } from "@/services/trainingService";
+
 import { Score } from "@/types/score";
 import ScoreParticipantsDisplay from "./TrainingPageScoreParticipantsDisplay";
+import { TrainingStore } from "@/store/trainingStore";
 
 export default function TrainingPageScore() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [assignmentSessions, setAssignmentSessions] = useState([]);
-    const [currentTrainingId, setCurrentTrainingId] = useState('');
     const [expandedSquads, setExpandedSquads] = useState<any>({});
     const [expandedScores, setExpandedScores] = useState<Record<string, boolean>>({});
     const [filterCondition, setFilterCondition] = useState('all');
     const { scores, createScore } = useStore(scoreStore);
     const { user } = useStore(userStore);
-
-    useEffect(() => {
-        if (scores && scores.length > 0 && scores[0].assignment_session?.training_id) {
-            setCurrentTrainingId(scores[0].assignment_session.training_id);
-        }
-    }, [scores]);
-
-    useEffect(() => {
-        const fetchTrainingData = async () => {
-            if (!currentTrainingId) return;
-
-            try {
-                const trainingData = await getTrainingById(currentTrainingId);
-                if (trainingData && trainingData.assignment_session) {
-                    setAssignmentSessions(trainingData.assignment_session);
-                }
-            } catch (error) {
-                console.error('Error fetching training data:', error);
-            }
-        };
-
-        fetchTrainingData();
-    }, [currentTrainingId]);
+    const { training } = useStore(TrainingStore);
 
     useEffect(() => {
         if (scores.length > 0) {
@@ -63,7 +40,9 @@ export default function TrainingPageScore() {
     };
 
     const submitScore = async (formValues: any) => {
-        formValues.squad_id = user?.squad_id || "";
+        if (!user?.squad_id) {
+            formValues.squad_id = user?.squad_id;
+        }
         await createScore(formValues);
         setIsModalOpen(false);
     };
@@ -265,18 +244,18 @@ export default function TrainingPageScore() {
                                                     </div>
                                                     <div className="text-sm text-zinc-400 flex items-center">
                                                         <Clock size={14} className="mr-1.5 text-zinc-500" />
-                                                        {formatDate(score.created_at)}
+                                                        {formatDate(score.created_at || "")}
                                                     </div>
                                                     <div className="flex items-center justify-end space-x-2">
                                                         {score.score_participants && score.score_participants.length > 0 && (
                                                             <button
-                                                                onClick={(e) => toggleScoreExpansion(score.id, e)}
+                                                                onClick={(e) => toggleScoreExpansion(score.id || "", e)}
                                                                 className="flex items-center gap-1 px-2 py-1 rounded hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors"
                                                             >
                                                                 <Users size={14} />
                                                                 <span className="text-xs font-medium">
                                                                     {score.score_participants.length}
-                                                                    {expandedScores[score.id] ?
+                                                                    {expandedScores[score.id || ""] ?
                                                                         <ChevronUp size={14} className="ml-1 inline" /> :
                                                                         <ChevronDown size={14} className="ml-1 inline" />
                                                                     }
@@ -300,7 +279,7 @@ export default function TrainingPageScore() {
                                                 </div>
 
                                                 {/* Participant details section */}
-                                                {expandedScores[score.id] && score.score_participants && (
+                                                {expandedScores[score.id || ""] && score.score_participants && (
                                                     <div className="py-3 px-4 bg-zinc-800/30">
                                                         <ScoreParticipantsDisplay
                                                             participants={score.score_participants}
@@ -330,7 +309,7 @@ export default function TrainingPageScore() {
                     onClose={() => setIsModalOpen(false)}
                     onSubmit={(formValues) => submitScore(formValues)}
                     editingScore={null}
-                    assignmentSessions={assignmentSessions}
+                    assignmentSessions={training?.assignment_session || []}
                 />
             </div>
         </BaseDashboardCard>

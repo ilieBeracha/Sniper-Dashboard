@@ -33,6 +33,6 @@ export const squadStore = create<SquadStore>((set) => ({
   },
   getSquadUsersBySquadId: async (squad_id) => {
     const data = await getSquadUsersBySquadId(squad_id);
-    set({ squadUsers: data.users as unknown as any[] });
+    set({ squadUsers: data as unknown as any[] });
   },
 }));

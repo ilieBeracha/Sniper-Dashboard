@@ -1,18 +1,12 @@
 import { getWeapons } from "@/services/weaponsService";
 import { createStore } from "zustand";
+import { Weapon } from "@/types/weapon";
 
-export interface Weapon {
-    id: string;
-    name: string;
-    type: string;
+export const weaponsStore = createStore<{ weapons: Weapon[], getWeapons: (teamId: string) => Promise<void> }>((set) => ({
+    weapons: [] as Weapon[],
 
-}
-
-export const weaponsStore = createStore<{ weapons: Weapon[], getWeapons: () => void }>((set) => ({
-    weapons: [],
-
-    getWeapons: () => {
-        const weapons = getWeapons();
-        set({ weapons: weapons as any });
+    getWeapons: async (teamId: string) => {
+        const weapons = await getWeapons(teamId);
+        set({ weapons: weapons as Weapon[] });
     }
 }))

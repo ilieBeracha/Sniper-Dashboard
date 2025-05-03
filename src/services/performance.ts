@@ -2,6 +2,7 @@
 import { supabase } from "./supabaseClient";
 import { HitPercentageData, SquadWeaponPerformance } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
+import { User } from "@supabase/supabase-js";
 
 export async function getUserHitPercentageRpc(userId: string): Promise<HitPercentageData> {
   const { data, error } = await supabase.rpc("get_user_hit_percentage_by_single_sniper", {
@@ -37,11 +38,9 @@ export async function getUserGroupingSummaryRpc(userId: string): Promise<Groupin
     throw new Error("Could not complete get_user_grouping_summary");
   }
 
-  // Since the function returns JSON fields, ensure they're properly parsed
   if (data && data.length > 0) {
     const result = data[0];
 
-    // Parse JSON fields if they're returned as strings
     if (typeof result.weapon_breakdown === "string") {
       result.weapon_breakdown = JSON.parse(result.weapon_breakdown);
     }
@@ -54,4 +53,18 @@ export async function getUserGroupingSummaryRpc(userId: string): Promise<Groupin
   }
 
   throw new Error("No grouping summary data returned");
+}
+
+
+export async function getTopAccurateSnipers(teamId: string): Promise<User[]> {
+  const { data, error } = await supabase.rpc("get_top_snipers_by_team", {
+    team_uuid: teamId,
+  });
+
+  if (error) {
+    console.error("Error fetching top accurate snipers data:", error.message);
+    throw new Error("Failed to fetch top accurate snipers data");
+  }
+
+  return data || [];
 }

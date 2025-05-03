@@ -1,4 +1,4 @@
-import { Score } from "@/types/score";
+import { Score, ScoreParticipant } from "@/types/score";
 import { supabase } from "./supabaseClient";
 
 
@@ -33,10 +33,9 @@ export async function getScoresByTrainingId(training_id: string): Promise<any[]>
         score_participants (
           id,
           user_id,
-          role,
+          user_duty,
           weapon_id,
           equipment_id,
-          position,
           created_at,
           user:user_id (
             id,
@@ -62,9 +61,38 @@ export async function getScoresByTrainingId(training_id: string): Promise<any[]>
 }
 
 
-export async function createScore(data: Score) {
-  const { error } = await supabase.from("score").insert([data]);
+export async function createScoreParticipant(scoreParticipantData: Partial<ScoreParticipant>[], score_id: string) {
+  console.log("scoreParticipantData", scoreParticipantData)
+  console.log("score_id", score_id)
+  try {
+    if (!Array.isArray(scoreParticipantData) || scoreParticipantData.length === 0) {
+      throw new Error("scoreParticipantData must be a non-empty array");
+    }
+    const participantsWithScoreId = scoreParticipantData.map(participant => ({
+      ...participant,
+      score_id,
+    }));
+    const { data, error } = await supabase
+      .from("score_participants")
+      .insert(participantsWithScoreId)
+      .select("*");
+    if (error) throw error;
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error creating score participant:", error);
+    throw error;
+  }
+}
 
-  if (error) throw new Error(error.message);
-  return data;
+
+export async function createScore(scoreData: Partial<Score>) {
+  try {
+    const { data, error } = await supabase.from("score").insert(scoreData).select("*").single();
+    if (error) throw new Error(error.message);
+    return data;
+  } catch (error) {
+    console.error("Error creating score:", error);
+    throw error;
+  }
 }
