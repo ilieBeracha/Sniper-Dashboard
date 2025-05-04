@@ -1,7 +1,7 @@
-import { Card, Spacer } from "@heroui/react";
+import { Card } from "@heroui/react";
 import BaseTabs from "./BaseTabs";
 import { ResponsiveContainer, BarChart, Bar, XAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { SquadStats, UserPosition } from "@/types/performance";
+import { SquadStats } from "@/types/performance";
 import BaseDashboardCard from "./BaseDashboardCard";
 import { useEffect, useState } from "react";
 import { PositionScore } from "@/types/score";

@@ -1,12 +1,12 @@
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
-import DashboardMostAccurate from "./DashboardMostAccurate";
 import BaseDashboardCard from "./BaseDashboardCard";
 import UserHitPercentage from "./DashboardUserHitPercentage";
-import Chart from "./DashboardSquadStats";
+import DashboardSquadStats from "./DashboardSquadStats";
+import DashboardDayNightPerformance from "./DashboardDayNightPerformance";
 
 export default function DashboardRowKPI() {
-  const { topAccurateSnipers } = useStore(performanceStore);
+  const { dayNightPerformance } = useStore(performanceStore);
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
@@ -18,13 +18,13 @@ export default function DashboardRowKPI() {
           </BaseDashboardCard>
         </div>
         <div className="col-span-3">
-          <BaseDashboardCard header="Precision Accuracy">
-            <DashboardMostAccurate topAccurateSnipers={topAccurateSnipers} />
+          <BaseDashboardCard header="Day/Night Performance" tooltipContent="Your performance in day and night">
+            <DashboardDayNightPerformance dayNightPerformance={dayNightPerformance} />
           </BaseDashboardCard>
         </div>
 
         <div className="col-span-6">
-          <Chart />
+          <DashboardSquadStats />
         </div>
       </div>
     </>

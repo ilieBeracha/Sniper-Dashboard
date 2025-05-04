@@ -22,30 +22,32 @@ export default function DashboardDayNightPerformance({ dayNightPerformance }: { 
     {
       name: "Day",
       value: parseFloat((dayData?.[activeMetric?.key as keyof DayNightPerformance] as string) || "0"),
-      color: "#fbbf24",
+      color: "#a1a1a9",
     },
     {
       name: "Night",
       value: parseFloat((nightData?.[activeMetric?.key as keyof DayNightPerformance] as string) || "0"),
-      color: "#60a5fa",
+      color: "#52525b",
     },
   ];
 
   return (
     <>
-      <div className="flex gap-1 mb-4  p-1 bg-zinc-900/50 rounded-lg">
-        {tabs.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setActiveTab(id)}
-            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-              activeTab === id ? "bg-zinc-700 text-white" : "text-zinc-400 hover:text-white"
-            }`}
-          >
-            <Icon size={14} />
-            {label}
-          </button>
-        ))}
+      <div className="mb-4 p-1 bg-zinc-900/50 rounded-lg overflow-hidden">
+        <div className="flex gap-1 overflow-x-auto pb-1.5">
+          {tabs.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                activeTab === id ? "bg-zinc-700 text-white" : "text-zinc-400 hover:text-white"
+              }`}
+            >
+              <Icon size={14} />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Chart */}
