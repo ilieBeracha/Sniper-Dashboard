@@ -2,13 +2,13 @@ import { BiAddToQueue, BiInfoCircle } from "react-icons/bi";
 import { Tooltip } from "react-tooltip";
 
 export default function BaseDashboardCard({
-  title,
+  header,
   children,
   tooltipContent = "",
   withBg = true,
   withBtn = false,
 }: {
-  title: string | React.ReactNode;
+  header: string | React.ReactNode;
   children: React.ReactNode;
   tooltipContent?: string;
   withBg?: boolean;
@@ -20,19 +20,23 @@ export default function BaseDashboardCard({
         withBg ? "bg-[#1E1E1E]" : "bg-transparent"
       }`}
     >
-      <div className="px-4 pt-4 pb-2 border-b border-white/5 mb-2">
+      <div className="px-4 py-3 border-b border-white/5 mb-2">
         <div className="flex justify-between relative h-full items-center">
           {tooltipContent && (
             <BiInfoCircle
               className="absolute -top-1 -right-1 text-indigo-400/80 hover:text-indigo-400 cursor-help transition-colors duration-200"
               size={16}
-              data-tooltip-id={`${title}-tooltip`}
+              data-tooltip-id={`${header}-tooltip`}
               data-tooltip-content={tooltipContent}
             />
           )}
           <h2 className="font-semibold text-white flex items-center gap-2">
-            <div className="h-1.5 w-1.5 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full"></div>
-            {title}
+            <div
+              className={`h-1.5 w-1.5 max-h-1.5 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full ${
+                typeof header === "string" ? "lg:text-lg text-sm" : ""
+              }`}
+            ></div>
+            {header}
           </h2>
           {withBtn ?? (
             <button className="p-1.5 rounded-lg hover:bg-white/5 transition-colors duration-200">
@@ -44,7 +48,7 @@ export default function BaseDashboardCard({
       <div className="px-4 pb-4 flex-1 h-full">{children}</div>
 
       <Tooltip
-        id={`${title}-tooltip`}
+        id={`${header}-tooltip`}
         place="top"
         className="!bg-[#1A1A1A] !text-gray-300 !opacity-100 !border !border-white/10 !rounded-lg !p-3 !text-sm !max-w-xs"
         style={{

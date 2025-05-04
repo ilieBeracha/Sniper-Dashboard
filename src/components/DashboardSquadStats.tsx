@@ -61,14 +61,20 @@ export default function DashboardSquadStats() {
 
   return (
     <BaseDashboardCard
-      title={
+      header={
         <div className="flex flex-row items-center justify-between gap-4">
-          <BaseTabs selectedTab={selectedTab} handleSelectedTab={handleSelectedTabs} tabs={tabs} resetFilters={() => resetFilters()} />
+          <BaseTabs
+            selectedTab={selectedTab}
+            handleSelectedTab={handleSelectedTabs}
+            tabs={tabs}
+            resetFilters={() => resetFilters()}
+            header={<h2 className="font-semibold text-white flex items-center gap-2">Squad Stats</h2>}
+          />
         </div>
       }
     >
       <Card className="bg-transparent rounded-xl w-full h-full flex flex-col justify-center gap-4">
-        <ResponsiveContainer width="100%" height={340}>
+        <ResponsiveContainer width="100%" maxHeight={340} height={340}>
           <BarChart data={chartData} barCategoryGap={16} barGap={8} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
             <defs>
               <linearGradient id="gradientPerformance" x1="0" y1="0" x2="0" y2="1">

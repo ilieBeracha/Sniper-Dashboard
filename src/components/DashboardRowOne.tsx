@@ -14,13 +14,13 @@ export default function DashboardRowOne({ user }: DashboardRowOneProps) {
     <section className="pb-0 mb-8">
       <div className="grid grid-cols-1 lg:grid-cols-8 gap-6 relative">
         <div className="lg:col-span-3">
-          <BaseDashboardCard title="User Profile">
+          <BaseDashboardCard header="User Profile">
             <UserProfile user={user} />
           </BaseDashboardCard>
         </div>
 
         <div className="lg:col-span-5">
-          <BaseDashboardCard title="Calendar" tooltipContent="View and manage your schedule and events">
+          <BaseDashboardCard header="Calendar" tooltipContent="View and manage your schedule and events">
             <DashboardCalendar />
           </BaseDashboardCard>
         </div>

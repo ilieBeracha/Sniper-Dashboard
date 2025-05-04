@@ -11,14 +11,16 @@ export default function DashboardRowKPI() {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
         <div className="col-span-3">
-          <BaseDashboardCard title="User Hit Percentage" tooltipContent="Your overall hit accuracy and performance metrics">
+          <BaseDashboardCard header="User Hit Percentage" tooltipContent="Your overall hit accuracy and performance metrics">
             <div className="h-full flex items-center justify-center">
               <UserHitPercentage />
             </div>
           </BaseDashboardCard>
         </div>
         <div className="col-span-3">
-          <DashboardMostAccurate topAccurateSnipers={topAccurateSnipers} />
+          <BaseDashboardCard header="Precision Accuracy">
+            <DashboardMostAccurate topAccurateSnipers={topAccurateSnipers} />
+          </BaseDashboardCard>
         </div>
 
         <div className="col-span-6">

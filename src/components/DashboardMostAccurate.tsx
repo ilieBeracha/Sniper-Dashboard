@@ -1,10 +1,8 @@
 import { TrendingUp } from "lucide-react";
-import BaseDashboardCard from "./BaseDashboardCard";
 
 export default function DashboardMostAccurate({ topAccurateSnipers }: { topAccurateSnipers: any[] }) {
   return (
-    <div className="lg:col-span-3 h-full">
-      <BaseDashboardCard title="Precision Accuracy">
+   
         <ol className="space-y-3 mt-4 h-full overflow-y-auto">
           {(topAccurateSnipers || []).slice(0, 5).map((sniper: any, idx: number) => {
             const percentage = sniper.user_accuracy_percentage || 0;
@@ -36,7 +34,5 @@ export default function DashboardMostAccurate({ topAccurateSnipers }: { topAccur
 
           {(!topAccurateSnipers || topAccurateSnipers.length === 0) && <li className="text-zinc-500 text-xs italic px-2 py-2">No data available.</li>}
         </ol>
-      </BaseDashboardCard>
-    </div>
   );
 }

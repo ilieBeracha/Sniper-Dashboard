@@ -1,6 +1,5 @@
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Spacer } from "@heroui/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
 import { ChevronDown, X } from "lucide-react";
-import { useEffect } from "react";
 
 type TabItem = {
   name: string;
@@ -13,31 +12,28 @@ type Props = {
   selectedTab: string;
   handleSelectedTab: (tab: string) => void;
   resetFilters: () => void;
+  header: string | React.ReactNode;
 };
 
-export default function BaseTabs({ tabs, selectedTab, handleSelectedTab, resetFilters }: Props) {
-  useEffect(() => {
-    console.log("Selected tab:", selectedTab);
-  }, [selectedTab]);
-
+export default function BaseTabs({ tabs, selectedTab, handleSelectedTab, resetFilters, header }: Props) {
   return (
-    <div className="w-full justify-between">
-      <div className="w-full flex flex-col gap-2">
-        <ul className="flex flex-wrap gap-3 px-2">
+    <div className="w-full justify-between flex flex-row">
+      <div className="w-full flex gap-2 items-center">
+        {typeof header === "string" ? <p className="text-sm text-zinc-400">{header}</p> : header}
+        <ul className="flex flex-wrap gap-3 px-2 ">
           {tabs.map((tab) =>
             tab.dropdown?.length ? (
               <li key={tab.name}>
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button
-                      variant="light"
-                      className={`flex items-center gap-1 px-4 py-2 rounded-md border transition-colors ${
+                    <p
+                      className={`flex items-center gap-1 px-4 rounded-md border transition-colors ${
                         selectedTab.startsWith(tab.name) ? "border-primary-500 text-primary-500" : "border-zinc-700 text-zinc-400 hover:text-white"
                       }`}
                     >
                       {tab.name}
                       <ChevronDown size={16} />
-                    </Button>
+                    </p>
                   </DropdownTrigger>
                   <DropdownMenu
                     onAction={(key) => handleSelectedTab(key as string)}
@@ -69,13 +65,13 @@ export default function BaseTabs({ tabs, selectedTab, handleSelectedTab, resetFi
       </div>
       <div className="flex justify-end">
         {selectedTab && (
-          <button
+          <p
             onClick={resetFilters}
-            className="text-xs text-zinc-400 hover:text-white flex items-center gap-1 px-3 py-1 rounded bg-zinc-800 hover:bg-zinc-700 transition"
+            className="text-xs text-white hover:text-white flex items-center gap-1 px-1 py-1 rounded bg-red-500 hover:bg-red-600 transition"
           >
             <X size={12} />
-            Reset Filters
-          </button>
+            Reset
+          </p>
         )}
       </div>
     </div>
