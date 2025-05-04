@@ -53,7 +53,7 @@ export default function DashboardDayNightPerformance({ dayNightPerformance }: { 
       {/* Chart */}
       <div className="h-full max-h-[300px] pt-2 max-w-[600px] mx-auto">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+          <BarChart data={chartData} margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
             <XAxis dataKey="name" tick={{ fill: "#a1a1aa", fontSize: 12, spreadMethod: "align" }} axisLine={{ stroke: "#3f3f46" }} />
             <YAxis
               tick={{ fill: "#a1a1aa", fontSize: 12 }}

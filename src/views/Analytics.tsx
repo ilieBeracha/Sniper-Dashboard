@@ -32,7 +32,7 @@ export default function Analytics() {
         </div>
 
         <div className="col-span-2">
-          <BaseDashboardCard title="Weapon Performance" tooltipContent="Detailed weapon performance metrics across different squads">
+          <BaseDashboardCard header="Weapon Performance" tooltipContent="Detailed weapon performance metrics across different squads">
             <DashboardSquadWeaponPerformance />
           </BaseDashboardCard>
         </div>
