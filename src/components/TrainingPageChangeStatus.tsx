@@ -13,7 +13,7 @@ export default function TrainingPageChangeStatus({
   onStatusChange: (status: TrainingStatus) => void;
 }) {
   return (
-    <BaseDashboardCard title="Training Status" tooltipContent="Change the status of this training session">
+    <BaseDashboardCard header="Training Status" tooltipContent="Change the status of this training session">
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-400">Current Status:</span>

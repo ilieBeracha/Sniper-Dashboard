@@ -68,13 +68,13 @@ export default function ScoreFormModal({
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} width="max-w-5xl">
-      <div className="w-full">
-        <div className="flex  mb-4 border-b border-white/10 pb-3 w-fulSSl">
-          <h2 className="text-xl font-semibold text-white">{editingScore ? "Edit Score Entry" : "New Score Entry"}</h2>
+      <div className="w-full  from-[#181F3A] via-[#23213A] to-[#1A1A2E] rounded-2xl ">
+        <div className="flex mb-4 border-indigo-700/40 pb-3 w-full">
+          <h2 className="text-xl font-semibold text-indigo-200 drop-shadow-md">{editingScore ? "Edit Score Entry" : "New Score Entry"}</h2>
         </div>
 
         <div className="flex items-center gap-4 mb-2 p-2 w-full ">
-          <ol className="flex  w-full max-w-2xl text-sm font-medium text-gray-500 dark:text-gray-400 sm:text-base">
+          <ol className="flex w-full max-w-2xl text-sm font-medium text-indigo-300 sm:text-base">
             {["Assignment", "Participants"].map((label, idx) => {
               const stepIndex = idx + 1;
               const isActive = step === stepIndex;
@@ -84,19 +84,19 @@ export default function ScoreFormModal({
                   key={label}
                   className={`flex justify-center items-center relative ${
                     idx !== 1
-                      ? "after:content-[''] after:w-full after:h-0.5 after:border-b after:border-gray-200 after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700"
+                      ? "after:content-[''] after:w-full after:h-0.5 after:border-b after:border-indigo-700/40 after:inline-block after:mx-6 xl:after:mx-10"
                       : ""
                   }`}
                 >
                   <span className="flex items-center gap-2">
                     <div
-                      className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-bold transition-all duration-300
-                ${isActive ? "bg-gray-300 text-black border-gray-600 shadow-md" : "bg-zinc-700 text-zinc-300 border-zinc-500"}
+                      className={`w-7 h-7 flex items-center justify-center rounded-full border-2 text-xs font-bold transition-all duration-300 shadow-lg
+                ${isActive ? " text-white border-indigo-300 shadow-indigo-500/30" : "bg-zinc-800 text-indigo-300 border-indigo-700"}
               `}
                     >
                       {stepIndex}
                     </div>
-                    <span className={`${isActive ? "text-white font-semibold" : "text-gray-400"}`}>{label}</span>
+                    <span className={`${isActive ? "text-indigo-100 font-semibold" : "text-indigo-400"}`}>{label}</span>
                   </span>
                 </li>
               );
@@ -133,7 +133,7 @@ export default function ScoreFormModal({
         <div className="flex justify-between items-center mt-4">
           <button
             onClick={() => (step === 1 ? onClose() : setStep((step - 1) as 1 | 2))}
-            className="px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-md hover:bg-gray-700"
+            className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-zinc-700 via-indigo-800 to-zinc-900 rounded-md hover:from-indigo-700 hover:to-indigo-900 shadow-md border border-indigo-900/40"
           >
             {step === 1 ? "Cancel" : "Back"}
           </button>
@@ -141,12 +141,15 @@ export default function ScoreFormModal({
           {step === 1 ? (
             <button
               onClick={() => handleNextStep()}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-br rounded-md hover:from-indigo-500 hover:to-indigo-700 shadow-md border border-indigo-900/40"
             >
               Next
             </button>
           ) : (
-            <button onClick={handleSubmit} className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700">
+            <button
+              onClick={handleSubmit}
+              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-br rounded-md hover:from-blue-500 hover:to-indigo-700 shadow-md border border-indigo-900/40"
+            >
               Save
             </button>
           )}

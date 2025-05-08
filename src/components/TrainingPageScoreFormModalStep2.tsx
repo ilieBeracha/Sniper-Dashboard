@@ -37,10 +37,10 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
   return (
     <div className="w-full">
       {/* Participants Selection */}
-      <div className="mb-6 p-4 bg-zinc-800/30 rounded-lg border border-zinc-700/50">
+      <div className="mb-6 to-indigo-950/90">
         <div className="flex items-center gap-2 mb-3">
-          <Users className="text-indigo-400" size={16} />
-          <h2 className="text-base font-semibold text-white">Squad Members</h2>
+          <Users className="text-indigo-400 drop-shadow-glow" size={18} />
+          <h2 className="text-base font-semibold text-indigo-200">Squad Members</h2>
         </div>
         <SearchableCheckboxList
           items={formattedMembers}
@@ -59,9 +59,9 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
       {formValues?.participants?.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <Package className="text-green-400" size={16} />
-            <h3 className="text-base font-semibold text-white">Participant Loadouts</h3>
-            <div className="flex-1 h-px bg-zinc-700/50 ml-3"></div>
+            <Package className="text-green-400 drop-shadow-glow" size={18} />
+            <h3 className="text-base font-semibold text-green-200 drop-shadow-md">Participant Loadouts</h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-green-700/40 via-indigo-700/30 to-transparent ml-3"></div>
           </div>
 
           <div className="space-y-3">
@@ -70,25 +70,28 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
               const userDuty = formValues?.duties?.[id];
 
               return (
-                <div key={id} className="bg-zinc-800/20 p-4 rounded-lg border border-zinc-700/30">
+                <div
+                  key={id}
+                  className="bg-gradient-to-br from-indigo-900/20 via-zinc-900/30 to-indigo-950/20 p-4 rounded-xl border border-indigo-800/30 shadow"
+                >
                   <div className="grid grid-cols-1 items-end md:grid-cols-2 gap-4">
                     {/* Member Info and Duty Selection */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <UserCircle size={16} className="text-zinc-400" />
-                        <p className="text-sm font-medium text-white">{member?.label}</p>
+                        <UserCircle size={16} className="text-indigo-400 drop-shadow-glow" />
+                        <p className="text-sm font-medium text-indigo-100">{member?.label}</p>
                       </div>
 
                       <div>
-                        <label className="flex items-center gap-1.5 text-sm text-zinc-300 font-medium mb-1.5">
-                          <UserCircle size={14} className="text-zinc-400" />
+                        <label className="flex items-center gap-1.5 text-sm text-indigo-200 font-medium mb-1.5">
+                          <UserCircle size={14} className="text-indigo-400" />
                           Combat Role
                         </label>
                         <select
                           value={userDuty || ""}
                           onChange={(e) => onChangeUserDuty(e.target.value as any, id)}
                           className="w-full min-h-9 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white 
-                                                             border border-zinc-700 hover:border-zinc-600 focus:border-indigo-500 
+                                                             border border-indigo-700 hover:border-indigo-500 focus:border-indigo-400 
                                                              focus:ring-1 focus:ring-indigo-500/20 transition-all duration-200
                                                              appearance-none cursor-pointer"
                           style={{
@@ -116,8 +119,8 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
                     <div className="space-y-3">
                       {userDuty === "Sniper" && (
                         <div>
-                          <label className="flex items-center gap-1.5 text-sm text-zinc-300 font-medium mb-1.5">
-                            <Crosshair size={14} className="text-zinc-400" />
+                          <label className="flex items-center gap-1.5 text-sm text-indigo-200 font-medium mb-1.5">
+                            <Crosshair size={14} className="text-indigo-400" />
                             Weapon
                           </label>
                           <select
@@ -129,7 +132,7 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
                               })
                             }
                             className="w-full min-h-9 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white 
-                                                                 border border-zinc-700 hover:border-zinc-600 focus:border-indigo-500 
+                                                                 border border-indigo-700 hover:border-indigo-500 focus:border-indigo-400 
                                                                  focus:ring-1 focus:ring-indigo-500/20 transition-all duration-200
                                                                  appearance-none cursor-pointer"
                             style={{
@@ -154,8 +157,8 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
 
                       {userDuty === "Spotter" && (
                         <div>
-                          <label className="flex items-center gap-1.5 text-sm text-zinc-300 font-medium mb-1.5">
-                            <Binoculars size={14} className="text-zinc-400" />
+                          <label className="flex items-center gap-1.5 text-sm text-indigo-200 font-medium mb-1.5">
+                            <Binoculars size={14} className="text-blue-400" />
                             Equipment
                           </label>
                           <select
@@ -167,8 +170,8 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
                               })
                             }
                             className="w-full min-h-9 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white 
-                                                                 border border-zinc-700 hover:border-zinc-600 focus:border-indigo-500 
-                                                                 focus:ring-1 focus:ring-indigo-500/20 transition-all duration-200
+                                                                 border border-blue-700 hover:border-blue-500 focus:border-blue-400 
+                                                                 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200
                                                                  appearance-none cursor-pointer"
                             style={{
                               backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
@@ -191,7 +194,7 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
                       )}
 
                       {!userDuty && (
-                        <div className="flex items-center justify-center h-[100px] text-sm text-zinc-500">
+                        <div className="flex items-center justify-center h-[100px] text-sm text-indigo-400">
                           Select a combat role to configure equipment
                         </div>
                       )}
@@ -206,10 +209,10 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
 
       {/* Empty State */}
       {formValues?.participants?.length === 0 && (
-        <div className="text-center py-8 bg-zinc-800/20 rounded-lg border border-zinc-700/30">
-          <Users className="h-10 w-10 text-zinc-600 mx-auto mb-3" />
-          <p className="text-zinc-400 mb-1">No participants selected</p>
-          <p className="text-zinc-500 text-sm">Select squad members from the list above to configure their loadouts</p>
+        <div className="text-center py-8 bg-gradient-to-br from-indigo-900/20 via-zinc-900/30 to-indigo-950/20 rounded-xl border border-indigo-800/30 shadow">
+          <Users className="h-10 w-10 text-indigo-600 mx-auto mb-3 drop-shadow-glow" />
+          <p className="text-indigo-300 mb-1">No participants selected</p>
+          <p className="text-indigo-400 text-sm">Select squad members from the list above to configure their loadouts</p>
         </div>
       )}
     </div>

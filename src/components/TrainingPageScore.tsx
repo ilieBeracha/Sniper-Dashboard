@@ -100,7 +100,7 @@ export default function TrainingPageScore() {
   const squadCount = Object.keys(scoresBySquad).length;
 
   return (
-    <BaseDashboardCard title="Training Score Dashboard" tooltipContent="Performance overview across all squads">
+    <BaseDashboardCard header="Training Score Dashboard" tooltipContent="Performance overview across all squads">
       <div className="relative">
         {/* Loading overlay for fetching data */}
         {isLoading && (

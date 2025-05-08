@@ -10,6 +10,7 @@ import { useStore } from "zustand";
 import { Plus, Calendar as CalendarIcon, List, ChartBar } from "lucide-react";
 import { isCommander, isCommanderOrSquadCommander } from "@/utils/permissions";
 import TrainingsWeeklyAssignmentsStats from "@/components/TrainingsWeeklyAssignmentsStats";
+import { useNavigate } from "react-router-dom";
 
 export default function Training() {
   const { loadTrainingByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
@@ -18,6 +19,7 @@ export default function Training() {
   const teamStoreState = useStore(teamStore);
   const members = teamStoreState.members;
   const { userRole } = useUserStore;
+  const navigate = useNavigate();
 
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,6 +48,7 @@ export default function Training() {
   function fetchTrainings() {
     const teamId = userStore.getState().user?.team_id;
     if (!teamId) return;
+    navigate(`/training/${teamId}`);
     return loadTrainingByTeamId(teamId);
   }
 

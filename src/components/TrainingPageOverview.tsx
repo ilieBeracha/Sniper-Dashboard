@@ -28,7 +28,7 @@ export default function TrainingPageOverview({ training }: TrainingPageOverviewP
   };
 
   return (
-    <BaseDashboardCard title="Training Overview" tooltipContent="Detailed information about the current training session">
+    <BaseDashboardCard header="Training Overview" tooltipContent="Detailed information about the current training session">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -46,7 +46,7 @@ export default function TrainingPageOverview({ training }: TrainingPageOverviewP
 
         {training && <TrainingPageStatus status={training.status} date={training.date} />}
 
-        <TrainingStats trainings={[training].filter(Boolean) as TrainingSession[]} />
+        {/* <TrainingStats trainings={[training].filter(Boolean) as TrainingSession[]} /> */}
         <EditTrainingSessionModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
