@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { User, UserRole } from "../types/user";
 import { User as SupabaseAuthUser } from "@supabase/supabase-js";
+import { User, UserRole } from "@/types/user";
 
 interface UserStore {
   user: User | null;
@@ -35,6 +35,8 @@ export const userStore = create<UserStore>((set) => ({
       user_role: meta.user_role ?? "",
       team_id: meta.team_id ?? "",
       squad_id: meta.squad_id ?? "",
+      team_name: meta.team_name ?? "",
+      squad_name: meta.squad_name ?? "",
       created_at: authUser.created_at ?? "",
     };
 

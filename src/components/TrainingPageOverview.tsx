@@ -2,13 +2,12 @@ import { useState } from "react";
 import BaseDashboardCard from "./BaseDashboardCard";
 import { TrainingSession } from "@/types/training";
 import TrainingPageStatus from "./TrainingPageStatus";
-import EditTrainingSessionModal from "./EditTrainingSessionModal";
+import EditTrainingSessionModal from "@/components/EditTrainingSessionModal";
 import { useStore } from "zustand";
 import { teamStore } from "@/store/teamStore";
 import { TrainingStore } from "@/store/trainingStore";
 import { isCommander } from "@/utils/permissions";
 import { userStore } from "@/store/userStore";
-import TrainingStats from "./TrainingsStats";
 
 type TrainingPageOverviewProps = {
   training: TrainingSession | null;

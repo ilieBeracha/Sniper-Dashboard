@@ -59,7 +59,7 @@ export default function BaseTabs({ tabs, selectedTab, handleSelectedTab, resetFi
                   {tab.name}
                 </button>
               </li>
-            )
+            ),
           )}
         </ul>
       </div>

@@ -29,16 +29,31 @@ export function TrainingSessionCard({
     <div
       onClick={handleSessionClick}
       className={`
+        relative
+        pl-2 pr-6 py-6
         border border-white/10 rounded-lg overflow-hidden
         bg-gradient-to-br from-white/5 to-white/[0.02] 
         hover:from-white/10 hover:to-white/[0.05] 
         transition-all duration-500 ease-in-out
         cursor-pointer
+        
       `}
     >
-      <div className="flex items-center justify-between p-4">
+      {/* Status */}
+      <div className="ml-4 flex flex-col items-end gap-2 absolute top-2 right-2">
+        <span
+          className={`text-xs font-medium px-2 py-1 rounded-full
+              ${isPast ? "bg-gray-500/10 text-gray-400" : highlight ? "bg-indigo-500/20 text-indigo-300" : "bg-green-500/10 text-green-400"}
+            `}
+        >
+          {isPast ? "Completed" : highlight ? "Today" : "Upcoming"}
+        </span>
+
+        <ChevronRight className="w-4 h-4 text-gray-400" />
+      </div>
+      <div className="flex items-center justify-between">
         {/* Date */}
-        <div className="min-w-[60px]">
+        <div className="min-w-[100px] h-full">
           <div className="flex flex-col items-center justify-center bg-white/5 rounded-lg p-2">
             <span className="text-base font-semibold text-white">{showDate ? format(sessionDate, "d") : format(sessionDate, "h:mm")}</span>
             <span className="text-xs text-gray-400">{showDate ? format(sessionDate, "MMM") : format(sessionDate, "a")}</span>
@@ -78,32 +93,7 @@ export function TrainingSessionCard({
             )}
           </div>
         </div>
-
-        {/* Status */}
-        <div className="ml-4 flex flex-col items-end gap-2">
-          <span
-            className={`text-xs font-medium px-2 py-1 rounded-full
-              ${isPast ? "bg-gray-500/10 text-gray-400" : highlight ? "bg-indigo-500/20 text-indigo-300" : "bg-green-500/10 text-green-400"}
-            `}
-          >
-            {isPast ? "Completed" : highlight ? "Today" : "Upcoming"}
-          </span>
-
-          <ChevronRight className="w-4 h-4 text-gray-400" />
-        </div>
       </div>
-
-      {/* Assignments Preview */}
-      {assignments.length > 0 && (
-        <div className="px-4 pb-4 flex flex-wrap gap-1.5">
-          {assignments.slice(0, 3).map((assignment: Assignment) => (
-            <span key={assignment.id} className="inline-block px-2 py-1 bg-white/5 rounded-md text-xs text-gray-300">
-              {assignment.assignment.assignment_name}
-            </span>
-          ))}
-          {assignments.length > 3 && <span className="inline-block px-2 py-1 text-xs text-gray-500">+{assignments.length - 3} more</span>}
-        </div>
-      )}
     </div>
   );
 }

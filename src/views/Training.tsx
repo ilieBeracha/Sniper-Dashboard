@@ -51,12 +51,9 @@ export default function TrainingPage() {
 
   const handleConfirmStatusChange = async () => {
     try {
-      const { data, error } = await supabase.from("training_session").update({ status: pendingStatus }).eq("id", training?.id);
-      console.log(data, error);
+      const { error } = await supabase.from("training_session").update({ status: pendingStatus }).eq("id", training?.id);
       if (error) {
         console.error("Error updating training status:", error);
-      } else {
-        console.log("Status updated successfully:", data);
       }
       await loadTrainingById(id as string);
     } catch (error) {
@@ -73,8 +70,8 @@ export default function TrainingPage() {
   };
 
   return (
-    <div className="min-h-screen from-[#1E1E20] text-gray-100 px-6 md:px-16 lg:px-28 py-8 md:py-12">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div className="min-h-screen from-[#1E1E20] text-gray-100 px-6 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
         <div className="lg:col-span-2">
           <TrainingPageOverview training={training} />
         </div>
@@ -82,9 +79,11 @@ export default function TrainingPage() {
           <TrainingPageAssignments training={training} />
         </div>
 
-        <div className="lg:col-span-3">
-          {isCommander(userRole) ? <TrainingPageChangeStatus training={training as TrainingSession} onStatusChange={handleStatusChange} /> : <></>}
-        </div>
+        {isCommander(userRole) && (
+          <div className="lg:col-span-3">
+            <TrainingPageChangeStatus training={training as TrainingSession} onStatusChange={handleStatusChange} />
+          </div>
+        )}
 
         <div className="lg:col-span-3">
           <TrainingPageScore />

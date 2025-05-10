@@ -8,7 +8,7 @@ export default function DashboardRowTwo() {
   const { dayNightPerformance } = useStore(performanceStore);
   return (
     <section>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-2">
         <div className="lg:col-span-6">
           <BaseDashboardCard header="User Group Score" tooltipContent="Your performance compared to your group and squad">
             <UserGroupingSummary />

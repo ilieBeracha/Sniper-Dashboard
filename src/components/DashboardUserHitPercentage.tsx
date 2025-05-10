@@ -1,6 +1,7 @@
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
+import NoDataDisplay from "./BaseNoData";
 
 export default function UserHitPercentage() {
   const { userHitPercentage } = useStore(performanceStore);
@@ -27,81 +28,66 @@ export default function UserHitPercentage() {
 
   const hitColor = getColor(percentage);
 
-  if (!userHitPercentage.hit_percentage && userHitPercentage.total_shots === 0) {
-    return (
-      <div className="h-full flex w-full flex-col items-center justify-center text-white bg-[#161616] rounded-lg p-4">
-        <div className=" p-3 rounded-full mb-3">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-        <h3 className="text-white text-sm font-medium mb-1">No Hit Data</h3>
-        <p className="text-gray-400 text-xs text-center">Complete target shooting exercises to track your accuracy</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex w-full flex-col h-full justify-evenly">
-      <div className=" relative justify-between flex">
-        <ResponsiveContainer width="100%" height={200}>
-          <PieChart>
-            <Pie
-              data={gaugeData}
-              cx="50%"
-              cy="80%"
-              startAngle={180}
-              endAngle={0}
-              innerRadius="60%"
-              outerRadius="90%"
-              paddingAngle={0}
-              dataKey="value"
-              cornerRadius={6}
-            >
-              <Cell fill={hitColor} />
-              <Cell fill="#333" />
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
+    <div className="flex w-full flex-col h-full justify-evenly col-auto">
+      <div className=" relative justify-between flex h-full flex-col">
+        {!userHitPercentage.hit_percentage && userHitPercentage.total_shots === 0 ? (
+          <NoDataDisplay />
+        ) : (
+          <>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={gaugeData}
+                  cx="50%"
+                  cy="80%"
+                  startAngle={180}
+                  endAngle={0}
+                  innerRadius="60%"
+                  outerRadius="90%"
+                  paddingAngle={0}
+                  dataKey="value"
+                  cornerRadius={6}
+                >
+                  <Cell fill={hitColor} />
+                  <Cell fill="#333" />
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
 
-        <div className="absolute inset-0 flex flex-col mt-1">
-          <span className="text-3xl font-bold text-white">{percentage ? percentage.toFixed(1) : 0}%</span>
-          <span className="text-xs text-gray-400 uppercase tracking-wider">Accuracy</span>
-        </div>
-      </div>
+            <div className="absolute inset-0 flex flex-col mt-1">
+              <span className="text-3xl font-bold text-white">{percentage ? percentage.toFixed(1) : 0}%</span>
+              <span className="text-xs text-gray-400 uppercase tracking-wider">Accuracy</span>
+            </div>
+            <div className="grid grid-cols-1 gap-3 mt-2">
+              <div className="bg-[#1A1A1A] p-2 rounded-lg">
+                <div className="flex justify-between">
+                  <span className="text-xs text-gray-400">Total Shots</span>
+                  <span className="text-xs px-1.5 py-0.5 bg-gray-800 rounded-md text-gray-300">{userHitPercentage.total_shots}</span>
+                </div>
+                <div className="mt-1 h-1 w-full bg-gray-800 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full bg-blue-500" style={{ width: `100%` }}></div>
+                </div>
+              </div>
 
-      <div className="grid grid-cols-1 gap-3 mt-2">
-        <div className="bg-[#1A1A1A] p-2 rounded-lg">
-          <div className="flex justify-between">
-            <span className="text-xs text-gray-400">Total Shots</span>
-            <span className="text-xs px-1.5 py-0.5 bg-gray-800 rounded-md text-gray-300">{userHitPercentage.total_shots}</span>
-          </div>
-          <div className="mt-1 h-1 w-full bg-gray-800 rounded-full overflow-hidden">
-            <div className="h-full rounded-full bg-blue-500" style={{ width: `100%` }}></div>
-          </div>
-        </div>
-
-        <div className="bg-[#1A1A1A] p-2 rounded-lg">
-          <div className="flex justify-between">
-            <span className="text-xs text-gray-400">Confirmed Hits</span>
-            <span className="text-xs px-1.5 py-0.5 bg-gray-800 rounded-md text-gray-300">{userHitPercentage.total_hits}</span>
-          </div>
-          <div className="mt-1 h-1 w-full bg-gray-800 rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full"
-              style={{ width: `${(userHitPercentage.total_hits / userHitPercentage.total_shots) * 100}%`, backgroundColor: hitColor }}
-            ></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-3 text-center text-xs text-gray-400">
-        <span className="bg-[#1A1A1A] px-2 py-0.5 rounded">{userHitPercentage.assignments_count} Assignments Completed</span>
+              <div className="bg-[#1A1A1A] p-2 rounded-lg">
+                <div className="flex justify-between">
+                  <span className="text-xs text-gray-400">Confirmed Hits</span>
+                  <span className="text-xs px-1.5 py-0.5 bg-gray-800 rounded-md text-gray-300">{userHitPercentage.total_hits}</span>
+                </div>
+                <div className="mt-1 h-1 w-full bg-gray-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${(userHitPercentage.total_hits / userHitPercentage.total_shots) * 100}%`, backgroundColor: hitColor }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-3 text-center text-xs text-gray-400">
+              <span className="bg-[#1A1A1A] px-2 py-0.5 rounded">{userHitPercentage.assignments_count} Assignments Completed</span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

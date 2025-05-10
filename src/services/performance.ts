@@ -95,13 +95,12 @@ export async function getTrainingEffectivenessByTeam(teamId: string) {
   return data;
 }
 
-export async function getSquadStatByTeamId(teamId: string, position: PositionScore | null, distance: number | null) {
-  const { data, error } = await supabase.rpc("get_squads_stats_by_team_id", {
+export async function getSquadStatByTeamId(teamId: string, position: PositionScore | null, distance: string | null) {
+  const { data, error } = await supabase.rpc("get_squad_stats", {
     p_position: position ? (position as PositionScore) : null,
     p_team_id: teamId,
     p_distance: distance ? distance : null,
   });
-  console.log(data);
 
   if (error) {
     console.error("Error fetching squad stats:", error);

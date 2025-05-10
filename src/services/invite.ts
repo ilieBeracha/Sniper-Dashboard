@@ -1,16 +1,9 @@
 import { Invite } from "@/types/Invite";
 import { supabase } from "./supabaseClient";
 
-export async function getInviteByInviterId(
-  userId: string
-): Promise<Invite | null> {
+export async function getInviteByInviterId(userId: string): Promise<Invite | null> {
   try {
-    console.log(userId);
-    const { data, error } = await supabase
-      .from("invitations")
-      .select("*")
-      .eq("inviter_id", userId)
-      .maybeSingle();
+    const { data, error } = await supabase.from("invitations").select("*").eq("inviter_id", userId).maybeSingle();
 
     if (error) {
       console.error("Error fetching invite by user ID:", error.message);

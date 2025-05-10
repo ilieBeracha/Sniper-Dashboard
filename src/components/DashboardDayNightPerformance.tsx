@@ -1,7 +1,9 @@
 import { DayNightPerformance } from "@/types/performance";
 import { Sun, Moon, Target, Zap, Timer, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import NoDataDisplay from "./BaseNoData";
+import BaseDropBox from "./BaseDropBox";
 
 export default function DashboardDayNightPerformance({ dayNightPerformance }: { dayNightPerformance: DayNightPerformance[] }) {
   const [activeTab, setActiveTab] = useState("accuracy");
@@ -22,47 +24,31 @@ export default function DashboardDayNightPerformance({ dayNightPerformance }: { 
     {
       name: "Day",
       value: parseFloat((dayData?.[activeMetric?.key as keyof DayNightPerformance] as string) || "0"),
-      color: "#a1a1a9",
+      color: "#fbbf24",
     },
     {
       name: "Night",
       value: parseFloat((nightData?.[activeMetric?.key as keyof DayNightPerformance] as string) || "0"),
-      color: "#52525b",
+      color: "#3b82f6",
     },
   ];
 
-  return (
-    <>
-      <div className="mb-4 p-1 bg-zinc-900/50 rounded-lg overflow-hidden">
-        <div className="flex gap-1 overflow-x-auto pb-1.5">
-          {tabs.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
-                activeTab === id ? "bg-zinc-700 text-white" : "text-zinc-400 hover:text-white"
-              }`}
-            >
-              <Icon size={14} />
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
+  const isEmpty = chartData.every((d) => d.value === 0);
 
-      {/* Chart */}
-      <div className="h-full max-h-[300px] pt-2 max-w-[600px] mx-auto">
+  return isEmpty ? (
+    <NoDataDisplay />
+  ) : (
+    <>
+      {/* Tabs */}
+      <BaseDropBox tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+
+      {/* Pie Chart */}
+      <div className="h-[300px] w-full max-w-xs mx-auto px-4">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 0, right: 30, left: 0, bottom: 0 }}>
-            <XAxis dataKey="name" tick={{ fill: "#a1a1aa", fontSize: 12, spreadMethod: "align" }} axisLine={{ stroke: "#3f3f46" }} />
-            <YAxis
-              tick={{ fill: "#a1a1aa", fontSize: 12 }}
-              axisLine={{ stroke: "#3f3f46" }}
-              tickFormatter={(value) => `${value}${activeTab === "reaction" ? "s" : "%"}`}
-            />
+          <PieChart>
             <Tooltip
               contentStyle={{
-                backgroundColor: "#18181818",
+                backgroundColor: "#181818",
                 border: "1px solid #3f3f46",
                 borderRadius: "0.5rem",
                 padding: "0.5rem",
@@ -70,23 +56,31 @@ export default function DashboardDayNightPerformance({ dayNightPerformance }: { 
               }}
               formatter={(value: number) => [`${value}${activeTab === "reaction" ? " sec" : "%"}`, activeMetric?.label]}
             />
-            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+            <Pie
+              data={chartData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+            >
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
-            </Bar>
-          </BarChart>
+            </Pie>
+          </PieChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Summary Stats */}
+      {/* Mission Summary */}
       <div className="flex justify-between border-t pt-2 border-zinc-700/50">
         <div className="flex items-center gap-2">
-          <Sun size={22} className="text-amber-400" />
+          <Sun size={20} className="text-amber-400" />
           <span className="text-sm text-zinc-400">{dayData?.total_missions || 0} missions</span>
         </div>
         <div className="flex items-center gap-2">
-          <Moon size={22} className="text-blue-400" />
+          <Moon size={20} className="text-blue-400" />
           <span className="text-sm text-zinc-400">{nightData?.total_missions || 0} missions</span>
         </div>
       </div>

@@ -1,22 +1,7 @@
 import React from "react";
 import { ScoreFormValues } from "@/hooks/useScoreForm";
 import { Assignment } from "@/types/training";
-import { 
-  Target, 
-  Sun, 
-  Moon, 
-  Activity,
-  Crosshair,
-  Zap,
-  Wind,
-  Navigation,
-  Timer,
-  StickyNote,
-  CheckCircle2,
-  XCircle,
-  FileQuestion,
-  Ruler
-} from "lucide-react";
+import { Target, Sun, Activity, Crosshair, Zap, Wind, Navigation, Timer, StickyNote, CheckCircle2, XCircle, FileQuestion, Ruler } from "lucide-react";
 
 interface ScoreFormFieldProps {
   field: string;
@@ -89,16 +74,10 @@ const fieldConfig = {
   },
 };
 
-const ScoreFormField: React.FC<ScoreFormFieldProps> = ({ 
-  field, 
-  type, 
-  formValues, 
-  setFormValues, 
-  assignmentSessions 
-}) => {
+const ScoreFormField: React.FC<ScoreFormFieldProps> = ({ field, type, formValues, setFormValues, assignmentSessions }) => {
   const config = fieldConfig[field as keyof typeof fieldConfig];
   const Icon = config?.icon || Target;
-  
+
   const renderInput = () => {
     if (type === "select") {
       return (
@@ -111,10 +90,10 @@ const ScoreFormField: React.FC<ScoreFormFieldProps> = ({
                      appearance-none cursor-pointer"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-            backgroundPosition: 'right 0.5rem center',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: '1.2em 1.2em',
-            paddingRight: '2rem',
+            backgroundPosition: "right 0.5rem center",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "1.2em 1.2em",
+            paddingRight: "2rem",
           }}
         >
           <option value="" className="bg-zinc-800 text-zinc-400">
@@ -123,47 +102,62 @@ const ScoreFormField: React.FC<ScoreFormFieldProps> = ({
 
           {field === "assignment_session_id" && assignmentSessions ? (
             assignmentSessions.map((assignment: Assignment) => (
-              <option 
-                key={assignment.assignment.id} 
-                value={assignment.id}
-                className="bg-zinc-800 text-white"
-              >
-                {assignment.assignment.assignment_name}
+              <option key={assignment.id} value={assignment.id} className="bg-zinc-800 text-white">
+                {assignment?.assignment_name}
               </option>
             ))
           ) : field === "position" ? (
             <>
-              <option value="lying" className="bg-zinc-800">🛌 Lying</option>
-              <option value="standing" className="bg-zinc-800">🚶 Standing</option>
-              <option value="sitting" className="bg-zinc-800">💺 Sitting</option>
-              <option value="operational" className="bg-zinc-800">🎯 Operational</option>
+              <option value="lying" className="bg-zinc-800">
+                Lying
+              </option>
+              <option value="standing" className="bg-zinc-800">
+                Standing
+              </option>
+              <option value="sitting" className="bg-zinc-800">
+                Sitting
+              </option>
+              <option value="operational" className="bg-zinc-800">
+                Operational
+              </option>
             </>
           ) : field === "day_night" ? (
             <>
-              <option value="day" className="bg-zinc-800">☀️ Day</option>
-              <option value="night" className="bg-zinc-800">🌙 Night</option>
+              <option value="day" className="bg-zinc-800">
+                Day
+              </option>
+              <option value="night" className="bg-zinc-800">
+                Night
+              </option>
             </>
           ) : field === "mistake" ? (
             <>
-              <option value="missed" className="bg-zinc-800">❌ Missed</option>
-              <option value="wrong target" className="bg-zinc-800">🎯 Wrong Target</option>
-              <option value="slow reaction" className="bg-zinc-800">⏱️ Slow Reaction</option>
+              <option value="missed" className="bg-zinc-800">
+                Missed
+              </option>
+              <option value="wrong target" className="bg-zinc-800">
+                Wrong Target
+              </option>
+              <option value="slow reaction" className="bg-zinc-800">
+                Slow Reaction
+              </option>
             </>
           ) : null}
         </select>
       );
     } else if (type === "boolean") {
       const value = (formValues as any)[field];
-      
+
       return (
         <div className="flex gap-3">
           <button
             type="button"
             onClick={() => setFormValues({ ...formValues, [field]: "true" })}
             className={`flex-1 p-2 rounded-lg border transition-all duration-200 flex items-center justify-center gap-1.5 text-sm
-              ${value === "true" 
-                ? "bg-green-900/30 border-green-600 text-green-400" 
-                : "bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:border-zinc-600"
+              ${
+                value === "true"
+                  ? "bg-green-900/30 border-green-600 text-green-400"
+                  : "bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:border-zinc-600"
               }`}
           >
             <CheckCircle2 size={14} />
@@ -173,9 +167,8 @@ const ScoreFormField: React.FC<ScoreFormFieldProps> = ({
             type="button"
             onClick={() => setFormValues({ ...formValues, [field]: "false" })}
             className={`flex-1 p-2 rounded-lg border transition-all duration-200 flex items-center justify-center gap-1.5 text-sm
-              ${value === "false" 
-                ? "bg-red-900/30 border-red-600 text-red-400" 
-                : "bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:border-zinc-600"
+              ${
+                value === "false" ? "bg-red-900/30 border-red-600 text-red-400" : "bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:border-zinc-600"
               }`}
           >
             <XCircle size={14} />
@@ -213,14 +206,14 @@ const ScoreFormField: React.FC<ScoreFormFieldProps> = ({
 
   return (
     <div className="flex flex-col">
-      <label 
-        className="flex items-center gap-1.5 text-sm text-zinc-300 font-medium mb-1.5" 
-        htmlFor={field}
-      >
+      <label className="flex items-center gap-1.5 text-sm text-zinc-300 font-medium mb-1.5" htmlFor={field}>
         <Icon size={14} className="text-zinc-400" />
-        {config?.title || field.replace(/_/g, " ").split(" ").map(word => 
-          word.charAt(0).toUpperCase() + word.slice(1)
-        ).join(" ")}
+        {config?.title ||
+          field
+            .replace(/_/g, " ")
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ")}
       </label>
       {renderInput()}
     </div>

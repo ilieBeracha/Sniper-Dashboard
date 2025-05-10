@@ -1,9 +1,8 @@
 export interface Assignment {
-  assignment: {
-    id: string;
-    assignment_name: string;
-    created_at: string;
-  };
+  id: string;
+  assignment_name: string;
+  created_at: string;
+  team_id: string;
 }
 
 export interface TrainingParticipant {
@@ -53,7 +52,7 @@ export interface TrainingSession {
   session_name: string;
   location: string;
   team_id?: string;
-  assignment_session?: Assignment[];
+  assignment_sessions?: Assignment[];
   participants?: TrainingParticipant[];
   status: TrainingStatus;
 }
@@ -67,13 +66,6 @@ export interface TrainingSessionChart {
 export interface TrainingsNextLastChart {
   next: TrainingSessionChart | null;
   last: TrainingSessionChart | null;
-}
-
-export interface Assignment {
-  id: string;
-  assignment_name: string;
-  text: string;
-  created_at: string;
 }
 
 export interface TrainingPageParticipantsScoreData {

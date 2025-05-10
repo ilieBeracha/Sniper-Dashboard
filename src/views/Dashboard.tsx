@@ -4,7 +4,6 @@ import { useStore } from "zustand";
 import Header from "@/components/Header";
 
 import DashboardRowOne from "@/components/DashboardRowOne";
-import DashboardRowTwo from "@/components/DashboardRowTwo";
 import DashboardRowThree from "@/components/DashboardRowThree";
 import DashboardRowFour from "@/components/DashboardRowFour";
 import InviteModal from "@/components/InviteModal";
@@ -29,7 +28,6 @@ export default function Dashboard() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log(user);
     const load = async () => {
       if (user?.team_id) {
         await getUserGroupingSummaryRpc(user.id);
@@ -48,13 +46,13 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen from-[#1E1E20] text-gray-100 md:px-16 lg:px-20 py-6 md:py-12">
+    <div className="min-h-screen max-w-screen-3xl mx-auto  from-[#1E1E20] text-gray-100 p-3">
       {userRole !== "soldier" && <Header setIsOpen={setIsInviteModalOpen} />}
-      <div className="space-y-8">
+      <div className="grid grid-cols-1 gap-2">
         <DashboardRowOne user={user} />
         <DashboardRowKPI />
         <DashboardRowThree loading={loading} />
-        <DashboardRowTwo />
+        {/* <DashboardRowTwo /> */}
         <DashboardRowFour />
       </div>
       {userRole !== "soldier" && user?.id && <InviteModal isOpen={isInviteModalOpen} setIsOpen={setIsInviteModalOpen} userId={user.id} />}

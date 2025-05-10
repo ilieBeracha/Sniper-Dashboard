@@ -1,18 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import BaseModal from "./BaseModal";
 import { UserPlus, ClipboardCheck } from "lucide-react";
 import { InvitationStore } from "@/store/InvitationStore";
 import { useStore } from "zustand";
 
-export default function InviteModal({
-  isOpen,
-  setIsOpen,
-  userId,
-}: {
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
-  userId: string;
-}) {
+export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boolean; setIsOpen: (open: boolean) => void; userId: string }) {
   const useInvitationStore = useStore(InvitationStore);
   const invitation = useInvitationStore.invitation;
   const [loading, setLoading] = useState(false);
@@ -49,10 +41,6 @@ export default function InviteModal({
     setCopied(false);
   };
 
-  useEffect(() => {
-    console.log(invitation);
-  }, [invitation]);
-
   return (
     <BaseModal isOpen={isOpen} onClose={onCloseModal}>
       <div className="flex flex-col items-center text-center px-6 py-4 space-y-6">
@@ -60,22 +48,14 @@ export default function InviteModal({
           <UserPlus className="w-10 h-10" />
         </div>
 
-        <h2 className="text-xl font-bold text-white">
-          Invite Your Squad Commander
-        </h2>
-        <p className="text-sm text-gray-400 max-w-md">
-          Generate and share the invite token below to onboard your Squad
-          Commander.
-        </p>
+        <h2 className="text-xl font-bold text-white">Invite Your Squad Commander</h2>
+        <p className="text-sm text-gray-400 max-w-md">Generate and share the invite token below to onboard your Squad Commander.</p>
 
         {inviteFetched ? (
           <div className="w-full space-y-4">
             <div className="relative flex items-center justify-between bg-gray-800 px-4 py-3 rounded-lg text-white font-mono text-sm shadow-md">
               <span className="truncate">{invitation?.token}</span>
-              <button
-                onClick={handleCopy}
-                className="ml-4 text-indigo-400 hover:text-indigo-300 transition"
-              >
+              <button onClick={handleCopy} className="ml-4 text-indigo-400 hover:text-indigo-300 transition">
                 {copied ? (
                   <span className="flex items-center gap-1 text-green-400">
                     <ClipboardCheck className="w-4 h-4" /> Copied

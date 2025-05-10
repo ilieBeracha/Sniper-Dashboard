@@ -15,7 +15,7 @@ interface SquadStore {
 
   getSquadMetricsByRole: (team_id: string) => Promise<void>;
   getSquadsWithUsersByTeamId: (team_id: string) => Promise<void>;
-  getSquadUsersBySquadId: (squad_id: string) => Promise<void>;  
+  getSquadUsersBySquadId: (squad_id: string) => Promise<void>;
 }
 
 export const squadStore = create<SquadStore>((set) => ({

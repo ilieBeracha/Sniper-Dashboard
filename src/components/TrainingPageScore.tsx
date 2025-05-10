@@ -1,5 +1,5 @@
 import BaseDashboardCard from "./BaseDashboardCard";
-import ScoreFormModal from "./TrainingPageScoreFormModal";
+import ScoreFormModal from "./TrainingPageScoreFormModal/TrainingPageScoreFormModal";
 import { useState, useEffect } from "react";
 import { useStore } from "zustand";
 import { scoreStore } from "@/store/scoreSrore";
@@ -10,8 +10,8 @@ import { isCommander } from "@/utils/permissions";
 import { Score } from "@/types/score";
 import ScoreParticipantsDisplay from "./TrainingPageScoreParticipantsDisplay";
 import { TrainingStore } from "@/store/trainingStore";
-import { getScoresByTrainingId } from "@/services/scoreService";
 import { loaderStore } from "@/store/loaderStore";
+
 export default function TrainingPageScore() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expandedSquads, setExpandedSquads] = useState<any>({});
@@ -21,13 +21,22 @@ export default function TrainingPageScore() {
   const { user } = useStore(userStore);
   const { training } = useStore(TrainingStore);
   const { isLoading, setIsLoading } = useStore(loaderStore);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { getScoresByTrainingId } = useStore(scoreStore);
+
+  const getSquadNameFromScore = (score: Score): string => {
+    const participantWithSquad = score.score_participants?.find((participant: any) => participant.user?.squad?.squad_name);
+
+    if (participantWithSquad) {
+      return participantWithSquad.user.squad.squad_name;
+    }
+    return "Unknown Squad";
+  };
 
   useEffect(() => {
     if (scores.length > 0) {
       const initialExpandState: { [key: string]: boolean } = {};
       scores.forEach((score) => {
-        const squadName = score?.squad?.squad_name || "Unknown Squad";
+        const squadName = getSquadNameFromScore(score);
         initialExpandState[squadName] = true;
       });
       setExpandedSquads(initialExpandState);
@@ -43,11 +52,9 @@ export default function TrainingPageScore() {
   };
 
   const submitScore = async (formValues: any) => {
-    setIsSubmitting(true);
     try {
-      if (!user?.squad_id) {
-        formValues.squad_id = user?.squad_id;
-      }
+      formValues.creator_id = user?.id;
+      formValues.squad_id = user?.squad_id;
       await createScore(formValues);
       setIsModalOpen(false);
       setIsLoading(true);
@@ -55,13 +62,12 @@ export default function TrainingPageScore() {
     } catch (error) {
       console.error("Error submitting score:", error);
     } finally {
-      setIsSubmitting(false);
       setIsLoading(false);
     }
   };
 
   const scoresBySquad = scores.reduce((acc: any, score: Score) => {
-    const squadName = score?.squad?.squad_name || "Unknown Squad";
+    const squadName = getSquadNameFromScore(score);
     if (!acc[squadName]) acc[squadName] = [];
     acc[squadName].push(score);
     return acc;
@@ -276,7 +282,7 @@ export default function TrainingPageScore() {
                                 </span>
                               </button>
                             )}
-                            {(user?.squad_id === score.squad_id || isCommander(user?.user_role || null)) && (
+                            {((user?.squad_id === score.squad_id && user.id === score.creator_id) || isCommander(user?.user_role || null)) && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -295,7 +301,7 @@ export default function TrainingPageScore() {
                         {/* Participant details section */}
                         {expandedScores[score.id || ""] && score.score_participants && (
                           <div className="py-3 px-4 bg-zinc-800/30">
-                            <ScoreParticipantsDisplay participants={score.score_participants} equipment={[]} />
+                            <ScoreParticipantsDisplay participants={score.score_participants} />
                           </div>
                         )}
                       </div>
@@ -319,7 +325,7 @@ export default function TrainingPageScore() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSubmit={(formValues) => submitScore(formValues)}
-          assignmentSessions={training?.assignment_session || []}
+          assignmentSessions={training?.assignment_sessions || []}
         />
       </div>
     </BaseDashboardCard>

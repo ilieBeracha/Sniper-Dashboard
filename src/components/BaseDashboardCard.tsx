@@ -16,15 +16,15 @@ export default function BaseDashboardCard({
 }) {
   return (
     <div
-      className={`h-full rounded-2xl border border-white/5 shadow-lg flex flex-col transition-all duration-300 hover:border-white/10 ${
+      className={`h-full  border-white/5 shadow-lg flex flex-col transition-all duration-300 rounded-sm hover:border-white/10 ${
         withBg ? "bg-[#1E1E1E]" : "bg-transparent"
       }`}
     >
-      <div className="px-4 py-3 border-b border-white/5 mb-2">
+      <div className="px-4 py-2 border-b border-white/5 mb-2">
         <div className="flex justify-between relative h-full items-center">
           {tooltipContent && (
             <BiInfoCircle
-              className="absolute -top-1 -right-1 text-indigo-400/80 hover:text-indigo-400 cursor-help transition-colors duration-200"
+              className="absolute top-0 -right-1 text-indigo-400/80 hover:text-indigo-400 cursor-help transition-colors duration-200"
               size={16}
               data-tooltip-id={`${header}-tooltip`}
               data-tooltip-content={tooltipContent}

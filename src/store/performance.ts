@@ -24,7 +24,7 @@ interface PerformanceStore {
   dayNightPerformance: DayNightPerformance[];
   getDayNightPerformance: (teamId: string) => Promise<void>;
   squadStats: SquadStats[];
-  getSquadStats: (teamId: string, position: PositionScore | null, distance: number | null) => Promise<void>;
+  getSquadStats: (teamId: string, position: PositionScore | null, distance: string | null) => Promise<void>;
   userHitPercentage: HitPercentageData | null;
   getUserHitPercentage: (userId: string) => Promise<HitPercentageData>;
 
@@ -49,10 +49,9 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   userPerformanceConfig: [],
   bestSquadConfigurations: [],
 
-  getSquadStats: async (teamId: string, position: PositionScore | null, distance: number | null) => {
+  getSquadStats: async (teamId: string, position: PositionScore | null, distance: string | null) => {
     try {
       set({ isLoading: true });
-      console.log(teamId, position, distance);
       const data = await getSquadStatByTeamId(teamId, position, distance);
       set({ squadStats: data });
     } catch (error) {

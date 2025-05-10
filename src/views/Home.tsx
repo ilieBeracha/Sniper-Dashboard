@@ -11,7 +11,9 @@ import { teamStore } from "@/store/teamStore";
 import TrainingPage from "./Training";
 import { squadStore } from "@/store/squadStore";
 import { weaponsStore } from "@/store/weaponsStore";
-import { eqipmentStore } from "@/store/eqipmentStore";
+import { equipmentStore } from "@/store/equipmentStore";
+import { IsMobile } from "@/utils/isMobile";
+import { getSquadsWithUsersByTeamId } from "@/services/squadService";
 
 export default function Home() {
   const { token } = useStore(authStore);
@@ -19,7 +21,7 @@ export default function Home() {
   const { fetchMembers } = useStore(teamStore);
   const { getSquadUsersBySquadId } = useStore(squadStore);
   const { getWeapons } = useStore(weaponsStore);
-  const { getEqipmentsByTeamId } = useStore(eqipmentStore);
+  const { getEqipmentsByTeamId } = useStore(equipmentStore);
 
   const user = useUserStore.user;
 
@@ -29,6 +31,7 @@ export default function Home() {
         await fetchMembers(user.team_id);
         await getEqipmentsByTeamId(user.team_id);
         await getWeapons(user.team_id);
+        await getSquadsWithUsersByTeamId(user.team_id);
 
         if (user?.squad_id) {
           await getSquadUsersBySquadId(user.squad_id);
@@ -41,9 +44,9 @@ export default function Home() {
 
   return (
     <div className="flex w-screen">
-      {token && <SidebarT />}
+      <div>{token && <SidebarT />}</div>
 
-      <main className="flex-1  overflow-y-hidden ">
+      <main className={`flex-1 overflow-y-hidden ${IsMobile ? "mt-16" : ""}`}>
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/training" element={<Training />}></Route>
