@@ -1,10 +1,11 @@
-import { authStore } from "@/store/authStore";
-import { userStore } from "@/store/userStore";
-import { useStore } from "zustand";
+import { Dialog } from "@headlessui/react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { BiSolidDashboard, BiSolidLogOut, BiSolidCog, BiSolidUser, BiChevronRight, BiChevronLeft } from "react-icons/bi";
 import { BsBarChartFill } from "react-icons/bs";
-import { useState } from "react";
+import { authStore } from "@/store/authStore";
+import { userStore } from "@/store/userStore";
+import { useStore } from "zustand";
 import { IsMobile } from "@/utils/isMobile";
 
 const navSections = [
@@ -27,23 +28,27 @@ const navSections = [
 export default function Sidebar() {
   const { logout } = useStore(authStore);
   const { user } = useStore(userStore);
-  const [collapsed, setCollapsed] = useState(IsMobile);
-  console.log(IsMobile);
   const userInitial = user?.first_name?.[0] || "U";
 
-  return (
-    <div
-      className={`flex flex-col bg-[#121212] border-r border-[#1D1D1F] ${collapsed ? "w-20" : "w-72"} h-screen sticky top-0 transition-all duration-300`}
-    >
-      {/* Top bar */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-[#1D1D1F] bg-[#121212] sticky top-0 z-10">
+  const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(IsMobile);
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const SidebarContent = () => (
+    <div className={`flex flex-col bg-[#121212] border-r border-[#1D1D1F] ${collapsed ? "w-20" : "w-72"} h-full`}>
+      <div className="flex items-center justify-between h-16 px-4 border-b border-[#1D1D1F] bg-[#121212]">
         {!collapsed && <span className="text-lg font-bold text-white">SniperOps</span>}
-        <button onClick={() => setCollapsed(!collapsed)} className="text-white text-xl hover:opacity-80">
+        <button onClick={() => (isMobile ? setDrawerOpen(false) : setCollapsed(!collapsed))} className="text-white text-xl hover:opacity-80">
           {collapsed ? <BiChevronRight className="w-5 h-5" /> : <BiChevronLeft className="w-5 h-5" />}
         </button>
       </div>
 
-      {/* User info */}
       {!collapsed && (
         <div className="px-4 pt-4">
           <div className="bg-[#1E1E20] p-3 rounded-lg flex items-center space-x-3">
@@ -58,7 +63,6 @@ export default function Sidebar() {
         </div>
       )}
 
-      {/* Links */}
       <div className="flex-1 px-2 py-4 overflow-y-auto">
         {navSections.map(({ title, items }) => (
           <div key={title} className="mb-4">
@@ -67,6 +71,7 @@ export default function Sidebar() {
               <NavLink
                 key={name}
                 to={href}
+                onClick={() => isMobile && setDrawerOpen(false)}
                 className={({ isActive }) =>
                   `flex items-center px-4 py-2 text-sm rounded-lg transition-colors duration-150 ${
                     isActive ? "bg-[#1E1E20] text-white" : "text-gray-400 hover:text-white hover:bg-[#1D1D1F]"
@@ -81,8 +86,7 @@ export default function Sidebar() {
         ))}
       </div>
 
-      {/* Logout */}
-      <div className="p-4 border-t border-[#1D1D1F] bg-[#121212] sticky bottom-0">
+      <div className="p-4 border-t border-[#1D1D1F] bg-[#121212]">
         <button
           onClick={logout}
           className={`flex items-center w-full px-4 py-2 text-sm text-red-400 hover:text-white rounded-lg hover:bg-red-600/20 ${
@@ -95,4 +99,21 @@ export default function Sidebar() {
       </div>
     </div>
   );
+
+  if (isMobile) {
+    return (
+      <div className="min-h-[10vh]">
+        <button className="fixed top-4 left-4 z-50 p-2 bg-[#1E1E1E] rounded-lg text-white" onClick={() => setDrawerOpen(true)}>
+          <BiChevronRight className="w-6 h-6" />
+        </button>
+
+        <Dialog open={isDrawerOpen} onClose={() => setDrawerOpen(false)} className="relative z-50">
+          <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+          <div className="fixed inset-y-0 left-0 max-w-xs w-full bg-[#121212] shadow-xl">{SidebarContent()}</div>
+        </Dialog>
+      </div>
+    );
+  }
+
+  return <div className="h-screen sticky top-0">{SidebarContent()}</div>;
 }

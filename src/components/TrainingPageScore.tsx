@@ -276,7 +276,7 @@ export default function TrainingPageScore() {
                                 </span>
                               </button>
                             )}
-                            {(user?.squad_id === score.squad_id || isCommander(user?.user_role || null)) && (
+                            {((user?.squad_id === score.squad_id && user.squad_id === score.creator_id) || isCommander(user?.user_role || null)) && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();

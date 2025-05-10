@@ -22,6 +22,7 @@ export interface Score {
   mistake?: any;
   score_participants: any;
   squad_id: string;
+  creator_id: string;
   squad: {
     squad_name: string;
   };

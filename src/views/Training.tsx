@@ -73,7 +73,7 @@ export default function TrainingPage() {
   };
 
   return (
-    <div className="min-h-screen from-[#1E1E20] text-gray-100 px-6 md:px-16 lg:px-28 py-8 md:py-12">
+    <div className="min-h-screen from-[#1E1E20] text-gray-100 px-6 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
         <div className="lg:col-span-2">
           <TrainingPageOverview training={training} />

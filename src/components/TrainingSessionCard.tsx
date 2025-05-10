@@ -30,7 +30,7 @@ export function TrainingSessionCard({
       onClick={handleSessionClick}
       className={`
         relative
-        px-6 py-6
+        pl-2 pr-6 py-6
         border border-white/10 rounded-lg overflow-hidden
         bg-gradient-to-br from-white/5 to-white/[0.02] 
         hover:from-white/10 hover:to-white/[0.05] 

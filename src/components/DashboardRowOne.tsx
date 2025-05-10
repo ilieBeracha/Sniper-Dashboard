@@ -1,7 +1,7 @@
 import { User } from "@/types/user";
 import BaseDashboardCard from "./BaseDashboardCard";
 import DashboardCalendar from "./DashboardCalendar";
-import DashboardWelcome from "./dashboard/DashboardWelcome";
+import DashboardWelcome from "./DashboardWelcome";
 
 type DashboardRowOneProps = {
   user: User | null;

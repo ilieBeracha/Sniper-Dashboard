@@ -12,6 +12,7 @@ import TrainingPage from "./Training";
 import { squadStore } from "@/store/squadStore";
 import { weaponsStore } from "@/store/weaponsStore";
 import { eqipmentStore } from "@/store/eqipmentStore";
+import { IsMobile } from "@/utils/isMobile";
 
 export default function Home() {
   const { token } = useStore(authStore);
@@ -41,9 +42,9 @@ export default function Home() {
 
   return (
     <div className="flex w-screen">
-      {token && <SidebarT />}
+      <div>{token && <SidebarT />}</div>
 
-      <main className="flex-1 overflow-y-hidden ">
+      <main className={`flex-1 overflow-y-hidden ${IsMobile ? "mt-16" : ""}`}>
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/training" element={<Training />}></Route>
