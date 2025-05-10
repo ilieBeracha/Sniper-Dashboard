@@ -26,10 +26,7 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
   const pastSessions = activeTrainings.filter((s) => isPast(parseISO(s.date)) && !isToday(parseISO(s.date))).reverse();
 
   return (
-    <div className="sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-9 space-y-8 grid grid-cols-1 gap-8">
-      <div className="sm:hidden md:block gap-2 space-y-8 border-b border-white/5 col-span-3 sticky top-8 h-fit">
-        <TrainingCalendar trainings={trainings} />
-      </div>
+    <div className="sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-9 space-y-8 grid grid-cols-1 gap-8 px-3">
       <div className="sm:col-span-6 md:col-span-6 lg:col-span-6 overflow-y-auto max-h-full pr-1 custom-scrollbar col-span-6 ">
         {activeTab === "active" ? (
           <>
@@ -74,6 +71,9 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
             ))}
           </TrainingSessionGroup>
         )}
+      </div>
+      <div className="sm:hidden md:block gap-2 space-y-8 border-b border-white/5 col-span-3 sticky top-8 h-fit">
+        <TrainingCalendar trainings={trainings} />
       </div>
     </div>
 
