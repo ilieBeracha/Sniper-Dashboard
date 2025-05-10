@@ -23,15 +23,20 @@ export default function ScoreFormModal({
     setStep,
     errors,
     setErrors,
+    validateScoreParticipantsForm,
     searchTerm,
     setSearchTerm,
-    validateForm,
-    handleAssignmentErrors,
+    validateScoreForm,
     teamMembers,
     resetForm,
   } = useScoreForm({ isOpen, editingScore, assignmentSessions });
 
   const handleSubmit = () => {
+    const isParticipantsValid = validateScoreParticipantsForm();
+    if (!isParticipantsValid) {
+      return;
+    }
+
     const score_participants = formValues.participants.map((userId: string) => {
       const duty = formValues.duties[userId];
       return {
@@ -51,8 +56,11 @@ export default function ScoreFormModal({
   };
 
   const handleNextStep = () => {
-    if (!validateForm()) {
-      handleAssignmentErrors(formValues);
+    const isValid = validateScoreForm();
+    if (!isValid) {
+      console.log("errors", errors);
+      // handleAssignmentErrors(formValues);
+      return;
     } else {
       setErrors([]);
       setStep((prevStep) => (prevStep === 1 ? 2 : 1));

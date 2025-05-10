@@ -30,7 +30,7 @@ export default function UserHitPercentage() {
 
   return (
     <div className="flex w-full flex-col h-full justify-evenly col-auto">
-      <div className=" relative justify-between flex">
+      <div className=" relative justify-between flex h-full flex-col">
         {!userHitPercentage.hit_percentage && userHitPercentage.total_shots === 0 ? (
           <NoDataDisplay />
         ) : (

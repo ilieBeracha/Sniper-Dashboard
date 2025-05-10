@@ -1,9 +1,12 @@
 import { useStore } from "zustand";
 import SearchableCheckboxList from "./SearchableCheckboxList";
 import { weaponsStore } from "@/store/weaponsStore";
-import { eqipmentStore } from "@/store/eqipmentStore";
+import { equipmentStore } from "@/store/equipmentStore";
 import { ScoreFormValues } from "@/hooks/useScoreForm";
-import { Users, UserCircle, Crosshair, Binoculars, Package } from "lucide-react";
+import { Users, Package } from "lucide-react";
+import TrainingPageScoreFormModalUserParticipant from "./TrainingPageScoreFormModalUserParticipant";
+import { useEffect } from "react";
+import { userStore } from "@/store/userStore";
 
 interface Step2Props {
   formValues: ScoreFormValues;
@@ -15,7 +18,17 @@ interface Step2Props {
 
 export default function TrainingPageScoreFormModalStep2({ formValues, setFormValues, formattedMembers, searchTerm, setSearchTerm }: Step2Props) {
   const { weapons } = useStore(weaponsStore);
-  const { eqipments } = useStore(eqipmentStore);
+  const { equipments } = useStore(equipmentStore);
+  const { user } = useStore(userStore);
+
+  useEffect(() => {
+    if (user?.id && !formValues.participants.includes(user.id)) {
+      setFormValues({
+        ...formValues,
+        participants: [user.id, ...formValues.participants],
+      });
+    }
+  }, [user]);
 
   function onChangeUserDuty(duty: string, id: string) {
     const newFormValues = {
@@ -64,146 +77,20 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
             <div className="flex-1 h-px bg-gradient-to-r from-green-700/40 via-indigo-700/30 to-transparent ml-3"></div>
           </div>
 
-          <div className="space-y-3">
-            {formValues?.participants?.map((id: string) => {
-              const member = formattedMembers?.find((m) => m.id === id);
-              const userDuty = formValues?.duties?.[id];
-
-              return (
-                <div
-                  key={id}
-                  className="bg-gradient-to-br from-indigo-900/20 via-zinc-900/30 to-indigo-950/20 p-4 rounded-xl border border-indigo-800/30 shadow"
-                >
-                  <div className="grid grid-cols-1 items-end md:grid-cols-2 gap-4">
-                    {/* Member Info and Duty Selection */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <UserCircle size={16} className="text-indigo-400 drop-shadow-glow" />
-                        <p className="text-sm font-medium text-indigo-100">{member?.label}</p>
-                      </div>
-
-                      <div>
-                        <label className="flex items-center gap-1.5 text-sm text-indigo-200 font-medium mb-1.5">
-                          <UserCircle size={14} className="text-indigo-400" />
-                          Combat Role
-                        </label>
-                        <select
-                          value={userDuty || ""}
-                          onChange={(e) => onChangeUserDuty(e.target.value as any, id)}
-                          className="w-full min-h-9 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white 
-                                                             border border-indigo-700 hover:border-indigo-500 focus:border-indigo-400 
-                                                             focus:ring-1 focus:ring-indigo-500/20 transition-all duration-200
-                                                             appearance-none cursor-pointer"
-                          style={{
-                            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                            backgroundPosition: "right 0.5rem center",
-                            backgroundRepeat: "no-repeat",
-                            backgroundSize: "1.2em 1.2em",
-                            paddingRight: "2rem",
-                          }}
-                        >
-                          <option value="" className="bg-zinc-800">
-                            Select combat role
-                          </option>
-                          <option value="Sniper" className="bg-zinc-800">
-                            🎯 Sniper
-                          </option>
-                          <option value="Spotter" className="bg-zinc-800">
-                            🔭 Spotter
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* Equipment Selection */}
-                    <div className="space-y-3">
-                      {userDuty === "Sniper" && (
-                        <div>
-                          <label className="flex items-center gap-1.5 text-sm text-indigo-200 font-medium mb-1.5">
-                            <Crosshair size={14} className="text-indigo-400" />
-                            Weapon
-                          </label>
-                          <select
-                            value={formValues?.weapons?.[id] || ""}
-                            onChange={(e) =>
-                              setFormValues({
-                                ...formValues,
-                                weapons: { ...formValues.weapons, [id]: e.target.value },
-                              })
-                            }
-                            className="w-full min-h-9 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white 
-                                                                 border border-indigo-700 hover:border-indigo-500 focus:border-indigo-400 
-                                                                 focus:ring-1 focus:ring-indigo-500/20 transition-all duration-200
-                                                                 appearance-none cursor-pointer"
-                            style={{
-                              backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                              backgroundPosition: "right 0.5rem center",
-                              backgroundRepeat: "no-repeat",
-                              backgroundSize: "1.2em 1.2em",
-                              paddingRight: "2rem",
-                            }}
-                          >
-                            <option value="" className="bg-zinc-800">
-                              Select weapon
-                            </option>
-                            {weapons?.map((weapon: any) => (
-                              <option key={weapon.id} value={weapon.id} className="bg-zinc-800">
-                                {weapon.weapon_type} — {weapon.serial_number}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      )}
-
-                      {userDuty === "Spotter" && (
-                        <div>
-                          <label className="flex items-center gap-1.5 text-sm text-indigo-200 font-medium mb-1.5">
-                            <Binoculars size={14} className="text-blue-400" />
-                            Equipment
-                          </label>
-                          <select
-                            value={formValues.equipments?.[id] || ""}
-                            onChange={(e) =>
-                              setFormValues({
-                                ...formValues,
-                                equipments: { ...formValues.equipments, [id]: e.target.value },
-                              })
-                            }
-                            className="w-full min-h-9 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white 
-                                                                 border border-blue-700 hover:border-blue-500 focus:border-blue-400 
-                                                                 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200
-                                                                 appearance-none cursor-pointer"
-                            style={{
-                              backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                              backgroundPosition: "right 0.5rem center",
-                              backgroundRepeat: "no-repeat",
-                              backgroundSize: "1.2em 1.2em",
-                              paddingRight: "2rem",
-                            }}
-                          >
-                            <option value="" className="bg-zinc-800">
-                              Select equipment
-                            </option>
-                            {eqipments?.map((equipment: any) => (
-                              <option key={equipment.id} value={equipment.id} className="bg-zinc-800">
-                                {equipment.equipment_type} — {equipment.serial_number}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      )}
-
-                      {!userDuty && (
-                        <div className="flex items-center justify-center h-[100px] text-sm text-indigo-400">
-                          Select a combat role to configure equipment
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {formValues?.participants?.map((id: string) => {
+            return (
+              <TrainingPageScoreFormModalUserParticipant
+                member={formattedMembers?.find((m) => m.id === id)}
+                userDuty={formValues?.duties?.[id]}
+                onChangeUserDuty={onChangeUserDuty}
+                id={id}
+                formValues={formValues}
+                setFormValues={setFormValues}
+                weapons={weapons}
+                equipment={equipments}
+              />
+            );
+          })}
         </div>
       )}
 

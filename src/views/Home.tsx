@@ -11,7 +11,7 @@ import { teamStore } from "@/store/teamStore";
 import TrainingPage from "./Training";
 import { squadStore } from "@/store/squadStore";
 import { weaponsStore } from "@/store/weaponsStore";
-import { eqipmentStore } from "@/store/eqipmentStore";
+import { equipmentStore } from "@/store/equipmentStore";
 import { IsMobile } from "@/utils/isMobile";
 
 export default function Home() {
@@ -20,7 +20,7 @@ export default function Home() {
   const { fetchMembers } = useStore(teamStore);
   const { getSquadUsersBySquadId } = useStore(squadStore);
   const { getWeapons } = useStore(weaponsStore);
-  const { getEqipmentsByTeamId } = useStore(eqipmentStore);
+  const { getEqipmentsByTeamId } = useStore(equipmentStore);
 
   const user = useUserStore.user;
 

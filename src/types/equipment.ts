@@ -1,4 +1,5 @@
-export interface Eqipment {
+
+export interface Equipment {
     id: string;
     equipment_type: string;
     serial_number: string;
