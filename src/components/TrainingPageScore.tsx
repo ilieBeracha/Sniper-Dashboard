@@ -12,6 +12,7 @@ import ScoreParticipantsDisplay from "./TrainingPageScoreParticipantsDisplay";
 import { TrainingStore } from "@/store/trainingStore";
 import { getScoresByTrainingId } from "@/services/scoreService";
 import { loaderStore } from "@/store/loaderStore";
+
 export default function TrainingPageScore() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expandedSquads, setExpandedSquads] = useState<any>({});
@@ -21,7 +22,6 @@ export default function TrainingPageScore() {
   const { user } = useStore(userStore);
   const { training } = useStore(TrainingStore);
   const { isLoading, setIsLoading } = useStore(loaderStore);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (scores.length > 0) {
@@ -43,11 +43,9 @@ export default function TrainingPageScore() {
   };
 
   const submitScore = async (formValues: any) => {
-    setIsSubmitting(true);
     try {
-      if (!user?.squad_id) {
-        formValues.squad_id = user?.squad_id;
-      }
+      formValues.creator_id = user?.id;
+      formValues.squad_id = user?.squad_id;
       await createScore(formValues);
       setIsModalOpen(false);
       setIsLoading(true);
@@ -55,7 +53,6 @@ export default function TrainingPageScore() {
     } catch (error) {
       console.error("Error submitting score:", error);
     } finally {
-      setIsSubmitting(false);
       setIsLoading(false);
     }
   };
@@ -295,7 +292,7 @@ export default function TrainingPageScore() {
                         {/* Participant details section */}
                         {expandedScores[score.id || ""] && score.score_participants && (
                           <div className="py-3 px-4 bg-zinc-800/30">
-                            <ScoreParticipantsDisplay participants={score.score_participants} equipment={[]} />
+                            <ScoreParticipantsDisplay participants={score.score_participants} equipment={score.score_participants} />
                           </div>
                         )}
                       </div>
@@ -319,7 +316,7 @@ export default function TrainingPageScore() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSubmit={(formValues) => submitScore(formValues)}
-          assignmentSessions={training?.assignment_session || []}
+          assignmentSessions={training?.assignment_sessions || []}
         />
       </div>
     </BaseDashboardCard>

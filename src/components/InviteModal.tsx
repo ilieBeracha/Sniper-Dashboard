@@ -48,11 +48,7 @@ export default function InviteModal({
     setInviteFetched(false);
     setCopied(false);
   };
-
-  useEffect(() => {
-    console.log(invitation);
-  }, [invitation]);
-
+  
   return (
     <BaseModal isOpen={isOpen} onClose={onCloseModal}>
       <div className="flex flex-col items-center text-center px-6 py-4 space-y-6">

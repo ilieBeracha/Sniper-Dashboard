@@ -28,7 +28,6 @@ export default function Dashboard() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log(user);
     const load = async () => {
       if (user?.team_id) {
         await getUserGroupingSummaryRpc(user.id);

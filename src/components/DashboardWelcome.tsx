@@ -32,7 +32,7 @@ export default function DashboardWelcome({ user }: { user: User }) {
   };
 
   return (
-    <div className="p-2 sm:p-3 md:p-4">
+    <div className="p-2 sm:p-3 md:pt-4 md:px-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         {/* Left Side */}
         <div className="space-y-2 flex-1">

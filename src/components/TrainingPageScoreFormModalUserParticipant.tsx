@@ -19,7 +19,6 @@ export default function TrainingPageScoreFormModalUserParticipant({
   weapons: any;
   equipment: any;
 }) {
-  console.log(equipment);
   return (
     <div className="grid grid-cols-1 items-end md:grid-cols-2 gap-4 py-2">
       {/* Member Info and Duty Selection */}

@@ -23,7 +23,7 @@ export interface ScoreFormValues {
   duties: Record<string, string | null>;
   assignment_session_id: string;
   weapons: Record<string, string | null>;
-  equipments: Record<string, string | null>;
+  equipment: Record<string, string | null>;
 }
 
 export interface UseScoreFormProps {
@@ -53,7 +53,7 @@ export function useScoreForm({ editingScore, assignmentSessions = [] }: UseScore
     duties: {},
     assignment_session_id: "",
     weapons: {},
-    equipments: {},
+    equipment: {},
   });
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -72,7 +72,7 @@ export function useScoreForm({ editingScore, assignmentSessions = [] }: UseScore
         duties: {},
         assignment_session_id: editingScore.assignment_session_id || "",
         weapons: {},
-        equipments: {},
+        equipment: {},
         wind_strength: editingScore.wind_strength || null,
         wind_direction: editingScore.wind_direction || null,
         first_shot_hit: editingScore.first_shot_hit || null,
@@ -105,7 +105,7 @@ export function useScoreForm({ editingScore, assignmentSessions = [] }: UseScore
   function handleEquipmentChange(userId: string, equipmentId: string) {
     setFormValues((prev) => ({
       ...prev,
-      equipments: { ...prev.equipments, [userId]: equipmentId },
+      equipment: { ...prev.equipment, [userId]: equipmentId },
     }));
   }
 
@@ -125,7 +125,7 @@ export function useScoreForm({ editingScore, assignmentSessions = [] }: UseScore
       duties: {},
       assignment_session_id: "",
       weapons: {},
-      equipments: {},
+      equipment: {},
       shots_fired: "",
     });
 
@@ -182,13 +182,13 @@ export function useScoreForm({ editingScore, assignmentSessions = [] }: UseScore
     if (!formValues.participants.includes(user?.id as string)) {
       newErrors.push("You must be in the participants list and have a weapon/equipment assigned.");
     }
-    if (formValues.duties[user?.id as string] !== "Sniper" || !formValues.weapons[user?.id as string]) {
+    if (formValues.duties[user?.id as string] !== "Sniper") {
       newErrors.push("Must be at least one sniper.");
     }
     if (!Object.values(formValues.weapons).every((weapon) => weapon !== "")) {
       newErrors.push("Each sniper must have a weapon assigned.");
     }
-    if (!Object.values(formValues.equipments).every((equipment) => equipment !== "")) {
+    if (!Object.values(formValues.equipment).every((equipment) => equipment !== "")) {
       newErrors.push("Each spotter must have an equipment assigned.");
     }
     setErrors(newErrors);

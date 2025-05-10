@@ -2,6 +2,7 @@ import { ScoreFormValues } from "@/hooks/useScoreForm";
 import { Assignment } from "@/types/training";
 import ScoreFormField from "./ScoreFormField";
 import { Target, Info, Crosshair, Wind, StickyNote } from "lucide-react";
+import { useEffect } from "react";
 
 interface Step1Props {
   formValues: ScoreFormValues;

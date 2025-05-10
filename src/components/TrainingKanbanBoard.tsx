@@ -54,7 +54,7 @@ export default function TrainingKanbanBoard({ trainings }: { trainings: Training
     <div className="w-full overflow-x-auto pb-4 h-full">
       <div className=" grid grid-cols-3 gap-8 p-1 h-full px-3">
         {columns.map((col) => (
-          <div className="h-full col-span-1">
+          <div className="h-full col-span-1" key={col.title}>
             <ColumnHeader icon={col.icon} title={col.title} count={col.sessions.length} color={col.color} />
 
             <div className="h-full">
@@ -72,6 +72,7 @@ export default function TrainingKanbanBoard({ trainings }: { trainings: Training
                 ) : (
                   col.sessions.map((session) => (
                     <TrainingSessionCard
+                      key={session.id}
                       session={session}
                       currentUserId={user?.id}
                       showDate={col.title !== "Today"}

@@ -45,7 +45,6 @@ export default function DashboardSquadStats() {
 
     let position: string | null = null;
     let distance: number | null = null;
-    console.log(Object.values(PositionScore).includes(tab as PositionScore));
     if (Object.values(PositionScore).includes(tab as PositionScore)) {
       position = tab;
     } else if (!isNaN(Number(tab))) {

@@ -43,7 +43,7 @@ export default function ScoreFormModal({
         user_id: userId,
         user_duty: duty,
         weapon_id: duty === "Sniper" ? formValues.weapons[userId] : null,
-        equipment_id: duty === "Spotter" ? formValues.equipments[userId] : null,
+        equipment_id: duty === "Spotter" ? formValues.equipment[userId] : null,
       };
     });
 

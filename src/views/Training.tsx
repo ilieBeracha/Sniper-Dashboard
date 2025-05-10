@@ -51,12 +51,9 @@ export default function TrainingPage() {
 
   const handleConfirmStatusChange = async () => {
     try {
-      const { data, error } = await supabase.from("training_session").update({ status: pendingStatus }).eq("id", training?.id);
-      console.log(data, error);
+      const { error } = await supabase.from("training_session").update({ status: pendingStatus }).eq("id", training?.id);
       if (error) {
         console.error("Error updating training status:", error);
-      } else {
-        console.log("Status updated successfully:", data);
       }
       await loadTrainingById(id as string);
     } catch (error) {

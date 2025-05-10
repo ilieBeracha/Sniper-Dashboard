@@ -52,7 +52,6 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   getSquadStats: async (teamId: string, position: PositionScore | null, distance: number | null) => {
     try {
       set({ isLoading: true });
-      console.log(teamId, position, distance);
       const data = await getSquadStatByTeamId(teamId, position, distance);
       set({ squadStats: data });
     } catch (error) {

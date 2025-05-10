@@ -38,9 +38,9 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
 
     if (duty === "Sniper") {
       newFormValues.weapons = { ...formValues.weapons, [id]: null };
-      newFormValues.equipments = { ...formValues.equipments, [id]: null };
+      newFormValues.equipment = { ...formValues.equipment, [id]: null };
     } else if (duty === "Spotter") {
-      newFormValues.equipments = { ...formValues.equipments, [id]: null };
+      newFormValues.equipment = { ...formValues.equipment, [id]: null };
       newFormValues.weapons = { ...formValues.weapons, [id]: null };
     }
 

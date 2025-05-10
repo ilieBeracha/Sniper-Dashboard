@@ -102,8 +102,8 @@ const ScoreFormField: React.FC<ScoreFormFieldProps> = ({ field, type, formValues
 
           {field === "assignment_session_id" && assignmentSessions ? (
             assignmentSessions.map((assignment: Assignment) => (
-              <option key={assignment.assignment.id} value={assignment.id} className="bg-zinc-800 text-white">
-                {assignment.assignment.assignment_name}
+              <option key={assignment.id} value={assignment.id} className="bg-zinc-800 text-white">
+                {assignment?.assignment_name}
               </option>
             ))
           ) : field === "position" ? (

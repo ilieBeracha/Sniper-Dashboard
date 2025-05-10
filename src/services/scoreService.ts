@@ -45,7 +45,7 @@ export async function getScoresByTrainingId(training_id: string) {
             last_name
           )
         )
-      `
+      `,
       )
       .eq("training_id", training_id)
       .order("created_at", { ascending: false });
@@ -62,8 +62,6 @@ export async function getScoresByTrainingId(training_id: string) {
   }
 }
 export async function createScoreParticipant(scoreParticipantData: Partial<ScoreParticipant>[], score_id: string) {
-  console.log("scoreParticipantData", scoreParticipantData);
-  console.log("score_id", score_id);
   try {
     if (!Array.isArray(scoreParticipantData) || scoreParticipantData.length === 0) {
       throw new Error("scoreParticipantData must be a non-empty array");
@@ -74,7 +72,6 @@ export async function createScoreParticipant(scoreParticipantData: Partial<Score
     }));
     const { data, error } = await supabase.from("score_participants").insert(participantsWithScoreId).select("*");
     if (error) throw error;
-    console.log(data);
     return data;
   } catch (error) {
     console.error("Error creating score participant:", error);
@@ -83,8 +80,6 @@ export async function createScoreParticipant(scoreParticipantData: Partial<Score
 }
 
 export async function createScore(scoreData: ScoreFormValues) {
-  console.log("Creating score with data:", scoreData);
-
   try {
     const { data, error } = await supabase.from("score").insert([scoreData]).select("*").single();
 

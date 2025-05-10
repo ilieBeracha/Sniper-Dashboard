@@ -32,7 +32,7 @@ export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, t
       const formattedDate = trainingDate.toISOString().slice(0, 16);
       setDate(formattedDate);
       setMembers(training.participants?.map((p) => p.participant_id) || []);
-      setAssignmentIds(training.assignment_session?.map((a) => a.assignment.id) || []);
+      setAssignmentIds(training.assignment_sessions?.map((a) => a.id) || []);
     }
   }, [training]);
 
@@ -112,7 +112,14 @@ export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, t
             setDate={setDate}
           />
 
-          <AssignmentsSection assignments={assignments} assignmentIds={assignmentIds} setAssignmentIds={setAssignmentIds} />
+          <AssignmentsSection
+            assignments={assignments}
+            assignmentIds={assignmentIds}
+            setAssignmentIds={setAssignmentIds}
+            handleAddAssignment={() => {}}
+            isAddAssignmentOpen={false}
+            setIsAddAssignmentOpen={() => {}}
+          />
 
           <TeamMembersSection teamMembers={teamMembers} members={members} setMembers={setMembers} />
         </div>

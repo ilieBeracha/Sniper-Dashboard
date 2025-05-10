@@ -15,6 +15,7 @@ export const scoreStore = create<ScoreStore>((set) => ({
   async createScore(scoreForm: any) {
     const training_id = TrainingStore.getState().training?.id;
     const score: any = {
+      creator_id: scoreForm.creator_id,
       time_until_first_shot: scoreForm.time_until_first_shot,
       distance: scoreForm.distance,
       target_hit: scoreForm.target_hit,
@@ -29,8 +30,10 @@ export const scoreStore = create<ScoreStore>((set) => ({
       assignment_session_id: scoreForm.assignment_session_id,
       training_id: training_id,
     };
-
-    if (scoreForm.squad_id) score.squad_id = scoreForm.squad_id;
+    // Add squad_id only if it exists
+    if (scoreForm.squad_id) {
+      score.squad_id = scoreForm.squad_id;
+    }
     const res = await createScore(score);
 
     if (res) {

@@ -2,45 +2,16 @@ import { Assignment } from "@/types/training";
 import { supabase } from "./supabaseClient";
 
 export async function getTrainingById(trainingId: string) {
-  const { data, error } = await supabase
-    .from("training_session")
-    .select(
-      `
-      *,
-      participants:trainings_participants(
-        id,
-        participant_id,
-        created_at,
-        user:participant_id(
-          id, 
-          first_name, 
-          last_name, 
-          email, 
-          user_role,
-          team_id,
-          squad_id
-        )
-      ),
-      assignment_session:assignment_session(
-        id,
-        assignment:assignment_id(
-          id,
-          assignment_name,
-          created_at
-        )
-        
-      )
-    `
-    )
-    .eq("id", trainingId)
-    .single();
+  const { data, error } = await supabase.rpc("get_trainings_with_assignment_sessions", {
+    training_id: trainingId,
+  });
 
   if (error) {
     console.error("Error fetching training with details:", error);
     return null;
   }
 
-  return data;
+  return data[0];
 }
 
 export async function getTrainingByTeamId(teamId: string, currentUserId?: string) {
@@ -72,7 +43,7 @@ export async function getTrainingByTeamId(teamId: string, currentUserId?: string
           email
         )
       )
-      `
+      `,
     )
     .eq("team_id", teamId)
     .order("date", { ascending: true })
@@ -115,7 +86,7 @@ export async function getNextAndLastTraining(team_id: string) {
           assignment_name
         )
       )
-    `
+    `,
     )
     .eq("team_id", team_id)
     .gt("date", new Date().toISOString())
@@ -137,7 +108,7 @@ export async function getNextAndLastTraining(team_id: string) {
           assignment_name
         )
       )
-    `
+    `,
     )
     .eq("team_id", team_id)
     .lt("date", new Date().toISOString())
@@ -153,7 +124,6 @@ export async function getNextAndLastTraining(team_id: string) {
 }
 
 export async function insertTraining(payload: any) {
-  console.log(payload);
   return supabase.from("training_session").insert([payload]).select("id").maybeSingle();
 }
 

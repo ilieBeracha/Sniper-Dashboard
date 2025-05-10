@@ -101,7 +101,6 @@ export async function getSquadStatByTeamId(teamId: string, position: PositionSco
     p_team_id: teamId,
     p_distance: distance ? distance : null,
   });
-  console.log(data);
 
   if (error) {
     console.error("Error fetching squad stats:", error);
