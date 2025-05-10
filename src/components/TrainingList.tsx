@@ -1,17 +1,15 @@
 import { TrainingSession, TrainingStatus } from "@/types/training";
-import { parseISO, isToday, isPast, isFuture, isThisWeek } from "date-fns";
-import { useStore } from "zustand";
-import { userStore } from "@/store/userStore";
+import { parseISO, isToday, isPast, isFuture } from "date-fns";
 import { TrainingSessionCard } from "./TrainingSessionCard";
 import TrainingSessionGroup from "./TrainingSessionGroup";
 import TrainingListEmpty from "./TrainingListEmpty";
 import { useState } from "react";
+import TrainingCalendar from "./TrainingCalendar";
 
 type Tab = "active" | "canceled";
 
 export default function TrainingList({ trainings }: { trainings: TrainingSession[] }) {
-  const { user } = useStore(userStore);
-  const [activeTab, setActiveTab] = useState<Tab>("active");
+  const [activeTab] = useState<Tab>("active");
 
   if (trainings.length === 0) {
     return <TrainingListEmpty />;
@@ -24,32 +22,15 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
   const canceledTrainings = sortedTrainings.filter((s) => s.status === TrainingStatus.Canceled);
 
   const todaySessions = activeTrainings.filter((s) => isToday(parseISO(s.date)));
-  const thisWeekSessions = activeTrainings.filter((s) => isThisWeek(parseISO(s.date)) && !isToday(parseISO(s.date)) && isFuture(parseISO(s.date)));
-  const upcomingSessions = activeTrainings.filter((s) => isFuture(parseISO(s.date)) && !isThisWeek(parseISO(s.date)));
+  const upcomingSessions = activeTrainings.filter((s) => isFuture(parseISO(s.date)) && !isToday(parseISO(s.date)));
   const pastSessions = activeTrainings.filter((s) => isPast(parseISO(s.date)) && !isToday(parseISO(s.date))).reverse();
 
   return (
-    <div className="space-y-8">
-      <div className="flex gap-2 border-b border-white/5">
-        <button
-          onClick={() => setActiveTab("active")}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
-            activeTab === "active" ? "text-white border-b-2 border-indigo-500" : "text-gray-400 hover:text-white"
-          }`}
-        >
-          Active Trainings
-        </button>
-        <button
-          onClick={() => setActiveTab("canceled")}
-          className={`px-2 py-1 text-sm font-medium transition-colors ${
-            activeTab === "canceled" ? "text-white border-b-2 border-red-500" : "text-gray-400 hover:text-white"
-          }`}
-        >
-          Canceled Trainings
-        </button>
+    <div className="sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-9 space-y-8 grid grid-cols-1 gap-8">
+      <div className="sm:hidden md:block gap-2 space-y-8 border-b border-white/5 col-span-3 sticky top-8 h-fit">
+        <TrainingCalendar trainings={trainings} />
       </div>
-
-      <div className="space-y-8 overflow-y-auto max-h-full pr-1 custom-scrollbar">
+      <div className="sm:col-span-6 md:col-span-6 lg:col-span-6 overflow-y-auto max-h-full pr-1 custom-scrollbar col-span-6 ">
         {activeTab === "active" ? (
           <>
             {/* Today */}
@@ -57,18 +38,7 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
               <TrainingSessionGroup title="Today" color="indigo" date={today}>
                 {todaySessions.map((s) => (
                   <div key={s.id} className="relative group">
-                    <TrainingSessionCard key={s.id} session={s} currentUserId={user?.id} showDate={false} highlight />
-                  </div>
-                ))}
-              </TrainingSessionGroup>
-            )}
-
-            {/* This Week */}
-            {thisWeekSessions.length > 0 && (
-              <TrainingSessionGroup title="This Week" color="green">
-                {thisWeekSessions.map((s) => (
-                  <div key={s.id} className="relative group">
-                    <TrainingSessionCard key={s.id} session={s} currentUserId={user?.id} />
+                    <TrainingSessionCard key={s.id} session={s} showDate={false} highlight />
                   </div>
                 ))}
               </TrainingSessionGroup>
@@ -79,7 +49,7 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
               <TrainingSessionGroup title="Upcoming" color="blue">
                 {upcomingSessions.map((s) => (
                   <div key={s.id} className="relative group">
-                    <TrainingSessionCard key={s.id} session={s} currentUserId={user?.id} />
+                    <TrainingSessionCard key={s.id} session={s} />
                   </div>
                 ))}
               </TrainingSessionGroup>
@@ -89,7 +59,7 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
               <TrainingSessionGroup title="Past Sessions" color="gray">
                 {pastSessions.map((s) => (
                   <div key={s.id} className="relative group">
-                    <TrainingSessionCard key={s.id} session={s} currentUserId={user?.id} isPast />
+                    <TrainingSessionCard key={s.id} session={s} />
                   </div>
                 ))}
               </TrainingSessionGroup>
@@ -99,12 +69,14 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
           <TrainingSessionGroup title="Canceled Sessions" color="red">
             {canceledTrainings.map((s) => (
               <div key={s.id} className="relative group">
-                <TrainingSessionCard key={s.id} session={s} currentUserId={user?.id} isPast />
+                <TrainingSessionCard key={s.id} session={s} />
               </div>
             ))}
           </TrainingSessionGroup>
         )}
       </div>
     </div>
+
+    // </div>
   );
 }

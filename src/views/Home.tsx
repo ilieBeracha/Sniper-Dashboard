@@ -43,7 +43,7 @@ export default function Home() {
     <div className="flex w-screen">
       {token && <SidebarT />}
 
-      <main className="flex-1  overflow-y-hidden ">
+      <main className="flex-1 overflow-y-hidden ">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/training" element={<Training />}></Route>

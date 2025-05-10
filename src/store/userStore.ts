@@ -35,6 +35,8 @@ export const userStore = create<UserStore>((set) => ({
       user_role: meta.user_role ?? "",
       team_id: meta.team_id ?? "",
       squad_id: meta.squad_id ?? "",
+      team_name: meta.team_name ?? "",
+      squad_name: meta.squad_name ?? "",
       created_at: authUser.created_at ?? "",
     };
 

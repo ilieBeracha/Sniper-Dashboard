@@ -7,5 +7,5 @@ import "react-tooltip/dist/react-tooltip.css";
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <App />
-  </BrowserRouter>
+  </BrowserRouter>,
 );

@@ -8,6 +8,7 @@ import { PositionScore } from "@/types/score";
 import { performanceStore } from "@/store/performance";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
+import NoDataDisplay from "./BaseNoData";
 
 const formatValue = (value: number, type: string | undefined) => {
   if (type === "number") {
@@ -73,50 +74,56 @@ export default function DashboardSquadStats() {
         </div>
       }
     >
-      <Card className="bg-transparent rounded-xl w-full h-full flex flex-col justify-center gap-4">
-        <ResponsiveContainer width="100%" maxHeight={340} height={340}>
-          <BarChart data={chartData} barCategoryGap={16} barGap={8} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-            <defs>
-              <linearGradient id="gradientPerformance" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#4ade80" stopOpacity={0.8} />
-                <stop offset="100%" stopColor="#4ade80" stopOpacity={0.2} />
-              </linearGradient>
-              <linearGradient id="gradientAccuracy" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.8} />
-                <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.2} />
-              </linearGradient>
-              <linearGradient id="gradientElimination" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#f87171" stopOpacity={0.8} />
-                <stop offset="100%" stopColor="#f87171" stopOpacity={0.2} />
-              </linearGradient>
-              <linearGradient id="gradientCoordination" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.8} />
-                <stop offset="100%" stopColor="#a78bfa" stopOpacity={0.2} />
-              </linearGradient>
-            </defs>
+      <Card className="bg-transparent justify-center rounded-xl w-full h-full flex flex-col items-center gap-4">
+        {chartData.length === 0 ? (
+          <NoDataDisplay />
+        ) : (
+          <>
+            <ResponsiveContainer width="97%" maxHeight={380} height={340}>
+              <BarChart data={chartData} barCategoryGap={16} barGap={8} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                <defs>
+                  <linearGradient id="gradientPerformance" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4ade80" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="#4ade80" stopOpacity={0.2} />
+                  </linearGradient>
+                  <linearGradient id="gradientAccuracy" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.2} />
+                  </linearGradient>
+                  <linearGradient id="gradientElimination" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#f87171" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="#f87171" stopOpacity={0.2} />
+                  </linearGradient>
+                  <linearGradient id="gradientCoordination" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="#a78bfa" stopOpacity={0.2} />
+                  </linearGradient>
+                </defs>
 
-            <CartesianGrid strokeDasharray="3 3" stroke="transparent" />
-            <XAxis dataKey="name" stroke="#9ca3af" style={{ fontSize: "12px" }} />
-            <Tooltip
-              cursor={{ fill: "transparent" }}
-              content={({ label, payload }) => (
-                <div className="bg-zinc-800 text-white p-2 rounded shadow hover:bg-zinc-700">
-                  <p className="text-xs font-semibold">{label}</p>
-                  {payload?.map((p, i) => (
-                    <p key={i} className="text-sm">
-                      {p.name}: {formatValue(p.value as number, "number")}
-                    </p>
-                  ))}
-                </div>
-              )}
-            />
-            <Legend iconType="circle" />
-            <Bar dataKey="performance" name="Performance" fill="url(#gradientPerformance)" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="accuracy" name="Accuracy" fill="url(#gradientAccuracy)" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="elimination" name="Elimination" fill="url(#gradientElimination)" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="coordination" name="Coordination" fill="url(#gradientCoordination)" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+                <CartesianGrid strokeDasharray="3 3" stroke="transparent" />
+                <XAxis dataKey="name" stroke="#9ca3af" style={{ fontSize: "12px", paddingBottom: "10px" }} />
+                <Tooltip
+                  cursor={{ fill: "transparent" }}
+                  content={({ label, payload }) => (
+                    <div className="bg-zinc-800 text-white p-2 rounded shadow hover:bg-zinc-700">
+                      <p className="text-xs font-semibold">{label}</p>
+                      {payload?.map((p, i) => (
+                        <p key={i} className="text-sm">
+                          {p.name}: {formatValue(p.value as number, "number")}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                />
+                <Legend iconType="circle" />
+                <Bar dataKey="performance" name="Performance" fill="url(#gradientPerformance)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="accuracy" name="Accuracy" fill="url(#gradientAccuracy)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="elimination" name="Elimination" fill="url(#gradientElimination)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="coordination" name="Coordination" fill="url(#gradientCoordination)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </>
+        )}
       </Card>
     </BaseDashboardCard>
   );

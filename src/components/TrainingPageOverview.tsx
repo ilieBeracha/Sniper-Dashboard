@@ -8,7 +8,6 @@ import { teamStore } from "@/store/teamStore";
 import { TrainingStore } from "@/store/trainingStore";
 import { isCommander } from "@/utils/permissions";
 import { userStore } from "@/store/userStore";
-import TrainingStats from "./TrainingsStats";
 
 type TrainingPageOverviewProps = {
   training: TrainingSession | null;

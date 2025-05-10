@@ -13,6 +13,8 @@ export interface User {
   user_role: UserRole;
   first_name: string;
   last_name: string;
+  team_name: string;
+  squad_name: string;
   team_id: string;
   squad_id?: string | null;
   registered?: boolean;
