@@ -2,7 +2,7 @@ import { useState } from "react";
 import BaseDashboardCard from "./BaseDashboardCard";
 import { TrainingSession } from "@/types/training";
 import TrainingPageStatus from "./TrainingPageStatus";
-import EditTrainingSessionModal from "./EditTrainingSessionModal";
+import EditTrainingSessionModal from "@/components/EditTrainingSessionModal";
 import { useStore } from "zustand";
 import { teamStore } from "@/store/teamStore";
 import { TrainingStore } from "@/store/trainingStore";

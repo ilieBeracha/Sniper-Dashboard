@@ -5,9 +5,9 @@ import TeamManagerRegisterForm from "@/components/Auth/TeamManagerRegisterForm";
 import TeamMemberRegisterForm from "@/components/Auth/SquadCommanderRegisterForm";
 import SoldierRegisterForm from "@/components/Auth/SoldierRegisterForm";
 import { authStore } from "@/store/authStore";
-import { LoginUserData, RegisterUserData } from "../types/auth";
 import Login from "@/components/Auth/LoginForm";
 import AuthHero from "@/components/Auth/AuthHero";
+import { LoginUserData, RegisterUserData } from "@/types/auth";
 
 type AuthType = "login" | "team_manager_register" | "squad_manager_register" | "soldier_register";
 

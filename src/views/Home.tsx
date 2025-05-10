@@ -13,6 +13,7 @@ import { squadStore } from "@/store/squadStore";
 import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
 import { IsMobile } from "@/utils/isMobile";
+import { getSquadsWithUsersByTeamId } from "@/services/squadService";
 
 export default function Home() {
   const { token } = useStore(authStore);
@@ -30,6 +31,7 @@ export default function Home() {
         await fetchMembers(user.team_id);
         await getEqipmentsByTeamId(user.team_id);
         await getWeapons(user.team_id);
+        await getSquadsWithUsersByTeamId(user.team_id);
 
         if (user?.squad_id) {
           await getSquadUsersBySquadId(user.squad_id);

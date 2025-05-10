@@ -43,7 +43,7 @@ export default function Sidebar() {
   const SidebarContent = () => (
     <div className={`flex flex-col bg-[#121212] border-r border-[#1D1D1F] ${collapsed ? "w-20" : "w-72"} h-full`}>
       <div className="flex items-center justify-between h-16 px-4 border-b border-[#1D1D1F] bg-[#121212]">
-        {!collapsed && <span className="text-lg font-bold text-white">SniperOps</span>}
+        {!collapsed && <span className="text-lg font-bold text-white">ScopeStats</span>}
         <button onClick={() => (isMobile ? setDrawerOpen(false) : setCollapsed(!collapsed))} className="text-white text-xl hover:opacity-80">
           {collapsed ? <BiChevronRight className="w-5 h-5" /> : <BiChevronLeft className="w-5 h-5" />}
         </button>

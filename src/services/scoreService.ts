@@ -28,9 +28,6 @@ export async function getScoresByTrainingId(training_id: string) {
             assignment_name
           )
         ),
-        squad:squad_id(
-          squad_name
-        ),
         score_participants(
           id,
           user_id,
@@ -42,7 +39,10 @@ export async function getScoresByTrainingId(training_id: string) {
             id,
             squad_id,
             first_name,
-            last_name
+            last_name,
+            squad:squad_id(
+              squad_name
+            )
           )
         )
       `,

@@ -7,7 +7,7 @@ type TrainingPageAssignmentsProps = {
 
 export default function TrainingPageAssignments({ training }: TrainingPageAssignmentsProps) {
   return (
-    <BaseDashboardCard header="Current Assignments" tooltipContent="List of assignments for this training session">
+    <BaseDashboardCard header="Related Assignments" tooltipContent="List of assignments for this training session">
       <div className="space-y-3 max-h-[300px] overflow-y-auto">
         {training?.assignment_sessions &&
           training?.assignment_sessions?.map((assignment_session: Assignment) => (

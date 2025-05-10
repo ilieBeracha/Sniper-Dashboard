@@ -1,12 +1,14 @@
-import { Users, Target, Award, Shield } from "lucide-react";
-import { useEffect } from "react";
+import { Users, Award, Shield } from "lucide-react";
+import { useStore } from "zustand";
+import { weaponsStore } from "@/store/weaponsStore";
+import { equipmentStore } from "@/store/equipmentStore";
 
 interface ScoreParticipant {
   id: string;
   user_id: string;
   role: string;
-  weapon_id: string;
-  equipment_id: string;
+  weapon_id: string | null; // weapon_id can be null
+  equipment_id: string | null; // equipment_id can be null
   created_at: string;
   user: {
     id: string;
@@ -16,10 +18,20 @@ interface ScoreParticipant {
   };
 }
 
-const ScoreParticipantsDisplay = ({ participants, equipment }: { participants: ScoreParticipant[]; equipment: any }) => {
-  const getEquipmentName = (equipmentId: string) => {
-    const item = equipment.find((item: any) => item.id === equipmentId);
-    return item ? item.name : "Unknown Equipment";
+const ScoreParticipantsDisplay = ({ participants }: { participants: ScoreParticipant[] }) => {
+  const { weapons } = useStore(weaponsStore);
+  const { equipments } = useStore(equipmentStore);
+
+  const getEquipmentInfo = (equipmentId: string | null): string => {
+    if (!equipmentId) return "No Equipment"; // If equipmentId is null, return "No Equipment"
+    const item = equipments.find((item) => item.id === equipmentId);
+    return item ? `${item.equipment_type} - ${item.serial_number}` : "Unknown Equipment";
+  };
+
+  const getWeaponInfo = (weaponId: string | null): string => {
+    if (!weaponId) return "No Weapon"; // If weaponId is null, return "No Weapon"
+    const item = weapons.find((item) => item.id === weaponId);
+    return item ? `${item.weapon_type} - ${item.serial_number}` : "Unknown Weapon";
   };
 
   return (
@@ -51,17 +63,23 @@ const ScoreParticipantsDisplay = ({ participants, equipment }: { participants: S
 
               <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700/50">
                 <div className="space-y-3">
-                  <div className="flex items-center">
-                    <Award className="h-4 w-4 text-zinc-400 mr-2" />
-                    <span className="text-zinc-500 text-sm">Weapon</span>
-                  </div>
-                  <div className="text-white font-medium ml-6">{participant.weapon_id}</div>
+                  {/* Weapon Display */}
+                  {participant.weapon_id && (
+                    <div className="flex items-center">
+                      <Award className="h-4 w-4 text-zinc-400 mr-2" />
+                      <span className="text-zinc-500 text-sm">Weapon</span>
+                    </div>
+                  )}
+                  <div className="text-white font-medium ml-6">{getWeaponInfo(participant.weapon_id)}</div>
 
-                  <div className="flex items-center mt-2">
-                    <Shield className="h-4 w-4 text-zinc-400 mr-2" />
-                    <span className="text-zinc-500 text-sm">Equipment</span>
-                  </div>
-                  <div className="text-white font-medium ml-6">{getEquipmentName(participant.equipment_id)}</div>
+                  {/* Equipment Display */}
+                  {participant.equipment_id && (
+                    <div className="flex items-center mt-2">
+                      <Shield className="h-4 w-4 text-zinc-400 mr-2" />
+                      <span className="text-zinc-500 text-sm">Equipment</span>
+                    </div>
+                  )}
+                  <div className="text-white font-medium ml-6">{getEquipmentInfo(participant.equipment_id)}</div>
                 </div>
               </div>
             </div>

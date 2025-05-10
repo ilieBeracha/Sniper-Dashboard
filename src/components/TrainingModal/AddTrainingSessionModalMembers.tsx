@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { User } from "@/types/user";
-import SearchableCheckboxList from "./SearchableCheckboxList";
+import SearchableCheckboxList from "../SearchableCheckboxList";
+
 
 type TeamMembersSectionProps = {
   teamMembers: User[];

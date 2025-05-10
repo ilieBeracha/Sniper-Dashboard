@@ -84,12 +84,12 @@ export default function DashboardWelcome({ user }: { user: User }) {
       {/* Team/Squad Info */}
       <div className="mt-3  flex flex-col sm:flex-row pt-3 border-t border-[#333] gap-2">
         <div className="flex-col justify-between sm:flex-row  sm:grid-cols-2 gap-2 w-full">
-          <div className="bg-[#1a1a1a] rounded-md p-2 border border-[#333]">
-            <h3 className="text-gray-400 text-xs mb-0.5">Squad</h3>
+          <h3 className="text-gray-400 text-xs mb-0.5">Squad</h3>
+          <div className="bg-[#1a1a1a] rounded-md p-2 border border-[#333] mb-2">
             <p className="text-white text-sm font-medium">{user.squad_name}</p>
           </div>
+          <h3 className="text-gray-400 text-xs mb-0.5">Team</h3>
           <div className="bg-[#1a1a1a] rounded-md p-2 border border-[#333]">
-            <h3 className="text-gray-400 text-xs mb-0.5">Team</h3>
             <p className="text-white text-sm font-medium">{user.team_name}</p>
           </div>
         </div>

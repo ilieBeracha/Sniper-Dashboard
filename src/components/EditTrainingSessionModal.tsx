@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/services/supabaseClient";
 import { User } from "@/types/user";
 import { Assignment, TrainingSession } from "@/types/training";
-import BasicInfoSection from "./AddTrainingSessionModalBasicInfo";
-import AssignmentsSection from "./AddTrainingSessionModalAssignments";
-import TeamMembersSection from "./AddTrainingSessionModalMembers";
-import PreviewSection from "./AddTrainingSessionModalPreview";
+import BasicInfoSection from "./TrainingModal/AddTrainingSessionModalBasicInfo";
+import AssignmentsSection from "./TrainingModal/AddTrainingSessionModalAssignments";
+import TeamMembersSection from "./TrainingModal/AddTrainingSessionModalMembers";
+import PreviewSection from "./TrainingModal/AddTrainingSessionModalPreview";
 
 type EditTrainingSessionModalProps = {
   isOpen: boolean;

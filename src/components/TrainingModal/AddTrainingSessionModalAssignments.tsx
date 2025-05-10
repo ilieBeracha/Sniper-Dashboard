@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Assignment } from "@/types/training";
-import SearchableCheckboxList from "./SearchableCheckboxList";
+import SearchableCheckboxList from "@/components/SearchableCheckboxList";
 import { PlusCircleIcon } from "lucide-react";
-import AddAssignmentModal from "./AddAssignmentModal";
+import AddAssignmentModal from "@/components/AddAssignmentModal";
 
 type AssignmentsSectionProps = {
   assignments: Assignment[];

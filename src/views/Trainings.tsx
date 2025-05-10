@@ -1,4 +1,4 @@
-import TrainingAddTrainingSessionModal from "@/components/AddTrainingSessionModal";
+import TrainingAddTrainingSessionModal from "@/components/TrainingModal/AddTrainingSessionModal";
 import TrainingList from "@/components/TrainingList";
 import { teamStore } from "@/store/teamStore";
 import { TrainingStore } from "@/store/trainingStore";
@@ -42,11 +42,10 @@ export default function Training() {
     load();
   }, []);
 
-  function fetchTrainings() {
+  async function fetchTrainings() {
     const teamId = userStore.getState().user?.team_id;
     if (!teamId) return;
-    navigate(`/training/${teamId}`);
-    return loadTrainingByTeamId(teamId);
+    await loadTrainingByTeamId(teamId);
   }
 
   return (

@@ -1,6 +1,6 @@
 import { ScoreFormValues } from "@/hooks/useScoreForm";
 import { Assignment } from "@/types/training";
-import ScoreFormField from "./ScoreFormField";
+import ScoreFormField from "@/components/ScoreFormField";
 import { Target, Info, Crosshair, Wind, StickyNote } from "lucide-react";
 import { useState } from "react";
 
@@ -22,7 +22,7 @@ export default function TrainingPageScoreFormModalStep1({ formValues, setFormVal
   ];
 
   const renderRequiredFields = () => (
-    <div className="mb-4">
+    <div className="mb-4 flex flex-col gap-4">
       <div className="flex items-center gap-2 mb-3">
         <Crosshair className="text-green-400" size={16} />
         <h3 className="text-base font-semibold text-white">Combat Details</h3>
@@ -42,6 +42,7 @@ export default function TrainingPageScoreFormModalStep1({ formValues, setFormVal
         ))}
         <ScoreFormField field="time_until_first_shot" type="number" formValues={formValues} setFormValues={setFormValues} />
       </div>
+      <ScoreFormField field="first_shot_hit" type="boolean" formValues={formValues} setFormValues={setFormValues} />
     </div>
   );
 
@@ -62,7 +63,6 @@ export default function TrainingPageScoreFormModalStep1({ formValues, setFormVal
               Target Assessment
             </h4>
             <ScoreFormField field="target_eliminated" type="boolean" formValues={formValues} setFormValues={setFormValues} />
-            <ScoreFormField field="first_shot_hit" type="boolean" formValues={formValues} setFormValues={setFormValues} />
           </div>
 
           {/* Group environmental factors */}
@@ -89,29 +89,34 @@ export default function TrainingPageScoreFormModalStep1({ formValues, setFormVal
   );
 
   return (
-    <form className="w-full">
-      {/* Mission Selection - Full Width */}
-      <div className="mb-4 p-4 bg-zinc-800/30 rounded-lg border border-zinc-700/50">
-        <div className="flex items-center gap-2 mb-3">
-          <Target className="text-indigo-400" size={16} />
-          <h2 className="text-base font-semibold text-white">Mission Selection</h2>
+    <div className="relative">
+      <form className="w-full ">
+        {/* Mission Selection - Full  Width */}
+
+        <div className="mb-4 p-4 bg-zinc-800/30 rounded-lg border border-zinc-700/50">
+          <div className="flex items-center gap-2 mb-3">
+            <Target className="text-indigo-400" size={16} />
+            <h2 className="text-base font-semibold text-white">Mission Selection</h2>
+          </div>
+          <div className="space-y-4">
+            <ScoreFormField
+              field="assignment_session_id"
+              type="select"
+              formValues={formValues}
+              setFormValues={setFormValues}
+              assignmentSessions={assignmentSessions}
+            />
+          </div>
         </div>
-        <ScoreFormField
-          field="assignment_session_id"
-          type="select"
-          formValues={formValues}
-          setFormValues={setFormValues}
-          assignmentSessions={assignmentSessions}
-        />
-      </div>
 
-      {renderRequiredFields()}
+        {renderRequiredFields()}
 
-      <button type="button" onClick={() => setShowOptionalFields(!showOptionalFields)} className="mb-4 text-blue-400 hover:text-blue-300">
-        {showOptionalFields ? "Hide Additional Information" : "Show Additional Information"}
-      </button>
+        <button type="button" onClick={() => setShowOptionalFields(!showOptionalFields)} className="mb-4 text-blue-400 hover:text-blue-300">
+          {showOptionalFields ? "Hide Additional Information" : "Show Additional Information"}
+        </button>
 
-      {showOptionalFields && renderOptionalFields()}
-    </form>
+        {showOptionalFields && renderOptionalFields()}
+      </form>
+    </div>
   );
 }

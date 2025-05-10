@@ -20,9 +20,9 @@ export default function BaseDropBox({
 
   return (
     <Listbox value={selectedOption} onChange={(opt) => setActiveTab(opt.id)}>
-      <div className="relative w-full max-w-sm mx-auto mb-4">
+      <div className="relative w-full max-w-sm mx-auto">
         <div className="flex w-full overflow-hidden rounded-lg bg-zinc-800 border border-zinc-700 focus-within:ring-2 focus-within:ring-indigo-500">
-          <div className="flex items-center gap-2 px-4 py-2 text-white flex-grow">
+          <div className="flex items-center gap-2 px-4 py-1 text-white flex-grow">
             <CheckIcon className="w-4 h-4 text-zinc-400" />
             <p className="text-sm font-medium truncate">{selectedOption?.label || "Select a metric"}</p>
           </div>

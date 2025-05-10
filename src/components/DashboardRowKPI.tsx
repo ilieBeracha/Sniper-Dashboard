@@ -8,7 +8,7 @@ export default function DashboardRowKPI() {
     <>
       <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-2">
         <div className="sm:col-span-1 md:col-span-3 lg:col-span-3">
-          <BaseDashboardCard header="Day/Night Performance" tooltipContent="Your performance in day and night">
+          <BaseDashboardCard header="User Group Score" tooltipContent="Your performance compared to your group and squad">
             <UserGroupingSummary />
           </BaseDashboardCard>
         </div>

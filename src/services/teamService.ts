@@ -1,10 +1,7 @@
 import { User } from "@/types/user";
 import { supabase } from "./supabaseClient";
 
-export async function getTeamMembers(
-  teamId: string,
-  currentUser: User
-): Promise<User[]> {
+export async function getTeamMembers(teamId: string): Promise<User[]> {
   const { data, error } = await supabase
     .from("users")
     .select(
@@ -14,7 +11,7 @@ export async function getTeamMembers(
         id,
         squad_name
       )
-    `
+    `,
     )
     .eq("team_id", teamId);
 

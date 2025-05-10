@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { User, UserRole } from "../types/user";
 import { User as SupabaseAuthUser } from "@supabase/supabase-js";
+import { User, UserRole } from "@/types/user";
 
 interface UserStore {
   user: User | null;

@@ -15,7 +15,7 @@ export async function getSquadsWithUsersByTeamId(team_id: string) {
         user_role,
         email
       )
-    `
+    `,
     )
     .eq("team_id", team_id);
 
@@ -42,7 +42,7 @@ export async function getSquadUsersBySquadId(squad_id: string) {
         user_role,
         email
       ) 
-    `
+    `,
     )
     .eq("id", squad_id);
 

@@ -2,7 +2,6 @@
 @plugin "flowbite-react/plugin/tailwindcss";
 @source "../.flowbite-react/class-list.json";
 
-
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-weight: 400;
@@ -41,7 +40,6 @@ button {
   border-radius: 9999px;
 }
 
-
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -53,7 +51,6 @@ button {
   }
 }
 
-
 #container {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -64,3 +61,6 @@ button {
   background-color: transparent;
 }
 
+svg .recharts-layer .recharts-bar {
+  width: 100vw !important;
+}

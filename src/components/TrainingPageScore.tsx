@@ -1,5 +1,5 @@
 import BaseDashboardCard from "./BaseDashboardCard";
-import ScoreFormModal from "./TrainingPageScoreFormModal";
+import ScoreFormModal from "./TrainingPageScoreFormModal/TrainingPageScoreFormModal";
 import { useState, useEffect } from "react";
 import { useStore } from "zustand";
 import { scoreStore } from "@/store/scoreSrore";
@@ -10,7 +10,6 @@ import { isCommander } from "@/utils/permissions";
 import { Score } from "@/types/score";
 import ScoreParticipantsDisplay from "./TrainingPageScoreParticipantsDisplay";
 import { TrainingStore } from "@/store/trainingStore";
-import { getScoresByTrainingId } from "@/services/scoreService";
 import { loaderStore } from "@/store/loaderStore";
 
 export default function TrainingPageScore() {
@@ -22,12 +21,22 @@ export default function TrainingPageScore() {
   const { user } = useStore(userStore);
   const { training } = useStore(TrainingStore);
   const { isLoading, setIsLoading } = useStore(loaderStore);
+  const { getScoresByTrainingId } = useStore(scoreStore);
+
+  const getSquadNameFromScore = (score: Score): string => {
+    const participantWithSquad = score.score_participants?.find((participant: any) => participant.user?.squad?.squad_name);
+
+    if (participantWithSquad) {
+      return participantWithSquad.user.squad.squad_name;
+    }
+    return "Unknown Squad";
+  };
 
   useEffect(() => {
     if (scores.length > 0) {
       const initialExpandState: { [key: string]: boolean } = {};
       scores.forEach((score) => {
-        const squadName = score?.squad?.squad_name || "Unknown Squad";
+        const squadName = getSquadNameFromScore(score);
         initialExpandState[squadName] = true;
       });
       setExpandedSquads(initialExpandState);
@@ -58,7 +67,7 @@ export default function TrainingPageScore() {
   };
 
   const scoresBySquad = scores.reduce((acc: any, score: Score) => {
-    const squadName = score?.squad?.squad_name || "Unknown Squad";
+    const squadName = getSquadNameFromScore(score);
     if (!acc[squadName]) acc[squadName] = [];
     acc[squadName].push(score);
     return acc;
@@ -292,7 +301,7 @@ export default function TrainingPageScore() {
                         {/* Participant details section */}
                         {expandedScores[score.id || ""] && score.score_participants && (
                           <div className="py-3 px-4 bg-zinc-800/30">
-                            <ScoreParticipantsDisplay participants={score.score_participants} equipment={score.score_participants} />
+                            <ScoreParticipantsDisplay participants={score.score_participants} />
                           </div>
                         )}
                       </div>

@@ -1,7 +1,10 @@
-import BaseModal from "./BaseModal";
-import TrainingPageScoreFormModalStep1 from "./TrainingPageScoreFormModalStep1";
-import TrainingPageScoreFormModalStep2 from "./TrainingPageScoreFormModalStep2";
+import TrainingPageScoreFormModalStep1 from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModalStep1";
+import TrainingPageScoreFormModalStep2 from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModalStep2";
 import { useScoreForm } from "@/hooks/useScoreForm";
+import BaseModal from "../BaseModal";
+import { useState } from "react";
+
+import BaseToggle from "../BaseToggle";
 
 export default function ScoreFormModal({
   isOpen,
@@ -16,6 +19,7 @@ export default function ScoreFormModal({
   editingScore?: any;
   assignmentSessions?: any[];
 }) {
+  const [isGrouping, setIsGrouping] = useState(false);
   const {
     formValues,
     setFormValues,
@@ -52,14 +56,13 @@ export default function ScoreFormModal({
       score_participants,
     };
     onSubmit(payload);
+
     resetForm();
   };
 
   const handleNextStep = () => {
     const isValid = validateScoreForm();
     if (!isValid) {
-      console.log("errors", errors);
-      // handleAssignmentErrors(formValues);
       return;
     } else {
       setErrors([]);
@@ -77,6 +80,8 @@ export default function ScoreFormModal({
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} width="max-w-5xl">
       <div className="w-full  from-[#181F3A] via-[#23213A] to-[#1A1A2E] rounded-2xl ">
+        <BaseToggle checked={isGrouping} onChange={() => setIsGrouping(!isGrouping)} label="Grouping" />
+
         <div className="flex mb-4 border-indigo-700/40 pb-3 w-full">
           <h2 className="text-xl font-semibold text-indigo-200 drop-shadow-md">{editingScore ? "Edit Score Entry" : "New Score Entry"}</h2>
         </div>
@@ -111,12 +116,13 @@ export default function ScoreFormModal({
             })}
           </ol>
         </div>
+        {isGrouping && <div className="flex justify-between items-center mt-4"></div>}
 
-        {step === 1 && (
+        {step === 1 && !isGrouping && (
           <TrainingPageScoreFormModalStep1 formValues={formValues} setFormValues={setFormValues} assignmentSessions={assignmentSessions} />
         )}
 
-        {step === 2 && (
+        {step === 2 && !isGrouping && (
           <TrainingPageScoreFormModalStep2
             formValues={formValues}
             setFormValues={setFormValues}

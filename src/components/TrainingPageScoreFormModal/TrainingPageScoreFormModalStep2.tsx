@@ -1,10 +1,10 @@
 import { useStore } from "zustand";
-import SearchableCheckboxList from "./SearchableCheckboxList";
+import SearchableCheckboxList from "@/components/SearchableCheckboxList";
 import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
 import { ScoreFormValues } from "@/hooks/useScoreForm";
 import { Users, Package } from "lucide-react";
-import TrainingPageScoreFormModalUserParticipant from "./TrainingPageScoreFormModal/TrainingPageScoreFormModalUserParticipant";
+import TrainingPageScoreFormModalUserParticipant from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModalUserParticipant";
 import { useEffect } from "react";
 import { userStore } from "@/store/userStore";
 

@@ -1,14 +1,14 @@
-import BaseModal from "./BaseModal";
+import BaseModal from "@/components/BaseModal";
 import { useState } from "react";
 import { supabase } from "@/services/supabaseClient";
 import { userStore } from "@/store/userStore";
 import { User } from "@/types/user";
-import { Assignment } from "@/types/training";
-import BasicInfoSection from "./AddTrainingSessionModalBasicInfo";
-import AssignmentsSection from "./AddTrainingSessionModalAssignments";
-import TeamMembersSection from "./AddTrainingSessionModalMembers";
+import BasicInfoSection from "@/components/TrainingModal/AddTrainingSessionModalBasicInfo";
+import AssignmentsSection from "@/components/TrainingModal/AddTrainingSessionModalAssignments";
+import TeamMembersSection from "@/components/TrainingModal/AddTrainingSessionModalMembers";
 import { useStore } from "zustand";
 import { TrainingStore } from "@/store/trainingStore";
+import { Assignment } from "@/types/training";
 
 export default function TrainingAddTrainingSessionModal({
   isOpen,

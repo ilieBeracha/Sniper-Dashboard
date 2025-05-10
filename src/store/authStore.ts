@@ -1,9 +1,10 @@
 import { create } from "zustand";
-import { authService } from "../services/auth";
 import { userStore } from "./userStore";
-import { User } from "../types/user";
-import { LoginUserData, RegisterUserData } from "../types/auth";
+
 import { supabase } from "@/services/supabaseClient";
+import { LoginUserData, RegisterUserData } from "@/types/auth";
+import { authService } from "@/services/auth";
+import { User } from "@/types/user";
 
 interface props {
   token: string | null;
