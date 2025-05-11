@@ -71,8 +71,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex h-screen bg-[#121212] overflow-hidden ">
-      {/* Subtle Background Pattern */}
+    <div className="flex h-screen bg-[#121212] overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
         <div
           className="absolute inset-0"
@@ -85,7 +84,7 @@ export default function Auth() {
 
       <AuthHero />
 
-      <div className="w-full md:w-3/5 flex items-center justify-center p-4 md:p-8 relative z-10 ">
+      <div className="w-full md:w-3/5 flex items-center justify-center p-6 sm:p-8 md:p-8 relative z-10 shadow-black shadow-2xl">
         <div className="w-full max-w-md">
           <div className="mb-8">
             <div className="w-8 h-8 bg-[#1E1E1E] rounded-full flex items-center justify-center mb-6 border border-[#2A2A2A]">
@@ -104,7 +103,7 @@ export default function Auth() {
 
           {/* Tabs */}
           <div className="flex mb-4">
-            <div className="bg-[#s] p-1 rounded-xl flex w-full border border-[#2A2A2A]">
+            <div className="bg-[#1A1A1A] p-1 rounded-xl flex w-full border border-[#2A2A2A]">
               {[
                 { type: "login", label: "Sign In" },
                 { type: "team_manager_register", label: "Commander" },
