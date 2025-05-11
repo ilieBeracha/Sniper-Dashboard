@@ -32,7 +32,7 @@ export default function TrainingPageOverview({ training }: TrainingPageOverviewP
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xl font-semibold">{training?.session_name}</h3>
-            <p className="text-sm text-gray-400">Session #{training?.id}</p>
+            <p className="text-sm text-gray-400">Location: {training?.location}</p>
           </div>
           <div className="flex gap-2">
             {isCommander(userRole) && (

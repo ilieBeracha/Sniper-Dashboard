@@ -30,7 +30,7 @@ export default function TrainingPage() {
   const { members } = useStore(teamStore);
   const { assignments } = useStore(TrainingStore);
 
-  const { getScoresByTrainingId } = useStore(scoreStore);
+  const { getScoresByTrainingId, scores } = useStore(scoreStore);
 
   useEffect(() => {
     const load = async () => {
@@ -43,6 +43,10 @@ export default function TrainingPage() {
 
     load();
   }, [id, isLoading]);
+
+  function classNames(...classes: string[]) {
+    return classes.filter(Boolean).join(" ");
+  }
 
   const handleStatusChange = async (newStatus: TrainingStatus) => {
     setPendingStatus(newStatus);
@@ -84,6 +88,8 @@ export default function TrainingPage() {
             <TrainingPageChangeStatus training={training as TrainingSession} onStatusChange={handleStatusChange} />
           </div>
         )}
+
+        <div></div>
 
         <div className="lg:col-span-3">
           <TrainingPageScore />

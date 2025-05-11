@@ -16,11 +16,11 @@ export default function BaseDashboardCard({
 }) {
   return (
     <div
-      className={`h-full  border-white/5 shadow-lg flex flex-col transition-all duration-300 rounded-sm hover:border-white/10 ${
+      className={`h-full  border-white/5 shadow-lg flex flex-col transition-all duration-300 rounded-md hover:border-white/10 ${
         withBg ? "bg-[#1E1E1E]" : "bg-transparent"
       }`}
     >
-      <div className="px-4 py-2 border-b border-white/5 mb-2">
+      <div className="px-4 py-4 border-b border-white/5 mb-2">
         <div className="flex justify-between relative h-full items-center">
           {tooltipContent && (
             <BiInfoCircle

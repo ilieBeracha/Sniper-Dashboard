@@ -46,7 +46,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen max-w-screen-3xl mx-auto  from-[#1E1E20] text-gray-100 p-3">
+    <div className="min-h-[calc(100dvh-100px)] max-w-screen-3xl mx-auto  from-[#1E1E20] text-gray-100 p-3">
       {userRole !== "soldier" && <Header setIsOpen={setIsInviteModalOpen} />}
       <div className="grid grid-cols-1 gap-2">
         <DashboardRowOne user={user} />
