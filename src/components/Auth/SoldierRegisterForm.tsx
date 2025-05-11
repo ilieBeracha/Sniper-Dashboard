@@ -27,7 +27,7 @@ export default function SoldierRegisterForm({
     <form className="space-y-4" onSubmit={handleSubmit}>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="first-name" className="block text-sm font-medium text-gray-400 mb-2">
+          <label htmlFor="first-name" className="block text-sm font-medium text-gray-200 mb-2">
             First name
           </label>
           <input
@@ -36,13 +36,13 @@ export default function SoldierRegisterForm({
             required
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="block w-full px-4 py-2 rounded-md bg-[#0A0A0A] text-gray-300 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
+            className="block w-full px-4 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
             placeholder="John"
           />
         </div>
 
         <div>
-          <label htmlFor="last-name" className="block text-sm font-medium text-gray-400 mb-2">
+          <label htmlFor="last-name" className="block text-sm font-medium text-gray-200 mb-2">
             Last name
           </label>
           <input
@@ -51,14 +51,14 @@ export default function SoldierRegisterForm({
             required
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="block w-full px-4 py-2 rounded-md bg-[#0A0A0A] text-gray-300 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
+            className="block w-full px-4 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
             placeholder="Doe"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-2">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-2">
           Military Email
         </label>
         <div className="relative">
@@ -78,14 +78,14 @@ export default function SoldierRegisterForm({
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 rounded-md bg-[#0A0A0A] text-gray-300 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
+            className="block w-full pl-10 pr-3 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
             placeholder="john.doe@military.gov"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-400 mb-2">
+        <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-2">
           Password
         </label>
         <div className="relative">
@@ -105,12 +105,12 @@ export default function SoldierRegisterForm({
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 rounded-md bg-[#0A0A0A] text-gray-300 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
+            className="block w-full pl-10 pr-3 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
             placeholder="••••••••"
           />
           <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center">
             {showPassword ? (
-              <svg className="h-5 w-5 text-gray-600 hover:text-gray-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-gray-600 hover:text-gray-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path
                   strokeLinecap="round"
@@ -120,7 +120,7 @@ export default function SoldierRegisterForm({
                 />
               </svg>
             ) : (
-              <svg className="h-5 w-5 text-gray-600 hover:text-gray-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-gray-600 hover:text-gray-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -134,7 +134,7 @@ export default function SoldierRegisterForm({
       </div>
 
       <div>
-        <label htmlFor="invite-code" className="block text-sm font-medium text-gray-400 mb-2">
+        <label htmlFor="invite-code" className="block text-sm font-medium text-gray-200 mb-2">
           Squad Invite Code
         </label>
         <div className="relative">
@@ -154,7 +154,7 @@ export default function SoldierRegisterForm({
             required
             value={inviteCode}
             onChange={(e) => setInviteCode(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 rounded-md bg-[#0A0A0A] text-gray-300 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
+            className="block w-full pl-10 pr-3 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
             placeholder="Code from your commander"
           />
         </div>

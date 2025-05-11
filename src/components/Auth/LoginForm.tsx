@@ -13,7 +13,7 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-2">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-2">
           Email address
         </label>
         <div className="relative">
@@ -33,14 +33,14 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 rounded-md bg-[#0A0A0A] text-gray-300 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
+            className="block w-full pl-10 pr-3 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
             placeholder="Enter your email"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-400 mb-2">
+        <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-2">
           Password
         </label>
         <div className="relative">
@@ -60,12 +60,12 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 rounded-md bg-[#0A0A0A] text-gray-300 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
+            className="block w-full pl-10 pr-3 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
             placeholder="Enter your password"
           />
           <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center">
             {showPassword ? (
-              <svg className="h-5 w-5 text-gray-600 hover:text-gray-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-gray-600 hover:text-gray-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path
                   strokeLinecap="round"
@@ -75,7 +75,7 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
                 />
               </svg>
             ) : (
-              <svg className="h-5 w-5 text-gray-600 hover:text-gray-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-gray-600 hover:text-gray-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -91,7 +91,7 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
       <div className="space-y-4">
         <button
           type="submit"
-          className="w-full flex justify-center items-center px-4 py-3 rounded-2xl bg-white text-[#0A0A0A] font-semibold hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] transition-all duration-200"
+          className="w-full flex justify-center items-center px-4 py-4 rounded-2xl bg-white text-[#0A0A0A] font-semibold hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] transition-all duration-200"
         >
           Sign In
         </button>

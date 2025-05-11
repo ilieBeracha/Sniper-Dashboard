@@ -71,7 +71,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex h-screen bg-[#0A0A0A] overflow-hidden">
+    <div className="flex h-screen bg-[#121212] overflow-hidden ">
       {/* Subtle Background Pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
         <div
@@ -85,10 +85,10 @@ export default function Auth() {
 
       <AuthHero />
 
-      <div className="w-full md:w-3/5 flex items-center justify-center p-4 md:p-8 relative z-10">
+      <div className="w-full md:w-3/5 flex items-center justify-center p-4 md:p-8 relative z-10 ">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <div className="w-8 h-8 bg-[#1A1A1A] rounded-full flex items-center justify-center mb-6 border border-[#2A2A2A]">
+            <div className="w-8 h-8 bg-[#1E1E1E] rounded-full flex items-center justify-center mb-6 border border-[#2A2A2A]">
               <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -126,7 +126,7 @@ export default function Auth() {
 
           {/* Form Card */}
           <div className="relative">
-            <div className="relative bg-[#121212] py-8 px-8 rounded-3xl border border-[#2A2A2A]">
+            <div className="relative bg-[#161616] py-8 px-8 rounded-3xl border border-[#2A2A2A]">
               {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10 rounded-3xl backdrop-blur-sm">
                   <div className="flex flex-col items-center">
@@ -168,14 +168,14 @@ export default function Auth() {
             {authType === "login" ? (
               <p className="text-gray-600 text-sm">
                 Need assistance?{" "}
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <a href="#" className="text-gray-400 hover:text-white">
                   Contact support
                 </a>
               </p>
             ) : (
               <p className="text-gray-600 text-sm">
                 Already have an account?{" "}
-                <button onClick={() => setAuthType("login")} className="text-gray-400 hover:text-white transition-colors">
+                <button onClick={() => setAuthType("login")} className="text-gray-400 hover:text-white ">
                   Sign in
                 </button>
               </p>
