@@ -119,7 +119,7 @@ export default function DashboardSquadStats() {
         ) : (
           <>
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 w-full px-2 mt-2">
-              <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 sm:gap-4 w-full lg:w-auto w-full">
+              <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 sm:gap-4 w-full lg:w-auto">
                 <div className="w-full sm:w-auto min-w-[120px] sm:min-w-[160px]">
                   <BaseDropBox tabs={filterOptions} activeTab={selectedFilter} setActiveTab={handleFilterChange} />
                 </div>
