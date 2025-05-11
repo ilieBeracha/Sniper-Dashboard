@@ -47,7 +47,6 @@ export default function DashboardSquadStats() {
   ];
 
   useEffect(() => {
-    console.log(squadStats);
     if (squadStats.length !== 0) {
       setChartData(squadStats as any);
     } else {
