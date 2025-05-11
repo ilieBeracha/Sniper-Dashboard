@@ -100,15 +100,9 @@ export default function TrainingPageScore() {
     return acc;
   }, {});
 
-  const totalScores = scores.length;
-  const dayScores = scores.filter((score) => score.day_night === "day").length;
-  const nightScores = scores.filter((score) => score.day_night === "night").length;
-  const squadCount = Object.keys(scoresBySquad).length;
-
   return (
     <BaseDashboardCard header="Training Score Dashboard" tooltipContent="Performance overview across all squads">
       <div className="relative">
-        {/* Loading overlay for fetching data */}
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/50 backdrop-blur-sm z-10">
             <div className="bg-zinc-800 rounded-lg p-4 flex items-center space-x-3 border border-zinc-700">
@@ -119,11 +113,11 @@ export default function TrainingPageScore() {
         )}
 
         <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center space-x-2">
-            <Target className="h-5 w-5 text-zinc-400" />
-            <h2 className="text-lg font-medium text-white">Performance Overview</h2>
-          </div>
+          <div className="text-sm text-zinc-400">Showing scores for all participating squads</div>
+        </div>
 
+        {/* Filter controls */}
+        <div className="flex justify-between items-center mb-6">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={isLoading}
@@ -134,47 +128,6 @@ export default function TrainingPageScore() {
             <Plus size={16} />
             Record Score
           </button>
-        </div>
-
-        {/* Dashboard stats summary */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
-          <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-            <div className="flex items-center mb-2">
-              <Target className="h-4 w-4 text-zinc-400 mr-2" />
-              <h3 className="text-sm font-medium text-zinc-200">Total Records</h3>
-            </div>
-            <p className="text-2xl font-semibold text-white">{totalScores}</p>
-          </div>
-
-          <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-            <div className="flex items-center mb-2">
-              <Sun className="h-4 w-4 text-amber-400 mr-2" />
-              <h3 className="text-sm font-medium text-zinc-200">Day Sessions</h3>
-            </div>
-            <p className="text-2xl font-semibold text-white">{dayScores}</p>
-          </div>
-
-          <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-            <div className="flex items-center mb-2">
-              <Moon className="h-4 w-4 text-zinc-400 mr-2" />
-              <h3 className="text-sm font-medium text-zinc-200">Night Sessions</h3>
-            </div>
-            <p className="text-2xl font-semibold text-white">{nightScores}</p>
-          </div>
-
-          <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-            <div className="flex items-center mb-2">
-              <Users className="h-4 w-4 text-zinc-400 mr-2" />
-              <h3 className="text-sm font-medium text-zinc-200">Active Squads</h3>
-            </div>
-            <p className="text-2xl font-semibold text-white">{squadCount}</p>
-          </div>
-        </div>
-
-        {/* Filter controls */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="text-sm text-zinc-400">Showing scores for all participating squads</div>
-
           <div className="flex items-center space-x-3">
             <span className="text-sm text-zinc-400">Filter:</span>
             <div className="flex bg-zinc-800 rounded-md overflow-hidden border border-zinc-700">

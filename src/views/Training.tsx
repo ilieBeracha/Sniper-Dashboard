@@ -15,6 +15,8 @@ import TrainingPageChangeStatus from "@/components/TrainingPageChangeStatus";
 import TrainingPageScore from "@/components/TrainingPageScore";
 import { scoreStore } from "@/store/scoreSrore";
 import { loaderStore } from "@/store/loaderStore";
+import TrainingPageScoreStats from "@/components/TrainingPageScoreStats";
+import { squadStore } from "@/store/squadStore";
 
 export default function TrainingPage() {
   const params = useParams();
@@ -22,6 +24,7 @@ export default function TrainingPage() {
   const { training, loadTrainingById, loadAssignments } = useStore(TrainingStore);
 
   const { userRole } = useStore(userStore);
+  const { squadsWithMembers } = useStore(squadStore);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -43,10 +46,6 @@ export default function TrainingPage() {
 
     load();
   }, [id, isLoading]);
-
-  function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(" ");
-  }
 
   const handleStatusChange = async (newStatus: TrainingStatus) => {
     setPendingStatus(newStatus);
@@ -73,8 +72,16 @@ export default function TrainingPage() {
     }
   };
 
+  const totalScores = scores.length;
+  const dayScores = scores.filter((score) => score.day_night === "day").length;
+  const nightScores = scores.filter((score) => score.day_night === "night").length;
+  const squadCount = squadsWithMembers?.length || 0;
+
   return (
-    <div className="min-h-screen from-[#1E1E20] text-gray-100 px-6 py-8">
+    <div className="min-h-screen from-[#1E1E20] text-gray-100 px-6 py-8 space-y-4">
+      <div className="grid sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 gap-2 w-full">
+        <TrainingPageScoreStats totalScores={totalScores} dayScores={dayScores} nightScores={nightScores} squadCount={squadCount} />
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
         <div className="lg:col-span-2">
           <TrainingPageOverview training={training} />
@@ -88,8 +95,6 @@ export default function TrainingPage() {
             <TrainingPageChangeStatus training={training as TrainingSession} onStatusChange={handleStatusChange} />
           </div>
         )}
-
-        <div></div>
 
         <div className="lg:col-span-3">
           <TrainingPageScore />

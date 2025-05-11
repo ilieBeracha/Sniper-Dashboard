@@ -5,7 +5,7 @@ import TeamManagerRegisterForm from "@/components/Auth/TeamManagerRegisterForm";
 import TeamMemberRegisterForm from "@/components/Auth/SquadCommanderRegisterForm";
 import SoldierRegisterForm from "@/components/Auth/SoldierRegisterForm";
 import { authStore } from "@/store/authStore";
-import Login from "@/components/Auth/LoginForm";
+import { ModernLogin } from "@/components/Auth/LoginForm";
 import AuthHero from "@/components/Auth/AuthHero";
 import { LoginUserData, RegisterUserData } from "@/types/auth";
 
@@ -44,8 +44,6 @@ export default function Auth() {
 
   const getAuthTitle = () => {
     switch (authType) {
-      case "login":
-        return "Welcome Back";
       case "team_manager_register":
         return "Create Your Team";
       case "squad_manager_register":
@@ -73,85 +71,111 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex h-screen bg-[#121212]">
+    <div className="flex h-screen bg-[#0A0A0A] overflow-hidden">
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 1px)`,
+            backgroundSize: "24px 24px",
+          }}
+        />
+      </div>
+
       <AuthHero />
-      <div className="w-full md:w-5/5 flex items-center justify-center p-8">
-        <div className="w-full max-w-xl">
+
+      <div className="w-full md:w-3/5 flex items-center justify-center p-4 md:p-8 relative z-10">
+        <div className="w-full max-w-md">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-white">{getAuthTitle()}</h2>
-            <p className="mt-2 text-gray-400">{getAuthDescription()}</p>
+            <div className="w-8 h-8 bg-[#1A1A1A] rounded-full flex items-center justify-center mb-6 border border-[#2A2A2A]">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-semibold text-white mb-2">{getAuthTitle()}</h2>
+            <p className="text-gray-500 text-base">{getAuthDescription()}</p>
           </div>
 
           {/* Tabs */}
-          <div className="flex mb-8 space-x-2 border-b border-white/10">
-            {[
-              { type: "login", label: "Sign In" },
-              { type: "team_manager_register", label: "Team Commander" },
-              { type: "squad_manager_register", label: "Squad Commander" },
-              { type: "soldier_register", label: "Soldier" },
-            ].map(({ type, label }) => (
-              <button
-                key={type}
-                onClick={() => setAuthType(type as AuthType)}
-                className={`pb-2 px-4 text-sm font-medium transition-all duration-200 ${
-                  authType === type ? "border-b-2 border-[#7F5AF0] text-[#7F5AF0]" : "text-gray-500 hover:text-[#7F5AF0]"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="flex mb-4">
+            <div className="bg-[#s] p-1 rounded-xl flex w-full border border-[#2A2A2A]">
+              {[
+                { type: "login", label: "Sign In" },
+                { type: "team_manager_register", label: "Commander" },
+                { type: "squad_manager_register", label: "Squad" },
+                { type: "soldier_register", label: "Soldier" },
+              ].map(({ type, label }) => (
+                <button
+                  key={type}
+                  onClick={() => setAuthType(type as AuthType)}
+                  className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
+                    authType === type ? "bg-white text-[#0A0A0A]" : "text-gray-500 hover:text-gray-300"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Form Card */}
-          <div className="relative bg-[#1E1E1E] py-8 px-8 shadow-2xl rounded-xl border border-white/10">
-            {isLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-10 rounded-xl backdrop-blur-sm">
-                <div className="flex flex-col items-center">
-                  <svg className="animate-spin h-8 w-8 text-[#7F5AF0] mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  <p className="text-white">Authenticating...</p>
+          <div className="relative">
+            <div className="relative bg-[#121212] py-8 px-8 rounded-3xl border border-[#2A2A2A]">
+              {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10 rounded-3xl backdrop-blur-sm">
+                  <div className="flex flex-col items-center">
+                    <div className="relative">
+                      <div className="w-12 h-12 border-2 border-gray-700 rounded-full" />
+                      <div className="absolute inset-0 w-12 h-12 border-t-2 border-white rounded-full animate-spin" />
+                    </div>
+                    <p className="text-white mt-4 text-sm">Authenticating...</p>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {authType === "login" && <Login AuthSubmit={AuthSubmit} />}
-            {authType === "team_manager_register" && <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />}
-            {authType === "squad_manager_register" && <TeamMemberRegisterForm AuthSubmit={AuthSubmit} />}
-            {authType === "soldier_register" && <SoldierRegisterForm AuthSubmit={AuthSubmit} />}
-
-            {error && (
-              <div className="mt-4 p-3 bg-[#F25F4C]/10 border border-[#F25F4C]/30 rounded-md flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#F25F4C] mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <p className="text-sm text-[#F25F4C]">{error}</p>
+              <div className="relative z-10">
+                {authType === "login" && <ModernLogin AuthSubmit={AuthSubmit} />}
+                {authType === "team_manager_register" && <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />}
+                {authType === "squad_manager_register" && <TeamMemberRegisterForm AuthSubmit={AuthSubmit} />}
+                {authType === "soldier_register" && <SoldierRegisterForm AuthSubmit={AuthSubmit} />}
               </div>
-            )}
+
+              {error && (
+                <div className="mt-6 p-4 bg-red-900/10 border border-red-900/20 rounded-2xl flex items-center">
+                  <div className="w-8 h-8 bg-red-900/20 rounded-full flex items-center justify-center mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-red-400">{error}</p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Additional Help Text */}
-          <div className="mt-6 text-center text-sm text-gray-500">
+          <div className="mt-8 text-center">
             {authType === "login" ? (
-              <p>
+              <p className="text-gray-600 text-sm">
                 Need assistance?{" "}
-                <a href="#" className="text-[#7F5AF0] hover:text-[#7F5AF0]/80">
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
                   Contact support
                 </a>
               </p>
             ) : (
-              <p>
+              <p className="text-gray-600 text-sm">
                 Already have an account?{" "}
-                <button onClick={() => setAuthType("login")} className="text-[#7F5AF0] hover:text-[#7F5AF0]/80">
+                <button onClick={() => setAuthType("login")} className="text-gray-400 hover:text-white transition-colors">
                   Sign in
                 </button>
               </p>
