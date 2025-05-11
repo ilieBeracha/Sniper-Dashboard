@@ -1,4 +1,3 @@
-import { TrendingUp, TrendingDown, Clock, Award, BarChart3, Target } from "lucide-react";
 import { WeeklyAssignmentStats } from "@/types/training";
 
 interface TrainingWeeklyStatsProps {

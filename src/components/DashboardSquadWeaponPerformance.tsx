@@ -103,7 +103,7 @@ export default function DashboardSquadWeaponPerformance() {
               <PolarAngleAxis dataKey="attribute" tick={{ fill: "#9CA3AF", fontSize: 10 }} />
 
               {/* Render each weapon type */}
-              {activeSquadData?.map((item, index) => (
+              {activeSquadData?.map((item) => (
                 <Radar
                   key={item.weapon_type}
                   name={item.weapon_type}

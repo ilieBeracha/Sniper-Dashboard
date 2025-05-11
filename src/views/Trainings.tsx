@@ -6,7 +6,6 @@ import { userStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
 import { useStore } from "zustand";
 import { Calendar as CalendarIcon, List } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import TrainingKanbanBoard from "@/components/TrainingKanbanBoard";
 import TrainingsHeader from "@/components/TrainingsHeader";
 
@@ -16,7 +15,6 @@ export default function Training() {
   const useUserStore = useStore(userStore);
   const teamStoreState = useStore(teamStore);
   const members = teamStoreState.members;
-  const navigate = useNavigate();
 
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

@@ -1,4 +1,4 @@
-import { TrainingSession, Assignment } from "@/types/training";
+import { TrainingSession } from "@/types/training";
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { ChevronRight, Clock, MapPin, Bookmark, UserCheck } from "lucide-react";
@@ -19,7 +19,7 @@ export function TrainingSessionCard({
   const sessionDate = parseISO(session.date);
 
   const participants = session.participants || [];
-  const assignments = session.assignment_session || [];
+  const assignments = session.assignment_sessions || [];
 
   const handleSessionClick = () => {
     navigate(`/training/${session.id}`);
