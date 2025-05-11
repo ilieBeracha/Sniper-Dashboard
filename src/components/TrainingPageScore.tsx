@@ -117,31 +117,31 @@ export default function TrainingPageScore() {
         </div>
 
         {/* Filter controls */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col gap-4 mb-6">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={isLoading}
-            className="px-4 py-2 text-sm font-medium text-white bg-zinc-800 hover:bg-zinc-700 
-                            active:bg-zinc-900 rounded flex items-center gap-2 border border-zinc-700 
+            className="px-4 py-2 text-sm font-medium text-white bg-[#7F5AF0] hover:bg-[#6B4ACF] 
+                            active:bg-[#5A3DB0] rounded flex items-center gap-2 border border-[#6B4ACF] 
                             transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus size={16} />
             Record Score
           </button>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 w-full">
             <span className="text-sm text-zinc-400">Filter:</span>
-            <div className="flex bg-zinc-800 rounded-md overflow-hidden border border-zinc-700">
+            <div className="flex bg-[#1A1A1A] rounded-md overflow-hidden border border-[#2A2A2A] flex-1">
               <button
-                className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                  filterCondition === "all" ? "bg-zinc-700 text-white" : "text-zinc-400 hover:bg-zinc-700/50"
+                className={`px-3 py-1.5 text-xs font-medium transition-colors flex-1 ${
+                  filterCondition === "all" ? " text-white" : "text-zinc-400 hover:bg-[#7F5AF0]/10"
                 }`}
                 onClick={() => setFilterCondition("all")}
               >
                 All
               </button>
               <button
-                className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                  filterCondition === "day" ? "bg-zinc-700 text-white" : "text-zinc-400 hover:bg-zinc-700/50"
+                className={`px-3 py-1.5 text-xs font-medium transition-colors flex-1 ${
+                  filterCondition === "day" ? " text-white" : "text-zinc-400 hover:bg-gray-400/10"
                 }`}
                 onClick={() => setFilterCondition("day")}
               >
@@ -149,8 +149,8 @@ export default function TrainingPageScore() {
                 Day
               </button>
               <button
-                className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                  filterCondition === "night" ? "bg-zinc-700 text-white" : "text-zinc-400 hover:bg-zinc-700/50"
+                className={`px-3 py-1.5 text-xs font-medium transition-colors flex-1 ${
+                  filterCondition === "night" ? " text-white" : "text-zinc-400 hover:bg-gray-400/10"
                 }`}
                 onClick={() => setFilterCondition("night")}
               >

@@ -64,7 +64,7 @@ export default function Training() {
         <div className="sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8">
           <div className="xl:col-span-5 order-2 xl:order-1">
             <div className="">
-              <div className="flex items-center justify-between p-6 border-b border-white/5">
+              <div className="flex items-center justify-between px-2 py-4 border-b border-white/5">
                 <div className="flex items-center">
                   <List className="w-5 h-5 text-indigo-400 mr-3" />
                   <h2 className="text-xl font-bold text-white">Training Sessions</h2>

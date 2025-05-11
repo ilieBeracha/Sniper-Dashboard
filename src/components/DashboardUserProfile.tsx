@@ -19,46 +19,48 @@ export default function UserProfile({ user }: { user: User }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-1">
-          <InfoRow
-            icon={<BiMailSend className="text-cyan-400" />}
-            label={
-              <div className="flex flex-col">
-                <span className="text-xs text-gray-400">Email</span>
-                <span className="text-white text-sm font-medium truncate">{user?.email}</span>
-              </div>
-            }
-          />
-          <InfoRow
-            icon={<BiGroup className="text-emerald-400" />}
-            label={
-              <div className="flex flex-col">
-                <span className="text-xs text-gray-400">Team ID</span>
-                <span className="text-white text-sm font-medium truncate">{user.team_id}</span>
-              </div>
-            }
-          />
-          {user?.squad_id && (
+        {(!user?.squad_id || !user?.team_id) && (
+          <div className="grid grid-cols-1 gap-1">
             <InfoRow
-              icon={<BiCalendar className="text-pink-400" />}
+              icon={<BiMailSend className="text-cyan-400" />}
               label={
                 <div className="flex flex-col">
-                  <span className="text-xs text-gray-400">Squad ID</span>
-                  <span className="text-white text-sm font-medium truncate">{user.squad_id}</span>
+                  <span className="text-xs text-gray-400">Email</span>
+                  <span className="text-white text-sm font-medium truncate">{user?.email}</span>
                 </div>
               }
             />
-          )}
-          <InfoRow
-            icon={<BiUser className="text-yellow-400" />}
-            label={
-              <div className="flex flex-col">
-                <span className="text-xs text-gray-400">User ID</span>
-                <span className="text-white text-sm font-medium truncate">{user.id}</span>
-              </div>
-            }
-          />
-        </div>
+            <InfoRow
+              icon={<BiGroup className="text-emerald-400" />}
+              label={
+                <div className="flex flex-col">
+                  <span className="text-xs text-gray-400">Team ID</span>
+                  <span className="text-white text-sm font-medium truncate">{user?.team_id}</span>
+                </div>
+              }
+            />
+            {user?.squad_id && (
+              <InfoRow
+                icon={<BiCalendar className="text-pink-400" />}
+                label={
+                  <div className="flex flex-col">
+                    <span className="text-xs text-gray-400">Squad ID</span>
+                    <span className="text-white text-sm font-medium truncate">{user?.squad_id}</span>
+                  </div>
+                }
+              />
+            )}
+            <InfoRow
+              icon={<BiUser className="text-yellow-400" />}
+              label={
+                <div className="flex flex-col">
+                  <span className="text-xs text-gray-400">User ID</span>
+                  <span className="text-white text-sm font-medium truncate">{user.id}</span>
+                </div>
+              }
+            />
+          </div>
+        )}
       </div>
     </div>
   );
