@@ -7,6 +7,7 @@ import { authStore } from "@/store/authStore";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { IsMobile } from "@/utils/isMobile";
+import { FaCrosshairs } from "react-icons/fa";
 
 const navSections = [
   {
@@ -14,6 +15,7 @@ const navSections = [
     items: [
       { name: "Dashboard", href: "/", icon: <BiSolidDashboard className="w-5 h-5" /> },
       { name: "Training", href: "/training", icon: <BsBarChartFill className="w-5 h-5" /> },
+      { name: "Assets", href: "/assets", icon: <FaCrosshairs className="w-5 h-5" /> },
     ],
   },
   {

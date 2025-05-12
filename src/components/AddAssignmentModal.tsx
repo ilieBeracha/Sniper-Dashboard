@@ -1,5 +1,8 @@
 import { useState } from "react";
 import BaseModal from "./BaseModal";
+import { loaderStore } from "@/store/loaderStore";
+import { useStore } from "zustand";
+import { toastService } from "@/services/toastService";
 
 export default function AddAssignmentModal({
   isOpen,
@@ -11,8 +14,14 @@ export default function AddAssignmentModal({
   onSuccess: (assignmentName: string) => void;
 }) {
   const [assignmentName, setAssignmentName] = useState("");
+  const { isLoading } = useStore(loaderStore);
 
   const handleSubmit = () => {
+    if (!assignmentName) {
+      toastService.error("Please enter an assignment name");
+      return;
+    }
+
     setAssignmentName("");
     onSuccess(assignmentName);
   };
@@ -42,6 +51,7 @@ export default function AddAssignmentModal({
             Cancel
           </button>
           <button
+            disabled={isLoading}
             type="button"
             onClick={handleSubmit}
             className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"

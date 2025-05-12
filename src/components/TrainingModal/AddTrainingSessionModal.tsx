@@ -9,6 +9,8 @@ import TeamMembersSection from "@/components/TrainingModal/AddTrainingSessionMod
 import { useStore } from "zustand";
 import { TrainingStore } from "@/store/trainingStore";
 import { Assignment } from "@/types/training";
+import { useModal } from "@/hooks/useModal";
+import { toastService } from "@/services/toastService";
 
 export default function TrainingAddTrainingSessionModal({
   isOpen,
@@ -28,8 +30,8 @@ export default function TrainingAddTrainingSessionModal({
   const [date, setDate] = useState("");
   const [members, setMembers] = useState<string[]>([]);
   const [assignmentIds, setAssignmentIds] = useState<string[]>([]);
-  const [isAddAssignmentOpen, setIsAddAssignmentOpen] = useState(false);
-  const { loadAssignments } = useStore(TrainingStore);
+  const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
+  const { loadAssignments, createAssignment } = useStore(TrainingStore);
 
   const { user } = useStore(userStore);
 
@@ -48,6 +50,7 @@ export default function TrainingAddTrainingSessionModal({
       ])
       .select("id")
       .maybeSingle();
+    toastService.success("Training session created successfully");
 
     if (sessionError || !newTraining?.id) {
       console.error("Error creating training session:", sessionError);
@@ -80,7 +83,7 @@ export default function TrainingAddTrainingSessionModal({
 
       if (assignmentError) {
         console.error("Assigning training assignments failed:", assignmentError);
-        return alert("Training created, but assignment linking failed.");
+        toastService.error("Assigning training assignments failed");
       }
     }
 
@@ -89,18 +92,8 @@ export default function TrainingAddTrainingSessionModal({
   }
 
   const handleAddAssignment = async (assignmentName: string) => {
-    const { data, error } = await supabase
-      .from("assignment")
-      .insert({
-        assignment_name: assignmentName,
-        team_id: user?.team_id,
-      })
-      .select();
-    if (error) {
-      console.error(error);
-      return;
-    }
-    setAssignmentIds([...assignmentIds, data[0].id]);
+    const data = await createAssignment(assignmentName, true);
+    setAssignmentIds([...assignmentIds, data.id]);
     setIsAddAssignmentOpen(false);
     loadAssignments();
   };

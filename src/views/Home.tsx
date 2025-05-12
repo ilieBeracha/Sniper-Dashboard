@@ -14,6 +14,7 @@ import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
 import { IsMobile } from "@/utils/isMobile";
 import { getSquadsWithUsersByTeamId } from "@/services/squadService";
+import Assets from "./Assets";
 
 export default function Home() {
   const { token } = useStore(authStore);
@@ -50,6 +51,7 @@ export default function Home() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/training" element={<Training />}></Route>
+          <Route path="/assets" element={<Assets />}></Route>
           <Route path="/training/:id" element={<TrainingPage />}></Route>
           <Route path="/*" element={<ErrorPage />}></Route>
         </Routes>

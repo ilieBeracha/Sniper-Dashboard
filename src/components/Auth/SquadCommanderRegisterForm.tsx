@@ -165,7 +165,7 @@ export default function SoldierRegisterForm({
           type="submit"
           className="w-full flex justify-center items-center px-4 py-3 rounded-2xl bg-white text-[#0A0A0A] font-semibold hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] transition-all duration-200"
         >
-          Register as Soldier
+          Register as Squad Commander
         </button>
       </div>
     </form>

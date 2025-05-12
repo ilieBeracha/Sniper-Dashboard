@@ -17,11 +17,14 @@ import { scoreStore } from "@/store/scoreSrore";
 import { loaderStore } from "@/store/loaderStore";
 import TrainingPageScoreStats from "@/components/TrainingPageScoreStats";
 import { squadStore } from "@/store/squadStore";
+import { useModal } from "@/hooks/useModal";
+import AddAssignmentModal from "@/components/AddAssignmentModal";
 
 export default function TrainingPage() {
   const params = useParams();
   const { id } = params;
-  const { training, loadTrainingById, loadAssignments } = useStore(TrainingStore);
+  const { training, loadTrainingById, loadAssignments, createAssignment } = useStore(TrainingStore);
+  const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
 
   const { userRole } = useStore(userStore);
   const { squadsWithMembers } = useStore(squadStore);
@@ -29,7 +32,7 @@ export default function TrainingPage() {
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const { isLoading } = useStore(loaderStore);
+  const { isLoading, setIsLoading } = useStore(loaderStore);
   const { members } = useStore(teamStore);
   const { assignments } = useStore(TrainingStore);
 
@@ -72,6 +75,18 @@ export default function TrainingPage() {
     }
   };
 
+  const handleAddAssignment = async (assignmentName: string) => {
+    try {
+      setIsLoading(true);
+      await createAssignment(assignmentName, true, training?.id as string);
+      loadTrainingById(id as string);
+      setIsAddAssignmentOpen(false);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error adding assignment:", error);
+    }
+  };
+
   const totalScores = scores.length;
   const dayScores = scores.filter((score) => score.day_night === "day").length;
   const nightScores = scores.filter((score) => score.day_night === "night").length;
@@ -87,7 +102,7 @@ export default function TrainingPage() {
           <TrainingPageOverview training={training} />
         </div>
         <div className="lg:col-span-1">
-          <TrainingPageAssignments training={training} />
+          <TrainingPageAssignments training={training} setIsAddAssignmentOpen={setIsAddAssignmentOpen} />
         </div>
 
         {isCommander(userRole) && (
@@ -116,6 +131,8 @@ export default function TrainingPage() {
         onConfirm={handleConfirmStatusChange}
         newStatus={pendingStatus as TrainingStatus}
       />
+
+      <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
     </div>
   );
 }

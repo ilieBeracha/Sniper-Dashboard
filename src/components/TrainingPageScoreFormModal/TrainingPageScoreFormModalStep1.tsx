@@ -1,6 +1,6 @@
 import { ScoreFormValues } from "@/hooks/useScoreForm";
 import { Assignment } from "@/types/training";
-import ScoreFormField from "@/components/ScoreFormField";
+import ScoreFormField from "@/components/TrainingPageScoreFormModal/ScoreFormField";
 import { Target, Info, Crosshair, Wind, StickyNote } from "lucide-react";
 import { useState } from "react";
 
@@ -17,8 +17,8 @@ export default function TrainingPageScoreFormModalStep1({ formValues, setFormVal
     { field: "day_night", type: "select" },
     { field: "position", type: "select" },
     { field: "distance", type: "number" },
-    { field: "target_hit", type: "number" },
     { field: "shots_fired", type: "number" },
+    { field: "target_hit", type: "number" },
   ];
 
   const renderRequiredFields = () => (
@@ -42,7 +42,8 @@ export default function TrainingPageScoreFormModalStep1({ formValues, setFormVal
         ))}
         <ScoreFormField field="time_until_first_shot" type="number" formValues={formValues} setFormValues={setFormValues} />
       </div>
-      <ScoreFormField field="first_shot_hit" type="boolean" formValues={formValues} setFormValues={setFormValues} />
+
+      <ScoreFormField field="target_eliminated" type="boolean" formValues={formValues} setFormValues={setFormValues} />
     </div>
   );
 
@@ -62,10 +63,9 @@ export default function TrainingPageScoreFormModalStep1({ formValues, setFormVal
               <Target size={12} />
               Target Assessment
             </h4>
-            <ScoreFormField field="target_eliminated" type="boolean" formValues={formValues} setFormValues={setFormValues} />
+            <ScoreFormField field="first_shot_hit" type="boolean" formValues={formValues} setFormValues={setFormValues} />
           </div>
 
-          {/* Group environmental factors */}
           <div className="space-y-3">
             <h4 className="text-sm font-medium text-zinc-400 flex items-center gap-2">
               <Wind size={12} />

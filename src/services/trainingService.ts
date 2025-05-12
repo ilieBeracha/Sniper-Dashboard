@@ -158,3 +158,35 @@ export async function getWeeklyAssignmentsStats(team_id: string) {
 
   return data;
 }
+
+export async function insertAssignment(assignmentName: string, teamId: string) {
+  const { data, error } = await supabase
+    .from("assignment")
+    .insert([
+      {
+        assignment_name: assignmentName,
+        team_id: teamId,
+      },
+    ])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error inserting assignment:", error.message);
+    return null;
+  }
+
+  return data;
+}
+
+export async function insertAssignmentSession(assignmentId: string, teamId: string, trainingId: string) {
+  const { data, error } = await supabase
+    .from("assignment_session")
+    .insert([{ assignment_id: assignmentId, team_id: teamId, training_id: trainingId }])
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
