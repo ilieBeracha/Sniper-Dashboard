@@ -155,7 +155,7 @@ export default function SoldierRegisterForm({
             value={inviteCode}
             onChange={(e) => setInviteCode(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
-            placeholder="Code from your commander"
+            placeholder="Code from your squad commander"
           />
         </div>
       </div>

@@ -159,11 +159,8 @@ export function useScoreForm({ editingScore, assignmentSessions = [] }: UseScore
     if (!formValues.time_until_first_shot) {
       newErrors.push("Time until first shot is required.");
     }
-    if (formValues.target_eliminated !== "true" && formValues.target_eliminated !== "false") {
+    if (formValues.target_eliminated === null) {
       newErrors.push("Target eliminated must be true or false.");
-    }
-    if (formValues.first_shot_hit !== "true" && formValues.first_shot_hit !== "false") {
-      newErrors.push("First shot hit must be true or false.");
     }
     if (formValues.wind_strength !== null && formValues.wind_strength % 6 !== 0) {
       newErrors.push("Wind strength must be a multiple of 6.");

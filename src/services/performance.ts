@@ -96,7 +96,7 @@ export async function getTrainingEffectivenessByTeam(teamId: string) {
 }
 
 export async function getSquadStatByTeamId(teamId: string, position: PositionScore | null, distance: string | null) {
-  const { data, error } = await supabase.rpc("get_squad_stats", {
+  const { data, error } = await supabase.rpc("get_squad_stats_with_filters", {
     p_position: position ? (position as PositionScore) : null,
     p_team_id: teamId,
     p_distance: distance ? distance : null,
