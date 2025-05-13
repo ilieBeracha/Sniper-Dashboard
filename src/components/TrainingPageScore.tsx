@@ -112,27 +112,27 @@ export default function TrainingPageScore() {
           </div>
         )}
 
-        <div className="flex justify-between items-center mb-6">
-          <div className="text-sm text-zinc-400">Showing scores for all participating squads</div>
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <div className="text-xs sm:text-sm text-zinc-400">Showing scores for all participating squads</div>
         </div>
 
         {/* Filter controls */}
-        <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-6">
           <button
             onClick={() => setIsModalOpen(true)}
             disabled={isLoading}
-            className="px-4 py-2 text-sm font-medium text-white bg-[#7F5AF0] hover:bg-[#6B4ACF] 
+            className="px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#7F5AF0] hover:bg-[#6B4ACF] 
                             active:bg-[#5A3DB0] rounded flex items-center gap-2 border border-[#6B4ACF] 
                             transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus size={16} />
             Record Score
           </button>
-          <div className="flex items-center space-x-3 w-full">
-            <span className="text-sm text-zinc-400">Filter:</span>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full">
+            <span className="text-xs sm:text-sm text-zinc-400">Filter:</span>
             <div className="flex bg-[#1A1A1A] rounded-md overflow-hidden border border-[#2A2A2A] flex-1">
               <button
-                className={`px-3 py-1.5 text-xs font-medium transition-colors flex-1 ${
+                className={`px-2 sm:px-3 py-1.5 text-xs font-medium transition-colors flex-1 ${
                   filterCondition === "all" ? " text-white" : "text-zinc-400 hover:bg-[#7F5AF0]/10"
                 }`}
                 onClick={() => setFilterCondition("all")}
@@ -140,7 +140,7 @@ export default function TrainingPageScore() {
                 All
               </button>
               <button
-                className={`px-3 py-1.5 text-xs font-medium transition-colors flex-1 ${
+                className={`px-2 sm:px-3 py-1.5 text-xs font-medium transition-colors flex-1 ${
                   filterCondition === "day" ? " text-white" : "text-zinc-400 hover:bg-gray-400/10"
                 }`}
                 onClick={() => setFilterCondition("day")}
@@ -149,7 +149,7 @@ export default function TrainingPageScore() {
                 Day
               </button>
               <button
-                className={`px-3 py-1.5 text-xs font-medium transition-colors flex-1 ${
+                className={`px-2 sm:px-3 py-1.5 text-xs font-medium transition-colors flex-1 ${
                   filterCondition === "night" ? " text-white" : "text-zinc-400 hover:bg-gray-400/10"
                 }`}
                 onClick={() => setFilterCondition("night")}
@@ -162,18 +162,18 @@ export default function TrainingPageScore() {
         </div>
 
         {/* Scores by squad */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {Object.entries(filteredScoresBySquad).length > 0 ? (
             Object.entries(filteredScoresBySquad).map(([squadName, squadScores]: any[]) => (
               <div key={squadName} className="bg-zinc-800/50 rounded-lg border border-zinc-700 overflow-hidden">
                 <div
-                  className="flex justify-between items-center px-4 py-6 bg-zinc-800 cursor-pointer"
+                  className="flex justify-between items-center px-3 sm:px-4 py-4 sm:py-6 bg-zinc-800 cursor-pointer"
                   onClick={() => toggleSquadExpansion(squadName)}
                 >
                   <div className="flex items-center">
                     <Users className="h-4 w-4 text-zinc-400 mr-2" />
-                    <h3 className="text-md font-medium text-white">{squadName}</h3>
-                    <span className="ml-2 text-sm bg-zinc-700 text-zinc-300 px-2 py-0.5 rounded-full">
+                    <h4 className="text-sm sm:text-md font-medium text-white">{squadName}</h4>
+                    <span className="ml-2 text-xs sm:text-sm bg-zinc-700 text-zinc-300 px-2 py-0.5 rounded-full">
                       {squadScores.length as any} {squadScores.length === 1 ? "record" : "records"}
                     </span>
                   </div>
@@ -188,7 +188,7 @@ export default function TrainingPageScore() {
 
                 {expandedSquads[squadName] && (
                   <div className="divide-y divide-zinc-700/50">
-                    <div className="grid grid-cols-4 px-4 py-2 bg-zinc-900/50 text-xs uppercase tracking-wider text-zinc-500 font-medium">
+                    <div className="hidden sm:grid grid-cols-4 px-4 py-2 bg-zinc-900/50 text-xs uppercase tracking-wider text-zinc-500 font-medium">
                       <div>Assignment</div>
                       <div>Conditions</div>
                       <div>Date & Time</div>
@@ -197,7 +197,7 @@ export default function TrainingPageScore() {
 
                     {squadScores.map((score: Score) => (
                       <div key={score.id} className="divide-y divide-zinc-700/20">
-                        <div className="grid grid-cols-4 px-4 py-3 hover:bg-zinc-700/20 transition-colors relative">
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:gap-0 px-3 sm:px-4 py-3 hover:bg-zinc-700/20 transition-colors relative">
                           <div className="text-sm text-zinc-300 font-medium">{score.assignment_session?.assignment?.assignment_name}</div>
                           <div className="text-sm flex items-center text-zinc-400">
                             {score.day_night === "day" ? (
@@ -218,7 +218,7 @@ export default function TrainingPageScore() {
                             <Clock size={14} className="mr-1.5 text-zinc-500" />
                             {formatDate(score.created_at || "")}
                           </div>
-                          <div className="flex items-center justify-end space-x-2">
+                          <div className="flex items-center justify-start sm:justify-end space-x-2">
                             {score.score_participants && score.score_participants.length > 0 && (
                               <button
                                 onClick={(e) => toggleScoreExpansion(score.id || "", e)}
@@ -253,7 +253,7 @@ export default function TrainingPageScore() {
 
                         {/* Participant details section */}
                         {expandedScores[score.id || ""] && score.score_participants && (
-                          <div className="py-3 px-4 bg-zinc-800/30">
+                          <div className="py-3 px-3 sm:px-4 bg-zinc-800/30">
                             <ScoreParticipantsDisplay participants={score.score_participants} />
                           </div>
                         )}
@@ -264,10 +264,10 @@ export default function TrainingPageScore() {
               </div>
             ))
           ) : (
-            <div className="text-center py-10 bg-zinc-800/30 rounded-lg border border-zinc-700">
-              <Target className="h-12 w-12 text-zinc-600 mx-auto mb-3" />
-              <p className="text-zinc-400 mb-1">No scores match the current filter</p>
-              <p className="text-zinc-500 text-sm">
+            <div className="text-center py-8 sm:py-10 bg-zinc-800/30 rounded-lg border border-zinc-700">
+              <Target className="h-10 w-10 sm:h-12 sm:w-12 text-zinc-600 mx-auto mb-3" />
+              <p className="text-sm sm:text-base text-zinc-400 mb-1">No scores match the current filter</p>
+              <p className="text-xs sm:text-sm text-zinc-500">
                 {filterCondition !== "all" ? "Try changing your filter selection" : "Record your first score to get started"}
               </p>
             </div>

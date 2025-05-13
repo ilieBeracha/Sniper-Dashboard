@@ -5,7 +5,7 @@
 body {
   font-family: "Roboto", sans-serif;
 }
-p,
+/* p,
 h1,
 h2,
 h3,
@@ -20,8 +20,8 @@ span,
 button,
 a,
 div {
-  font-size: 0.875rem !important;
-}
+  font-size: 99% !important;
+} */
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

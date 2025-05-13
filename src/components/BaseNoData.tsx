@@ -13,7 +13,7 @@ export default function NoDataDisplay({
         </div>
 
         <div className="space-y-2">
-          <h3 className="text-lg font-medium text-gray-300">{title}</h3>
+          <h4 className="text-lg font-medium text-gray-300">{title}</h4>
           <p className="text-sm text-gray-500 max-w-md">{message}</p>
         </div>
       </div>

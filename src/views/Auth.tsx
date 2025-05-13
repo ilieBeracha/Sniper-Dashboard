@@ -97,7 +97,7 @@ export default function Auth() {
                 />
               </svg>
             </div>
-            <h2 className="text-3xl font-semibold text-white mb-2">{getAuthTitle()}</h2>
+            <h2 className="text-2xl font-semibold text-white mb-2">{getAuthTitle()}</h2>
             <p className="text-gray-500 text-sm">{getAuthDescription()}</p>
           </div>
 

@@ -25,7 +25,7 @@ export default function TrainingPageScoreFormModalStep1({ formValues, setFormVal
     <div className="mb-4 flex flex-col gap-4">
       <div className="flex items-center gap-2 mb-3">
         <Crosshair className="text-green-400" size={16} />
-        <h3 className="text-base font-semibold text-white">Combat Details</h3>
+        <h4 className="text-sm font-semibold text-white">Combat Details</h4>
         <div className="flex-1 h-px bg-zinc-700/50 ml-3"></div>
       </div>
 
@@ -51,7 +51,7 @@ export default function TrainingPageScoreFormModalStep1({ formValues, setFormVal
     <div>
       <div className="flex items-center gap-2 mb-3">
         <Info className="text-blue-400" size={16} />
-        <h3 className="text-base font-semibold text-white">Additional Information</h3>
+        <h4 className="text-base font-semibold text-white">Additional Information</h4>
         <div className="flex-1 h-px bg-zinc-700/50 ml-3"></div>
       </div>
 

@@ -24,7 +24,7 @@ export default function BaseDesktopDrawer({
             <DialogPanel className={`pointer-events-auto w-[${width}] transform transition duration-500 ease-in-out data-[closed]:translate-x-full`}>
               <div className="flex h-full flex-col overflow-y-scroll bg-[#161616] py-6 shadow-xl">
                 <div className="px-6 flex items-center justify-between">
-                  <DialogTitle className="text-white text-lg font-semibold ">{title}</DialogTitle>
+                  <DialogTitle className="text-white text-lg ">{title}</DialogTitle>
                   <button onClick={() => setIsOpen(false)} className="text-white hover:text-gray-400 focus:outline-none">
                     <X className="size-6" />
                   </button>

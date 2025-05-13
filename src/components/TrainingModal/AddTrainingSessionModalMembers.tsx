@@ -21,7 +21,7 @@ export default function TeamMembersSection({ teamMembers, members, setMembers }:
   return (
     <div className="bg-[#1A1A1A] rounded-lg border border-white/5 p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-white">Assign Members</h3>
+        <h4 className="text-sm font-medium text-white">Assign Members</h4>
         {members.length > 0 && <div className="bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded text-xs">{members.length} selected</div>}
       </div>
 

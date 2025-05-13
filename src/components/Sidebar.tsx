@@ -62,7 +62,7 @@ export default function Sidebar() {
       <div className="flex-1 px-2 py-4 overflow-y-auto">
         {navSections.map(({ title, items }) => (
           <div key={title} className="mb-4">
-            {!collapsed && <h3 className="text-xs text-gray-500 px-4 mb-1 tracking-wide">{title}</h3>}
+            {!collapsed && <h4 className="text-xs text-gray-500 px-4 mb-1 tracking-wide">{title}</h4>}
             {items.map(({ name, href, icon }) => (
               <NavLink
                 key={name}

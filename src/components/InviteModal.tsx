@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UserPlus, ClipboardCheck } from "lucide-react";
+import { UserPlus, ClipboardCheck, Loader2 } from "lucide-react";
 import { InvitationStore } from "@/store/InvitationStore";
 import { useStore } from "zustand";
 import BaseDesktopDrawer from "./BaseDrawer/BaseDesktopDrawer";
@@ -45,21 +45,27 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
   };
 
   const Content = (
-    <div className="flex flex-col items-center text-center px-6 py-4 space-y-6 h-full w-full from-[#181F3A] via-[#23213A] to-[#1A1A2E]">
-      <div className="p-4 rounded-full shadow-sm">
-        <UserPlus className="w-10 h-10" />
+    <div className="flex flex-col items-center text-center px-4 sm:px-6 py-4 space-y-6 h-full w-full">
+      <div className="p-4 rounded-full bg-zinc-800/50 border border-zinc-700/50 shadow-lg">
+        <UserPlus className="w-8 h-8 sm:w-10 sm:h-10 text-indigo-400" />
       </div>
 
-      <h2 className="text-xl font-bold text-white">Invite Your Squad Commander</h2>
-      <p className="text-sm text-gray-400 max-w-md">Generate and share the invite token below to onboard your Squad Commander.</p>
+      <div className="space-y-2">
+        <h2 className="text-lg sm:text-xl font-semibold text-white">Invite Your Squad Commander</h2>
+        <p className="text-sm text-zinc-400 max-w-md">Generate and share the invite token below to onboard your Squad Commander.</p>
+      </div>
 
       {inviteFetched ? (
         <div className="w-full space-y-4">
-          <div className="relative flex items-center justify-between px-4 py-3 rounded-lg text-white font-mono text-sm shadow-md">
-            <span className="truncate">{invitation?.token}</span>
-            <button onClick={handleCopy} className="ml-4 text-indigo-400 hover:text-indigo-300 transition">
+          {/* Token Display */}
+          <div className="relative flex items-center justify-between px-4 py-3 rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-white font-mono text-sm">
+            <span className="truncate pr-4">{invitation?.token}</span>
+            <button
+              onClick={handleCopy}
+              className="flex-shrink-0 px-3 py-1.5 rounded-md bg-zinc-700/50 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-600"
+            >
               {copied ? (
-                <span className="flex items-center gap-1 text-green-400">
+                <span className="flex items-center gap-1.5 text-emerald-400">
                   <ClipboardCheck className="w-4 h-4" /> Copied
                 </span>
               ) : (
@@ -70,19 +76,32 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
 
           <button
             onClick={onCloseModal}
-            className="w-full px-6 py-2 text-sm text-gray-300 bg-gray-900 border border-gray-700 rounded-lg hover:bg-gray-800 transition-all"
+            className="w-full px-4 py-2.5 text-sm font-medium text-zinc-300 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-600"
           >
             Close
           </button>
         </div>
       ) : (
-        <button
-          onClick={handleInvite}
-          className="w-full mt-2 px-6 py-3 text-white text-sm bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-60"
-          disabled={loading}
-        >
-          {loading ? "Generating..." : "Generate Invite Code"}
-        </button>
+        <div className="flex flex-col items-center text-center px-4 sm:px-6 py-4 space-y-6 h-full w-full">
+          <div className="flex flex-col items-center text-center px-4 sm:px-6 py-4 space-y-6 h-full w-full"></div>
+          <button
+            onClick={handleInvite}
+            disabled={loading}
+            className="flex-shrink-0 px-3 py-1.5 rounded-md bg-zinc-700/50 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-600"
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Generating...
+              </span>
+            ) : (
+              "Generate Invite Code"
+            )}
+          </button>
+          <div className="flex flex-col items-center text-center px-4 sm:px-6 py-4 space-y-6 h-full w-full">
+            <p className="text-xs text-zinc-400">Generate and share the invite token below to onboard your Squad Commander.</p>
+          </div>
+        </div>
       )}
     </div>
   );

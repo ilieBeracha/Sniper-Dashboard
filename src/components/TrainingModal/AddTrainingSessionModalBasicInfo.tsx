@@ -12,7 +12,7 @@ type BasicInfoSectionProps = {
 export default function BasicInfoSection({ sessionName, setSessionName, location, setLocation, date, setDate }: BasicInfoSectionProps) {
   return (
     <div className="bg-[#1A1A1A] rounded-lg border border-white/5 p-6">
-      <h3 className="text-sm font-medium text-white mb-4">Basic Information</h3>
+      <h4 className="text-sm font-medium text-white mb-4">Basic Information</h4>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <BaseInput

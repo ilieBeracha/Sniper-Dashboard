@@ -14,10 +14,10 @@ type PreviewSectionProps = {
 export default function PreviewSection({ sessionName, location, date, assignments, assignmentIds, teamMembers, members }: PreviewSectionProps) {
   return (
     <div className="bg-[#1A1A1A] rounded-lg border border-white/5 p-6 sticky top-4">
-      <h3 className="text-sm font-medium text-white mb-6 flex items-center gap-2">
+      <h4 className="text-sm font-medium text-white mb-6 flex items-center gap-2">
         <span className="w-[400px] h-1.5 rounded-full bg-indigo-500"></span>
         Session Preview
-      </h3>
+      </h4>
 
       <div className="space-y-8">
         {/* Basic Info Preview */}

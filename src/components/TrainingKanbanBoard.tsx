@@ -12,7 +12,7 @@ const ColumnHeader = ({ icon: Icon, title, count, color }: { icon: React.Element
       <div className={`p-1.5 rounded-md bg-${color}-500/10 text-${color}-400`}>
         <Icon className="w-4 h-4" />
       </div>
-      <h3 className="font-medium text-gray-200">{title}</h3>
+      <h4 className="font-medium text-gray-200">{title}</h4>
     </div>
     <div className="bg-[#1E1E20] text-gray-400 border border-white/10">{count}</div>
   </div>

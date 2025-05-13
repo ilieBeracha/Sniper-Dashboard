@@ -31,7 +31,7 @@ export default function TrainingPageOverview({ training }: TrainingPageOverviewP
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-xl font-semibold">{training?.session_name}</h3>
+            <h4 className="text-lg font-semibold">{training?.session_name}</h4>
             <p className="text-sm text-gray-400">Location: {training?.location}</p>
           </div>
           <div className="flex gap-2">

@@ -4,7 +4,7 @@ export default function Profile() {
   return (
     <div>
       <div className="px-4 sm:px-0">
-        <h3 className="text-base/7 font-semibold text-white">Applicant Information</h3>
+        <h4 className="text-base/7 font-semibold text-white">Applicant Information</h4>
         <p className="mt-1 max-w-2xl text-sm/6 text-gray-400">Personal details and application.</p>
       </div>
       <div className="mt-6 border-t border-white/10">

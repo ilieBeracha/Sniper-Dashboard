@@ -42,10 +42,10 @@ export default function TrainingPageScoreStats({
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <div key={stat.title} className="rounded-xl bg-zinc-800 p-5 border border-zinc-700 hover:shadow-md transition-shadow">
+          <div key={stat.title} className="rounded-md bg-zinc-800 p-5 border border-zinc-700 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-2">
               {stat.icon}
-              <h3 className="text-sm font-medium text-zinc-300">{stat.title}</h3>
+              <h4 className="text-sm font-medium text-zinc-300">{stat.title}</h4>
             </div>
             <p className="text-3xl font-bold text-white">{stat.value}</p>
           </div>

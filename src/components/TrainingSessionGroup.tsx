@@ -20,7 +20,7 @@ export default function TrainingSessionGroup({ title, color, date, children }: T
     <div>
       <div className="flex items-center gap-2 my-4">
         <div className={`w-2 h-2 rounded-full ${colorMap[color]} shadow-[0_0_8px_0px_${colorMap[color]}]`}></div>
-        <h3 className="text-sm font-medium text-white uppercase tracking-wider">{title}</h3>
+        <h4 className="text-sm font-medium text-white uppercase tracking-wider">{title}</h4>
         <div className="h-px flex-grow bg-white/5"></div>
         {date && <span className="text-xs text-gray-400 font-medium">{format(date, "EEEE, MMMM d")}</span>}
       </div>

@@ -73,7 +73,7 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Package className="text-green-400 drop-shadow-glow" size={18} />
-            <h3 className="text-base font-semibold text-green-200 drop-shadow-md">Participant Loadouts</h3>
+            <h4 className="text-base font-semibold text-green-200 drop-shadow-md">Participant Loadouts</h4>
             <div className="flex-1 h-px bg-gradient-to-r from-green-700/40 via-indigo-700/30 to-transparent ml-3"></div>
           </div>
 

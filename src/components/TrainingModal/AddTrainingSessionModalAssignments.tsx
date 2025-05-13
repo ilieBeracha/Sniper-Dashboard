@@ -33,7 +33,7 @@ export default function AssignmentsSection({
     <div className="bg-[#1A1A1A] rounded-lg border border-white/5 p-6">
       <div className="flex items-center mb-4 justify-between">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-medium text-white">Training Assignments</h3>
+          <h4 className="text-sm font-medium text-white">Training Assignments</h4>
           <BaseCreateBtn onClick={() => setIsAddAssignmentOpen(true)} />
         </div>
         {assignmentIds.length > 0 && (

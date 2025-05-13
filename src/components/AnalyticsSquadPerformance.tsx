@@ -7,7 +7,7 @@ export default function AnalyticsSquadPerformance({ squadPerformance }: { squadP
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Shield size={16} className="text-blue-400" />
-          <h3 className="text-base font-semibold text-white">Squad Performance</h3>
+          <h4 className="text-sm font-semibold text-white">Squad Performance</h4>
         </div>
         <span className="text-xs text-zinc-400">{squadPerformance.length} squads</span>
       </div>
@@ -24,10 +24,10 @@ export default function AnalyticsSquadPerformance({ squadPerformance }: { squadP
                     index === 0
                       ? "bg-amber-500/20 text-amber-400"
                       : index === 1
-                      ? "bg-zinc-300/20 text-zinc-300"
-                      : index === 2
-                      ? "bg-orange-700/20 text-orange-600"
-                      : "bg-zinc-700/50 text-zinc-400"
+                        ? "bg-zinc-300/20 text-zinc-300"
+                        : index === 2
+                          ? "bg-orange-700/20 text-orange-600"
+                          : "bg-zinc-700/50 text-zinc-400"
                   }`}
                 >
                   {index + 1}
