@@ -14,14 +14,12 @@ export default function TrainingCalendar({ trainings }: { trainings: TrainingSes
     <div className="flex justify-start items-start my-6 text-sm">
       <div className="w-full min-h-[200px]">
         <div className="flex justify-center items-center mb-6">
-          <h4 className="text-lg font-bold text-white bg-gradient-to-r from-indigo-500 to-indigo-400 bg-clip-text text-sm">
-            {format(today, "MMMM yyyy")}
-          </h4>
+          <h4 className="font-bold text-white bg-gradient-to-r from-indigo-500 to-indigo-400 bg-clip-text text-sm">{format(today, "MMMM yyyy")}</h4>
         </div>
 
         <div className="grid grid-cols-7 gap-2">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-            <div key={day} className="text-xs font-medium text-gray-400 text-center pb-2 text-sm">
+            <div key={day} className="font-medium text-gray-400 text-center pb-2 text-sm">
               {day}
             </div>
           ))}
@@ -58,7 +56,7 @@ export default function TrainingCalendar({ trainings }: { trainings: TrainingSes
           })}
         </div>
 
-        <div className="flex items-center justify-center mt-8 text-xs text-gray-400 gap-6 text-sm">
+        <div className="flex items-center justify-center mt-8 text-xs text-gray-400 gap-6">
           <div className="flex items-center">
             <div className="w-3 h-3 rounded-full border-2 border-green-500 mr-1.5 shadow-[0_0_4px_0px_rgba(34,197,94,0.5)] text-sm"></div>
             <span>Today</span>
