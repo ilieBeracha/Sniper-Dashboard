@@ -1,10 +1,13 @@
 import { useState } from "react";
-import BaseModal from "./BaseModal";
 import { UserPlus, ClipboardCheck } from "lucide-react";
 import { InvitationStore } from "@/store/InvitationStore";
 import { useStore } from "zustand";
+import BaseDesktopDrawer from "./BaseDrawer/BaseDesktopDrawer";
+import BaseMobileDrawer from "./BaseDrawer/BaseMobileDrawer";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boolean; setIsOpen: (open: boolean) => void; userId: string }) {
+  const isMobile = useIsMobile();
   const useInvitationStore = useStore(InvitationStore);
   const invitation = useInvitationStore.invitation;
   const [loading, setLoading] = useState(false);
@@ -41,48 +44,56 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
     setCopied(false);
   };
 
-  return (
-    <BaseModal isOpen={isOpen} onClose={onCloseModal}>
-      <div className="flex flex-col items-center text-center px-6 py-4 space-y-6">
-        <div className="bg-indigo-500/10 text-indigo-400 p-4 rounded-full shadow-sm">
-          <UserPlus className="w-10 h-10" />
-        </div>
+  const Content = (
+    <div className="flex flex-col items-center text-center px-6 py-4 space-y-6 h-full w-full from-[#181F3A] via-[#23213A] to-[#1A1A2E]">
+      <div className="p-4 rounded-full shadow-sm">
+        <UserPlus className="w-10 h-10" />
+      </div>
 
-        <h2 className="text-xl font-bold text-white">Invite Your Squad Commander</h2>
-        <p className="text-sm text-gray-400 max-w-md">Generate and share the invite token below to onboard your Squad Commander.</p>
+      <h2 className="text-xl font-bold text-white">Invite Your Squad Commander</h2>
+      <p className="text-sm text-gray-400 max-w-md">Generate and share the invite token below to onboard your Squad Commander.</p>
 
-        {inviteFetched ? (
-          <div className="w-full space-y-4">
-            <div className="relative flex items-center justify-between bg-gray-800 px-4 py-3 rounded-lg text-white font-mono text-sm shadow-md">
-              <span className="truncate">{invitation?.token}</span>
-              <button onClick={handleCopy} className="ml-4 text-indigo-400 hover:text-indigo-300 transition">
-                {copied ? (
-                  <span className="flex items-center gap-1 text-green-400">
-                    <ClipboardCheck className="w-4 h-4" /> Copied
-                  </span>
-                ) : (
-                  "Copy"
-                )}
-              </button>
-            </div>
-
-            <button
-              onClick={onCloseModal}
-              className="w-full px-6 py-2 text-sm text-gray-300 bg-gray-900 border border-gray-700 rounded-lg hover:bg-gray-800 transition-all"
-            >
-              Close
+      {inviteFetched ? (
+        <div className="w-full space-y-4">
+          <div className="relative flex items-center justify-between px-4 py-3 rounded-lg text-white font-mono text-sm shadow-md">
+            <span className="truncate">{invitation?.token}</span>
+            <button onClick={handleCopy} className="ml-4 text-indigo-400 hover:text-indigo-300 transition">
+              {copied ? (
+                <span className="flex items-center gap-1 text-green-400">
+                  <ClipboardCheck className="w-4 h-4" /> Copied
+                </span>
+              ) : (
+                "Copy"
+              )}
             </button>
           </div>
-        ) : (
+
           <button
-            onClick={handleInvite}
-            className="w-full mt-2 px-6 py-3 text-white text-sm bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-60"
-            disabled={loading}
+            onClick={onCloseModal}
+            className="w-full px-6 py-2 text-sm text-gray-300 bg-gray-900 border border-gray-700 rounded-lg hover:bg-gray-800 transition-all"
           >
-            {loading ? "Generating..." : "Generate Invite Code"}
+            Close
           </button>
-        )}
-      </div>
-    </BaseModal>
+        </div>
+      ) : (
+        <button
+          onClick={handleInvite}
+          className="w-full mt-2 px-6 py-3 text-white text-sm bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-60"
+          disabled={loading}
+        >
+          {loading ? "Generating..." : "Generate Invite Code"}
+        </button>
+      )}
+    </div>
+  );
+
+  return isMobile ? (
+    <BaseMobileDrawer title="Invite Your Squad Commander" isOpen={isOpen} setIsOpen={setIsOpen}>
+      {Content}
+    </BaseMobileDrawer>
+  ) : (
+    <BaseDesktopDrawer title="Invite Your Squad Commander" isOpen={isOpen} setIsOpen={setIsOpen} width="400px">
+      {Content}
+    </BaseDesktopDrawer>
   );
 }

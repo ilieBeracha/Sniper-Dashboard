@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
+import BaseInput from "./BaseInput";
 
 type ListItem = {
   id: string;
@@ -39,7 +40,7 @@ export default function SearchableCheckboxList({
   const filteredItems = items.filter(
     (item) =>
       item.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   const toggleSelection = (id: string) => {
@@ -85,25 +86,15 @@ export default function SearchableCheckboxList({
       {isOpen && (
         <div className="absolute z-10 w-full mt-1 bg-[#151515] rounded-lg border border-white/10 shadow-lg">
           <div className="px-3 py-2 border-b border-white/5">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fillRule="evenodd"
-                    d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={searchPlaceholder}
-                className="w-full pl-10 pr-3 py-2 rounded-md bg-white/5 text-white text-sm border border-white/10 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
+            <BaseInput
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={searchPlaceholder}
+              leftIcon={<Search size={16} className="text-gray-400" />}
+              containerClassName="bg-transparent"
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
 
           {/* Items list */}

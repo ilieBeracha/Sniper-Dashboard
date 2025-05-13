@@ -1,4 +1,4 @@
-import { IsMobile } from "@/utils/isMobile";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function TrainingsHeader({
   setIsOpen,
@@ -9,6 +9,7 @@ export default function TrainingsHeader({
   kanbanView: boolean;
   setKanbanView: (view: boolean) => void;
 }) {
+  const isMobile = useIsMobile();
   return (
     <div className=" mb-2 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-2">
       <div className="flex space-x-4 w-full justify-between items-center">
@@ -19,7 +20,7 @@ export default function TrainingsHeader({
           Create Training
         </button>
       </div>
-      {IsMobile ? (
+      {isMobile ? (
         <></>
       ) : (
         <div className="flex items-center gap-2">

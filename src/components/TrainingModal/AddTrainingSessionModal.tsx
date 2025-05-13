@@ -1,4 +1,3 @@
-import BaseModal from "@/components/BaseModal";
 import { useState } from "react";
 import { supabase } from "@/services/supabaseClient";
 import { userStore } from "@/store/userStore";
@@ -11,7 +10,9 @@ import { TrainingStore } from "@/store/trainingStore";
 import { Assignment } from "@/types/training";
 import { useModal } from "@/hooks/useModal";
 import { toastService } from "@/services/toastService";
-
+import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
+import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
+import { useIsMobile } from "@/hooks/useIsMobile";
 export default function TrainingAddTrainingSessionModal({
   isOpen,
   onClose,
@@ -25,14 +26,15 @@ export default function TrainingAddTrainingSessionModal({
   teamMembers: User[];
   assignments: Assignment[];
 }) {
+  const isMobile = useIsMobile();
   const [sessionName, setSessionName] = useState("");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
   const [members, setMembers] = useState<string[]>([]);
   const [assignmentIds, setAssignmentIds] = useState<string[]>([]);
+
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { loadAssignments, createAssignment } = useStore(TrainingStore);
-
   const { user } = useStore(userStore);
 
   async function handleSubmit() {
@@ -50,6 +52,7 @@ export default function TrainingAddTrainingSessionModal({
       ])
       .select("id")
       .maybeSingle();
+
     toastService.success("Training session created successfully");
 
     if (sessionError || !newTraining?.id) {
@@ -68,7 +71,7 @@ export default function TrainingAddTrainingSessionModal({
       const { error: participantsError } = await supabase.from("trainings_participants").insert(participants);
 
       if (participantsError) {
-        console.error("adding participants failed:", participantsError);
+        console.error("Adding participants failed:", participantsError);
         return alert("Training created, but adding participants failed.");
       }
     }
@@ -94,20 +97,17 @@ export default function TrainingAddTrainingSessionModal({
   const handleAddAssignment = async (assignmentName: string) => {
     const data = await createAssignment(assignmentName, true);
     setAssignmentIds([...assignmentIds, data.id]);
-    setIsAddAssignmentOpen(false);
     loadAssignments();
+    setIsAddAssignmentOpen(false);
   };
 
-  return (
-    <BaseModal isOpen={isOpen} onClose={onClose}>
+  const Content = (
+    <>
       <div className="border-b border-white/10 pb-4 w-full">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">New Training Session</h2>
-        </div>
         <p className="mt-1 text-sm text-gray-400">Plan a session, select assignments, and assign team members to participate.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 mt-4">
+      <div className="grid grid-cols-1 gap-8 mt-4">
         <div>
           <BasicInfoSection
             sessionName={sessionName}
@@ -147,6 +147,16 @@ export default function TrainingAddTrainingSessionModal({
           Create Session
         </button>
       </div>
-    </BaseModal>
+    </>
+  );
+
+  return isMobile ? (
+    <BaseMobileDrawer title="New Training Session" isOpen={isOpen} setIsOpen={onClose}>
+      {Content}
+    </BaseMobileDrawer>
+  ) : (
+    <BaseDesktopDrawer title="New Training Session" isOpen={isOpen} width="600px" setIsOpen={onClose}>
+      {Content}
+    </BaseDesktopDrawer>
   );
 }

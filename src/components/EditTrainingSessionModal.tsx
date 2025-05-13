@@ -90,9 +90,9 @@ export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, t
   }
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} width="max-w-6xl">
+    <BaseModal isOpen={isOpen} onClose={onClose}>
       {/* Header Section */}
-      <div className="border-b border-white/10 pb-4">
+      <div className="border-b border-white/10 pb-4 ">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-white">Edit Training Session</h2>
           <div className="bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full text-xs font-medium">Editing</div>
