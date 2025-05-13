@@ -8,6 +8,7 @@ import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { FaCrosshairs } from "react-icons/fa";
 import { useIsMobile } from "@/hooks/useIsMobile";
+
 const navSections = [
   {
     title: "OVERVIEW",
