@@ -3,22 +3,29 @@ import { useStore } from "zustand";
 import { format } from "date-fns";
 import { TrainingSessionChart } from "@/types/training";
 import { CalendarDays } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function DashboardCalendar() {
   const useTrainingCalendar = useStore(TrainingStore);
   const { last, next } = useTrainingCalendar.trainingsChartDisplay;
-
+  const navigate = useNavigate();
   return (
     <div className="w-full h-full flex flex-col justify-center">
       <div className="relative border-l-2 border-white/10 pl-6 space-y-6">
         {last ? (
-          <TrainingTimelineItem session={last} label="Last Training" alignment="left" color="gray" />
+          <TrainingTimelineItem onClick={() => navigate(`/training/${last.id}`)} session={last} label="Last Training" alignment="left" color="gray" />
         ) : (
           <PlaceholderTimelineItem title="Last Training" />
         )}
 
         {next ? (
-          <TrainingTimelineItem session={next} label="Next Training" alignment="right" color="green" />
+          <TrainingTimelineItem
+            onClick={() => navigate(`/training/${next.id}`)}
+            session={next}
+            label="Next Training"
+            alignment="right"
+            color="green"
+          />
         ) : (
           <PlaceholderTimelineItem title="Next Training" />
         )}
@@ -28,6 +35,7 @@ export default function DashboardCalendar() {
 }
 
 function TrainingTimelineItem({
+  onClick,
   session,
   label,
   alignment,
@@ -37,6 +45,7 @@ function TrainingTimelineItem({
   label: string;
   alignment: "left" | "right";
   color: "gray" | "green";
+  onClick: () => void;
 }) {
   const glowColor = color === "green" ? "text-green-400" : "text-gray-400";
   const tagColor = color === "green" ? "bg-green-700/20 text-green-300" : "bg-gray-700/40 text-gray-300";
@@ -60,7 +69,15 @@ function TrainingTimelineItem({
         <h4 className="text-lg font-semibold line-clamp-1">{session.session_name}</h4>
         <p className="text-sm text-gray-400 mt-1 flex items-center gap-2">
           <CalendarDays className="w-4 h-4 text-gray-500" />
-          {format(new Date(session.date), "dd MMM yyyy, HH:mm")}
+          <div className="flex items-center justify-between w-full gap-2">
+            {format(new Date(session.date), "dd MMM yyyy, HH:mm")}
+            <p
+              className="bg-indigo-200/10 rounded-md px-3 py-1 text-sm cursor-pointer underline-offset-1 text-white mt-1 flex items-center gap-2"
+              onClick={onClick}
+            >
+              View
+            </p>
+          </div>
         </p>
       </div>
     </div>

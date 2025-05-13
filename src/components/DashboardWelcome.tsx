@@ -1,10 +1,9 @@
 import { Shield, Mail, Users, Target } from "lucide-react";
 import { User, UserRole } from "@/types/user";
-import { IsMobile } from "@/utils/isMobile";
-
+import { useIsMobile } from "@/hooks/useIsMobile";
 export default function DashboardWelcome({ user }: { user: User }) {
   if (!user) return null;
-
+  const isMobile = useIsMobile();
   const getRoleColor = (role: UserRole) => {
     switch (role) {
       case "commander":
@@ -64,7 +63,7 @@ export default function DashboardWelcome({ user }: { user: User }) {
         </div>
 
         {/* Avatar */}
-        {IsMobile ? (
+        {isMobile ? (
           <></>
         ) : (
           <div className="relative self-start md:self-auto">

@@ -6,9 +6,8 @@ import { BsBarChartFill } from "react-icons/bs";
 import { authStore } from "@/store/authStore";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
-import { IsMobile } from "@/utils/isMobile";
 import { FaCrosshairs } from "react-icons/fa";
-
+import { useIsMobile } from "@/hooks/useIsMobile";
 const navSections = [
   {
     title: "OVERVIEW",
@@ -33,14 +32,8 @@ export default function Sidebar() {
   const userInitial = user?.first_name?.[0] || "U";
 
   const [collapsed, setCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(IsMobile);
+  const isMobile = useIsMobile();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const SidebarContent = () => (
     <div className={`flex flex-col bg-[#121212] border-r border-[#1D1D1F] ${collapsed ? "w-20" : "w-72"} h-full`}>

@@ -2,6 +2,7 @@ import React from "react";
 import { ScoreFormValues } from "@/hooks/useScoreForm";
 import { Assignment } from "@/types/training";
 import { Target, Sun, Activity, Crosshair, Zap, Wind, Navigation, Timer, StickyNote, CheckCircle2, XCircle, FileQuestion, Ruler } from "lucide-react";
+import BaseInput from "@/components/BaseInput";
 
 interface ScoreFormFieldProps {
   field: string;
@@ -191,14 +192,14 @@ const ScoreFormField: React.FC<ScoreFormFieldProps> = ({ field, type, formValues
       );
     } else {
       return (
-        <input
+        <BaseInput
           type={type}
           value={(formValues as any)[field] || ""}
           onChange={(e) => setFormValues({ ...formValues, [field]: e.target.value })}
           placeholder={config?.placeholder}
-          className="w-full min-h-9 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white 
-                     border border-zinc-700 hover:border-zinc-600 focus:border-indigo-500 
-                     focus:ring-1 focus:ring-indigo-500/20 transition-all duration-200"
+          containerClassName="bg-transparent"
+          labelClassName="text-zinc-300"
+          leftIcon={<Icon size={14} className="text-zinc-400" />}
         />
       );
     }
@@ -206,16 +207,38 @@ const ScoreFormField: React.FC<ScoreFormFieldProps> = ({ field, type, formValues
 
   return (
     <div className="flex flex-col">
-      <label className="flex items-center gap-1.5 text-sm text-zinc-300 font-medium mb-1.5" htmlFor={field}>
-        <Icon size={14} className="text-zinc-400" />
-        {config?.title ||
-          field
-            .replace(/_/g, " ")
-            .split(" ")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")}
-      </label>
-      {renderInput()}
+      {type === "select" || type === "boolean" || (type === "text" && field === "note") ? (
+        <>
+          <label className="flex items-center gap-1.5 text-sm text-zinc-300 font-medium mb-1.5" htmlFor={field}>
+            <Icon size={14} className="text-zinc-400" />
+            {config?.title ||
+              field
+                .replace(/_/g, " ")
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}
+          </label>
+          {renderInput()}
+        </>
+      ) : (
+        <BaseInput
+          label={
+            config?.title ||
+            field
+              .replace(/_/g, " ")
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")
+          }
+          type={type}
+          value={(formValues as any)[field] || ""}
+          onChange={(e) => setFormValues({ ...formValues, [field]: e.target.value })}
+          placeholder={config?.placeholder}
+          containerClassName="bg-transparent"
+          labelClassName="text-zinc-300"
+          leftIcon={<Icon size={14} className="text-zinc-400" />}
+        />
+      )}
     </div>
   );
 };

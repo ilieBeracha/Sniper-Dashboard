@@ -98,7 +98,7 @@ export default function Auth() {
               </svg>
             </div>
             <h2 className="text-3xl font-semibold text-white mb-2">{getAuthTitle()}</h2>
-            <p className="text-gray-500 text-base">{getAuthDescription()}</p>
+            <p className="text-gray-500 text-sm">{getAuthDescription()}</p>
           </div>
 
           {/* Tabs */}
@@ -125,7 +125,7 @@ export default function Auth() {
 
           {/* Form Card */}
           <div className="relative">
-            <div className="relative bg-[#161616] py-8 px-8 rounded-3xl border border-[#2A2A2A]">
+            <div className="relative bg-[#161616] py-4 px-4 rounded-xl border border-[#2A2A2A]">
               {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10 rounded-3xl backdrop-blur-sm">
                   <div className="flex flex-col items-center">
@@ -160,25 +160,6 @@ export default function Auth() {
                 </div>
               )}
             </div>
-          </div>
-
-          {/* Additional Help Text */}
-          <div className="mt-8 text-center">
-            {authType === "login" ? (
-              <p className="text-gray-600 text-sm">
-                Need assistance?{" "}
-                <a href="#" className="text-gray-400 hover:text-white">
-                  Contact support
-                </a>
-              </p>
-            ) : (
-              <p className="text-gray-600 text-sm">
-                Already have an account?{" "}
-                <button onClick={() => setAuthType("login")} className="text-gray-400 hover:text-white ">
-                  Sign in
-                </button>
-              </p>
-            )}
           </div>
         </div>
       </div>

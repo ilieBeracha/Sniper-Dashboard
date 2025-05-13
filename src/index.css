@@ -5,6 +5,23 @@
 body {
   font-family: "Roboto", sans-serif;
 }
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+textarea,
+select,
+label,
+span,
+button,
+a,
+div {
+  font-size: 0.875rem !important;
+}
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

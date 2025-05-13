@@ -91,8 +91,6 @@ export default function TrainingPageScoreFormModalStep1({ formValues, setFormVal
   return (
     <div className="relative">
       <form className="w-full ">
-        {/* Mission Selection - Full  Width */}
-
         <div className="mb-4 p-4 bg-zinc-800/30 rounded-lg border border-zinc-700/50">
           <div className="flex items-center gap-2 mb-3">
             <Target className="text-indigo-400" size={16} />

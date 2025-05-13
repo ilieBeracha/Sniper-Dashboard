@@ -12,9 +12,9 @@ import TrainingPage from "./Training";
 import { squadStore } from "@/store/squadStore";
 import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
-import { IsMobile } from "@/utils/isMobile";
 import { getSquadsWithUsersByTeamId } from "@/services/squadService";
 import Assets from "./Assets";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function Home() {
   const { token } = useStore(authStore);
@@ -23,7 +23,7 @@ export default function Home() {
   const { getSquadUsersBySquadId } = useStore(squadStore);
   const { getWeapons } = useStore(weaponsStore);
   const { getEqipmentsByTeamId } = useStore(equipmentStore);
-
+  const isMobile = useIsMobile();
   const user = useUserStore.user;
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function Home() {
     <div className="flex w-screen">
       <div>{token && <SidebarT />}</div>
 
-      <main className={`flex-1 overflow-y-hidden ${IsMobile ? "mt-16" : ""}`}>
+      <main className={`flex-1 overflow-y-hidden ${isMobile ? "mt-16" : ""}`}>
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/training" element={<Training />}></Route>
