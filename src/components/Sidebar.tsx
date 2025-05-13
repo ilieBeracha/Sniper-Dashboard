@@ -1,5 +1,5 @@
 import { Dialog } from "@headlessui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { BiSolidDashboard, BiSolidLogOut, BiSolidCog, BiSolidUser, BiChevronRight, BiChevronLeft } from "react-icons/bi";
 import { BsBarChartFill } from "react-icons/bs";
