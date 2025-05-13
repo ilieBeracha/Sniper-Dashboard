@@ -22,7 +22,7 @@ export default function BaseDropBox({
     <Listbox value={selectedOption} onChange={(opt) => setActiveTab(opt.id)}>
       <div className="relative w-full max-w-sm mx-auto">
         <div className="flex w-full overflow-hidden rounded-lg bg-zinc-800 border border-zinc-700 focus-within:ring-2 focus-within:ring-indigo-500">
-          <div className="flex items-center gap-2 px-4 text-white flex-grow text-sm">
+          <div className="flex items-center gap-2 px-4 py-1 text-white flex-grow text-sm">
             <CheckIcon className="w-4 h-4 text-zinc-400" />
             <p className="text-sm font-medium truncate">{selectedOption?.label || "Select a metric"}</p>
           </div>
@@ -39,7 +39,7 @@ export default function BaseDropBox({
             <ListboxOption
               key={option.id}
               value={option}
-              className="group   cursor-pointer select-none   text-sm text-white hover:bg-zinc-700 data-[focus]:bg-zinc-700"
+              className=" cursor-pointer select-none p-2  text-sm text-white hover:bg-zinc-700 data-[focus]:bg-zinc-700"
             >
               <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">

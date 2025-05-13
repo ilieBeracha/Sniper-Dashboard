@@ -20,7 +20,7 @@ export default function UserProfile({ user }: { user: User }) {
         </div>
 
         {(!user?.squad_id || !user?.team_id) && (
-          <div className="grid grid-cols-1 gap-1">
+          <div className="grid grid-cols-1 gap-1 text-sm">
             <InfoRow
               icon={<BiMailSend className="text-cyan-400" />}
               label={

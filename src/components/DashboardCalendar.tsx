@@ -79,12 +79,12 @@ function TrainingTimelineItem({
           <CalendarDays className="w-4 h-4 text-gray-500" />
           <div className="flex items-center justify-between w-full gap-2">
             {format(new Date(session.date), "dd MMM yyyy, HH:mm")}
-            <p
+            <span
               className="bg-indigo-200/10 rounded-md px-3 text-xs cursor-pointer underline-offset-1 text-white mt-1 flex items-center gap-2"
               onClick={onClick}
             >
               View
-            </p>
+            </span>
           </div>
         </p>
       </div>

@@ -9,6 +9,7 @@ import { performanceStore } from "@/store/performance";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import NoDataDisplay from "./BaseNoData";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const formatValue = (value: number, type: string | undefined) => {
   if (type === "number") {
@@ -28,6 +29,7 @@ export default function DashboardSquadStats() {
   const [selectedDistance, setSelectedDistance] = useState("");
   const [selectedPosition, setSelectedPosition] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const isMobile = useIsMobile();
 
   const rangeOptions = [
     { id: "short", label: "Short Range (0-300m)" },
@@ -56,7 +58,6 @@ export default function DashboardSquadStats() {
   }, [squadStats]);
 
   useEffect(() => {
-    // Initial load
     setIsLoading(true);
     getSquadStats(user?.team_id as string, null, null);
   }, [user?.team_id]);
@@ -64,7 +65,6 @@ export default function DashboardSquadStats() {
   const handleFilterChange = async (filter: string) => {
     setSelectedFilter(filter as "distance" | "position" | "");
 
-    // Only reset the other filter, not the one being selected
     if (filter !== "distance") {
       setSelectedDistance("");
     }
@@ -97,18 +97,6 @@ export default function DashboardSquadStats() {
     await getSquadStats(user?.team_id as string, null, null);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[300px] w-full">
-        <div className="relative w-12 h-12 text-sm">
-          <div className="absolute top-0 left-0 w-full h-full border-4 border-zinc-700 rounded-full"></div>
-          <div className="absolute top-0 left-0 w-full h-full border-4 border-t-zinc-400 rounded-full animate-spin"></div>
-        </div>
-        <p className="mt-4 text-zinc-400 text-sm">Loading data...</p>
-      </div>
-    );
-  }
-
   return (
     <BaseDashboardCard
       header={
@@ -127,13 +115,13 @@ export default function DashboardSquadStats() {
                 </div>
 
                 {selectedFilter === "distance" && (
-                  <div className="w-full sm:w-auto min-w-[200px] sm:min-w-[240px] text-sm">
+                  <div className="w-full sm:w-auto min-w-[120px] sm:min-w-[240px] text-sm">
                     <BaseDropBox tabs={rangeOptions} activeTab={selectedDistance} setActiveTab={handleDistanceChange} />
                   </div>
                 )}
 
                 {selectedFilter === "position" && (
-                  <div className="w-full sm:w-auto min-w-[120px] sm:min-w-[160px] text-sm">
+                  <div className="w-full sm:w-auto min-w-[120px] sm:min-w-[120px] text-sm">
                     <BaseDropBox tabs={positionOptions} activeTab={selectedPosition} setActiveTab={handlePositionChange} />
                   </div>
                 )}
@@ -148,11 +136,37 @@ export default function DashboardSquadStats() {
                 )}
               </div>
             </div>
-            {chartData.length === 0 ? (
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center h-[300px] w-full">
+                <div className="relative w-12 h-12 text-sm">
+                  <div className="absolute top-0 left-0 w-full h-full border-4 border-zinc-700 rounded-full"></div>
+                  <div className="absolute top-0 left-0 w-full h-full border-4 border-t-zinc-400 rounded-full animate-spin"></div>
+                </div>
+                <p className="mt-4 text-zinc-400 text-sm">Loading data...</p>
+              </div>
+            ) : chartData.length === 0 ? (
               <NoDataDisplay />
             ) : (
               <ResponsiveContainer width="100%" maxHeight={300} height={300} className="text-sm">
-                <BarChart data={chartData} barCategoryGap={16} barGap={10} margin={{ top: 20, right: 0, left: 0, bottom: 5 }}>
+                <BarChart data={chartData} barCategoryGap={16} barGap={isMobile ? 2 : 6} margin={{ top: 20, right: 0, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="transparent" />
+                  <XAxis dataKey="name" stroke="#9ca3af" style={{ fontSize: "12px", paddingBottom: "10px" }} />
+                  <Tooltip
+                    cursor={{ fill: "transparent" }}
+                    content={({ label, payload }) => (
+                      <div className="bg-zinc-800 text-white p-2 rounded shadow hover:bg-zinc-700">
+                        <p className="text-xs font-semibold">{label}</p>
+                        {payload?.map((p, i) => (
+                          <p key={i} className="text-sm">
+                            {p.name}: {formatValue(p.value as number, "number")}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  />
+                  <Legend iconType="circle" />
+                  <Bar dataKey="performance" name="Performance" fill="url(#gradientPerformance)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="accuracy" name="Accuracy" fill="url(#gradientAccuracy)" radius={[4, 4, 0, 0]} />
                   <defs>
                     <linearGradient id="gradientPerformance" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#4ade80" stopOpacity={0.8} />

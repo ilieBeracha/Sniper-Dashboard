@@ -16,7 +16,7 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
     return (
       <div className={cn("w-full", containerClassName)}>
         {label && (
-          <label htmlFor={props.id} className={cn("block text-sm font-medium text-gray-200 mb-1.5", labelClassName)}>
+          <label htmlFor={props.id} className={cn("block text-sm font-medium text-white text-left mb-1.5", labelClassName)}>
             {label}
           </label>
         )}
@@ -25,10 +25,11 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
           <input
             ref={ref}
             className={cn(
-              "block w-full rounded-md text-gray-200 border border-[#2A2A2A] bg-zinc-900 px-1 py-1 ",
+              "block w-full rounded-md text-white border border-[#2A2A2A] bg-zinc-900 px-1 py-1 text-sm",
               "focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500",
               "disabled:opacity-50 disabled:cursor-not-allowed",
-              "transition-all duration-200 placeholder:pl-2 placeholder:text-gray-400 placeholder:text-sm",
+              "placeholder:text-white placeholder:text-sm",
+              "transition-all duration-200 placeholder:pl-2 placeholder:text-white placeholder:text-sm",
               leftIcon && "pl-10",
               rightIcon && "pr-10",
               error && "border-red-500 focus:border-red-500 focus:ring-red-500",
