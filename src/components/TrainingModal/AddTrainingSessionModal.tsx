@@ -131,7 +131,7 @@ export default function TrainingAddTrainingSessionModal({
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-x-4 pt-4 border-t border-white/10 mt-4">
+      <div className="flex items-center justify-end gap-x-4 pt-4 border-t border-white/10 mt-4 text-sm">
         <button
           type="button"
           onClick={onClose}

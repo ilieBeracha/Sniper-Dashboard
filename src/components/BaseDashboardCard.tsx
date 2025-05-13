@@ -16,7 +16,7 @@ export default function BaseDashboardCard({
 }) {
   return (
     <div
-      className={`h-full  border-white/5 shadow-lg flex flex-col transition-all duration-300 rounded-md hover:border-white/10 ${
+      className={`h-full shadow-lg flex flex-col transition-all text-sm duration-300 rounded-md hover:border-white/10 ${
         withBg ? "bg-[#1E1E1E]" : "bg-transparent"
       }`}
     >
@@ -30,7 +30,7 @@ export default function BaseDashboardCard({
               data-tooltip-content={tooltipContent}
             />
           )}
-          <h2 className="font-semibold text-white flex items-center gap-2">
+          <h2 className="font-semibold text-white flex items-center gap-2 text-sm ">
             <div
               className={`h-1.5 w-1.5 max-h-1.5 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full ${
                 typeof header === "string" ? "lg:text-lg text-sm" : ""

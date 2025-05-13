@@ -8,7 +8,7 @@ export default function UserHitPercentage() {
 
   if (!userHitPercentage) {
     return (
-      <div className="h-full flex justify-center items-center w-full">
+      <div className="h-full flex justify-center items-center w-full text-sm">
         <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-indigo-500"></div>
       </div>
     );
@@ -29,13 +29,13 @@ export default function UserHitPercentage() {
   const hitColor = getColor(percentage);
 
   return (
-    <div className="flex w-full flex-col h-full justify-evenly col-auto">
-      <div className=" relative justify-between flex h-full flex-col">
+    <div className="flex w-full flex-col h-full justify-evenly col-auto text-sm">
+      <div className=" relative justify-between flex h-full flex-col gap-2">
         {!userHitPercentage.hit_percentage && userHitPercentage.total_shots === 0 ? (
           <NoDataDisplay />
         ) : (
           <>
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height={200} className="text-sm">
               <PieChart>
                 <Pie
                   data={gaugeData}
@@ -56,7 +56,7 @@ export default function UserHitPercentage() {
             </ResponsiveContainer>
 
             <div className="absolute inset-0 flex flex-col mt-1">
-              <span className="text-3xl font-bold text-white">{percentage ? percentage.toFixed(1) : 0}%</span>
+              <span className="text-2xl font-bold text-white">{percentage ? percentage.toFixed(1) : 0}%</span>
               <span className="text-xs text-gray-400 uppercase tracking-wider">Accuracy</span>
             </div>
             <div className="grid grid-cols-1 gap-3 mt-2">

@@ -21,7 +21,7 @@ export default function DashboardRowOne({ user }: DashboardRowOneProps) {
         </BaseDashboardCard>
       </div>
 
-      <div className="col-span-1 lg:col-span-8 w-full">
+      <div className="col-span-1 lg:col-span-8 w-full text-sm">
         <BaseDashboardCard header="Calendar" tooltipContent="View and manage your schedule and events">
           <DashboardCalendar />
         </BaseDashboardCard>

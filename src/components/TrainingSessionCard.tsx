@@ -30,19 +30,22 @@ export function TrainingSessionCard({
       onClick={handleSessionClick}
       className={`
         relative
-        pl-2 pr-6 py-6
+        pl-4 pr-6 py-2
         border border-white/10 rounded-lg overflow-hidden
         bg-gradient-to-br from-white/5 to-white/[0.02] 
         hover:from-white/10 hover:to-white/[0.05] 
         transition-all duration-500 ease-in-out
         cursor-pointer
+        text-sm
+        justify-center
+        items-center
         
       `}
     >
       {/* Status */}
-      <div className="ml-4 flex flex-col items-end gap-2 absolute top-2 right-2">
+      <div className="ml-4 flex flex-col items-end gap-2 absolute top-0 right-0 text-sm ">
         <span
-          className={`text-xs font-medium px-2 py-1 rounded-full
+          className={`text-xs font-medium px-2 py-1 rounded-bl-lg rounded-tr-lg
               ${isPast ? "bg-gray-500/10 text-gray-400" : highlight ? "bg-indigo-500/20 text-indigo-300" : "bg-green-500/10 text-green-400"}
             `}
         >
@@ -51,9 +54,9 @@ export function TrainingSessionCard({
 
         <ChevronRight className="w-4 h-4 text-gray-400" />
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between text-sm ">
         {/* Date */}
-        <div className="min-w-[100px] h-full">
+        <div className="w-[100px] h-full text-sm">
           <div className="flex flex-col items-center justify-center bg-white/5 rounded-lg p-2">
             <span className="text-base font-semibold text-white">{showDate ? format(sessionDate, "d") : format(sessionDate, "h:mm")}</span>
             <span className="text-xs text-gray-400">{showDate ? format(sessionDate, "MMM") : format(sessionDate, "a")}</span>
@@ -73,14 +76,7 @@ export function TrainingSessionCard({
                 {format(sessionDate, "h:mm a")}
               </div>
             )}
-            <div className="flex items-center">
-              <MapPin className="w-3 h-3 mr-1.5" />
-              {session.location ? (
-                <span className="truncate max-w-[120px]">{session.location}</span>
-              ) : (
-                <span className="text-gray-500 italic">Unknown location</span>
-              )}
-            </div>
+
             <div className="flex items-center">
               <UserCheck className="w-3 h-3 mr-1.5" />
               {participants.length} participants
@@ -91,6 +87,14 @@ export function TrainingSessionCard({
                 {assignments.length} assignments
               </div>
             )}
+            <div className="flex items-center mt-2 *:text-xs">
+              <MapPin className="w-3 h-3 mr-1.5" />
+              {session.location ? (
+                <span className="truncate max-w-[120px]">{session.location}</span>
+              ) : (
+                <span className="text-gray-500 italic">Unknown location</span>
+              )}
+            </div>
           </div>
         </div>
       </div>

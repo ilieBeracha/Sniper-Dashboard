@@ -31,34 +31,21 @@ export default function DashboardWelcome({ user }: { user: User }) {
   };
 
   return (
-    <div className="p-2 sm:p-3 md:pt-4 md:px-4">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+    <div className="p-2 sm:p-3 md:px-4">
+      <div className="flex md:items-center md:justify-between gap-2">
         {/* Left Side */}
         <div className="space-y-2 flex-1">
           <div>
             <p className="text-lg font-bold text-white mb-0.5">
               {user.first_name} {user.last_name}
             </p>
-            <div className="flex items-center gap-1 text-xs flex-wrap">
-              <span className={`flex items-center gap-1 ${getRoleColor(user.user_role)}`}>
-                {getRoleIcon(user.user_role)}
-                {user.user_role.replace("_", " ")}
-              </span>
-              {user.registered && <span className="bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-full text-xs">Active</span>}
-            </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3 text-gray-400 text-xs">
+          <div className="flex flex-col gap-1 text-gray-400 text-xs">
             <div className="flex items-center gap-1">
               <Mail className="w-3 h-3" />
               <span>{user.email}</span>
             </div>
-            {user.team_name && (
-              <div className="flex items-center gap-1">
-                <Users className="w-3 h-3" />
-                <span>{user.team_name}</span>
-              </div>
-            )}
           </div>
         </div>
 
@@ -82,15 +69,26 @@ export default function DashboardWelcome({ user }: { user: User }) {
 
       {/* Team/Squad Info */}
       <div className="mt-3  flex flex-col sm:flex-row pt-3 border-t border-[#333] gap-2">
-        <div className="flex-col justify-between sm:flex-row  sm:grid-cols-2 gap-2 w-full">
-          <h4 className="text-gray-400 text-xs mb-0.5">Squad</h4>
-          <div className="bg-[#1a1a1a] rounded-md p-2 border border-[#333] mb-2">
-            <p className="text-white text-sm font-medium">{user?.squad_name || "No Squad"}</p>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-1 flex-wrap">
+            <span className={`flex items-center gap-1 ${getRoleColor(user.user_role)}`}>
+              {getRoleIcon(user.user_role)}
+              {user.user_role.replace("_", " ")}
+            </span>
+            {user.registered && <span className="bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-full text-xs">Active</span>}
           </div>
-          <h4 className="text-gray-400 text-xs mb-0.5">Team</h4>
-          <div className="bg-[#1a1a1a] rounded-md p-2 border border-[#333]">
-            <p className="text-white text-sm font-medium">{user?.team_name || "No Team"}</p>
-          </div>
+          {user.team_name && (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-1">
+                <Users className="w-3 h-3" />
+                <p>{user.team_name}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="w-3 h-3" />
+                <p>{user.squad_name}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
