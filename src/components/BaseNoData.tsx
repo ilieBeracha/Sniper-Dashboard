@@ -6,7 +6,7 @@ export default function NoDataDisplay({
   icon: CustomIcon = BarChartIcon,
 }) {
   return (
-    <div className="flex flex-col items-center justify-center w-full rounded-xl  h-full ">
+    <div className="flex flex-col h-full items-center justify-center w-full rounded-xl  h-full ">
       <div className="flex flex-col items-center text-center space-y-4 my-8">
         <div className="p-4 rounded-full bg-indigo-500/10 text-indigo-400">
           <CustomIcon className="w-8 h-8" />

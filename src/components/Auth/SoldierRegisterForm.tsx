@@ -1,69 +1,83 @@
 import React, { useState } from "react";
+import { Button } from "../common";
 
-export default function SoldierRegisterForm({
-  AuthSubmit,
-}: {
-  AuthSubmit: (data: { first_name: string; last_name: string; email: string; password: string; invite_code: string }) => void;
-}) {
+export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [inviteCode, setInviteCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [inviteCode, setInviteCode] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    AuthSubmit({
-      first_name: firstName,
-      last_name: lastName,
-      email,
-      password,
-      invite_code: inviteCode,
-    });
+    AuthSubmit({ first_name: firstName, last_name: lastName, email, password, invite_code: inviteCode });
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
-      <div className="grid grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="space-y-2">
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor="first-name" className="block text-sm font-medium text-gray-200 mb-2">
-            First name
+          <label htmlFor="firstName" className="block text-xs font-medium text-gray-400 mb-1">
+            First Name
           </label>
-          <input
-            type="text"
-            id="first-name"
-            required
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            className="block w-full px-4 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
-            placeholder="John"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            </div>
+            <input
+              type="text"
+              id="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="w-full pl-10 pr-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+              placeholder="Enter your first name"
+              required
+            />
+          </div>
         </div>
-
         <div>
-          <label htmlFor="last-name" className="block text-sm font-medium text-gray-200 mb-2">
-            Last name
+          <label htmlFor="lastName" className="block text-xs font-medium text-gray-400 mb-1">
+            Last Name
           </label>
-          <input
-            type="text"
-            id="last-name"
-            required
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            className="block w-full px-4 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
-            placeholder="Doe"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            </div>
+            <input
+              type="text"
+              id="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="w-full pl-10 pr-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+              placeholder="Enter your last name"
+              required
+            />
+          </div>
         </div>
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-2">
-          Military Email
+        <label htmlFor="email" className="block text-xs font-medium text-gray-400 mb-1">
+          Email
         </label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -75,22 +89,22 @@ export default function SoldierRegisterForm({
           <input
             type="email"
             id="email"
-            required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
-            placeholder="john.doe@military.gov"
+            className="w-full pl-10 pr-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+            placeholder="Enter your military email"
+            required
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-2">
+        <label htmlFor="password" className="block text-xs font-medium text-gray-400 mb-1">
           Password
         </label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -102,15 +116,15 @@ export default function SoldierRegisterForm({
           <input
             type={showPassword ? "text" : "password"}
             id="password"
-            required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
-            placeholder="••••••••"
+            className="w-full pl-10 pr-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+            placeholder="Enter your password"
+            required
           />
           <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center">
             {showPassword ? (
-              <svg className="h-5 w-5 text-gray-600 hover:text-gray-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5  hover:text-indigo-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path
                   strokeLinecap="round"
@@ -120,7 +134,7 @@ export default function SoldierRegisterForm({
                 />
               </svg>
             ) : (
-              <svg className="h-5 w-5 text-gray-600 hover:text-gray-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5  hover:text-indigo-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -134,12 +148,12 @@ export default function SoldierRegisterForm({
       </div>
 
       <div>
-        <label htmlFor="invite-code" className="block text-sm font-medium text-gray-200 mb-2">
-          Squad Invite Code
+        <label htmlFor="inviteCode" className="block text-xs font-medium text-gray-400 mb-1">
+          Invite Code
         </label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -150,20 +164,20 @@ export default function SoldierRegisterForm({
           </div>
           <input
             type="text"
-            id="invite-code"
-            required
+            id="inviteCode"
             value={inviteCode}
             onChange={(e) => setInviteCode(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
-            placeholder="Code from your squad commander"
+            className="w-full pl-10 pr-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+            placeholder="Enter your squad invite code"
+            required
           />
         </div>
       </div>
 
-      <div>
+      <div className="pt-1">
         <button
           type="submit"
-          className="w-full flex justify-center items-center px-4 py-3 rounded-2xl bg-white text-[#0A0A0A] font-semibold hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] transition-all duration-200"
+          className="w-full flex justify-center items-center px-4 py-2.5 rounded-xl  text-white font-semibold  focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] transition-all duration-200 text-sm"
         >
           Register as Soldier
         </button>

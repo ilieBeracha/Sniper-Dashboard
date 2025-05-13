@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "../common";
 
 export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
   const [email, setEmail] = useState("");
@@ -11,14 +12,14 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
   };
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="space-y-2">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-2">
-          Email address
+        <label htmlFor="email" className="block text-xs font-medium text-gray-400 mb-1">
+          Email
         </label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -30,22 +31,22 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
           <input
             type="email"
             id="email"
-            required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
+            className="w-full pl-10 pr-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
             placeholder="Enter your email"
+            required
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-2">
+        <label htmlFor="password" className="block text-xs font-medium text-gray-400 mb-1">
           Password
         </label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -57,15 +58,15 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
           <input
             type={showPassword ? "text" : "password"}
             id="password"
-            required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 rounded-md  text-gray-200 border border-[#2A2A2A] focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all"
+            className="w-full pl-10 pr-3 py-2 bg-[#1E1E1E] border border-[#2A2A2A] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
             placeholder="Enter your password"
+            required
           />
           <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center">
             {showPassword ? (
-              <svg className="h-5 w-5 text-gray-600 hover:text-gray-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5  hover:text-indigo-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path
                   strokeLinecap="round"
@@ -75,7 +76,7 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
                 />
               </svg>
             ) : (
-              <svg className="h-5 w-5 text-gray-600 hover:text-gray-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5  hover:text-indigo-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -88,10 +89,10 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="pt-1">
         <button
           type="submit"
-          className="w-full flex justify-center items-center px-4 py-4 rounded-2xl bg-white text-[#0A0A0A] font-semibold hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] transition-all duration-200"
+          className="w-full flex justify-center items-center px-4 py-2.5 rounded-xl  text-white font-semibold  focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] transition-all duration-200 text-sm"
         >
           Sign In
         </button>

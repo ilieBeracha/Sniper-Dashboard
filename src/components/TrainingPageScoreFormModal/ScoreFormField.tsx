@@ -2,6 +2,7 @@ import React from "react";
 import { ScoreFormValues } from "@/hooks/useScoreForm";
 import { Assignment } from "@/types/training";
 import { Target, Sun, Activity, Crosshair, Zap, Wind, Navigation, Timer, StickyNote, CheckCircle2, XCircle, FileQuestion, Ruler } from "lucide-react";
+import { Button } from "../common";
 
 interface ScoreFormFieldProps {
   field: string;
@@ -150,30 +151,26 @@ const ScoreFormField: React.FC<ScoreFormFieldProps> = ({ field, type, formValues
 
       return (
         <div className="flex gap-3">
-          <button
+          <Button
             type="button"
             onClick={() => setFormValues({ ...formValues, [field]: "true" })}
-            className={`flex-1 p-2 rounded-lg border transition-all duration-200 flex items-center justify-center gap-1.5 text-sm
-              ${
-                value === "true"
-                  ? "bg-green-900/30 border-green-600 text-green-400"
-                  : "bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:border-zinc-600"
-              }`}
+            variant={value === "true" ? "success" : "secondary"}
+            size="sm"
+            className="flex-1"
+            leftIcon={<CheckCircle2 size={14} />}
           >
-            <CheckCircle2 size={14} />
             Yes
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={() => setFormValues({ ...formValues, [field]: "false" })}
-            className={`flex-1 p-2 rounded-lg border transition-all duration-200 flex items-center justify-center gap-1.5 text-sm
-              ${
-                value === "false" ? "bg-red-900/30 border-red-600 text-red-400" : "bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:border-zinc-600"
-              }`}
+            variant={value === "false" ? "danger" : "secondary"}
+            size="sm"
+            className="flex-1"
+            leftIcon={<XCircle size={14} />}
           >
-            <XCircle size={14} />
             No
-          </button>
+          </Button>
         </div>
       );
     } else if (type === "text" && field === "note") {

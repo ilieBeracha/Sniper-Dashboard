@@ -26,7 +26,7 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
   const pastSessions = activeTrainings.filter((s) => isPast(parseISO(s.date)) && !isToday(parseISO(s.date))).reverse();
 
   return (
-    <div className="sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-9 space-y-8 grid grid-cols-1 gap-8 px-3">
+    <div className="sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-9 space-y-8 grid grid-cols-1 gap-0 md:gap-8 lg:gap-8 px-3">
       <div className="sm:col-span-6 md:col-span-6 lg:col-span-6 overflow-y-auto max-h-full pr-1 custom-scrollbar col-span-6 ">
         {activeTab === "active" ? (
           <>

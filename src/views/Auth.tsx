@@ -8,6 +8,7 @@ import { authStore } from "@/store/authStore";
 import { ModernLogin } from "@/components/Auth/LoginForm";
 import AuthHero from "@/components/Auth/AuthHero";
 import { LoginUserData, RegisterUserData } from "@/types/auth";
+import { Card, Button } from "../components/common";
 
 type AuthType = "login" | "team_manager_register" | "squad_manager_register" | "soldier_register";
 
@@ -84,7 +85,7 @@ export default function Auth() {
 
       <AuthHero />
 
-      <div className="w-full md:w-3/5 flex items-center justify-center p-6 sm:p-8 md:p-8 relative z-10 shadow-black shadow-2xl">
+      <div className="w-full md:w-3/5 flex items-center justify-center md:px-6 md:pb-12 sm:px-4 sm:pb-12 relative z-10 shadow-black shadow-2xl">
         <div className="w-full max-w-md">
           <div className="mb-8">
             <div className="w-8 h-8 bg-[#1E1E1E] rounded-full flex items-center justify-center mb-6 border border-[#2A2A2A]">
@@ -103,64 +104,60 @@ export default function Auth() {
 
           {/* Tabs */}
           <div className="flex mb-4">
-            <div className="bg-[#1A1A1A] p-1 rounded-xl flex w-full border border-[#2A2A2A]">
+            <div className=" flex w-full border-b  border-b-[#2A2A2A] rounded-t-xl">
               {[
                 { type: "login", label: "Sign In" },
                 { type: "team_manager_register", label: "Commander" },
                 { type: "squad_manager_register", label: "Squad" },
                 { type: "soldier_register", label: "Soldier" },
               ].map(({ type, label }) => (
-                <button
+                <span
                   key={type}
                   onClick={() => setAuthType(type as AuthType)}
-                  className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
-                    authType === type ? "bg-white text-[#0A0A0A]" : "text-gray-500 hover:text-gray-300"
-                  }`}
+                  className={`flex-1 cursor-pointer text-center  py-2 text-xs ${authType === type ? "text-white" : "text-gray-400"}`}
                 >
                   {label}
-                </button>
+                </span>
               ))}
             </div>
           </div>
 
           {/* Form Card */}
-          <div className="relative">
-            <div className="relative bg-[#161616] py-8 px-8 rounded-3xl border border-[#2A2A2A]">
-              {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10 rounded-3xl backdrop-blur-sm">
-                  <div className="flex flex-col items-center">
-                    <div className="relative">
-                      <div className="w-12 h-12 border-2 border-gray-700 rounded-full" />
-                      <div className="absolute inset-0 w-12 h-12 border-t-2 border-white rounded-full animate-spin" />
-                    </div>
-                    <p className="text-white mt-4 text-sm">Authenticating...</p>
+          <Card className="relative">
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10 rounded-3xl backdrop-blur-sm">
+                <div className="flex flex-col items-center">
+                  <div className="relative">
+                    <div className="w-12 h-12 border-2 border-gray-700 rounded-full" />
+                    <div className="absolute inset-0 w-12 h-12 border-t-2 border-white rounded-full animate-spin" />
                   </div>
+                  <p className="text-white mt-4 text-sm">Authenticating...</p>
                 </div>
-              )}
-
-              <div className="relative z-10">
-                {authType === "login" && <ModernLogin AuthSubmit={AuthSubmit} />}
-                {authType === "team_manager_register" && <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />}
-                {authType === "squad_manager_register" && <TeamMemberRegisterForm AuthSubmit={AuthSubmit} />}
-                {authType === "soldier_register" && <SoldierRegisterForm AuthSubmit={AuthSubmit} />}
               </div>
+            )}
 
-              {error && (
-                <div className="mt-6 p-4 bg-red-900/10 border border-red-900/20 rounded-2xl flex items-center">
-                  <div className="w-8 h-8 bg-red-900/20 rounded-full flex items-center justify-center mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-red-400">{error}</p>
-                </div>
-              )}
+            <div className="relative z-10">
+              {authType === "login" && <ModernLogin AuthSubmit={AuthSubmit} />}
+              {authType === "team_manager_register" && <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />}
+              {authType === "squad_manager_register" && <TeamMemberRegisterForm AuthSubmit={AuthSubmit} />}
+              {authType === "soldier_register" && <SoldierRegisterForm AuthSubmit={AuthSubmit} />}
             </div>
-          </div>
+
+            {error && (
+              <div className="mt-6 p-4 bg-red-900/10 border border-red-900/20 rounded-2xl flex items-center">
+                <div className="w-8 h-8 bg-red-900/20 rounded-full flex items-center justify-center mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <p className="text-sm text-red-400">{error}</p>
+              </div>
+            )}
+          </Card>
 
           {/* Additional Help Text */}
           <div className="mt-8 text-center">

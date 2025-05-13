@@ -3,7 +3,7 @@ import ScoreFormModal from "./TrainingPageScoreFormModal/TrainingPageScoreFormMo
 import { useState, useEffect } from "react";
 import { useStore } from "zustand";
 import { scoreStore } from "@/store/scoreSrore";
-import { Edit2Icon, Plus, Users, Moon, Sun, Clock, Target, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { Edit2Icon, Plus, Users, Moon, Sun, Clock, Target, ChevronDown, ChevronUp } from "lucide-react";
 import { userStore } from "@/store/userStore";
 import { isCommander } from "@/utils/permissions";
 
@@ -11,6 +11,7 @@ import { Score } from "@/types/score";
 import ScoreParticipantsDisplay from "./TrainingPageScoreParticipantsDisplay";
 import { TrainingStore } from "@/store/trainingStore";
 import { loaderStore } from "@/store/loaderStore";
+import { LoadingSpinner, Button } from "./common";
 
 export default function TrainingPageScore() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -103,14 +104,7 @@ export default function TrainingPageScore() {
   return (
     <BaseDashboardCard header="Training Score Dashboard" tooltipContent="Performance overview across all squads">
       <div className="relative">
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/50 backdrop-blur-sm z-10">
-            <div className="bg-zinc-800 rounded-lg p-4 flex items-center space-x-3 border border-zinc-700">
-              <Loader2 className="h-6 w-6 text-zinc-400 animate-spin" />
-              <span className="text-zinc-300 font-medium">Updating scores...</span>
-            </div>
-          </div>
-        )}
+        {isLoading && <LoadingSpinner text="Updating scores..." />}
 
         <div className="flex justify-between items-center mb-6">
           <div className="text-sm text-zinc-400">Showing scores for all participating squads</div>
@@ -118,16 +112,9 @@ export default function TrainingPageScore() {
 
         {/* Filter controls */}
         <div className="flex flex-col gap-4 mb-6">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            disabled={isLoading}
-            className="px-4 py-2 text-sm font-medium text-white bg-[#7F5AF0] hover:bg-[#6B4ACF] 
-                            active:bg-[#5A3DB0] rounded flex items-center gap-2 border border-[#6B4ACF] 
-                            transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Plus size={16} />
+          <Button onClick={() => setIsModalOpen(true)} disabled={isLoading} leftIcon={<Plus size={16} />}>
             Record Score
-          </button>
+          </Button>
           <div className="flex items-center space-x-3 w-full">
             <span className="text-sm text-zinc-400">Filter:</span>
             <div className="flex bg-[#1A1A1A] rounded-md overflow-hidden border border-[#2A2A2A] flex-1">

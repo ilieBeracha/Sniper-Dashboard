@@ -111,7 +111,7 @@ export default function Sidebar() {
 
         <Dialog open={isDrawerOpen} onClose={() => setDrawerOpen(false)} className="relative z-50">
           <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-          <div className="fixed inset-y-0 left-0 max-w-xs w-full bg-[#121212] shadow-xl">{SidebarContent()}</div>
+          <div className="fixed inset-y-0 left-0 max-w-2xs w-full bg-[#121212] shadow-xl">{SidebarContent()}</div>
         </Dialog>
       </div>
     );

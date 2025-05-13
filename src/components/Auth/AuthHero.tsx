@@ -1,4 +1,5 @@
 import img from "../../assets/auth.png";
+
 export default function AuthHero() {
   return (
     <div className="hidden md:flex px-12 justify-center items-center md:w-2/2 justify-self-center bg-gradient-to-br from-[#0A0A0A] to-[#121212] relative overflow-hidden">

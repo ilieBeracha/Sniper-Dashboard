@@ -9,6 +9,7 @@ import { performanceStore } from "@/store/performance";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import NoDataDisplay from "./BaseNoData";
+import { LoadingSpinner } from "./common";
 
 const formatValue = (value: number, type: string | undefined) => {
   if (type === "number") {
@@ -97,18 +98,6 @@ export default function DashboardSquadStats() {
     await getSquadStats(user?.team_id as string, null, null);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[300px] w-full">
-        <div className="relative w-12 h-12">
-          <div className="absolute top-0 left-0 w-full h-full border-4 border-zinc-700 rounded-full"></div>
-          <div className="absolute top-0 left-0 w-full h-full border-4 border-t-zinc-400 rounded-full animate-spin"></div>
-        </div>
-        <p className="mt-4 text-zinc-400 text-sm">Loading data...</p>
-      </div>
-    );
-  }
-
   return (
     <BaseDashboardCard
       header={
@@ -147,7 +136,11 @@ export default function DashboardSquadStats() {
               )}
             </div>
           </div>
-          {chartData.length === 0 ? (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center h-[300px] w-full">
+              <LoadingSpinner overlay={false} text="Loading squad stats..." />
+            </div>
+          ) : chartData.length === 0 ? (
             <NoDataDisplay />
           ) : (
             <ResponsiveContainer width="100%" maxHeight={300} height={300}>

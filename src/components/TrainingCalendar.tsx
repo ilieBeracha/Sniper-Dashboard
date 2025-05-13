@@ -12,7 +12,7 @@ export default function TrainingCalendar({ trainings }: { trainings: TrainingSes
 
   return (
     <div className="flex justify-start items-start my-6">
-      <div className="w-full min-h-[200px]">
+      <div className="w-full min-h-[200px] bg-[#1E1E1E] rounded-lg p-4">
         <div className="flex justify-center items-center mb-6">
           <h3 className="text-lg font-bold text-white bg-gradient-to-r from-indigo-500 to-indigo-400 bg-clip-text ">{format(today, "MMMM yyyy")}</h3>
         </div>

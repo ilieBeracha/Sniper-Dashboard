@@ -1,5 +1,7 @@
 import { BiAddToQueue, BiInfoCircle } from "react-icons/bi";
 import { Tooltip } from "react-tooltip";
+import { Card } from "./common/Card";
+import { Button } from "./common/Button";
 
 export default function BaseDashboardCard({
   header,
@@ -15,12 +17,10 @@ export default function BaseDashboardCard({
   withBtn?: boolean;
 }) {
   return (
-    <div
-      className={`h-full  border-white/5 shadow-lg flex flex-col transition-all duration-300 rounded-md hover:border-white/10 ${
-        withBg ? "bg-[#1E1E1E]" : "bg-transparent"
-      }`}
-    >
-      <div className="px-4 py-4 border-b border-white/5 mb-2">
+    <Card
+      withBackground={withBg}
+      className="h-full shadow-lg"
+      header={
         <div className="flex justify-between relative h-full items-center">
           {tooltipContent && (
             <BiInfoCircle
@@ -38,14 +38,11 @@ export default function BaseDashboardCard({
             ></div>
             {header}
           </h2>
-          {withBtn ?? (
-            <button className="p-1.5 rounded-lg hover:bg-white/5 transition-colors duration-200">
-              <BiAddToQueue className="text-indigo-400" />{" "}
-            </button>
-          )}
+          {withBtn && <Button variant="secondary" size="sm" className="p-1.5" leftIcon={<BiAddToQueue className="text-indigo-400" />} />}
         </div>
-      </div>
-      <div className="px-4 pb-4 flex-1 h-full">{children}</div>
+      }
+    >
+      <div className="flex-1 h-full">{children}</div>
 
       <Tooltip
         id={`${header}-tooltip`}
@@ -55,6 +52,6 @@ export default function BaseDashboardCard({
           zIndex: 1000,
         }}
       />
-    </div>
+    </Card>
   );
 }
