@@ -13,6 +13,7 @@ import { getUserGroupingSummaryRpc } from "@/services/performance";
 import DashboardRowKPI from "@/components/DashboardRowKPI";
 import { CalendarIcon } from "lucide-react";
 import { List } from "lucide-react";
+import { FaStackOverflow } from "react-icons/fa";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
@@ -54,8 +55,8 @@ export default function Dashboard() {
           <h2 className="text-xl font-bold text-white">Overview</h2>
         </div>
         <div className="flex items-center gap-2">
-          <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 py-1.5 px-3 rounded-full">
-            <CalendarIcon className="w-3 h-3 mr-1.5" />
+          <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 p-2 rounded-full">
+            <FaStackOverflow className="w-3 h-3" />
           </span>
         </div>
       </div>

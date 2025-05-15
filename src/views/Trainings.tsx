@@ -9,6 +9,7 @@ import { Calendar as CalendarIcon, List, Loader2 } from "lucide-react";
 import TrainingKanbanBoard from "@/components/TrainingKanbanBoard";
 import { useModal } from "@/hooks/useModal";
 import { loaderStore } from "@/store/loaderStore";
+import { useSidebarStore } from "@/store/sidebarStore";
 
 export default function Training() {
   const { loadTrainingByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
@@ -16,6 +17,7 @@ export default function Training() {
   const useUserStore = useStore(userStore);
   const teamStoreState = useStore(teamStore);
   const members = teamStoreState.members;
+  const { toggleDrawer } = useStore(useSidebarStore);
 
   const { isLoading, setIsLoading } = useStore(loaderStore);
 
@@ -59,7 +61,7 @@ export default function Training() {
     <div>
       <div className="flex items-center justify-between px-2 py-4 border-b border-white/5">
         <div className="flex items-center">
-          <List className="w-5 h-5 text-indigo-400 mr-3" />
+          <List className="w-5 h-5 text-indigo-400 mr-3 cursor-pointer" onClick={() => toggleDrawer()} />
           <h2 className="text-xl font-bold text-white">Trainings</h2>
         </div>
         <div className="flex items-center gap-2">
@@ -70,7 +72,7 @@ export default function Training() {
             onClick={() => setKanbanView(!kanbanView)}
             className="px-4 py-2 bg-[#222] hover:bg-[#333] border border-white/10 rounded-lg text-sm font-medium text-white transition-all"
           >
-            {kanbanView ? "Switch to List View" : "Switch to Kanban View"}
+            {kanbanView ? "List" : "Board"}
           </button>
         </div>
       </div>
