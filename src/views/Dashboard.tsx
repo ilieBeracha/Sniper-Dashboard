@@ -11,7 +11,6 @@ import { squadStore } from "@/store/squadStore";
 import { performanceStore } from "@/store/performance";
 import { getUserGroupingSummaryRpc } from "@/services/performance";
 import DashboardRowKPI from "@/components/DashboardRowKPI";
-import { CalendarIcon } from "lucide-react";
 import { List } from "lucide-react";
 import { FaStackOverflow } from "react-icons/fa";
 
