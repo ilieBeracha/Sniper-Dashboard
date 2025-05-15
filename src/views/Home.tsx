@@ -14,7 +14,7 @@ import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
 import { getSquadsWithUsersByTeamId } from "@/services/squadService";
 import Assets from "./Assets";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import { isMobile } from "react-device-detect";
 
 export default function Home() {
   const { token } = useStore(authStore);
@@ -23,7 +23,6 @@ export default function Home() {
   const { getSquadUsersBySquadId } = useStore(squadStore);
   const { getWeapons } = useStore(weaponsStore);
   const { getEqipmentsByTeamId } = useStore(equipmentStore);
-  const isMobile = useIsMobile();
   const user = useUserStore.user;
 
   useEffect(() => {
@@ -44,10 +43,10 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex w-screen">
-      <div>{token && <SidebarT />}</div>
+    <div className={`flex w-screen ${isMobile ? "flex-col" : "flex-row"}`}>
+      {token && <SidebarT />}
 
-      <main className={`flex-1 overflow-y-hidden ${isMobile ? "mt-16" : ""}`}>
+      <main className="flex-1 overflow-y-hidden">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/training" element={<Training />}></Route>

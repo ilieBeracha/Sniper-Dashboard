@@ -4,7 +4,7 @@ import { useStore } from "zustand";
 import { toastService } from "@/services/toastService";
 import BaseMobileDrawer from "./BaseDrawer/BaseMobileDrawer";
 import BaseDesktopDrawer from "./BaseDrawer/BaseDesktopDrawer";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import { isMobile } from "react-device-detect";
 import BaseInput from "./BaseInput";
 import { FileQuestion } from "lucide-react";
 
@@ -19,7 +19,6 @@ export default function AddAssignmentModal({
 }) {
   const [assignmentName, setAssignmentName] = useState("");
   const { isLoading } = useStore(loaderStore);
-  const isMobile = useIsMobile();
 
   const handleSubmit = () => {
     if (!assignmentName.trim()) {

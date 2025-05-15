@@ -4,10 +4,9 @@ import { InvitationStore } from "@/store/InvitationStore";
 import { useStore } from "zustand";
 import BaseDesktopDrawer from "./BaseDrawer/BaseDesktopDrawer";
 import BaseMobileDrawer from "./BaseDrawer/BaseMobileDrawer";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import { isMobile } from "react-device-detect";
 
 export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boolean; setIsOpen: (open: boolean) => void; userId: string }) {
-  const isMobile = useIsMobile();
   const useInvitationStore = useStore(InvitationStore);
   const invitation = useInvitationStore.invitation;
   const [loading, setLoading] = useState(false);

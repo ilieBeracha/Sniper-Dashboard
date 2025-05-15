@@ -24,7 +24,7 @@ export default function BaseMobileDrawer({
             <DialogPanel className="pointer-events-auto w-screen transform transition-all duration-300 ease-in-out data-[closed]:translate-x-full">
               <div className="flex h-full flex-col overflow-y-auto bg-[#161616] border-l border-zinc-800 shadow-2xl">
                 {/* Header */}
-                <div className="sticky top-0 z-10 px-4 sm:px-6 py-4 bg-[#161616] border-b border-zinc-800">
+                <div className="sticky top-0 z-10 px-4 sm:px-6 pt-6 pb-4 bg-[#161616] border-b border-zinc-800">
                   <div className="flex items-center justify-between">
                     <DialogTitle className="text-white text-lg font-medium">{title}</DialogTitle>
                     <button

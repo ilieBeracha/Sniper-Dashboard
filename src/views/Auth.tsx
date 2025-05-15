@@ -87,23 +87,13 @@ export default function Auth() {
       <div className="w-full md:w-3/5 flex items-center justify-center p-6 sm:p-8 md:p-8 relative z-10 shadow-black shadow-2xl">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <div className="w-8 h-8 bg-[#1E1E1E] rounded-full flex items-center justify-center mb-6 border border-[#2A2A2A]">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
-                />
-              </svg>
-            </div>
             <h2 className="text-2xl font-semibold text-white mb-2">{getAuthTitle()}</h2>
             <p className="text-gray-500 text-sm">{getAuthDescription()}</p>
           </div>
 
           {/* Tabs */}
           <div className="flex mb-4">
-            <div className="bg-[#1A1A1A] p-1 rounded-xl flex w-full border border-[#2A2A2A]">
+            <div className="bg-[#1A1A1A] rounded-xl flex w-full border border-[#2A2A2A]">
               {[
                 { type: "login", label: "Sign In" },
                 { type: "team_manager_register", label: "Commander" },
@@ -113,7 +103,7 @@ export default function Auth() {
                 <button
                   key={type}
                   onClick={() => setAuthType(type as AuthType)}
-                  className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
+                  className={`flex-1 px-4 py-1.5  text-xs font-medium rounded-xl transition-all duration-200 ${
                     authType === type ? "bg-white text-[#0A0A0A]" : "text-gray-500 hover:text-gray-300"
                   }`}
                 >

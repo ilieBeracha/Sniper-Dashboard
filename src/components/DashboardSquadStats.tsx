@@ -9,7 +9,7 @@ import { performanceStore } from "@/store/performance";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import NoDataDisplay from "./BaseNoData";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import { isMobile } from "react-device-detect";
 
 const formatValue = (value: number, type: string | undefined) => {
   if (type === "number") {
@@ -29,7 +29,6 @@ export default function DashboardSquadStats() {
   const [selectedDistance, setSelectedDistance] = useState("");
   const [selectedPosition, setSelectedPosition] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const isMobile = useIsMobile();
 
   const rangeOptions = [
     { id: "short", label: "Short Range (0-300m)" },

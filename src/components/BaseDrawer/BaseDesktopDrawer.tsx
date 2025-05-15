@@ -26,7 +26,7 @@ export default function BaseDesktopDrawer({
                 <div className="px-6 flex items-center justify-between">
                   <DialogTitle className="text-white text-lg ">{title}</DialogTitle>
                   <button onClick={() => setIsOpen(false)} className="text-white hover:text-gray-400 focus:outline-none">
-                    <X className="size-6" />
+                    <X className="size-4" />
                   </button>
                 </div>
                 <div className="relative mt-6 flex-1 px-6">{children}</div>

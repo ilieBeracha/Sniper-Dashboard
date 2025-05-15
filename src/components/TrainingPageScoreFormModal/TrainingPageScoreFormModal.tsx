@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import { isMobile } from "react-device-detect";
 import BaseMobileDrawer from "../BaseDrawer/BaseMobileDrawer";
 import { useScoreForm } from "@/hooks/useScoreForm";
 import TrainingPageScoreFormModalStep1 from "./TrainingPageScoreFormModalStep1";
@@ -19,7 +19,6 @@ export default function ScoreFormModal({
   editingScore?: any;
   assignmentSessions?: any[];
 }) {
-  const isMobile = useIsMobile();
   const [isGrouping] = useState(false);
 
   const {

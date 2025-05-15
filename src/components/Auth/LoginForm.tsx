@@ -59,7 +59,7 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
   );
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
+    <form className="space-y-6 " onSubmit={handleSubmit}>
       <BaseInput
         label="Email address"
         type="email"
@@ -68,6 +68,7 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Enter your email"
+        className="text-sm"
         leftIcon={emailIcon}
       />
 
@@ -79,6 +80,7 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Enter your password"
+        className="text-md"
         leftIcon={passwordIcon}
         rightIcon={togglePasswordIcon}
       />

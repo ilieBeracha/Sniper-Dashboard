@@ -12,7 +12,8 @@ import { useModal } from "@/hooks/useModal";
 import { toastService } from "@/services/toastService";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import { isMobile } from "react-device-detect";
+
 export default function TrainingAddTrainingSessionModal({
   isOpen,
   onClose,
@@ -26,7 +27,6 @@ export default function TrainingAddTrainingSessionModal({
   teamMembers: User[];
   assignments: Assignment[];
 }) {
-  const isMobile = useIsMobile();
   const [sessionName, setSessionName] = useState("");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");

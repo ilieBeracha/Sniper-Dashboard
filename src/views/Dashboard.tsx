@@ -1,7 +1,7 @@
 import { userStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
 import { useStore } from "zustand";
-import Header from "@/components/Header";
+import Header from "@/Headers/Header";
 
 import DashboardRowOne from "@/components/DashboardRowOne";
 import DashboardRowThree from "@/components/DashboardRowThree";
@@ -47,7 +47,16 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-[calc(100dvh-100px)] max-w-screen-3xl mx-auto  from-[#1E1E20] text-gray-100 p-3">
-      {userRole !== "soldier" && <Header setIsOpen={setIsInviteModalOpen} />}
+      <Header>
+        {userRole !== "soldier" && (
+          <button
+            onClick={() => setIsInviteModalOpen(true)}
+            className="px-4 py-2 bg-[#222] hover:bg-[#333] border border-white/10 rounded-lg text-sm font-medium text-white transition-all"
+          >
+            Invite
+          </button>
+        )}
+      </Header>
       <div className="grid grid-cols-1 gap-2">
         <DashboardRowOne user={user} />
         <DashboardRowKPI />

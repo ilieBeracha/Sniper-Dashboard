@@ -1,9 +1,9 @@
 import { Shield, Mail, Users, Target } from "lucide-react";
 import { User, UserRole } from "@/types/user";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import { isMobile } from "react-device-detect";
+
 export default function DashboardWelcome({ user }: { user: User }) {
   if (!user) return null;
-  const isMobile = useIsMobile();
   const getRoleColor = (role: UserRole) => {
     switch (role) {
       case "commander":

@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "zustand";
 import { Calendar as CalendarIcon, List } from "lucide-react";
 import TrainingKanbanBoard from "@/components/TrainingKanbanBoard";
-import TrainingsHeader from "@/components/TrainingsHeader";
+import TrainingHeader from "@/Headers/TrainingHeader";
 
 export default function Training() {
   const { loadTrainingByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
@@ -48,11 +48,7 @@ export default function Training() {
 
   return (
     <div className="min-h-screen w-full from-[#1E1E20] text-gray-100 p-3">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <div className="mb-2 md:mb-0"></div>
-        <TrainingsHeader setIsOpen={handleAddTrainingModal} kanbanView={kanbanView} setKanbanView={setKanbanView} />
-      </div>
-
+      <TrainingHeader kanbanView={kanbanView} setKanbanView={setKanbanView} />
       {isLoading ? (
         <div className="min-h-[500px] flex items-center justify-center">
           <div className="flex flex-col items-center">
