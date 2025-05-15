@@ -75,7 +75,7 @@ function TrainingTimelineItem({
         </div>
 
         <h4 className="text-sm font-semibold line-clamp-1">{session.session_name}</h4>
-        <p className="text-xs text-gray-400 mt-1 flex items-center gap-2">
+        <div className="text-xs text-gray-400 mt-1 flex items-center gap-2">
           <CalendarDays className="w-4 h-4 text-gray-500" />
           <div className="flex items-center justify-between w-full gap-2">
             {format(new Date(session.date), "dd MMM yyyy, HH:mm")}
@@ -86,7 +86,7 @@ function TrainingTimelineItem({
               View
             </span>
           </div>
-        </p>
+        </div>
       </div>
     </div>
   );

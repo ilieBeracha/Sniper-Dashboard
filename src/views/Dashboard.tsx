@@ -1,7 +1,6 @@
 import { userStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
 import { useStore } from "zustand";
-import Header from "@/Headers/Header";
 
 import DashboardRowOne from "@/components/DashboardRowOne";
 import DashboardRowThree from "@/components/DashboardRowThree";
@@ -12,6 +11,8 @@ import { squadStore } from "@/store/squadStore";
 import { performanceStore } from "@/store/performance";
 import { getUserGroupingSummaryRpc } from "@/services/performance";
 import DashboardRowKPI from "@/components/DashboardRowKPI";
+import { CalendarIcon } from "lucide-react";
+import { List } from "lucide-react";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
@@ -46,22 +47,22 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-[calc(100dvh-100px)] max-w-screen-3xl mx-auto  from-[#1E1E20] text-gray-100 p-3">
-      <Header>
-        {userRole !== "soldier" && (
-          <button
-            onClick={() => setIsInviteModalOpen(true)}
-            className="px-4 py-2 bg-[#222] hover:bg-[#333] border border-white/10 rounded-lg text-sm font-medium text-white transition-all"
-          >
-            Invite
-          </button>
-        )}
-      </Header>
-      <div className="grid grid-cols-1 gap-2">
+    <div className="min-h-[calc(100dvh-100px)] from-[#1E1E20] text-gray-100 ">
+      <div className="flex items-center justify-between px-2 py-4 border-b border-white/5">
+        <div className="flex items-center">
+          <List className="w-5 h-5 text-indigo-400 mr-3" />
+          <h2 className="text-xl font-bold text-white">Overview</h2>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 py-1.5 px-3 rounded-full">
+            <CalendarIcon className="w-3 h-3 mr-1.5" />
+          </span>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-2 mt-6">
         <DashboardRowOne user={user} />
         <DashboardRowKPI />
         <DashboardRowThree loading={loading} />
-        {/* <DashboardRowTwo /> */}
         <DashboardRowFour />
       </div>
       {userRole !== "soldier" && user?.id && <InviteModal isOpen={isInviteModalOpen} setIsOpen={setIsInviteModalOpen} userId={user.id} />}

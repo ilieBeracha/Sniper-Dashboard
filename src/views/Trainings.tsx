@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "zustand";
 import { Calendar as CalendarIcon, List } from "lucide-react";
 import TrainingKanbanBoard from "@/components/TrainingKanbanBoard";
-import TrainingHeader from "@/Headers/TrainingHeader";
+import { useModal } from "@/hooks/useModal";
 
 export default function Training() {
   const { loadTrainingByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
@@ -16,26 +16,19 @@ export default function Training() {
   const teamStoreState = useStore(teamStore);
   const members = teamStoreState.members;
 
-  const [showModal, setShowModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isOpen: isAddTrainingOpen, setIsOpen: setIsAddTrainingOpen } = useModal();
   const [kanbanView, setKanbanView] = useState(false);
 
   const user = useUserStore.user;
   const trainings = useTrainingStore.trainings || [];
   const assignments = useTrainingStore.assignments;
 
-  function handleAddTrainingModal() {
-    setShowModal(!showModal);
-  }
-
   useEffect(() => {
     const load = async () => {
-      setIsLoading(true);
       if (!user?.team_id) return;
       await loadWeeklyAssignmentsStats(user?.team_id);
       await loadTrainingByTeamId(user?.team_id);
       await loadAssignments();
-      setIsLoading(false);
     };
     load();
   }, []);
@@ -47,41 +40,29 @@ export default function Training() {
   }
 
   return (
-    <div className="min-h-screen w-full from-[#1E1E20] text-gray-100 p-3">
-      <TrainingHeader kanbanView={kanbanView} setKanbanView={setKanbanView} />
-      {isLoading ? (
-        <div className="min-h-[500px] flex items-center justify-center">
-          <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
-            <p className="mt-4 text-gray-400">Loading training data...</p>
-          </div>
+    <div>
+      <div className="flex items-center justify-between px-2 py-4 border-b border-white/5">
+        <div className="flex items-center">
+          <List className="w-5 h-5 text-indigo-400 mr-3" />
+          <h2 className="text-xl font-bold text-white">Trainings</h2>
         </div>
-      ) : (
-        <div className="sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-          <div className="xl:col-span-5 order-2 xl:order-1">
-            <div className="">
-              <div className="flex items-center justify-between px-2 py-4 border-b border-white/5">
-                <div className="flex items-center">
-                  <List className="w-5 h-5 text-indigo-400 mr-3" />
-                  <h2 className="text-xl font-bold text-white">Training Sessions</h2>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 py-1.5 px-3 rounded-full">
-                    <CalendarIcon className="w-3 h-3 mr-1.5" />
-                    {trainings.length} {trainings.length === 1 ? "session" : "sessions"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="pt-2 pb-6">{kanbanView ? <TrainingKanbanBoard trainings={trainings} /> : <TrainingList trainings={trainings} />}</div>
-            </div>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 py-1.5 px-3 rounded-full">
+            <CalendarIcon className="w-3 h-3 mr-1.5" />
+          </span>
+          <button
+            onClick={() => setKanbanView(!kanbanView)}
+            className="px-4 py-2 bg-[#222] hover:bg-[#333] border border-white/10 rounded-lg text-sm font-medium text-white transition-all"
+          >
+            {kanbanView ? "Switch to List View" : "Switch to Kanban View"}
+          </button>
         </div>
-      )}
+      </div>
+      <div className="">{kanbanView ? <TrainingKanbanBoard trainings={trainings} /> : <TrainingList trainings={trainings} />}</div>
 
       <TrainingAddTrainingSessionModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        isOpen={isAddTrainingOpen}
+        onClose={() => setIsAddTrainingOpen(false)}
         onSuccess={fetchTrainings}
         teamMembers={members}
         assignments={assignments}

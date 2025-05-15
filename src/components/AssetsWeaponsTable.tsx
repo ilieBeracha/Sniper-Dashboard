@@ -17,14 +17,6 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
 
   return (
     <div className=" px-4 sm:px-6 lg:px-8 min-h-screen">
-      <div className="sm:flex sm:items-center justify-end">
-        <button
-          type="button"
-          className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          Add weapon
-        </button>
-      </div>
       <div className="mt-8 flow-root bg-[#1E1E1E]  rounded-lg">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">

@@ -38,7 +38,7 @@ export default function TrainingPageScoreStats({
     <div className="w-full">
       <div className="flex items-center space-x-3 mb-4">
         <Target className="h-6 w-6 text-indigo-400" />
-        <h2 className="text-2xl font-semibold text-white tracking-tight">Performance Overview</h2>
+        <h4 className="text-2xl font-semibold text-white tracking-tight">Performance Overview</h4>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (

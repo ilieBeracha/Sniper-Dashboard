@@ -32,7 +32,6 @@ export default function SearchableCheckboxList({
   emptyMessage = "No items found",
   maxHeight = 200,
   showBadges = false,
-  showClearButton = true,
 }: SearchableCheckboxListProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -62,7 +61,7 @@ export default function SearchableCheckboxList({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const selectedItems = items.filter((item) => selectedIds.includes(item.id));
+  const selectedItems = items?.filter((item) => selectedIds?.includes(item.id));
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -129,23 +128,6 @@ export default function SearchableCheckboxList({
               </ul>
             )}
           </div>
-
-          {selectedIds.length > 0 && showClearButton && (
-            <div className="px-4 py-2 border-t border-white/5 flex justify-between bg-[#191919]">
-              <span className="text-xs text-gray-400">
-                {selectedIds.length} item{selectedIds.length !== 1 ? "s" : ""} selected
-              </span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedIds([]);
-                }}
-                className="text-xs text-indigo-400 hover:text-indigo-300"
-              >
-                Clear all
-              </button>
-            </div>
-          )}
         </div>
       )}
     </div>
