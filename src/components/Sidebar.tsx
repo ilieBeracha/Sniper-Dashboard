@@ -17,6 +17,8 @@ const navSections = [
       { name: "Dashboard", href: "/", icon: <BiSolidDashboard className="w-5 h-5" /> },
       { name: "Training", href: "/training", icon: <BsBarChartFill className="w-5 h-5" /> },
       { name: "Assets", href: "/assets", icon: <FaCrosshairs className="w-5 h-5" /> },
+            { name: "Notebook", href: "/notebook", icon: <FaCrosshairs className="w-5 h-5" /> },
+
     ],
   },
   {

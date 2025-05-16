@@ -14,6 +14,7 @@ import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
 import { getSquadsWithUsersByTeamId } from "@/services/squadService";
 import DefaultLayout from "@/layouts/DefaultLayout";
+import UserNotebook from "./Notebook";
 
 export default function AppRoutes() {
   const { token } = useStore(authStore);
@@ -46,6 +47,7 @@ export default function AppRoutes() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/training" element={<Training />} />
           <Route path="/assets" element={<Assets />} />
+          <Route path="/notebook" element={<UserNotebook />} />
           <Route path="/training/:id" element={<TrainingPage />} />
           <Route path="*" element={<ErrorPage />} />
         </Route>

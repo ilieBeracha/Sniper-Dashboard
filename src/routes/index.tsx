@@ -4,6 +4,7 @@ import Training from "@/views/Training";
 import Assets from "@/views/Assets";
 import TrainingPage from "@/views/Training";
 import ErrorPage from "@/views/404";
+import UserNotebook from "@/views/Notebook";
 
 export const routes: RouteObject[] = [
   {
@@ -17,6 +18,10 @@ export const routes: RouteObject[] = [
   {
     path: "/assets",
     element: <Assets />,
+  },
+  {
+    path: "/notebook",
+    element: <UserNotebook />,
   },
   {
     path: "/training/:id",

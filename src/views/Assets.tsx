@@ -13,7 +13,7 @@ export default function AssetsPage() {
       <Header>
         <button className="px-4 py-2 bg-[#222] hover:bg-[#333] border border-white/10 rounded-lg text-sm font-medium text-white transition-all">
           Add Assets
-        </button>{" "}
+        </button>
       </Header>
       <div className="flex flex-col gap-4">
         <AssetsWeaponsTable weapons={weapons} />
