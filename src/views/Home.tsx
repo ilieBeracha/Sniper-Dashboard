@@ -44,7 +44,7 @@ export default function AppRoutes() {
       {token ? (
         <Route element={<DefaultLayout />}>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/training" element={<Training />} />
+          <Route path="/trainings" element={<Training />} />
           <Route path="/assets" element={<Assets />} />
           <Route path="/training/:id" element={<TrainingPage />} />
           <Route path="*" element={<ErrorPage />} />

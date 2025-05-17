@@ -47,7 +47,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-[calc(100dvh-100px)] from-[#1E1E20] text-gray-100 ">
+    <div className="min-h-[calc(100dvh-100px)]  text-gray-100 ">
       <Header title="Overview">
         <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 p-2 rounded-full">
           <FaStackOverflow className="w-3 h-3" />

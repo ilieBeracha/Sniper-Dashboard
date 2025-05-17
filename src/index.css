@@ -2,10 +2,10 @@
 @plugin "flowbite-react/plugin/tailwindcss";
 @source "../.flowbite-react/class-list.json";
 /* src/index.css */
-body {
+/* body {
   font-family: "Roboto", sans-serif;
 }
-/* p,
+p,
 h1,
 h2,
 h3,
@@ -20,7 +20,7 @@ span,
 button,
 a,
 div {
-  font-size: 99% !important;
+  color: white !important;
 } */
 
 :root {

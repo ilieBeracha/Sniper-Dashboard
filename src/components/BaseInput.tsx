@@ -1,6 +1,5 @@
 import { forwardRef, InputHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
-
 export interface BaseInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
@@ -25,11 +24,9 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
           <input
             ref={ref}
             className={cn(
-              "block w-full rounded-md text-white border border-[#2A2A2A] bg-zinc-900 px-1 py-1.5 text-sm",
-              "focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              "placeholder:text-white placeholder:text-sm",
-              "transition-all duration-200 placeholder:pl-2 placeholder:text-white placeholder:text-sm",
+              " w-full  appearance-none px-4 py-2 text-sm shadow-theme-xs placeholder:text-gray-500 focus:outline-hidden focus:ring-3  dark:text-white/90 dark:placeholder:text-white/30",
+              "placeholder:text-white placeholder:text-sm border rounded-lg bg-transparent text-gray-300 border-gray-700 focus:border-gray-500 focus:ring-gray-500/20",
+              "transition-all duration-200 placeholder:pl-2 placeholder:text-gray-300 placeholder:text-sm",
               leftIcon && "pl-10",
               rightIcon && "pr-10",
               error && "border-red-500 focus:border-red-500 focus:ring-red-500",

@@ -87,7 +87,7 @@ export default function Auth() {
       <div className="w-full md:w-3/5 flex items-center justify-center p-6 sm:p-8 md:p-8 relative z-10 shadow-black shadow-2xl">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-white mb-2">{getAuthTitle()}</h2>
+            <h2 className="text-lg font-semibold text-white mb-2">{getAuthTitle()}</h2>
             <p className="text-gray-500 text-sm">{getAuthDescription()}</p>
           </div>
 
@@ -115,7 +115,7 @@ export default function Auth() {
 
           {/* Form Card */}
           <div className="relative">
-            <div className="relative bg-[#161616] py-4 px-4 rounded-xl border border-[#2A2A2A]">
+            <div className="relative py-4 px-4  rounded-xl border border-[#2A2A2A]">
               {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10 rounded-3xl backdrop-blur-sm">
                   <div className="flex flex-col items-center">

@@ -5,20 +5,18 @@ import { TrainingStore } from "@/store/trainingStore";
 import { userStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
 import { useStore } from "zustand";
-import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import TrainingKanbanBoard from "@/components/TrainingKanbanBoard";
 import { useModal } from "@/hooks/useModal";
-import { loaderStore } from "@/store/loaderStore";
+
 import Header from "@/Headers/Header";
 
-export default function Training() {
+export default function Trainings() {
   const { loadTrainingByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
   const useTrainingStore = useStore(TrainingStore);
   const useUserStore = useStore(userStore);
   const teamStoreState = useStore(teamStore);
   const members = teamStoreState.members;
-
-  const { isLoading, setIsLoading } = useStore(loaderStore);
 
   const { isOpen: isAddTrainingOpen, setIsOpen: setIsAddTrainingOpen } = useModal();
   const [kanbanView, setKanbanView] = useState(false);
@@ -29,13 +27,11 @@ export default function Training() {
 
   useEffect(() => {
     const load = async () => {
-      setIsLoading(true);
       isAddTrainingOpen;
       if (!user?.team_id) return;
       await loadWeeklyAssignmentsStats(user?.team_id);
       await loadTrainingByTeamId(user?.team_id);
       await loadAssignments();
-      setIsLoading(false);
     };
     load();
   }, []);
@@ -44,16 +40,6 @@ export default function Training() {
     const teamId = userStore.getState().user?.team_id;
     if (!teamId) return;
     await loadTrainingByTeamId(teamId);
-  }
-
-  if (isLoading) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/50 backdrop-blur-sm z-10">
-        <div className="bg-zinc-800 rounded-lg p-4 flex items-center space-x-3 border border-zinc-700">
-          <Loader2 className="h-6 w-6 text-zinc-400 animate-spin" />
-        </div>
-      </div>
-    );
   }
 
   return (
