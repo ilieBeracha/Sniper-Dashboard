@@ -5,6 +5,7 @@ import Assets from "@/views/Assets";
 import TrainingPage from "@/views/Training";
 import ErrorPage from "@/views/404";
 import UserNotebook from "@/views/Notebook";
+import TrainingSummaryPage from "@/views/TrainingSummary";
 
 export const routes: RouteObject[] = [
   {
@@ -22,6 +23,10 @@ export const routes: RouteObject[] = [
   {
     path: "/notebook",
     element: <UserNotebook />,
+  },
+  {
+    path: "/summary",
+    element: <TrainingSummaryPage />,
   },
   {
     path: "/training/:id",
