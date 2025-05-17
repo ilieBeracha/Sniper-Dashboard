@@ -132,10 +132,16 @@ export default function TrainingSummaryListPage() {
                 <div className="text-sm text-zinc-400">👥 Participants: {training.participant_ids?.length || 0}</div>
                 <div className="text-sm text-zinc-400">🎯 Scores Added: {training.total_scores}</div>
                 <div className="text-sm text-zinc-400">🔍 Your Scores: {training.user_scores}</div>
+
                 {training.summary && (
                   <div className="text-sm text-gray-300 border-t border-zinc-700 pt-3">
                     <strong className="flex items-center gap-1">🧠 Commander Summary:</strong>
                     <p className="mt-1 text-zinc-200">{training.summary}</p>
+                    {training.commander_first_name && training.commander_last_name && (
+                      <p className="text-xs text-zinc-500 mt-1">
+                        — {training.commander_first_name} {training.commander_last_name}
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -184,12 +190,20 @@ export default function TrainingSummaryListPage() {
                           onChange={(e) => handleFeedbackChange(training.id, e.target.value)}
                           placeholder="Write your thoughts about the training..."
                         />
-                        <button
-                          className="px-4 py-1 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded"
-                          onClick={() => handleFeedbackSubmit(training.id)}
-                        >
-                          {feedbackIdMap[training.id] ? "Update Feedback" : "Submit Feedback"}
-                        </button>
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            className="px-4 py-1 text-sm bg-zinc-700 text-white rounded"
+                            onClick={() => setEditingMap((prev) => ({ ...prev, [training.id]: false }))}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            className="px-4 py-1 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded"
+                            onClick={() => handleFeedbackSubmit(training.id)}
+                          >
+                            {feedbackIdMap[training.id] ? "Update Feedback" : "Submit Feedback"}
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
