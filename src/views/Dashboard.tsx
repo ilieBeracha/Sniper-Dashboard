@@ -11,7 +11,7 @@ import { squadStore } from "@/store/squadStore";
 import { performanceStore } from "@/store/performance";
 import { getUserGroupingSummaryRpc } from "@/services/performance";
 import DashboardRowKPI from "@/components/DashboardRowKPI";
-import { List } from "lucide-react";
+import Header from "@/Headers/Header";
 import { FaStackOverflow } from "react-icons/fa";
 
 export default function Dashboard() {
@@ -48,17 +48,11 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-[calc(100dvh-100px)] from-[#1E1E20] text-gray-100 ">
-      <div className="flex items-center justify-between px-2 py-4 border-b border-white/5">
-        <div className="flex items-center">
-          <List className="w-5 h-5 text-indigo-400 mr-3" />
-          <h2 className="text-xl font-bold text-white">Overview</h2>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 p-2 rounded-full">
-            <FaStackOverflow className="w-3 h-3" />
-          </span>
-        </div>
-      </div>
+      <Header title="Overview">
+        <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 p-2 rounded-full">
+          <FaStackOverflow className="w-3 h-3" />
+        </span>
+      </Header>
       <div className="grid grid-cols-1 gap-2 mt-6">
         <DashboardRowOne user={user} />
         <DashboardRowKPI />

@@ -1,19 +1,18 @@
-import { BiChevronRight } from "react-icons/bi";
 import { useStore } from "zustand";
 import { useSidebarStore } from "@/store/sidebarStore";
+import { List } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
-export default function Header({ children }: { children: React.ReactNode }) {
+export default function Header({ children, title }: { children: React.ReactNode; title?: string }) {
   const { toggleDrawer } = useStore(useSidebarStore);
 
   return (
-    <div className=" mb-2 w-full flex md:flex-row md:items-center md:justify-end gap-2 justify-center">
-      {isMobile && (
-        <button className=" z-50 p-2 bg-[#1E1E1E] rounded-lg text-white" onClick={() => toggleDrawer()}>
-          <BiChevronRight className="w-6 h-6" />
-        </button>
-      )}
-      <div className="flex space-x-4 w-full justify-end items-center">{children}</div>
+    <div className="flex items-center justify-between px-2 py-4 border-b border-white/5">
+      <div className="flex items-center">
+        {isMobile && <List className="w-5 h-5 text-indigo-400 mr-3" onClick={toggleDrawer} />}
+        <h2 className="text-xl font-bold text-white">{title}</h2>
+      </div>
+      <div className="flex items-center gap-2">{children}</div>
     </div>
   );
 }

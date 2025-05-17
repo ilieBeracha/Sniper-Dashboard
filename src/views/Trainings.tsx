@@ -5,11 +5,11 @@ import { TrainingStore } from "@/store/trainingStore";
 import { userStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
 import { useStore } from "zustand";
-import { Calendar as CalendarIcon, List, Loader2 } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import TrainingKanbanBoard from "@/components/TrainingKanbanBoard";
 import { useModal } from "@/hooks/useModal";
 import { loaderStore } from "@/store/loaderStore";
-import { useSidebarStore } from "@/store/sidebarStore";
+import Header from "@/Headers/Header";
 
 export default function Training() {
   const { loadTrainingByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
@@ -17,7 +17,6 @@ export default function Training() {
   const useUserStore = useStore(userStore);
   const teamStoreState = useStore(teamStore);
   const members = teamStoreState.members;
-  const { toggleDrawer } = useStore(useSidebarStore);
 
   const { isLoading, setIsLoading } = useStore(loaderStore);
 
@@ -59,23 +58,17 @@ export default function Training() {
 
   return (
     <div>
-      <div className="flex items-center justify-between px-2 py-4 border-b border-white/5">
-        <div className="flex items-center">
-          <List className="w-5 h-5 text-indigo-400 mr-3 cursor-pointer" onClick={() => toggleDrawer()} />
-          <h2 className="text-xl font-bold text-white">Trainings</h2>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 py-1.5 px-3 rounded-full">
-            <CalendarIcon className="w-3 h-3 mr-1.5" />
-          </span>
-          <button
-            onClick={() => setKanbanView(!kanbanView)}
-            className="px-4 py-2 bg-[#222] hover:bg-[#333] border border-white/10 rounded-lg text-sm font-medium text-white transition-all"
-          >
-            {kanbanView ? "List" : "Board"}
-          </button>
-        </div>
-      </div>
+      <Header title="Trainings">
+        <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 py-1.5 px-3 rounded-full">
+          <CalendarIcon className="w-3 h-3 mr-1.5" />
+        </span>
+        <button
+          onClick={() => setKanbanView(!kanbanView)}
+          className="px-4 py-2 bg-[#222] hover:bg-[#333] border border-white/10 rounded-lg text-sm font-medium text-white transition-all"
+        >
+          {kanbanView ? "List" : "Board"}
+        </button>
+      </Header>
       <div className="">{kanbanView ? <TrainingKanbanBoard trainings={trainings} /> : <TrainingList trainings={trainings} />}</div>
 
       <TrainingAddTrainingSessionModal
