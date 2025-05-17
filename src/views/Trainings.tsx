@@ -3,10 +3,9 @@ import TrainingList from "@/components/TrainingList";
 import { teamStore } from "@/store/teamStore";
 import { TrainingStore } from "@/store/trainingStore";
 import { userStore } from "@/store/userStore";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useStore } from "zustand";
 import { Calendar as CalendarIcon } from "lucide-react";
-import TrainingKanbanBoard from "@/components/TrainingKanbanBoard";
 import { useModal } from "@/hooks/useModal";
 
 import Header from "@/Headers/Header";
@@ -19,7 +18,6 @@ export default function Trainings() {
   const members = teamStoreState.members;
 
   const { isOpen: isAddTrainingOpen, setIsOpen: setIsAddTrainingOpen } = useModal();
-  const [kanbanView, setKanbanView] = useState(false);
 
   const user = useUserStore.user;
   const trainings = useTrainingStore.trainings || [];
@@ -48,22 +46,18 @@ export default function Trainings() {
         <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 py-1.5 px-3 rounded-full">
           <CalendarIcon className="w-3 h-3 mr-1.5" />
         </span>
-        <button
-          onClick={() => setKanbanView(!kanbanView)}
-          className="px-4 py-2 bg-[#222] hover:bg-[#333] border border-white/10 rounded-lg text-sm font-medium text-white transition-all"
-        >
-          {kanbanView ? "List" : "Board"}
-        </button>
       </Header>
-      <div className="">{kanbanView ? <TrainingKanbanBoard trainings={trainings} /> : <TrainingList trainings={trainings} />}</div>
+      <div className=" p-4 md:p-6 2xl:p-10">
+        <TrainingList trainings={trainings} />
 
-      <TrainingAddTrainingSessionModal
-        isOpen={isAddTrainingOpen}
-        onClose={() => setIsAddTrainingOpen(false)}
-        onSuccess={fetchTrainings}
-        teamMembers={members}
-        assignments={assignments}
-      />
+        <TrainingAddTrainingSessionModal
+          isOpen={isAddTrainingOpen}
+          onClose={() => setIsAddTrainingOpen(false)}
+          onSuccess={fetchTrainings}
+          teamMembers={members}
+          assignments={assignments}
+        />
+      </div>
     </div>
   );
 }

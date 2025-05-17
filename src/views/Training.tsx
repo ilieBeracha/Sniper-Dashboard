@@ -19,6 +19,7 @@ import TrainingPageScoreStats from "@/components/TrainingPageScoreStats";
 import { squadStore } from "@/store/squadStore";
 import { useModal } from "@/hooks/useModal";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
+import Header from "@/Headers/Header";
 
 export default function TrainingPage() {
   const params = useParams();
@@ -93,37 +94,43 @@ export default function TrainingPage() {
   const squadCount = squadsWithMembers?.length || 0;
 
   return (
-    <div className="min-h-screen from-[#1E1E20] text-gray-100 px-6 py-8 space-y-4">
-      <div className="grid sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 gap-2 w-full">
-        <TrainingPageScoreStats totalScores={totalScores} dayScores={dayScores} nightScores={nightScores} squadCount={squadCount} />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
-        <div className="lg:col-span-2">
-          <TrainingPageOverview training={training} />
-        </div>
-        <div className="lg:col-span-1">
-          <TrainingPageAssignments training={training} setIsAddAssignmentOpen={setIsAddAssignmentOpen} />
-        </div>
+    <div className="min-h-screen from-[#1E1E20] ">
+      <Header title="Training">
+        <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 py-1.5 px-3 rounded-full">{training?.date}</span>{" "}
+      </Header>
 
-        {isCommander(userRole) && (
-          <div className="lg:col-span-3">
-            <TrainingPageChangeStatus training={training as TrainingSession} onStatusChange={handleStatusChange} />
+      <div className=" p-4 md:p-6 2xl:p-10 text-gray-100 px-6 py-8 space-y-4">
+        <div className="grid sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 gap-2 w-full">
+          <TrainingPageScoreStats totalScores={totalScores} dayScores={dayScores} nightScores={nightScores} squadCount={squadCount} />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+          <div className="lg:col-span-2">
+            <TrainingPageOverview training={training} />
           </div>
-        )}
+          <div className="lg:col-span-1">
+            <TrainingPageAssignments training={training} setIsAddAssignmentOpen={setIsAddAssignmentOpen} />
+          </div>
 
-        <div className="lg:col-span-3">
-          <TrainingPageScore />
+          {isCommander(userRole) && (
+            <div className="lg:col-span-3">
+              <TrainingPageChangeStatus training={training as TrainingSession} onStatusChange={handleStatusChange} />
+            </div>
+          )}
+
+          <div className="lg:col-span-3">
+            <TrainingPageScore />
+          </div>
         </div>
-      </div>
 
-      <EditTrainingSessionModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        onSuccess={handleEditSuccess}
-        teamMembers={members}
-        assignments={assignments}
-        training={training}
-      />
+        <EditTrainingSessionModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSuccess={handleEditSuccess}
+          teamMembers={members}
+          assignments={assignments}
+          training={training}
+        />
+      </div>
 
       <ConfirmStatusChangeModal
         isOpen={isConfirmModalOpen}

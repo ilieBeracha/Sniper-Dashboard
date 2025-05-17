@@ -37,7 +37,11 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   const SidebarContent = () => (
-    <div className={`flex flex-col bg-[#121212] border-r border-[#1D1D1F] ${collapsed ? "w-20" : "w-72"} h-full`}>
+    <div className={`flex flex-col bg-[#121212] border-r border-[#1D1D1F] ${collapsed ? "w-20" : "w-72"} h-full relative`}>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-blue-500/10  rounded-full blur-3xl" />
+      </div>
       <div className="flex items-center justify-between h-16 px-4 border-b border-[#1D1D1F] bg-[#121212]">
         {!collapsed && <span className="text-lg font-bold text-white">ScopeStats</span>}
         <button onClick={() => (isMobile ? toggleDrawer() : setCollapsed(!collapsed))} className="text-white text-xl hover:opacity-80">

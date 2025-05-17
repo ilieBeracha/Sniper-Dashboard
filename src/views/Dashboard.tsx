@@ -53,7 +53,7 @@ export default function Dashboard() {
           <FaStackOverflow className="w-3 h-3" />
         </span>
       </Header>
-      <div className="grid grid-cols-1 gap-2 mt-6">
+      <div className="grid grid-cols-1 gap-2 p-4 md:p-6 2xl:p-10">
         <DashboardRowOne user={user} />
         <DashboardRowKPI />
         <DashboardRowThree loading={loading} />
