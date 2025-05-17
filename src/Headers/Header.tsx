@@ -7,7 +7,7 @@ export default function Header({ children, title }: { children: React.ReactNode;
   const { toggleDrawer } = useStore(useSidebarStore);
 
   return (
-    <div className="flex items-center justify-between px-4 py-4 h-16 border-b border-white/5 relative">
+    <div className="flex items-center justify-between px-4 py-4 h-16 border-b border-white/5 relative z-[100]">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-3xl" />
         <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-blue-500/10  rounded-full blur-3xl" />

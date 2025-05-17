@@ -99,7 +99,7 @@ export default function TrainingPage() {
         <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 py-1.5 px-3 rounded-full">{training?.date}</span>{" "}
       </Header>
 
-      <div className=" p-4 md:p-6 2xl:p-10 text-gray-100 px-6 py-8 space-y-4">
+      <div className="grid grid-cols-1 gap-2 p-4 md:p-6 2xl:p-10 ">
         <div className="grid sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 gap-2 w-full">
           <TrainingPageScoreStats totalScores={totalScores} dayScores={dayScores} nightScores={nightScores} squadCount={squadCount} />
         </div>

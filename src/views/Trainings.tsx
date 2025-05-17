@@ -47,7 +47,7 @@ export default function Trainings() {
           <CalendarIcon className="w-3 h-3 mr-1.5" />
         </span>
       </Header>
-      <div className=" p-4 md:p-6 2xl:p-10">
+      <div className="grid grid-cols-1 gap-2 p-4 md:p-6 2xl:p-10 ">
         <TrainingList trainings={trainings} />
 
         <TrainingAddTrainingSessionModal

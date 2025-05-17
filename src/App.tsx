@@ -25,7 +25,7 @@ export default function App() {
   }
 
   return (
-    <div className="w-screen min-h-screen ">
+    <div className="w-screen min-h-screen bg-[#121212]">
       <Routes>{token ? <Route path={"*"} element={<Home />} /> : <Route path={"*"} element={<Auth />} />}</Routes>
     </div>
   );
