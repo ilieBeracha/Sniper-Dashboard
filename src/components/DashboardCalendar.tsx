@@ -65,10 +65,14 @@ function TrainingTimelineItem({
       </div>
 
       <div
-        className={`bg-[#1E1E1E] border-l-red-800 border-4 p-2 rounded-xl shadow-md border-white/5 w-full md:w-[75%] text-sm ${
+        className={` relative border-l-red-800 border-4 p-2 rounded-xl shadow-md border-white/5 w-full md:w-[75%] text-sm ${
           alignment === "right" ? "ml-auto" : ""
         }`}
       >
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-emerald-500/10 to-yellow-500/10 rounded-full blur-3xl" /> */}
+          <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-3xl" />
+        </div>
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs text-gray-400">{label}</span>
           <span className={`text-xs px-3 py-1 rounded-full ${tagColor}`}>{color === "gray" ? "Completed" : "Upcoming"}</span>
