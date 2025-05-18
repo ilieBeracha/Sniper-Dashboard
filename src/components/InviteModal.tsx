@@ -46,7 +46,7 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
   };
 
   const Content = (
-    <div className="flex flex-col items-center text-center px-4 sm:px-6 py-4 space-y-6 h-full w-full">
+    <div className="flex flex-col items-center text-center  py-4 space-y-6 h-full w-full">
       <div className="p-4 rounded-full bg-zinc-800/50 border border-zinc-700/50 shadow-lg">
         <UserPlus className="w-8 h-8 sm:w-10 sm:h-10 text-indigo-400" />
       </div>

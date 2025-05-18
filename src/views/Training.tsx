@@ -20,11 +20,13 @@ import { squadStore } from "@/store/squadStore";
 import { useModal } from "@/hooks/useModal";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
 import Header from "@/Headers/Header";
+import { format, parseISO } from "date-fns";
 
 export default function TrainingPage() {
-  const params = useParams();
-  const { id } = params;
-  const { training, loadTrainingById, loadAssignments, createAssignment } = useStore(TrainingStore);
+  const { id } = useParams();
+
+  const { training, loadTrainingById, loadAssignments, createAssignment, assignments } = useStore(TrainingStore);
+
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
 
   const { userRole } = useStore(userStore);
@@ -35,78 +37,79 @@ export default function TrainingPage() {
 
   const { isLoading, setIsLoading } = useStore(loaderStore);
   const { members } = useStore(teamStore);
-  const { assignments } = useStore(TrainingStore);
-
   const { getScoresByTrainingId, scores } = useStore(scoreStore);
 
+  /* ------------ data loading ------------ */
   useEffect(() => {
     const load = async () => {
-      if (id) {
-        await loadAssignments();
-        await loadTrainingById(id as string);
-        await getScoresByTrainingId(id as string);
-      }
+      if (!id) return;
+      await loadAssignments();
+      await loadTrainingById(id);
+      await getScoresByTrainingId(id);
     };
-
     load();
   }, [id, isLoading]);
 
-  const handleStatusChange = async (newStatus: TrainingStatus) => {
+  /* ------------ handlers ------------ */
+  const handleStatusChange = (newStatus: TrainingStatus) => {
     setPendingStatus(newStatus);
     setIsConfirmModalOpen(true);
   };
 
   const handleConfirmStatusChange = async () => {
     try {
-      const { error } = await supabase.from("training_session").update({ status: pendingStatus }).eq("id", training?.id);
-      if (error) {
-        console.error("Error updating training status:", error);
-      }
+      await supabase.from("training_session").update({ status: pendingStatus }).eq("id", training?.id);
       await loadTrainingById(id as string);
     } catch (error) {
-      console.error("Error updating training status:", error);
+      console.error("Error updating status:", error);
+    } finally {
+      setIsConfirmModalOpen(false);
+      setPendingStatus(null);
     }
-    setIsConfirmModalOpen(false);
-    setPendingStatus(null);
   };
 
-  const handleEditSuccess = () => {
-    if (training?.id) {
-      loadTrainingById(training.id);
-    }
-  };
+  const handleEditSuccess = () => training?.id && loadTrainingById(training.id);
 
   const handleAddAssignment = async (assignmentName: string) => {
     try {
       setIsLoading(true);
       await createAssignment(assignmentName, true, training?.id as string);
-      loadTrainingById(id as string);
-      setIsAddAssignmentOpen(false);
-      setIsLoading(false);
+      await loadTrainingById(id as string);
     } catch (error) {
       console.error("Error adding assignment:", error);
+    } finally {
+      setIsAddAssignmentOpen(false);
+      setIsLoading(false);
     }
   };
 
+  /* ------------ derived stats ------------ */
   const totalScores = scores.length;
-  const dayScores = scores.filter((score) => score.day_night === "day").length;
-  const nightScores = scores.filter((score) => score.day_night === "night").length;
+  const dayScores = scores.filter((s) => s.day_night === "day").length;
+  const nightScores = scores.filter((s) => s.day_night === "night").length;
   const squadCount = squadsWithMembers?.length || 0;
 
+  const formattedDate = training?.date ? format(parseISO(training.date), "dd MMM yyyy") : "";
+
+  /* ------------ ui ------------ */
   return (
-    <div className="min-h-screen from-[#1E1E20] ">
+    <div className="min-h-screen  text-gray-100">
       <Header title="Training">
-        <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 py-1.5 px-3 rounded-full">{training?.date}</span>{" "}
+        <span className="flex items-center rounded-full bg-indigo-500/20 py-1.5 px-3 text-xs font-medium text-indigo-300">{formattedDate}</span>
       </Header>
 
-      <div className="grid grid-cols-1 gap-2 p-4 md:p-6 2xl:p-10 ">
-        <div className="grid sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 gap-2 w-full">
+      <main className="mt-6 space-y-8 px-4 pb-10 md:px-6 2xl:px-10">
+        {/* stats bar */}
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1">
           <TrainingPageScoreStats totalScores={totalScores} dayScores={dayScores} nightScores={nightScores} squadCount={squadCount} />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+
+        {/* main grid */}
+        <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <TrainingPageOverview training={training} />
           </div>
+
           <div className="lg:col-span-1">
             <TrainingPageAssignments training={training} setIsAddAssignmentOpen={setIsAddAssignmentOpen} />
           </div>
@@ -122,6 +125,7 @@ export default function TrainingPage() {
           </div>
         </div>
 
+        {/* modals */}
         <EditTrainingSessionModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
@@ -130,16 +134,16 @@ export default function TrainingPage() {
           assignments={assignments}
           training={training}
         />
-      </div>
 
-      <ConfirmStatusChangeModal
-        isOpen={isConfirmModalOpen}
-        onClose={() => setIsConfirmModalOpen(false)}
-        onConfirm={handleConfirmStatusChange}
-        newStatus={pendingStatus as TrainingStatus}
-      />
+        <ConfirmStatusChangeModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => setIsConfirmModalOpen(false)}
+          onConfirm={handleConfirmStatusChange}
+          newStatus={pendingStatus as TrainingStatus}
+        />
 
-      <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
+        <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
+      </main>
     </div>
   );
 }

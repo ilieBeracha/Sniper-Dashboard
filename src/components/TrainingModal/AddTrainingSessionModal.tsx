@@ -95,9 +95,12 @@ export default function TrainingAddTrainingSessionModal({
   }
 
   const handleAddAssignment = async (assignmentName: string) => {
-    const data = await createAssignment(assignmentName, true);
-    setAssignmentIds([...assignmentIds, data.id]);
-    loadAssignments();
+    const { id } = await createAssignment(assignmentName, true);
+    setAssignmentIds((prev) => {
+      const next = [...prev, id];
+      return next;
+    });
+    await loadAssignments();
     setIsAddAssignmentOpen(false);
   };
 

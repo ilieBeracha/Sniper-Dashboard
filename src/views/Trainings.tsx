@@ -3,7 +3,7 @@ import TrainingList from "@/components/TrainingList";
 import { teamStore } from "@/store/teamStore";
 import { TrainingStore } from "@/store/trainingStore";
 import { userStore } from "@/store/userStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "zustand";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useModal } from "@/hooks/useModal";
@@ -24,13 +24,12 @@ export default function Trainings() {
   const assignments = useTrainingStore.assignments;
 
   useEffect(() => {
-    const load = async () => {
-      isAddTrainingOpen;
+    async function load() {
       if (!user?.team_id) return;
-      await loadWeeklyAssignmentsStats(user?.team_id);
-      await loadTrainingByTeamId(user?.team_id);
+      await loadWeeklyAssignmentsStats(user.team_id);
+      await loadTrainingByTeamId(user.team_id);
       await loadAssignments();
-    };
+    }
     load();
   }, []);
 
@@ -41,14 +40,16 @@ export default function Trainings() {
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-[#121212] text-gray-100">
       <Header title="Trainings">
-        <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 py-1.5 px-3 rounded-full">
+        <span className="flex items-center text-xs font-medium  text-indigo-300 py-1.5 px-3 rounded-full">
           <CalendarIcon className="w-3 h-3 mr-1.5" />
+          {trainings.length}
         </span>
       </Header>
-      <div className="grid grid-cols-1 gap-2 p-4 md:p-6 2xl:p-10 ">
-        <TrainingList trainings={trainings} />
+
+      <main className="px-4 md:px-6 2xl:px-10 pb-10 space-y-6 mt-6">
+        <TrainingList trainings={trainings} setIsAddTrainingOpen={setIsAddTrainingOpen} />
 
         <TrainingAddTrainingSessionModal
           isOpen={isAddTrainingOpen}
@@ -57,7 +58,7 @@ export default function Trainings() {
           teamMembers={members}
           assignments={assignments}
         />
-      </div>
+      </main>
     </div>
   );
 }

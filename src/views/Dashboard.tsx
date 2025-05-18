@@ -49,11 +49,12 @@ export default function Dashboard() {
   return (
     <div className="min-h-[calc(100dvh-100px)]  text-gray-100 ">
       <Header title="Overview">
-        <span className="flex items-center text-xs font-medium bg-indigo-500/20 text-indigo-300 p-2 rounded-full">
-          <FaStackOverflow className="w-3 h-3" />
-        </span>
+        {" "}
+        <p className="bg-gray-700 text-xs rounded-2xl px-4 py-1" onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}>
+          Invite
+        </p>
       </Header>
-      <div className="grid grid-cols-1 gap-2 p-4 md:p-6 2xl:p-10 ">
+      <div className="grid grid-cols-1 gap-4 p-4 md:p-6 2xl:p-10 ">
         <DashboardRowOne user={user} />
         <DashboardRowKPI />
         <DashboardRowThree loading={loading} />

@@ -8,7 +8,7 @@ type DashboardRowThreeProps = {
 export default function DashboardRowThree({ loading }: DashboardRowThreeProps) {
   return (
     <section>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 text-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 text-sm">
         <div className="col-span-12">
           <BaseDashboardCard header="Operational Units" tooltipContent="Overview of all operational units and their current status">
             {loading ? (

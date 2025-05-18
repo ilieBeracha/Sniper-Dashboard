@@ -7,7 +7,7 @@ import BaseCreateBtn from "../BaseCreateBtn";
 type AssignmentsSectionProps = {
   assignments: Assignment[];
   assignmentIds: string[];
-  setAssignmentIds: (ids: string[]) => void;
+  setAssignmentIds: React.Dispatch<React.SetStateAction<string[]>>;
   handleAddAssignment: (assignmentName: string) => void;
   isAddAssignmentOpen: boolean;
   setIsAddAssignmentOpen: (open: boolean) => void;

@@ -11,8 +11,8 @@ export default function TrainingCalendar({ trainings }: { trainings: TrainingSes
   const getTrainingCount = (day: Date) => trainings?.filter((session) => isSameDay(parseISO(session.date), day)).length || 0;
 
   return (
-    <div className="flex justify-start items-start my-6 text-sm">
-      <div className="w-full min-h-[200px]">
+    <div className="flex justify-start items-start my-6 text-sm w-full">
+      <div className="w-full min-h-[300px]">
         <div className="flex justify-center items-center mb-6">
           <h4 className="font-bold text-white bg-gradient-to-r from-indigo-500 to-indigo-400 bg-clip-text text-sm">{format(today, "MMMM yyyy")}</h4>
         </div>
@@ -58,7 +58,7 @@ export default function TrainingCalendar({ trainings }: { trainings: TrainingSes
 
         <div className="flex items-center justify-center mt-8 text-xs text-gray-400 gap-6">
           <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full border-2 border-green-500 mr-1.5 shadow-[0_0_4px_0px_rgba(34,197,94,0.5)] text-sm"></div>
+            <div className="w-3 h-3 rounded-full border-2 border-green-500 shadow-[0_0_4px_0px_rgba(34,197,94,0.5)] text-sm"></div>
             <span>Today</span>
           </div>
           <div className="flex items-center">
