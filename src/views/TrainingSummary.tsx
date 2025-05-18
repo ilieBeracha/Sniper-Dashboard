@@ -167,48 +167,59 @@ export default function TrainingSummaryListPage() {
                   )}
                 </div>
 
-                {isParticipant && (
-                  <div className="mt-4">
-                    <h4 className="text-sm text-white font-semibold mb-2">Your Feedback</h4>
-                    {feedbackIdMap[training.id] && !isEditing ? (
-                      <div className="bg-zinc-900 p-3 rounded-md border border-zinc-700 flex items-start justify-between">
-                        <p className="text-sm text-gray-300 flex-1">{myFeedback}</p>
-                        <button
-                          className="text-indigo-400 hover:text-indigo-200 ml-4"
-                          onClick={() => setEditingMap((prev) => ({ ...prev, [training.id]: true }))}
-                          title="Edit Feedback"
-                        >
-                          <Pencil size={16} />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <textarea
-                          className="w-full p-2 bg-zinc-800 border border-zinc-700 text-white rounded"
-                          rows={3}
-                          value={myFeedback}
-                          onChange={(e) => handleFeedbackChange(training.id, e.target.value)}
-                          placeholder="Write your thoughts about the training..."
-                        />
-                        <div className="flex justify-end space-x-2">
-                          <button
-                            className="px-4 py-1 text-sm bg-zinc-700 text-white rounded"
-                            onClick={() => setEditingMap((prev) => ({ ...prev, [training.id]: false }))}
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            className="px-4 py-1 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded"
-                            onClick={() => handleFeedbackSubmit(training.id)}
-                          >
-                            {feedbackIdMap[training.id] ? "Update Feedback" : "Submit Feedback"}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+{isParticipant && (
+  <div className="mt-4">
+    <h4 className="text-sm text-white font-semibold mb-2">Your Feedback</h4>
 
+    {isEditing ? (
+      <div className="space-y-2">
+        <textarea
+          className="w-full p-2 bg-zinc-800 border border-zinc-700 text-white rounded"
+          rows={3}
+          value={myFeedback}
+          onChange={(e) => handleFeedbackChange(training.id, e.target.value)}
+          placeholder="Write your thoughts about the training..."
+        />
+        <div className="flex justify-end space-x-2">
+          <button
+            className="px-4 py-1 text-sm bg-zinc-700 text-white rounded"
+            onClick={() => setEditingMap((prev) => ({ ...prev, [training.id]: false }))}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-1 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded"
+            onClick={() => handleFeedbackSubmit(training.id)}
+          >
+            {feedbackIdMap[training.id] ? "Update Feedback" : "Submit Feedback"}
+          </button>
+        </div>
+      </div>
+    ) : (
+      <div>
+        {feedbackIdMap[training.id] ? (
+          <div className="bg-zinc-900 p-3 rounded-md border border-zinc-700 flex items-start justify-between">
+            <p className="text-sm text-gray-300 flex-1">{myFeedback}</p>
+            <button
+              className="text-indigo-400 hover:text-indigo-200 ml-4"
+              onClick={() => setEditingMap((prev) => ({ ...prev, [training.id]: true }))}
+              title="Edit Feedback"
+            >
+              <Pencil size={16} />
+            </button>
+          </div>
+        ) : (
+          <button
+            className="text-sm text-indigo-400 hover:underline"
+            onClick={() => setEditingMap((prev) => ({ ...prev, [training.id]: true }))}
+          >
+            Write Feedback
+          </button>
+        )}
+      </div>
+    )}
+  </div>
+)}
                 {!isParticipant && (
                   <p className="text-xs mt-2 text-red-400 italic">You were not a participant in this training. View only mode.</p>
                 )}
