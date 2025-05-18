@@ -3,7 +3,7 @@ import TrainingList from "@/components/TrainingList";
 import { teamStore } from "@/store/teamStore";
 import { TrainingStore } from "@/store/trainingStore";
 import { userStore } from "@/store/userStore";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useStore } from "zustand";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useModal } from "@/hooks/useModal";

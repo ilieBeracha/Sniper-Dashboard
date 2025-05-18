@@ -12,7 +12,7 @@ type ListItem = {
 type SearchableCheckboxListProps = {
   items: ListItem[];
   selectedIds: string[];
-  setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelectedIds: any;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   searchPlaceholder?: string;
@@ -42,7 +42,7 @@ export default function SearchableCheckboxList({
       (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
-  const toggleSelection = (id: string) => setSelectedIds((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
+  const toggleSelection = (id: string) => setSelectedIds((prev: any) => (prev.includes(id) ? prev.filter((p: any) => p !== id) : [...prev, id]));
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

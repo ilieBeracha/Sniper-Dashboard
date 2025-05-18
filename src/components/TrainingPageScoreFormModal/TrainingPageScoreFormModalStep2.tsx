@@ -58,7 +58,7 @@ export default function TrainingPageScoreFormModalStep2({ formValues, setFormVal
         <SearchableCheckboxList
           items={formattedMembers}
           selectedIds={formValues.participants}
-          setSelectedIds={(ids) => setFormValues({ ...formValues, participants: ids })}
+          setSelectedIds={(ids: any) => setFormValues({ ...formValues, participants: ids })}
           searchTerm={searchTerm}
           setSearchTerm={(term) => setSearchTerm(term)}
           searchPlaceholder="Search members..."

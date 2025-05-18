@@ -12,7 +12,6 @@ import { performanceStore } from "@/store/performance";
 import { getUserGroupingSummaryRpc } from "@/services/performance";
 import DashboardRowKPI from "@/components/DashboardRowKPI";
 import Header from "@/Headers/Header";
-import { FaStackOverflow } from "react-icons/fa";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
