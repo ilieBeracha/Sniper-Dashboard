@@ -25,6 +25,9 @@ export default function AppRoutes() {
   const user = useUserStore.user;
 
   useEffect(() => {
+    if (!user || !user.team_id) {
+      return;
+    }
     const load = async () => {
       if (user?.team_id) {
         await fetchMembers(user.team_id);
@@ -37,7 +40,7 @@ export default function AppRoutes() {
       }
     };
     load();
-  }, []);
+  }, [user]);
 
   return (
     <Routes>

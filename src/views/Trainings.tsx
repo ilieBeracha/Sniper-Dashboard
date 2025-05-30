@@ -25,13 +25,15 @@ export default function Trainings() {
 
   useEffect(() => {
     async function load() {
-      if (!user?.team_id) return;
+      if (!user || !user.team_id) {
+        return;
+      }
       await loadWeeklyAssignmentsStats(user.team_id);
       await loadTrainingByTeamId(user.team_id);
       await loadAssignments();
     }
     load();
-  }, []);
+  }, [user]);
 
   async function fetchTrainings() {
     const teamId = userStore.getState().user?.team_id;

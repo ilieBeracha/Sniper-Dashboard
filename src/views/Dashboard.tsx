@@ -29,6 +29,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     const load = async () => {
+      if (!user || !user.id || !user.team_id) {
+        setLoading(false);
+        return;
+      }
       if (user?.team_id) {
         await getUserGroupingSummaryRpc(user.id);
         await getUserHitPercentage(user.id);
@@ -43,7 +47,7 @@ export default function Dashboard() {
     };
 
     load();
-  }, []);
+  }, [user]);
 
   return (
     <div className="min-h-[calc(100dvh-100px)]  text-gray-100 ">

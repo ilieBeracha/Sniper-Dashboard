@@ -1,6 +1,6 @@
 import { TrainingSession } from "@/types/training";
 import { useNavigate } from "react-router-dom";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isValid } from "date-fns";
 import { ChevronRight, Clock, MapPin, Bookmark, UserCheck } from "lucide-react";
 import { isMobile } from "react-device-detect";
 
@@ -59,8 +59,8 @@ export function TrainingSessionCard({
         {/* Date */}
         <div className="w-[100px] h-full text-sm">
           <div className="flex flex-col items-center justify-center bg-white/5 rounded-lg p-2">
-            <span className="text-base font-semibold text-white">{showDate ? format(sessionDate, "d") : format(sessionDate, "h:mm")}</span>
-            <span className="text-xs text-gray-400">{showDate ? format(sessionDate, "MMM") : format(sessionDate, "a")}</span>
+            <span className="text-base font-semibold text-white">{showDate ? (isValid(sessionDate) ? format(sessionDate, "d") : "N/A") : (isValid(sessionDate) ? format(sessionDate, "h:mm") : "N/A")}</span>
+            <span className="text-xs text-gray-400">{showDate ? (isValid(sessionDate) ? format(sessionDate, "MMM") : "N/A") : (isValid(sessionDate) ? format(sessionDate, "a") : "N/A")}</span>
           </div>
         </div>
 
@@ -74,7 +74,7 @@ export function TrainingSessionCard({
             {showDate && !isMobile && (
               <div className="flex items-center">
                 <Clock className="w-3 h-3 mr-1.5" />
-                {format(sessionDate, "h:mm a")}
+                {isValid(sessionDate) ? format(sessionDate, "h:mm a") : "N/A"}
               </div>
             )}
 

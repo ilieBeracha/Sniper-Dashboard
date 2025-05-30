@@ -6,7 +6,12 @@ export const weaponsStore = createStore<{ weapons: Weapon[]; getWeapons: (teamId
   weapons: [] as Weapon[],
 
   getWeapons: async (teamId: string) => {
-    const weapons = await getWeapons(teamId);
-    set({ weapons: weapons as Weapon[] });
+    try {
+      const weapons = await getWeapons(teamId);
+      set({ weapons: weapons as Weapon[] });
+    } catch (error) {
+      console.error("Failed to fetch weapons:", error);
+      set({ weapons: [] });
+    }
   },
 }));

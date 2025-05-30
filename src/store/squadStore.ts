@@ -24,15 +24,30 @@ export const squadStore = create<SquadStore>((set) => ({
   squadUsers: null,
 
   getSquadMetricsByRole: async (team_id) => {
-    const data = await getSquadMetricsByRoleRpc(team_id);
-    set({ metrics: data });
+    try {
+      const data = await getSquadMetricsByRoleRpc(team_id);
+      set({ metrics: data });
+    } catch (error) {
+      console.error("Failed to fetch squad metrics:", error);
+      set({ metrics: null });
+    }
   },
   getSquadsWithUsersByTeamId: async (team_id) => {
-    const data = await getSquadsWithUsersByTeamId(team_id);
-    set({ squadsWithMembers: data as unknown as Squad[] });
+    try {
+      const data = await getSquadsWithUsersByTeamId(team_id);
+      set({ squadsWithMembers: data as unknown as Squad[] });
+    } catch (error) {
+      console.error("Failed to fetch squads with members:", error);
+      set({ squadsWithMembers: null });
+    }
   },
   getSquadUsersBySquadId: async (squad_id) => {
-    const data = await getSquadUsersBySquadId(squad_id);
-    set({ squadUsers: data as unknown as any[] });
+    try {
+      const data = await getSquadUsersBySquadId(squad_id);
+      set({ squadUsers: data as unknown as any[] });
+    } catch (error) {
+      console.error("Failed to fetch squad users:", error);
+      set({ squadUsers: null });
+    }
   },
 }));

@@ -39,13 +39,23 @@ export const TrainingStore = create<TrainingStore>((set) => ({
   },
 
   loadTrainingById: async (trainingId: string) => {
-    const res = await getTrainingById(trainingId);
-    set({ training: res });
+    try {
+      const res = await getTrainingById(trainingId);
+      set({ training: res });
+    } catch (error) {
+      console.error(`Failed to load training by id ${trainingId}:`, error);
+      set({ training: null });
+    }
   },
 
   loadTrainingByTeamId: async (teamId: string) => {
-    const res = await getTrainingByTeamId(teamId);
-    set({ trainings: res as any });
+    try {
+      const res = await getTrainingByTeamId(teamId);
+      set({ trainings: res as any });
+    } catch (error) {
+      console.error(`Failed to load training for team ${teamId}:`, error);
+      set({ trainings: [] });
+    }
   },
 
   loadNextAndLastTraining: async (team_id: string) => {
@@ -80,22 +90,42 @@ export const TrainingStore = create<TrainingStore>((set) => ({
   },
 
   createTraining: async (sessionData: TrainingSession) => {
-    const { data, error } = await insertTraining(sessionData);
-    if (error || !data?.id) return data;
+    try {
+      const { data, error } = await insertTraining(sessionData);
+      if (error || !data?.id) {
+        console.error("Failed to create training:", error || "No data returned");
+        throw new Error("Failed to create training session.");
+      }
+      return data;
+    } catch (err) {
+      console.error("Error in createTraining:", err);
+      throw err;
+    }
   },
 
   createAssignment: async (assignmentName: string, isInTraining: boolean = false, trainingId?: string) => {
     try {
       const { user } = userStore.getState();
-      if (!user?.team_id) return;
+      if (!user?.team_id) {
+        console.error("User or team_id not available for creating assignment");
+        throw new Error("User or team_id not available");
+      }
       const assignmentData = await insertAssignment(assignmentName, user.team_id);
+      if (!assignmentData) {
+          throw new Error("Failed to insert assignment data.");
+      }
       if (isInTraining) {
-        const trainingSession = await insertAssignmentSession(assignmentData.id, user.team_id, trainingId as string);
+        if (!trainingId) throw new Error("Training ID is required for in-training assignment.");
+        const trainingSession = await insertAssignmentSession(assignmentData.id, user.team_id, trainingId);
+        if (!trainingSession) {
+          throw new Error("Failed to insert assignment session.");
+        }
         return trainingSession;
       }
       return assignmentData;
     } catch (error) {
       console.error("Failed to create assignment:", error);
+      throw error;
     }
   },
 

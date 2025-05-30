@@ -11,7 +11,12 @@ export const equipmentStore = createStore<EquipmentStore>((set) => ({
   equipments: [],
 
   getEqipmentsByTeamId: async (teamId: string) => {
-    const equipment = await getEquipmentsByTeamId(teamId);
-    set({ equipments: equipment as Equipment[] });
+    try {
+      const equipment = await getEquipmentsByTeamId(teamId);
+      set({ equipments: equipment as Equipment[] });
+    } catch (error) {
+      console.error("Failed to fetch equipment:", error);
+      set({ equipments: [] });
+    }
   },
 }));

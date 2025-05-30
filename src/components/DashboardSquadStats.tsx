@@ -58,7 +58,12 @@ export default function DashboardSquadStats() {
 
   useEffect(() => {
     setIsLoading(true);
-    getSquadStats(user?.team_id as string, null, null);
+    if (!user?.team_id) {
+      console.error('User team_id not available.');
+      setIsLoading(false);
+      return;
+    }
+    getSquadStats(user.team_id, null, null);
   }, [user?.team_id]);
 
   const handleFilterChange = async (filter: string) => {
@@ -73,19 +78,34 @@ export default function DashboardSquadStats() {
 
     if (filter === "") {
       setIsLoading(true);
-      await getSquadStats(user?.team_id as string, null, null);
+      if (!user?.team_id) {
+        console.error('User team_id not available.');
+        setIsLoading(false);
+        return;
+      }
+      await getSquadStats(user.team_id, null, null);
     }
   };
   const handleDistanceChange = async (distance: string) => {
     setSelectedDistance(distance);
     setIsLoading(true);
-    getSquadStats(user?.team_id as string, null, distance);
+    if (!user?.team_id) {
+      console.error('User team_id not available.');
+      setIsLoading(false);
+      return;
+    }
+    getSquadStats(user.team_id, null, distance);
   };
 
   const handlePositionChange = async (position: string) => {
     setSelectedPosition(position);
     setIsLoading(true);
-    await getSquadStats(user?.team_id as string, position as PositionScore | null, null);
+    if (!user?.team_id) {
+      console.error('User team_id not available.');
+      setIsLoading(false);
+      return;
+    }
+    await getSquadStats(user.team_id, position as PositionScore | null, null);
   };
 
   const resetFilters = async () => {
@@ -93,7 +113,12 @@ export default function DashboardSquadStats() {
     setSelectedDistance("");
     setSelectedPosition("");
     setIsLoading(true);
-    await getSquadStats(user?.team_id as string, null, null);
+    if (!user?.team_id) {
+      console.error('User team_id not available.');
+      setIsLoading(false);
+      return;
+    }
+    await getSquadStats(user.team_id, null, null);
   };
 
   return (

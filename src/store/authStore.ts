@@ -68,8 +68,9 @@ export const authStore = create<props>((set, get) => ({
 
       return res;
     } catch (error: any) {
-      set({ error: error.response.data.error });
-      console.log(error);
+      const message = error?.response?.data?.error || error?.message || 'An unexpected authentication error occurred.';
+      set({ error: message });
+      console.error('Authentication error:', error);
     }
   },
 
@@ -83,8 +84,9 @@ export const authStore = create<props>((set, get) => ({
 
       return res;
     } catch (error: any) {
-      set({ error: error.response.data.error });
-      console.log(error);
+      const message = error?.response?.data?.error || error?.message || 'An unexpected authentication error occurred.';
+      set({ error: message });
+      console.error('Authentication error:', error);
     }
   },
 
@@ -98,8 +100,9 @@ export const authStore = create<props>((set, get) => ({
 
       return res;
     } catch (error: any) {
-      set({ error: error.response.data.error });
-      console.log(error);
+      const message = error?.response?.data?.error || error?.message || 'An unexpected authentication error occurred.';
+      set({ error: message });
+      console.error('Authentication error:', error);
     }
   },
 
@@ -114,8 +117,9 @@ export const authStore = create<props>((set, get) => ({
 
       return res;
     } catch (error: any) {
-      set({ error: error.response.data.error });
-      console.log(error);
+      const message = error?.response?.data?.error || error?.message || 'An unexpected authentication error occurred.';
+      set({ error: message });
+      console.error('Authentication error:', error);
     }
   },
 
@@ -124,7 +128,7 @@ export const authStore = create<props>((set, get) => ({
     await supabase.auth.signOut();
 
     authStore.getState().resetError();
-    userStore.getState().setUser({} as User);
+    userStore.getState().clearUser();
     location.href = "/";
   },
 
