@@ -7,7 +7,7 @@ export default function BaseDesktopDrawer({
   title,
   isOpen,
   setIsOpen,
-  width = "800px",
+  width = "1200px",
 }: {
   children: React.ReactNode;
   title: string;
@@ -16,7 +16,7 @@ export default function BaseDesktopDrawer({
   width?: string;
 }) {
   return (
-    <Dialog open={isOpen} onClose={setIsOpen} className="relative z-50 hidden sm:block">
+    <Dialog open={isOpen} onClose={setIsOpen} className="relative z-50 hidden sm:block w-screen">
       <div className="fixed inset-0 bg-black/50 " />
       <div className="fixed inset-0 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
