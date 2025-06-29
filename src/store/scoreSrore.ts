@@ -1,4 +1,6 @@
-import { getScoresByTrainingId, createScoreParticipant } from "@/services/scoreService";
+import { getScoresByTrainingId
+  // createScoreParticipant
+ } from "@/services/scoreService";
 import { create } from "zustand";
 import { TrainingStore } from "./trainingStore";
 import { supabase } from "@/services/supabaseClient";

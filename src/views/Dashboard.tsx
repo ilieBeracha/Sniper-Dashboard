@@ -10,7 +10,7 @@ import { TrainingStore } from "@/store/trainingStore";
 import { squadStore } from "@/store/squadStore";
 import { performanceStore } from "@/store/performance";
 import { getUserGroupingSummaryRpc } from "@/services/performance";
-import DashboardRowKPI from "@/components/DashboardRowKPI";
+// import DashboardRowKPI from "@/components/DashboardRowKPI";
 import Header from "@/Headers/Header";
 
 export default function Dashboard() {

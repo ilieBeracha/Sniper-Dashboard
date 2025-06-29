@@ -3,13 +3,13 @@ import { create } from "zustand";
 import { DayNightPerformance, HitPercentageData, SquadStats, SquadWeaponPerformance, TrainingEffectiveness } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
-  getUserHitPercentageRpc,
+  // getUserHitPercentageRpc,
   getWeaponPerformanceBySquadAndWeapon,
   getUserGroupingSummaryRpc,
   getTopAccurateSnipers,
-  getDayNightPerformanceByTeam,
+  // getDayNightPerformanceByTeam,
   getTrainingEffectivenessByTeam,
-  getSquadStatByTeamId,
+  // getSquadStatByTeamId,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { User } from "@supabase/supabase-js";
@@ -108,8 +108,9 @@ export const performanceStore = create<PerformanceStore>((set) => ({
 
   userHitPercentage: null,
   getUserHitPercentage: async (userId: string) => {
+    console.log("getUserHitPercentage", userId);
     try {
-      // const data = await getUserHitPercentageRpc(userId);
+      // const data = await (userId);
       const data = {
         hit_percentage: 0.5,
         total_shots: 100,
