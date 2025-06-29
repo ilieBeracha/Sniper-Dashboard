@@ -1,11 +1,11 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from "recharts";
-import { ScoreRangeRow } from "@/types/score";
+import { ScoreTarget } from "@/types/score";
 import BaseDashboardCard from "./BaseDashboardCard";
 
-export default function ScoreDistanceChart({ rows }: { rows: ScoreRangeRow[] | undefined }) {
+export default function ScoreDistanceChart({ rows }: { rows: ScoreTarget[] | undefined }) {
   const data = rows
     ? Object.values(
-        (rows as ScoreRangeRow[]).reduce<Record<number, { distance: string; target_hit: number; shots_fired: number; accuracy: number }>>(
+          (rows as ScoreTarget[]).reduce<Record<number, { distance: string; target_hit: number; shots_fired: number; accuracy: number }>>(
           (acc, { distance, target_hit, shots_fired }) => {
             const d = acc[distance] || { distance: `${distance}m`, target_hit: 0, shots_fired: 0, accuracy: 0 };
             d.target_hit += target_hit;

@@ -19,7 +19,7 @@ import { format, parseISO } from "date-fns";
 import ScoreDistanceChart from "@/components/ScoreDistanceChart";
 import ScoreDistanceTable from "@/components/ScoreDistnaceTable";
 import AddDistanceModal from "@/components/AddDistanceModal";
-import { ScoreRangeRow } from "@/types/score";
+import { ScoreTarget } from "@/types/score";
 import { BiAddToQueue } from "react-icons/bi";
 import TrainingPageScoreFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModal";
 import { Table, TableBody, TableHeader, TableRow, TableCell } from "@/ui/table";
@@ -41,7 +41,7 @@ export default function TrainingPage() {
 
   const { isLoading, setIsLoading } = useStore(loaderStore);
   const { members } = useStore(teamStore);
-  const { getScoresByTrainingId, scores, createScore: createScoreAction } = useStore(scoreStore);
+  const { getScoresByTrainingId, scores, handleCreateScore: createScoreAction } = useStore(scoreStore);
   const { getScoreRangesByTrainingId, scoreRanges } = useStore(scoreStore);
 
   const [isAddDistanceOpen, setIsAddDistanceOpen] = useState(false);
@@ -115,12 +115,12 @@ export default function TrainingPage() {
         <div className="grid gap-6 xl:grid-cols-12">
           {/* distance accuracy – chart */}
           <div className="xl:col-span-8">
-            <ScoreDistanceChart rows={scoreRanges as unknown as ScoreRangeRow[]} />
+            <ScoreDistanceChart rows={scoreRanges as unknown as ScoreTarget[]} />
           </div>
 
           {/* per-distance breakdown – table */}
           <div className="xl:col-span-4">
-            <ScoreDistanceTable rows={scoreRanges as unknown as ScoreRangeRow[]} />
+            <ScoreDistanceTable rows={scoreRanges as unknown as ScoreTarget[]} />
           </div>
 
           <div className="xl:col-span-12">

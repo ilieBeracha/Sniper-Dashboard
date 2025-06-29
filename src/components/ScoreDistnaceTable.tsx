@@ -1,7 +1,7 @@
-import { ScoreRangeRow } from "@/types/score";
+import { ScoreTarget } from "@/types/score";
 import BaseDashboardCard from "./BaseDashboardCard";
 
-export default function ScoreDistanceTable({ rows }: { rows: ScoreRangeRow[] }) {
+export default function ScoreDistanceTable({ rows }: { rows: ScoreTarget[] }) {
   // Group rows by distance, summing shots and hits
   const aggregated = Object.values(
     rows.reduce<Record<number, { bucket: number; shots_fired: number; target_hit: number }>>((acc, { distance, shots_fired, target_hit }) => {

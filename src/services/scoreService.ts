@@ -1,4 +1,4 @@
-import { ScoreParticipant } from "@/types/score";
+import { Score, ScoreParticipant, ScoreTarget } from "@/types/score";
 import { supabase } from "./supabaseClient";
 // import { ScoreFormValues } from "@/hooks/useScoreForm";
 
@@ -12,7 +12,11 @@ export async function getUserGroupingScoresRpc(userId: string) {
   }
   return data;
 }
-
+export async function createScore(scoreData: Partial<Score>) {
+  const { data, error } = await supabase.from("score").insert(scoreData).select("*");
+  if (error) throw error;
+  return data;
+}
 export async function getScoresByTrainingId(training_id: string) {
   try {
     const { data, error } = await supabase
@@ -77,6 +81,20 @@ export async function createScoreParticipant(scoreParticipantData: Partial<Score
     return data;
   } catch (error) {
     console.error("Error creating score participant:", error);
+    throw error;
+  }
+}
+export async function createTarget(scoreData: Partial<ScoreTarget>[], score_id: string) {
+  try {
+    const targetsWithScoreId = scoreData.map((target) => ({
+      ...target,
+      score_id,
+    }));
+    const { data, error } = await supabase.from("score_ranges").insert(targetsWithScoreId).select("*");
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Exception when creating target:", error);
     throw error;
   }
 }

@@ -5,8 +5,9 @@ import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
 import { teamStore } from "@/store/teamStore";
 import { Target, Users, Crosshair, Info, Plus, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { Assignment } from "@/types/training";
+import { Assignment, TrainingSession } from "@/types/training";
 import { userStore } from "@/store/userStore";
+import { TrainingStore } from "@/store/trainingStore";
 
 interface ScoreFormValues {
   assignment_session_id: string;
@@ -22,13 +23,14 @@ interface ScoreFormValues {
   weapons: Record<string, string>;
   equipment: Record<string, string>;
   training_id: string;
+  creator_id: string;
   scoreTargets: scoreTargets[];
 }
 
 interface scoreTargets {
   distance?: number;
   shots_fired?: number;
-  hits?: number;
+  target_hits?: number;
 }
 
 export default function ScoreFormModal({
@@ -36,7 +38,6 @@ export default function ScoreFormModal({
   onClose,
   onSubmit,
   editingScore,
-  assignmentSessions = [],
   trainingId,
 }: {
   isOpen: boolean;
@@ -46,6 +47,7 @@ export default function ScoreFormModal({
   assignmentSessions?: Assignment[];
   trainingId: string;
 }) {
+  const { training } = useStore(TrainingStore);
   const { weapons } = useStore(weaponsStore);
   const { equipments } = useStore(equipmentStore);
   const { user } = useStore(userStore);
@@ -62,6 +64,7 @@ export default function ScoreFormModal({
 
   const [formValues, setFormValues] = useState<ScoreFormValues>({
     assignment_session_id: "",
+    creator_id: "",
     day_night: "day",
     position: "",
     time_until_first_shot: "",
@@ -74,17 +77,21 @@ export default function ScoreFormModal({
       {
         distance: 100,
         shots_fired: 0,
-        hits: 0,
+        target_hits: 0,
       },
     ],
   });
 
   useEffect(() => {
-    formValues.participants.push(user?.id);
+    console.log(training);
+    if (user) {
+      formValues.participants.push(user?.id);
+      formValues.creator_id = user?.id;
+    }
   }, [user]);
 
   // Filter assignments for current training
-  const filteredAssignments = assignmentSessions.filter((assignment) => assignment.team_id === user?.team_id);
+  const filteredAssignments = training?.assignment_sessions;
 
   // Initialize form with editing score data if provided
 
@@ -94,6 +101,7 @@ export default function ScoreFormModal({
         assignment_session_id: editingScore.assignment_session_id || "",
         day_night: editingScore.day_night || "day",
         position: editingScore.position || "",
+        creator_id: editingScore.creator_id || "",
         time_until_first_shot: editingScore.time_until_first_shot || "",
         first_shot_hit: editingScore.first_shot_hit,
         wind_strength: editingScore.wind_strength,
@@ -108,7 +116,7 @@ export default function ScoreFormModal({
           {
             distance: editingScore.distance,
             shots_fired: editingScore.shots_fired,
-            hits: editingScore.hits,
+            target_hits: editingScore.target_hits,
           },
         ].filter((item) => item.distance !== undefined),
       });
@@ -121,7 +129,7 @@ export default function ScoreFormModal({
     // Assignment session validation
     if (!formValues.assignment_session_id) {
       newErrors.push("Assignment is required");
-    } else if (!filteredAssignments.some((session) => session.id === formValues.assignment_session_id)) {
+    } else if (!filteredAssignments?.some((session) => session.id === formValues.assignment_session_id)) {
       newErrors.push("Invalid assignment selected");
     }
 
@@ -173,10 +181,10 @@ export default function ScoreFormModal({
       if (entry.shots_fired === undefined || entry.shots_fired < 0) {
         newErrors.push(`Distance entry #${index + 1}: Shots fired must be a positive number`);
       }
-      if (entry.hits === undefined || entry.hits < 0) {
+      if (entry.target_hits === undefined || entry.target_hits < 0) {
         newErrors.push(`Distance entry #${index + 1}: Hits must be a positive number`);
       }
-      if (entry.hits !== undefined && entry.shots_fired !== undefined && entry.hits > entry.shots_fired) {
+      if (entry.target_hits !== undefined && entry.shots_fired !== undefined && entry.target_hits > entry.shots_fired) {
         newErrors.push(`Distance entry #${index + 1}: Hits cannot exceed shots fired`);
       }
     });
@@ -295,7 +303,7 @@ export default function ScoreFormModal({
           className="w-full min-h-9 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white border border-zinc-700"
         >
           <option value="">Select mission</option>
-          {filteredAssignments.map((assignment) => (
+          {filteredAssignments?.map((assignment) => (
             <option key={assignment.id} value={assignment.id}>
               {assignment.assignment_name}
             </option>
@@ -348,7 +356,7 @@ export default function ScoreFormModal({
     const newEntry: scoreTargets = {
       distance: 100,
       shots_fired: 0,
-      hits: 0,
+      target_hits: 0,
     };
     setFormValues({
       ...formValues,
@@ -444,8 +452,8 @@ export default function ScoreFormModal({
                 <span className="text-gray-400">Hits</span>
                 <input
                   type="number"
-                  value={entry.hits || ""}
-                  onChange={(e) => updateDistanceEntry(index, "hits", +e.target.value)}
+                  value={entry.target_hits || ""}
+                  onChange={(e) => updateDistanceEntry(index, "target_hits", +e.target.value)}
                   className="mt-1 w-full rounded-md bg-white/10 px-3 py-2 text-gray-100 outline-none"
                 />
               </label>
