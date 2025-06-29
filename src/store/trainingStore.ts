@@ -72,6 +72,7 @@ export const TrainingStore = create<TrainingStore>((set) => ({
   loadAssignments: async () => {
     try {
       const res = await getAssignments();
+      console.log("Assignments loaded:", res);
       set({ assignments: res });
       return res;
     } catch (error) {

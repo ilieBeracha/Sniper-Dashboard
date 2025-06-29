@@ -70,7 +70,6 @@ export interface TrainingsNextLastChart {
 
 export interface TrainingPageParticipantsScoreData {
   shots_fired: number | null;
-  hits: number | null;
   time_until_first_shot: number | null;
   distance: number | null;
   target_hit: number | null;

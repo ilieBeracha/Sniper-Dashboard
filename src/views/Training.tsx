@@ -2,8 +2,6 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { TrainingStore } from "@/store/trainingStore";
 import { useStore } from "zustand";
-import TrainingPageOverview from "@/components/TrainingPageOverview";
-import TrainingPageAssignments from "@/components/TrainingPageAssignments";
 import { TrainingSession, TrainingStatus } from "@/types/training";
 import { isCommander } from "@/utils/permissions";
 import { userStore } from "@/store/userStore";
@@ -12,15 +10,20 @@ import { supabase } from "@/services/supabaseClient";
 import EditTrainingSessionModal from "@/components/EditTrainingSessionModal";
 import { teamStore } from "@/store/teamStore";
 import TrainingPageChangeStatus from "@/components/TrainingPageChangeStatus";
-import TrainingPageScore from "@/components/TrainingPageScore";
 import { scoreStore } from "@/store/scoreSrore";
 import { loaderStore } from "@/store/loaderStore";
-import TrainingPageScoreStats from "@/components/TrainingPageScoreStats";
-import { squadStore } from "@/store/squadStore";
 import { useModal } from "@/hooks/useModal";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
 import Header from "@/Headers/Header";
 import { format, parseISO } from "date-fns";
+import ScoreDistanceChart from "@/components/ScoreDistanceChart";
+import ScoreDistanceTable from "@/components/ScoreDistnaceTable";
+import AddDistanceModal from "@/components/AddDistanceModal";
+import { ScoreRangeRow } from "@/types/score";
+import { BiAddToQueue } from "react-icons/bi";
+import TrainingPageScoreFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModal";
+import { Table, TableBody, TableHeader, TableRow, TableCell } from "@/ui/table";
+import BaseDashboardCard from "@/components/BaseDashboardCard";
 
 export default function TrainingPage() {
   const { id } = useParams();
@@ -28,16 +31,21 @@ export default function TrainingPage() {
   const { training, loadTrainingById, loadAssignments, createAssignment, assignments } = useStore(TrainingStore);
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
+  const { isOpen: isAddScoreOpen, setIsOpen: setIsAddScoreOpen } = useModal();
 
   const { userRole } = useStore(userStore);
-  const { squadsWithMembers } = useStore(squadStore);
+
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const { isLoading, setIsLoading } = useStore(loaderStore);
   const { members } = useStore(teamStore);
-  const { getScoresByTrainingId, scores } = useStore(scoreStore);
+  const { getScoresByTrainingId, scores, createScore: createScoreAction } = useStore(scoreStore);
+  const { getScoreRangesByTrainingId, scoreRanges } = useStore(scoreStore);
+
+  const [isAddDistanceOpen, setIsAddDistanceOpen] = useState(false);
+  const firstScoreId = scores[0]?.id;
 
   /* ------------ data loading ------------ */
   useEffect(() => {
@@ -46,6 +54,7 @@ export default function TrainingPage() {
       await loadAssignments();
       await loadTrainingById(id);
       await getScoresByTrainingId(id);
+      await getScoreRangesByTrainingId(id);
     };
     load();
   }, [id, isLoading]);
@@ -83,11 +92,10 @@ export default function TrainingPage() {
     }
   };
 
-  /* ------------ derived stats ------------ */
-  const totalScores = scores.length;
-  const dayScores = scores.filter((s) => s.day_night === "day").length;
-  const nightScores = scores.filter((s) => s.day_night === "night").length;
-  const squadCount = squadsWithMembers?.length || 0;
+  const handleAddScore = async (data: any) => {
+    await createScoreAction(data);
+    setIsAddScoreOpen(true);
+  };
 
   const formattedDate = training?.date ? format(parseISO(training.date), "dd MMM yyyy") : "";
 
@@ -96,33 +104,100 @@ export default function TrainingPage() {
     <div className="min-h-screen  text-gray-100">
       <Header title="Training">
         <span className="flex items-center rounded-full bg-indigo-500/20 py-1.5 px-3 text-xs font-medium text-indigo-300">{formattedDate}</span>
+        <button onClick={() => setIsAddScoreOpen(true)} className="p-1.5 rounded-lg hover:bg-white/5 transition-colors duration-200">
+          <BiAddToQueue className="text-indigo-400" />{" "}
+        </button>
       </Header>
 
       <main className="mt-6 space-y-8 px-4 pb-10 md:px-6 2xl:px-10">
         {/* stats bar */}
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1">
-          <TrainingPageScoreStats totalScores={totalScores} dayScores={dayScores} nightScores={nightScores} squadCount={squadCount} />
-        </div>
 
-        {/* main grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <TrainingPageOverview training={training} />
+        <div className="grid gap-6 xl:grid-cols-12">
+          {/* distance accuracy – chart */}
+          <div className="xl:col-span-8">
+            <ScoreDistanceChart rows={scoreRanges as unknown as ScoreRangeRow[]} />
           </div>
 
-          <div className="lg:col-span-1">
-            <TrainingPageAssignments training={training} setIsAddAssignmentOpen={setIsAddAssignmentOpen} />
+          {/* per-distance breakdown – table */}
+          <div className="xl:col-span-4">
+            <ScoreDistanceTable rows={scoreRanges as unknown as ScoreRangeRow[]} />
           </div>
 
+          <div className="xl:col-span-12">
+            <BaseDashboardCard header="Scores">
+              <div className="rounded-xl ">
+                <Table className="w-full border-separate border-spacing-0">
+                  <TableHeader>
+                    <TableRow className="border-b border-gray-700/50">
+                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                        Assignment
+                      </TableCell>
+                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                        Participant
+                      </TableCell>
+                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                        Squad
+                      </TableCell>
+                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                        Position
+                      </TableCell>
+                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                        Day/Night
+                      </TableCell>
+                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                        Target Hit
+                      </TableCell>
+                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                        Time to Shot
+                      </TableCell>
+                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                        Date
+                      </TableCell>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {scores.map((score: any) => (
+                      <TableRow key={score.id} className="border-b border-gray-700/30 hover:bg-gray-800/20 transition-colors">
+                        <TableCell className="py-4 px-6 text-sm text-gray-100">
+                          {score.assignment_session?.assignment?.assignment_name || "N/A"}
+                        </TableCell>
+                        <TableCell className="py-4 px-6 text-sm text-gray-100">
+                          {score.score_participants?.[0]?.user
+                            ? `${score.score_participants[0].user.first_name} ${score.score_participants[0].user.last_name}`
+                            : "N/A"}
+                        </TableCell>
+                        <TableCell className="py-4 px-6 text-sm text-gray-100">
+                          {score.score_participants?.[0]?.user?.squad?.squad_name || "N/A"}
+                        </TableCell>
+                        <TableCell className="py-4 px-6 text-sm text-gray-100 capitalize">{score.position || "N/A"}</TableCell>
+                        <TableCell className="py-4 px-6 text-sm text-gray-100 capitalize">{score.day_night || "N/A"}</TableCell>
+                        <TableCell className="py-4 px-6">
+                          <span
+                            className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
+                              score.target_eliminated ? "bg-green-500/20 text-green-300" : "bg-red-500/20 text-red-300"
+                            }`}
+                          >
+                            {score.target_eliminated ? "Yes" : "No"}
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-4 px-6 text-sm text-gray-100">
+                          {score.time_until_first_shot ? `${score.time_until_first_shot}s` : "N/A"}
+                        </TableCell>
+                        <TableCell className="py-4 px-6 text-sm text-gray-100">{format(parseISO(score.created_at), "dd MMM yyyy")}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </BaseDashboardCard>
+          </div>
+
+          {/* commander-only status controls */}
           {isCommander(userRole) && (
-            <div className="lg:col-span-3">
+            <div className="xl:col-span-12">
               <TrainingPageChangeStatus training={training as TrainingSession} onStatusChange={handleStatusChange} />
             </div>
           )}
-
-          <div className="lg:col-span-3">
-            <TrainingPageScore />
-          </div>
         </div>
 
         {/* modals */}
@@ -143,6 +218,15 @@ export default function TrainingPage() {
         />
 
         <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
+        <AddDistanceModal scoreId={firstScoreId as string} isOpen={isAddDistanceOpen} onClose={() => setIsAddDistanceOpen(false)} />
+        <TrainingPageScoreFormModal
+          trainingId={training?.id as string}
+          editingScore={null}
+          isOpen={isAddScoreOpen}
+          onClose={() => setIsAddScoreOpen(false)}
+          onSubmit={handleAddScore}
+          assignmentSessions={assignments}
+        />
       </main>
     </div>
   );

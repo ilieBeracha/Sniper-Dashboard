@@ -55,7 +55,7 @@ export default function Dashboard() {
       </Header>
       <div className="grid grid-cols-1 gap-4 p-4 md:p-6 2xl:p-10 ">
         <DashboardRowOne user={user} />
-        <DashboardRowKPI />
+        {/* <DashboardRowKPI /> */}
         <DashboardRowThree loading={loading} />
         <DashboardRowFour />
       </div>

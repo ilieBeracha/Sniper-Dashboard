@@ -37,6 +37,9 @@ button {
   -fx-focus-color: transparent;
 }
 
+th {
+  text-align: start;
+}
 h1 {
   font-size: 2.2em;
   line-height: 1.1;
