@@ -18,8 +18,7 @@ import Header from "@/Headers/Header";
 import { format, parseISO } from "date-fns";
 import ScoreDistanceChart from "@/components/ScoreDistanceChart";
 import ScoreDistanceTable from "@/components/ScoreDistnaceTable";
-import AddDistanceModal from "@/components/AddDistanceModal";
-import { ScoreRangeRow } from "@/types/score";
+import { ScoreTarget } from "@/types/score";
 import { BiAddToQueue } from "react-icons/bi";
 import TrainingPageScoreFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModal";
 import { Table, TableBody, TableHeader, TableRow, TableCell } from "@/ui/table";
@@ -41,11 +40,8 @@ export default function TrainingPage() {
 
   const { isLoading, setIsLoading } = useStore(loaderStore);
   const { members } = useStore(teamStore);
-  const { getScoresByTrainingId, scores, createScore: createScoreAction } = useStore(scoreStore);
+  const { getScoresByTrainingId, scores, handleCreateScore: createScoreAction } = useStore(scoreStore);
   const { getScoreRangesByTrainingId, scoreRanges } = useStore(scoreStore);
-
-  const [isAddDistanceOpen, setIsAddDistanceOpen] = useState(false);
-  const firstScoreId = scores[0]?.id;
 
   /* ------------ data loading ------------ */
   useEffect(() => {
@@ -115,12 +111,12 @@ export default function TrainingPage() {
         <div className="grid gap-6 xl:grid-cols-12">
           {/* distance accuracy – chart */}
           <div className="xl:col-span-8">
-            <ScoreDistanceChart rows={scoreRanges as unknown as ScoreRangeRow[]} />
+            <ScoreDistanceChart rows={scoreRanges as unknown as ScoreTarget[]} />
           </div>
 
           {/* per-distance breakdown – table */}
           <div className="xl:col-span-4">
-            <ScoreDistanceTable rows={scoreRanges as unknown as ScoreRangeRow[]} />
+            <ScoreDistanceTable rows={scoreRanges as unknown as ScoreTarget[]} />
           </div>
 
           <div className="xl:col-span-12">
@@ -145,7 +141,7 @@ export default function TrainingPage() {
                         Day/Night
                       </TableCell>
                       <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
-                        Target Hit
+                        Target Eliminated
                       </TableCell>
                       <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
                         Time to Shot
@@ -218,7 +214,6 @@ export default function TrainingPage() {
         />
 
         <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
-        <AddDistanceModal scoreId={firstScoreId as string} isOpen={isAddDistanceOpen} onClose={() => setIsAddDistanceOpen(false)} />
         <TrainingPageScoreFormModal
           trainingId={training?.id as string}
           editingScore={null}
