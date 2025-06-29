@@ -5,7 +5,7 @@ import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
 import { teamStore } from "@/store/teamStore";
 import { Target, Users, Crosshair, Info, Plus, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { Assignment, TrainingSession } from "@/types/training";
+import { Assignment } from "@/types/training";
 import { userStore } from "@/store/userStore";
 import { TrainingStore } from "@/store/trainingStore";
 

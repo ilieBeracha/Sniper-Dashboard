@@ -18,7 +18,6 @@ import Header from "@/Headers/Header";
 import { format, parseISO } from "date-fns";
 import ScoreDistanceChart from "@/components/ScoreDistanceChart";
 import ScoreDistanceTable from "@/components/ScoreDistnaceTable";
-import AddDistanceModal from "@/components/AddDistanceModal";
 import { ScoreTarget } from "@/types/score";
 import { BiAddToQueue } from "react-icons/bi";
 import TrainingPageScoreFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModal";
@@ -43,9 +42,6 @@ export default function TrainingPage() {
   const { members } = useStore(teamStore);
   const { getScoresByTrainingId, scores, handleCreateScore: createScoreAction } = useStore(scoreStore);
   const { getScoreRangesByTrainingId, scoreRanges } = useStore(scoreStore);
-
-  const [isAddDistanceOpen, setIsAddDistanceOpen] = useState(false);
-  const firstScoreId = scores[0]?.id;
 
   /* ------------ data loading ------------ */
   useEffect(() => {
@@ -145,7 +141,7 @@ export default function TrainingPage() {
                         Day/Night
                       </TableCell>
                       <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
-                        Target Hit
+                        Target Eliminated
                       </TableCell>
                       <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
                         Time to Shot
@@ -218,7 +214,6 @@ export default function TrainingPage() {
         />
 
         <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
-        <AddDistanceModal scoreId={firstScoreId as string} isOpen={isAddDistanceOpen} onClose={() => setIsAddDistanceOpen(false)} />
         <TrainingPageScoreFormModal
           trainingId={training?.id as string}
           editingScore={null}
