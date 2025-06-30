@@ -5,6 +5,7 @@ import TrainingSessionGroup from "./TrainingSessionGroup";
 import TrainingListEmpty from "./TrainingListEmpty";
 import { useState } from "react";
 import TrainingCalendar from "./TrainingCalendar";
+import { Plus } from "lucide-react";
 
 type Tab = "active" | "canceled";
 
@@ -52,9 +53,10 @@ export default function TrainingList({
         {/* create */}
         <button
           onClick={() => setIsAddTrainingOpen(true)}
-          className="inline-flex items-center gap-2 rounded-lg bg-[#121212] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF8906]"
+          className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed flex items-center gap-2"
         >
-          Create
+          <span className="text-xs font-medium">Add Training</span>
+          <Plus size={12} />
         </button>
       </div>
 

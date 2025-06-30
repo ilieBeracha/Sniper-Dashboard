@@ -18,7 +18,7 @@ export default function BaseMobileDrawer({
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" />
 
-      <div className="fixed inset-0 overflow-hidden">
+      <div className="fixed inset-0 overflow-hidden z-50" style={{ zIndex: 1000 }}>
         <div className="absolute inset-0 overflow-hidden">
           <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
             <DialogPanel className="pointer-events-auto w-screen transform transition-all duration-300 ease-in-out data-[closed]:translate-x-full">

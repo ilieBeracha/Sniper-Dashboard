@@ -7,7 +7,7 @@ export default function BaseDesktopDrawer({
   title,
   isOpen,
   setIsOpen,
-  width = "1200px",
+  width = "1500px",
 }: {
   children: React.ReactNode;
   title: string;

@@ -19,10 +19,11 @@ import { format, parseISO } from "date-fns";
 import ScoreDistanceChart from "@/components/ScoreDistanceChart";
 import ScoreDistanceTable from "@/components/ScoreDistnaceTable";
 import { ScoreTarget } from "@/types/score";
-import { BiAddToQueue } from "react-icons/bi";
 import TrainingPageScoreFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModal";
 import { Table, TableBody, TableHeader, TableRow, TableCell } from "@/ui/table";
 import BaseDashboardCard from "@/components/BaseDashboardCard";
+import { Badge } from "@/components/ui/badge";
+import { Plus } from "lucide-react";
 
 export default function TrainingPage() {
   const { id } = useParams();
@@ -30,9 +31,9 @@ export default function TrainingPage() {
   const { training, loadTrainingById, loadAssignments, createAssignment, assignments } = useStore(TrainingStore);
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
-  const { isOpen: isAddScoreOpen, setIsOpen: setIsAddScoreOpen } = useModal();
+  const { isOpen: isAddScoreOpen, setIsOpen: setIsAddScoreOpen, toggleIsOpen: toggleIsAddScoreOpen } = useModal();
 
-  const { userRole } = useStore(userStore);
+  const { userRole, user } = useStore(userStore);
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
@@ -53,7 +54,7 @@ export default function TrainingPage() {
       await getScoreRangesByTrainingId(id);
     };
     load();
-  }, [id, isLoading]);
+  }, [id]);
 
   /* ------------ handlers ------------ */
   const handleStatusChange = (newStatus: TrainingStatus) => {
@@ -89,64 +90,98 @@ export default function TrainingPage() {
   };
 
   const handleAddScore = async (data: any) => {
-    await createScoreAction(data);
-    setIsAddScoreOpen(true);
+    try {
+      await createScoreAction(data);
+      setIsAddScoreOpen(false);
+    } catch (error) {
+      console.error("Error adding score:", error);
+    }
   };
 
   const formattedDate = training?.date ? format(parseISO(training.date), "dd MMM yyyy") : "";
 
   /* ------------ ui ------------ */
   return (
-    <div className="min-h-screen  text-gray-100">
+    <div className="min-h-screen w-full  text-gray-100">
       <Header title="Training">
-        <span className="flex items-center rounded-full bg-indigo-500/20 py-1.5 px-3 text-xs font-medium text-indigo-300">{formattedDate}</span>
-        <button onClick={() => setIsAddScoreOpen(true)} className="p-1.5 rounded-lg hover:bg-white/5 transition-colors duration-200">
-          <BiAddToQueue className="text-indigo-400" />{" "}
-        </button>
+        <span className="flex items-center rounded-full bg-indigo-500/20 py-1.5 px-3 text-sm font-medium text-indigo-300">{formattedDate}</span>
       </Header>
 
-      <main className="mt-6 space-y-8 px-4 pb-10 md:px-6 2xl:px-10">
-        {/* stats bar */}
+      <main className="mt-6 space-y-4 px-4 pb-10 md:space-y-4 md:px-6 2xl:px-10 w-full">
+        <div className="flex items-center justify-end w-full mb-4">
+          {/* stats bar */}
+          <button
+            onClick={() => toggleIsAddScoreOpen()}
+            className="px-4 py-1.s5  flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
+          >
+            <span className="text-xs font-medium">Add Score</span>
+            <Plus size={12} />
+          </button>
+        </div>
 
-        <div className="grid gap-6 xl:grid-cols-12">
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-12">
           {/* distance accuracy – chart */}
-          <div className="xl:col-span-8">
+          <div className="col-span-1 lg:col-span-8">
             <ScoreDistanceChart rows={scoreRanges as unknown as ScoreTarget[]} />
           </div>
 
           {/* per-distance breakdown – table */}
-          <div className="xl:col-span-4">
+          <div className="col-span-1 lg:col-span-4">
             <ScoreDistanceTable rows={scoreRanges as unknown as ScoreTarget[]} />
           </div>
 
-          <div className="xl:col-span-12">
-            <BaseDashboardCard header="Scores">
-              <div className="rounded-xl ">
-                <Table className="w-full border-separate border-spacing-0">
+          <div className="col-span-1 lg:col-span-12">
+            <BaseDashboardCard header="Scores" withBtn>
+              <div className="rounded-xl overflow-x-auto">
+                <Table className="w-full min-w-[800px] border-separate border-spacing-0">
                   <TableHeader>
-                    <TableRow className="border-b border-gray-700/50">
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                    <TableRow className="border-b border-white/10 text-xs font-medium uppercase tracking-wider text-gray-400">
+                      <TableCell
+                        isHeader
+                        className="text-left py-3 sm:text-sm md:text-base  px-3 md:py-4 md:px-6   font-semibold text-gray-300  whitespace-nowrap"
+                      >
                         Assignment
                       </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                      <TableCell
+                        isHeader
+                        className="text-left py-3 sm:text-sm md:text-base  px-3 md:py-4 md:px-6   font-semibold text-gray-300  whitespace-nowrap"
+                      >
                         Participant
                       </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                      <TableCell
+                        isHeader
+                        className="text-left py-3 sm:text-sm md:text-base  px-3 md:py-4 md:px-6   font-semibold text-gray-300  whitespace-nowrap"
+                      >
                         Squad
                       </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                      <TableCell
+                        isHeader
+                        className="text-left py-3 sm:text-sm md:text-base  px-3 md:py-4 md:px-6   font-semibold text-gray-300  whitespace-nowrap"
+                      >
                         Position
                       </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                      <TableCell
+                        isHeader
+                        className="text-left py-3 sm:text-sm md:text-base  px-3 md:py-4 md:px-6   font-semibold text-gray-300  whitespace-nowrap"
+                      >
                         Day/Night
                       </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                      <TableCell
+                        isHeader
+                        className="text-left py-3 sm:text-sm md:text-base  px-3 md:py-4 md:px-6   font-semibold text-gray-300  whitespace-nowrap"
+                      >
                         Target Eliminated
                       </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                      <TableCell
+                        isHeader
+                        className="text-left py-3 sm:text-sm md:text-base  px-3 md:py-4 md:px-6   font-semibold text-gray-300  whitespace-nowrap"
+                      >
                         Time to Shot
                       </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
+                      <TableCell
+                        isHeader
+                        className="text-left py-3 sm:text-sm md:text-base  px-3 md:py-4 md:px-6   font-semibold text-gray-300  whitespace-nowrap"
+                      >
                         Date
                       </TableCell>
                     </TableRow>
@@ -154,32 +189,40 @@ export default function TrainingPage() {
                   <TableBody>
                     {scores.map((score: any) => (
                       <TableRow key={score.id} className="border-b border-gray-700/30 hover:bg-gray-800/20 transition-colors">
-                        <TableCell className="py-4 px-6 text-sm text-gray-100">
-                          {score.assignment_session?.assignment?.assignment_name || "N/A"}
+                        <TableCell className="py-3 px-3 md:py-4 md:px-6 text-sm md:text-sm text-gray-100 whitespace-nowrap">
+                          <div className="max-w-[120px] md:max-w-none truncate">{score.assignment_session?.assignment?.assignment_name || "N/A"}</div>
                         </TableCell>
-                        <TableCell className="py-4 px-6 text-sm text-gray-100">
-                          {score.score_participants?.[0]?.user
-                            ? `${score.score_participants[0].user.first_name} ${score.score_participants[0].user.last_name}`
-                            : "N/A"}
+                        <TableCell className="py-3 px-3 md:py-4 md:px-6 text-sm md:text-sm text-gray-100 whitespace-nowrap">
+                          <div className="max-w-[100px] md:max-w-none truncate">
+                            {score.score_participants?.[0]?.user
+                              ? `${score.score_participants[0].user.first_name} ${score.score_participants[0].user.last_name}`
+                              : "N/A"}
+                          </div>
                         </TableCell>
-                        <TableCell className="py-4 px-6 text-sm text-gray-100">
-                          {score.score_participants?.[0]?.user?.squad?.squad_name || "N/A"}
+                        <TableCell className="py-3 px-3 md:py-4 md:px-6 text-sm md:text-sm text-gray-100 whitespace-nowrap">
+                          <div className="max-w-[80px] md:max-w-none truncate">{score.score_participants?.[0]?.user?.squad?.squad_name || "N/A"}</div>
                         </TableCell>
-                        <TableCell className="py-4 px-6 text-sm text-gray-100 capitalize">{score.position || "N/A"}</TableCell>
-                        <TableCell className="py-4 px-6 text-sm text-gray-100 capitalize">{score.day_night || "N/A"}</TableCell>
-                        <TableCell className="py-4 px-6">
+                        <TableCell className="py-3 px-3 md:py-4 md:px-6 text-sm md:text-sm text-gray-100 capitalize whitespace-nowrap">
+                          {score.position || "N/A"}
+                        </TableCell>
+                        <TableCell className="py-3 px-3 md:py-4 md:px-6 text-sm md:text-sm text-gray-100 capitalize whitespace-nowrap">
+                          {score.day_night || "N/A"}
+                        </TableCell>
+                        <TableCell className="py-3 px-3 md:py-4 md:px-6 whitespace-nowrap">
                           <span
-                            className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
+                            className={`inline-flex px-2 py-1 rounded-full text-sm font-medium ${
                               score.target_eliminated ? "bg-green-500/20 text-green-300" : "bg-red-500/20 text-red-300"
                             }`}
                           >
-                            {score.target_eliminated ? "Yes" : "No"}
+                            {score.target_eliminated ? "Yes" : <Badge variant="secondary">No</Badge>}
                           </span>
                         </TableCell>
-                        <TableCell className="py-4 px-6 text-sm text-gray-100">
+                        <TableCell className="py-3 px-3 md:py-4 md:px-6 text-sm md:text-sm text-gray-100 whitespace-nowrap">
                           {score.time_until_first_shot ? `${score.time_until_first_shot}s` : "N/A"}
                         </TableCell>
-                        <TableCell className="py-4 px-6 text-sm text-gray-100">{format(parseISO(score.created_at), "dd MMM yyyy")}</TableCell>
+                        <TableCell className="py-3 px-3 md:py-4 md:px-6 text-sm md:text-sm text-gray-100 whitespace-nowrap">
+                          {format(parseISO(score.created_at), "dd MMM yyyy")}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -190,7 +233,7 @@ export default function TrainingPage() {
 
           {/* commander-only status controls */}
           {isCommander(userRole) && (
-            <div className="xl:col-span-12">
+            <div className="col-span-1 lg:col-span-12">
               <TrainingPageChangeStatus training={training as TrainingSession} onStatusChange={handleStatusChange} />
             </div>
           )}

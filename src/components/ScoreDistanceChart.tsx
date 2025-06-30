@@ -5,7 +5,7 @@ import BaseDashboardCard from "./BaseDashboardCard";
 export default function ScoreDistanceChart({ rows }: { rows: ScoreTarget[] | undefined }) {
   const data = rows
     ? Object.values(
-          (rows as ScoreTarget[]).reduce<Record<number, { distance: string; target_hit: number; shots_fired: number; accuracy: number }>>(
+        (rows as ScoreTarget[]).reduce<Record<number, { distance: string; target_hit: number; shots_fired: number; accuracy: number }>>(
           (acc, { distance, target_hit, shots_fired }) => {
             const d = acc[distance] || { distance: `${distance}m`, target_hit: 0, shots_fired: 0, accuracy: 0 };
             d.target_hit += target_hit;
@@ -38,9 +38,9 @@ export default function ScoreDistanceChart({ rows }: { rows: ScoreTarget[] | und
 
   return (
     <BaseDashboardCard header="Hits vs Shots per Distance">
-      <div className="h-80 w-full">
+      <div className="h-fit w-full">
         {data.length > 0 ? (
-          <ResponsiveContainer minHeight={350} width="100%" height="100%">
+          <ResponsiveContainer minHeight={350} width="100%" height="100%" className="w-full">
             <BarChart data={data} margin={{ top: 30, right: 30, left: 0, bottom: 5 }} barGap={2}>
               <CartesianGrid strokeDasharray="3 3" stroke="#2D3748" vertical={false} />
               <XAxis dataKey="distance" tick={{ fill: "#9CA3AF", fontSize: 12 }} axisLine={{ stroke: "#4B5563" }} tickLine={{ stroke: "#4B5563" }} />

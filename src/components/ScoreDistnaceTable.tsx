@@ -27,20 +27,20 @@ export default function ScoreDistanceTable({ rows }: { rows: ScoreTarget[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-white/10 text-xs font-medium uppercase tracking-wider text-gray-400">
-              <th className="px-6 py-3 text-left">Distance (m)</th>
-              <th className="px-6 py-3 text-left">Shots</th>
-              <th className="px-6 py-3 text-left">Hits</th>
-              <th className="px-6 py-3 text-right">Accuracy</th>
+              <th className="py-3 px-3 md:py-4 md:px-6 text-xs md:text-sm text-gray-100 whitespace-nowrap">Distance (m)</th>
+              <th className="py-3 px-3 md:py-4 md:px-6 text-xs md:text-sm text-gray-100 whitespace-nowrap">Shots</th>
+              <th className="py-3 px-3 md:py-4 md:px-6 text-xs md:text-sm text-gray-100 whitespace-nowrap">Hits</th>
+              <th className="py-3 px-3 md:py-4 md:px-6 text-xs md:text-sm text-gray-100 whitespace-nowrap">Accuracy</th>
             </tr>
           </thead>
           <tbody>
             {rowsWithPercentage.length > 0 ? (
               rowsWithPercentage.map((r) => (
                 <tr key={`${r.bucket}`} className="border-b border-white/5 transition-colors hover:bg-white/5">
-                  <td className="px-6 py-4 font-medium text-gray-200">{r.rangeLabel}</td>
-                  <td className="px-6 py-4 text-gray-300">{r.shots_fired}</td>
-                  <td className="px-6 py-4 text-gray-300">{r.target_hit}</td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="py-3 px-3 md:py-4 md:px-6 text-xs md:text-sm text-gray-100 whitespace-nowrap">{r.rangeLabel}</td>
+                  <td className="py-3 px-3 md:py-4 md:px-6 text-xs md:text-sm text-gray-100 whitespace-nowrap">{r.shots_fired}</td>
+                  <td className="py-3 px-3 md:py-4 md:px-6 text-xs md:text-sm text-gray-100 whitespace-nowrap">{r.target_hit}</td>
+                  <td className="py-3 px-3 md:py-4 md:px-6 text-xs md:text-sm text-gray-100 whitespace-nowrap">
                     <span
                       className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
                         r.hitPercentage >= 70
