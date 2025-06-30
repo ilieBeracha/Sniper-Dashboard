@@ -5,7 +5,6 @@ import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
 import { teamStore } from "@/store/teamStore";
 import { Target, Users, Crosshair, Info, Plus, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { Assignment } from "@/types/training";
 import { userStore } from "@/store/userStore";
 import { TrainingStore } from "@/store/trainingStore";
 import { scoreStore } from "@/store/scoreSrore";
@@ -13,6 +12,7 @@ import BaseMobileDrawer from "../BaseDrawer/BaseMobileDrawer";
 import { isMobile } from "react-device-detect";
 import AddAssignmentModal from "../AddAssignmentModal";
 import { useModal } from "@/hooks/useModal";
+import { Assignment } from "@/types/training";
 
 interface ScoreFormValues {
   assignment_session_id: string;
@@ -193,18 +193,24 @@ export default function ScoreFormModal({
     setTeamMemberWithUserRole(updatedTeamMembers);
   }, [teamMembers, user]);
 
+  // Add current user as default participant for new scores only
   useEffect(() => {
     const userId = user?.id;
-    if (userId) {
-      setFormValues({
-        ...formValues,
-        participants: [...formValues.participants, userId],
-        duties: { ...formValues.duties, [userId]: "Sniper" },
-        weapons: { ...formValues.weapons, [userId]: "1" },
-        equipment: { ...formValues.equipment, [userId]: "1" },
-      });
+    console.log('Default participant useEffect:', { userId, editingScore, participants: formValues.participants });
+    
+    if (userId && !editingScore && !formValues.participants.includes(userId)) {
+      console.log('Adding default user participant:', userId);
+      setFormValues(prev => ({
+        ...prev,
+        assignment_session_id: training?.assignment_sessions?.[0]?.id || prev.assignment_session_id,
+        creator_id: userId,
+        participants: [...prev.participants, userId],
+        duties: { ...prev.duties, [userId]: "Sniper" },
+        weapons: { ...prev.weapons, [userId]: "1" },
+        equipment: { ...prev.equipment, [userId]: "1" },
+      }));
     }
-  }, []);
+  }, [user, editingScore, training]);
 
   const validateForm = () => {
     const newErrors: string[] = [];

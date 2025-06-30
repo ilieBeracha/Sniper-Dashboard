@@ -5,9 +5,6 @@ import {
   createTarget,
   fetchScoreTargetsByScoreId,
   patchScore,
-  patchScoreParticipant,
-  patchScoreTarget,
-  fetchScoreParticipantsByScoreId,
 } from "@/services/scoreService";
 import { create } from "zustand";
 import { TrainingStore } from "./trainingStore";
