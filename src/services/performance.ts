@@ -1,7 +1,6 @@
 import { supabase } from "./supabaseClient";
 import { HitPercentageData, SquadWeaponPerformance } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
-import { User } from "@supabase/supabase-js";
 import { PositionScore } from "@/types/score";
 
 export async function getUserHitPercentageRpc(userId: string): Promise<HitPercentageData> {
