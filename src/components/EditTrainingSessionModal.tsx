@@ -7,6 +7,7 @@ import BasicInfoSection from "./TrainingModal/AddTrainingSessionModalBasicInfo";
 import AssignmentsSection from "./TrainingModal/AddTrainingSessionModalAssignments";
 import TeamMembersSection from "./TrainingModal/AddTrainingSessionModalMembers";
 import PreviewSection from "./TrainingModal/AddTrainingSessionModalPreview";
+import BaseButton from "./BaseButton";
 
 type EditTrainingSessionModalProps = {
   isOpen: boolean;
@@ -137,20 +138,16 @@ export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, t
       </div>
 
       <div className="flex items-center justify-end gap-x-4 pt-4 border-t border-white/10 mt-4">
-        <button
+        <BaseButton
           type="button"
           onClick={onClose}
           className="px-4 py-1.5 bg-white/5 hover:bg-white/10 transition-colors rounded-md text-sm font-medium text-white"
         >
           Cancel
-        </button>
-        <button
-          onClick={handleSubmit}
-          disabled={!sessionName || !location || !date}
-          className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
-        >
+        </BaseButton>
+        <BaseButton onClick={handleSubmit} disabled={!sessionName || !location || !date}>
           Save Changes
-        </button>
+        </BaseButton>
       </div>
     </BaseModal>
   );

@@ -5,6 +5,7 @@ import { useStore } from "zustand";
 import BaseDesktopDrawer from "./BaseDrawer/BaseDesktopDrawer";
 import BaseMobileDrawer from "./BaseDrawer/BaseMobileDrawer";
 import { isMobile } from "react-device-detect";
+import BaseButton from "./BaseButton";
 
 export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boolean; setIsOpen: (open: boolean) => void; userId: string }) {
   const useInvitationStore = useStore(InvitationStore);
@@ -56,9 +57,10 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
           {/* Token Display */}
           <div className="relative flex items-center justify-evenly px-4 py-3 rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-white font-mono text-sm">
             <span className="truncate pr-4">{invitation?.token}</span>
-            <button
+            <BaseButton
               onClick={handleCopy}
               className="flex-shrink-0 px-3 py-1.5 rounded-md bg-zinc-700/50 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-600"
+              type="button"
             >
               {copied ? (
                 <span className="flex items-center gap-1.5 text-emerald-400">
@@ -67,7 +69,7 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
               ) : (
                 "Copy"
               )}
-            </button>
+            </BaseButton>
           </div>
 
           {/* Instructions */}
@@ -81,12 +83,12 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
             </ol>
           </div>
 
-          <button
+          <BaseButton
             onClick={onCloseModal}
             className="w-full px-4 py-2.5 text-sm font-medium text-zinc-300 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-600"
           >
             Close
-          </button>
+          </BaseButton>
         </div>
       ) : (
         <div className="flex flex-col items-center text-center px-4 sm:px-6 h-full w-full space-y-6">
@@ -95,13 +97,13 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
             <p className="text-sm text-zinc-400 max-w-md">Generate and share the invite token below to onboard your Squad Commander.</p>
           </div>
 
-          <button
+          <BaseButton
             onClick={() => setShowInfo(!showInfo)}
             className="flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-300 transition-colors"
           >
             <Info className="w-4 h-4" />
             {showInfo ? "Hide Process Details" : "Show Process Details"}
-          </button>
+          </BaseButton>
 
           {showInfo && (
             <div className="w-full text-left space-y-4 text-sm text-zinc-400 bg-zinc-800/30 p-4 rounded-lg border border-zinc-700/50">

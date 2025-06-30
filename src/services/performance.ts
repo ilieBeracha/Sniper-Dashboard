@@ -55,19 +55,6 @@ export async function getUserGroupingSummaryRpc(userId: string): Promise<Groupin
   throw new Error("No grouping summary data returned");
 }
 
-export async function getTopAccurateSnipers(teamId: string): Promise<User[]> {
-  const { data, error } = await supabase.rpc("get_top_snipers_by_team", {
-    team_uuid: teamId,
-  });
-
-  if (error) {
-    console.error("Error fetching top accurate snipers data:", error.message);
-    throw new Error("Failed to fetch top accurate snipers data");
-  }
-
-  return data || [];
-}
-
 // In your service
 export async function getDayNightPerformanceByTeam(teamId: string) {
   const { data, error } = await supabase.rpc("get_day_night_performance_by_team", {

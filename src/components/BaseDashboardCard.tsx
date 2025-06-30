@@ -16,6 +16,13 @@ export default function BaseDashboardCard({
 }) {
   const isMobile = useIsMobile();
   if (!header) {
+    return (
+      <div
+        className={`bg-[#121212] shadow-lg shadow-black/20 relative h-full flex flex-col transition-all text-sm duration-300 rounded-md border border-[#7a78783c]  ${isMobile ? "min-h-[200px]" : "h-full"}`}
+      >
+        {children}
+      </div>
+    );
   }
   return (
     <div
@@ -42,7 +49,7 @@ export default function BaseDashboardCard({
           )}
         </div>
       </div>
-      <div className="px-4 pb-4 flex-1 h-full">{children}</div>
+      <div className="pb-4 flex-1 h-full">{children}</div>
 
       <Tooltip
         id={`${header}-tooltip`}

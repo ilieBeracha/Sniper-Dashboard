@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Assignment } from "@/types/training";
 import SearchableCheckboxList from "@/components/SearchableCheckboxList";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
-import BaseCreateBtn from "../BaseCreateBtn";
+import { Plus } from "lucide-react";
 
 type AssignmentsSectionProps = {
   assignments: Assignment[];
@@ -32,9 +32,14 @@ export default function AssignmentsSection({
   return (
     <div className="bg-[#1A1A1A] rounded-lg border border-white/5 p-6">
       <div className="flex items-center mb-4 justify-between">
-        <div className="flex items-center gap-2">
-          <h4 className="text-sm font-medium text-white">Training Assignments</h4>
-          <BaseCreateBtn onClick={() => setIsAddAssignmentOpen(true)} />
+        <div className="flex items-center gap-2 text-sm font-medium text-white justify-between w-full">
+          <h4 className="text-sm font-medium">Assignments</h4>
+          <button
+            onClick={() => setIsAddAssignmentOpen(true)}
+            className="text-indigo-400  flex items-center gap-1.5 sm:text-xs text-xs hover:text-indigo-300 bg-indigo-900/20 rounded-lg border border-indigo-700/50 px-3 py-1.5"
+          >
+            <Plus size={14} />
+          </button>
         </div>
         {assignmentIds.length > 0 && (
           <div className="bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded text-xs">{assignmentIds.length} selected</div>

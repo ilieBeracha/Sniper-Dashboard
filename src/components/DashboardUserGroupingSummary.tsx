@@ -3,6 +3,7 @@ import { LineChart, Line, BarChart, Bar, XAxis, CartesianGrid, Tooltip, Responsi
 import { performanceStore } from "@/store/performance";
 import { useStore } from "zustand";
 import NoDataDisplay from "./BaseNoData";
+import BaseButton from "./BaseButton";
 
 const UserGroupingSummary = () => {
   const { groupingSummary, getGroupingSummary, groupingSummaryLoading } = useStore(performanceStore);
@@ -86,18 +87,19 @@ const UserGroupingSummary = () => {
 
           {/* Simple tabs */}
           <div className="flex mb-3 border-b border-white/5">
-            <button
+            <BaseButton
               className={`py-1 px-3 text-sm ${activeTab === "recent" ? "text-indigo-400 border-b border-indigo-400" : "text-gray-400"}`}
               onClick={() => setActiveTab("recent")}
             >
               Recent
-            </button>
-            <button
+              <div className="w-1 h-1 bg-indigo-400 rounded-full"></div>
+            </BaseButton>
+            <BaseButton
               className={`py-1 px-3 text-sm ${activeTab === "weapons" ? "text-indigo-400 border-b border-indigo-400" : "text-gray-400"}`}
               onClick={() => setActiveTab("weapons")}
             >
               Weapons
-            </button>
+            </BaseButton>
           </div>
 
           {/* Chart area with auto height */}

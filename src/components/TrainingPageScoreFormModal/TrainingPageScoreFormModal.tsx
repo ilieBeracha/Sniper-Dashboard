@@ -5,9 +5,14 @@ import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
 import { teamStore } from "@/store/teamStore";
 import { Target, Users, Crosshair, Info, Plus, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { Assignment } from "@/types/training";
 import { userStore } from "@/store/userStore";
 import { TrainingStore } from "@/store/trainingStore";
+import { scoreStore } from "@/store/scoreSrore";
+import BaseMobileDrawer from "../BaseDrawer/BaseMobileDrawer";
+import { isMobile } from "react-device-detect";
+import AddAssignmentModal from "../AddAssignmentModal";
+import { useModal } from "@/hooks/useModal";
+import { Assignment } from "@/types/training";
 
 interface ScoreFormValues {
   assignment_session_id: string;
@@ -47,21 +52,19 @@ export default function ScoreFormModal({
   assignmentSessions?: Assignment[];
   trainingId: string;
 }) {
-  const { training } = useStore(TrainingStore);
+  const { training, createAssignment, loadTrainingById } = useStore(TrainingStore);
   const { weapons } = useStore(weaponsStore);
   const { equipments } = useStore(equipmentStore);
   const { user } = useStore(userStore);
   const { members: teamMembers } = useStore(teamStore);
+  const { scoreTargetsByScoreId } = useStore(scoreStore);
   const [showOptionalFields, setShowOptionalFields] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [showParticipantSelect, setShowParticipantSelect] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
-  const [teamMemberWithUserRole] = useState<any[]>([
-    ...teamMembers,
-    { id: user?.id, first_name: user?.first_name, last_name: user?.last_name, user_role: user?.user_role },
-  ]);
-
+  const [teamMemberWithUserRole, setTeamMemberWithUserRole] = useState<any[]>([]);
+  const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const [formValues, setFormValues] = useState<ScoreFormValues>({
     assignment_session_id: "",
     creator_id: "",
@@ -83,45 +86,131 @@ export default function ScoreFormModal({
   });
 
   useEffect(() => {
-    console.log(training);
     if (user) {
-      formValues.participants.push(user?.id);
-      formValues.creator_id = user?.id;
+      setFormValues((prev) => ({
+        ...prev,
+        assignment_session_id: training?.assignment_sessions?.[0]?.id || "",
+        creator_id: user?.id,
+        participants: [...prev.participants, user?.id],
+        duties: { ...prev.duties, [user?.id]: "Sniper" },
+        weapons: { ...prev.weapons, [user?.id]: "1" },
+        equipment: { ...prev.equipment, [user?.id]: "1" },
+      }));
     }
   }, [user]);
 
-  // Filter assignments for current training
   const filteredAssignments = training?.assignment_sessions;
 
-  // Initialize form with editing score data if provided
+  const handleOnAddAssignment = async (assignmentName: string) => {
+    const { id } = await createAssignment(assignmentName, true, trainingId);
+    setFormValues({
+      ...formValues,
+      assignment_session_id: id,
+    });
+    await loadTrainingById(trainingId);
+    setIsAddAssignmentOpen(false);
+  };
 
   useEffect(() => {
     if (editingScore) {
-      setFormValues({
+      // Extract participants from score_participants
+      const participants = editingScore.score_participants?.map((sp: any) => sp.user?.id || sp.user_id) || [];
+      const duties: Record<string, string> = {};
+      const weapons: Record<string, string> = {};
+      const equipment: Record<string, string> = {};
+
+      editingScore.score_participants?.forEach((sp: any) => {
+        const userId = sp.user?.id || sp.user_id;
+        if (userId) {
+          duties[userId] = sp.user_duty || sp.duty || "";
+          weapons[userId] = sp.weapon_id ? String(sp.weapon_id) : "";
+          equipment[userId] = sp.equipment_id ? String(sp.equipment_id) : "";
+        }
+      });
+
+      const formData = {
         assignment_session_id: editingScore.assignment_session_id || "",
         day_night: editingScore.day_night || "day",
         position: editingScore.position || "",
         creator_id: editingScore.creator_id || "",
         time_until_first_shot: editingScore.time_until_first_shot || "",
-        first_shot_hit: editingScore.first_shot_hit,
-        wind_strength: editingScore.wind_strength,
-        wind_direction: editingScore.wind_direction,
-        note: editingScore.note,
-        participants: editingScore.participants || [],
-        duties: editingScore.duties || {},
-        weapons: editingScore.weapons || {},
-        equipment: editingScore.equipment || {},
+        first_shot_hit: editingScore.first_shot_hit || "",
+        wind_strength: editingScore.wind_strength || undefined,
+        wind_direction: editingScore.wind_direction || undefined,
+        note: editingScore.note || "",
+        participants: participants,
+        duties: duties,
+        weapons: weapons,
+        equipment: equipment,
         training_id: trainingId,
+        scoreTargets:
+          scoreTargetsByScoreId?.length > 0
+            ? scoreTargetsByScoreId.map((st: any) => ({
+                distance: st.distance,
+                shots_fired: st.shots_fired,
+                target_hits: st.target_hits,
+              }))
+            : [
+                {
+                  distance: 100,
+                  shots_fired: 0,
+                  target_hits: 0,
+                },
+              ],
+      };
+
+      setFormValues(formData);
+    } else {
+      // Reset form for new score
+      setFormValues({
+        assignment_session_id: "",
+        creator_id: "",
+        day_night: "day",
+        position: "",
+        time_until_first_shot: "",
+        participants: [],
+        duties: {},
+        weapons: {},
+        equipment: {},
+        training_id: "",
         scoreTargets: [
           {
-            distance: editingScore.distance,
-            shots_fired: editingScore.shots_fired,
-            target_hits: editingScore.target_hits,
+            distance: 100,
+            shots_fired: 0,
+            target_hits: 0,
           },
-        ].filter((item) => item.distance !== undefined),
+        ],
       });
     }
-  }, [editingScore, trainingId]);
+  }, [editingScore, trainingId, scoreTargetsByScoreId]);
+
+  // Update team member list when teamMembers or user changes
+  useEffect(() => {
+    const updatedTeamMembers = [
+      ...teamMembers,
+      { id: user?.id, first_name: user?.first_name, last_name: user?.last_name, user_role: user?.user_role },
+    ].filter(member => member.id); // Filter out undefined users
+    setTeamMemberWithUserRole(updatedTeamMembers);
+  }, [teamMembers, user]);
+
+  // Add current user as default participant for new scores only
+  useEffect(() => {
+    const userId = user?.id;
+    console.log('Default participant useEffect:', { userId, editingScore, participants: formValues.participants });
+    
+    if (userId && !editingScore && !formValues.participants.includes(userId)) {
+      console.log('Adding default user participant:', userId);
+      setFormValues(prev => ({
+        ...prev,
+        assignment_session_id: training?.assignment_sessions?.[0]?.id || prev.assignment_session_id,
+        creator_id: userId,
+        participants: [...prev.participants, userId],
+        duties: { ...prev.duties, [userId]: "Sniper" },
+        weapons: { ...prev.weapons, [userId]: "1" },
+        equipment: { ...prev.equipment, [userId]: "1" },
+      }));
+    }
+  }, [user, editingScore, training]);
 
   const validateForm = () => {
     const newErrors: string[] = [];
@@ -206,12 +295,14 @@ export default function ScoreFormModal({
         equipment_id: formValues.duties[userId] === "Spotter" ? formValues.equipment[userId] : null,
       }));
 
-      onSubmit({
+      const scoreData = {
         ...formValues,
         score_participants,
         training_id: trainingId,
-        assignment_session_id: formValues.assignment_session_id, // Ensure this is explicitly set
-      });
+        assignment_session_id: formValues.assignment_session_id,
+      };
+
+      onSubmit(scoreData);
       onClose();
     } catch (error) {
       if (error instanceof Error) {
@@ -240,21 +331,14 @@ export default function ScoreFormModal({
   };
 
   const removeParticipant = (userId: string) => {
+    if (formValues.participants.length === 1) {
+      return;
+    }
+
     const newParticipants = formValues.participants.filter((id: any) => id !== userId);
-    const newDuties = { ...formValues.duties };
-    const newWeapons = { ...formValues.weapons };
-    const newEquipment = { ...formValues.equipment };
-
-    delete newDuties[userId];
-    delete newWeapons[userId];
-    delete newEquipment[userId];
-
     setFormValues({
       ...formValues,
       participants: newParticipants,
-      duties: newDuties,
-      weapons: newWeapons,
-      equipment: newEquipment,
     });
   };
 
@@ -272,7 +356,7 @@ export default function ScoreFormModal({
 
   const renderStepIndicator = () => (
     <div className="flex items-center justify-center mb-6">
-      <div className="flex items-center space-x-4 min-w-[500px] ">
+      <div className="flex items-center space-x-4  min-w-[00px] ">
         {[1, 2, 3].map((step) => (
           <div key={step} className=" items-center mx-auto flex justify-center">
             <div
@@ -292,23 +376,41 @@ export default function ScoreFormModal({
   const renderStep1 = () => (
     <div className="space-y-6">
       {/* Mission Selection */}
-      <div className="p-4 bg-zinc-800/30 rounded-lg border border-zinc-700/50">
-        <div className="flex items-center gap-2 mb-3">
-          <Target className="text-indigo-400" size={16} />
-          <h2 className="text-base font-semibold text-white">Mission Selection</h2>
+      <div className="p-4 bg-zinc-800/30 rounded-lg border border-zinc-700/50 flex flex-col gap-4">
+        <div className="flex items-center justify-between ">
+          <div className="flex items-center gap-2">
+            <Target className="text-indigo-400" size={16} />
+            <h2 className="text-base font-semibold text-white">Mission Selection</h2>
+          </div>
+
+          <button
+            onClick={() => setIsAddAssignmentOpen(true)}
+            className="text-indigo-400  flex items-center gap-1.5 sm:text-xs text-xs hover:text-indigo-300 bg-indigo-900/20 rounded-lg border border-indigo-700/50 px-3 py-1.5 "
+          >
+            <Plus size={14} />
+          </button>
         </div>
         <select
-          value={formValues.assignment_session_id}
+          value={formValues?.assignment_session_id || ""}
           onChange={(e) => setFormValues({ ...formValues, assignment_session_id: e.target.value })}
           className="w-full min-h-9 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white border border-zinc-700"
         >
-          <option value="">Select mission</option>
-          {filteredAssignments?.map((assignment) => (
-            <option key={assignment.id} value={assignment.id}>
-              {assignment.assignment_name}
-            </option>
-          ))}
+          <option value="">Select assignment</option>
+          {filteredAssignments?.map((assignment) => {
+            return (
+              <option key={assignment.id} value={assignment.id}>
+                {assignment.assignment_name}
+              </option>
+            );
+          })}
         </select>
+        <AddAssignmentModal
+          isOpen={isAddAssignmentOpen}
+          onClose={() => setIsAddAssignmentOpen(false)}
+          onSuccess={(assignmentName: string) => {
+            handleOnAddAssignment(assignmentName);
+          }}
+        />
       </div>
 
       {/* Combat Details */}
@@ -668,7 +770,7 @@ export default function ScoreFormModal({
   };
 
   const renderForm = () => (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-6 min-w-[30vw]">
       {renderStepIndicator()}
       {renderCurrentStep()}
 
@@ -723,8 +825,16 @@ export default function ScoreFormModal({
   );
 
   return (
-    <BaseDesktopDrawer isOpen={isOpen} setIsOpen={onClose} title={editingScore ? "Edit Score Entry" : "New Score Entry"}>
-      {renderForm()}
-    </BaseDesktopDrawer>
+    <>
+      {isMobile ? (
+        <BaseMobileDrawer isOpen={isOpen} setIsOpen={onClose} title={editingScore ? "Edit Score Entry" : "New Score Entry"}>
+          {renderForm()}
+        </BaseMobileDrawer>
+      ) : (
+        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={onClose} title={editingScore ? "Edit Score Entry" : "New Score Entry"}>
+          {renderForm()}
+        </BaseDesktopDrawer>
+      )}
+    </>
   );
 }

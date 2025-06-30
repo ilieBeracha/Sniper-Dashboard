@@ -10,12 +10,12 @@ import { TrainingStore } from "@/store/trainingStore";
 import { squadStore } from "@/store/squadStore";
 import { performanceStore } from "@/store/performance";
 import { getUserGroupingSummaryRpc } from "@/services/performance";
-// import DashboardRowKPI from "@/components/DashboardRowKPI";
+import DashboardRowKPI from "@/components/DashboardRowKPI";
 import Header from "@/Headers/Header";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
-  const { getUserHitPercentage, getTopAccurateSnipers, getDayNightPerformance, getSquadStats } = useStore(performanceStore);
+  const { getUserHitPercentage, getSquadStats } = useStore(performanceStore);
 
   const { getSquadMetricsByRole } = useStore(squadStore);
   const { loadNextAndLastTraining } = useStore(TrainingStore);
@@ -34,8 +34,6 @@ export default function Dashboard() {
         await getUserHitPercentage(user.id);
         await loadNextAndLastTraining(user.team_id);
         await getSquadMetricsByRole(user.id);
-        await getTopAccurateSnipers(user.team_id);
-        await getDayNightPerformance(user.team_id);
         await getSquadStats(user.team_id, null, null);
       }
 
@@ -55,7 +53,7 @@ export default function Dashboard() {
       </Header>
       <div className="grid grid-cols-1 gap-4 p-4 md:p-6 2xl:p-10 ">
         <DashboardRowOne user={user} />
-        {/* <DashboardRowKPI /> */}
+        <DashboardRowKPI />
         <DashboardRowThree loading={loading} />
         <DashboardRowFour />
       </div>

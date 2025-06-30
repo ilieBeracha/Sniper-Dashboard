@@ -1,8 +1,16 @@
-import { createScore, createScoreParticipant, getScoresByTrainingId, createTarget } from "@/services/scoreService";
+import {
+  createScore,
+  createScoreParticipant,
+  getScoresByTrainingId,
+  createTarget,
+  fetchScoreTargetsByScoreId,
+  patchScore,
+} from "@/services/scoreService";
 import { create } from "zustand";
 import { TrainingStore } from "./trainingStore";
 import { supabase } from "@/services/supabaseClient";
 import { DayNight, PositionScore, ScoreParticipant, ScoreTarget } from "@/types/score";
+import { userStore } from "./userStore";
 
 export interface Score {
   id?: string;
@@ -40,23 +48,27 @@ export interface NewScoreRange {
 interface ScoreStore {
   scores: Score[];
   scoreRanges: ScoreRangeRow[];
-  handleCreateScore: (score: Score) => Promise<any[]>;
+  handleCreateScore: (score: Score) => Promise<any[] | undefined>;
+  handlePatchScore: (scoreForm: any, scoreId: string) => Promise<void>;
   getScoresByTrainingId: (trainingId: string) => Promise<void>;
   getScoreRangesByTrainingId: (trainingId: string) => Promise<void>;
+  getScoreTargetsByScoreId: (scoreId: string) => Promise<ScoreTarget[]>;
+  scoreTargetsByScoreId: ScoreTarget[];
+  scoreParticipantsByScoreId: ScoreParticipant[];
 }
 
 export const scoreStore = create<ScoreStore>((set) => ({
   scores: [],
   scoreRanges: [],
-
+  scoreTargetsByScoreId: [],
+  scoreParticipantsByScoreId: [],
   async handleCreateScore(scoreForm: any) {
-    console.log(scoreForm);
     const training_id = TrainingStore.getState().training?.id;
-    console.log(training_id);
     const score: Score = {
-      creator_id: scoreForm.creator_id || "",
+      creator_id: userStore.getState().user?.id || "",
       time_until_first_shot: scoreForm.time_until_first_shot,
       note: scoreForm.note,
+
       wind_strength: scoreForm.wind_strength,
       first_shot_hit: scoreForm.first_shot_hit,
       position: scoreForm.position,
@@ -67,13 +79,12 @@ export const scoreStore = create<ScoreStore>((set) => ({
       squad_id: scoreForm.squad_id,
     };
 
-    console.log(score);
     const res = await createScore(score);
 
     if (res) {
       await createScoreParticipant(scoreForm.score_participants, res[0].id);
       await createTarget(scoreForm.scoreTargets, res[0].id);
-      return res[0].id;
+      return res;
     }
   },
 
@@ -87,5 +98,51 @@ export const scoreStore = create<ScoreStore>((set) => ({
     const { data, error } = await supabase.rpc("get_score_ranges_by_training_id", { training_id: trainingId });
     if (error) throw error;
     set({ scoreRanges: data });
+  },
+
+  getScoreTargetsByScoreId: async (scoreId: string) => {
+    const res = await fetchScoreTargetsByScoreId(scoreId);
+    set({ scoreTargetsByScoreId: res });
+    return res;
+  },
+
+  handlePatchScore: async (scoreForm: any, scoreId: string) => {
+    try {
+      // Update main score record
+      const scoreData = {
+        assignment_session_id: scoreForm.assignment_session_id,
+        time_until_first_shot: scoreForm.time_until_first_shot,
+        wind_strength: scoreForm.wind_strength,
+        first_shot_hit: false,
+        wind_direction: scoreForm.wind_direction,
+        day_night: scoreForm.day_night,
+        note: scoreForm.note,
+        position: scoreForm.position,
+      };
+
+      await patchScore(scoreData, scoreId);
+
+      // Delete existing participants and targets to replace with new data
+      const { error: deleteParticipantsError } = await supabase.from("score_participants").delete().eq("score_id", scoreId);
+
+      if (deleteParticipantsError) throw deleteParticipantsError;
+
+      const { error: deleteTargetsError } = await supabase.from("score_ranges").delete().eq("score_id", scoreId);
+
+      if (deleteTargetsError) throw deleteTargetsError;
+
+      // Create new participants with updated data
+      if (scoreForm.score_participants && scoreForm.score_participants.length > 0) {
+        await createScoreParticipant(scoreForm.score_participants, scoreId);
+      }
+
+      // Create new targets with updated data
+      if (scoreForm.scoreTargets && scoreForm.scoreTargets.length > 0) {
+        await createTarget(scoreForm.scoreTargets, scoreId);
+      }
+    } catch (error) {
+      console.error("Error updating score:", error);
+      throw error;
+    }
   },
 }));

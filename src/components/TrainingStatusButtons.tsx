@@ -1,4 +1,5 @@
 import { TrainingStatus } from "@/types/training";
+import BaseButton from "./BaseButton";
 
 type TrainingStatusButtonsProps = {
   currentStatus: TrainingStatus;
@@ -32,8 +33,9 @@ export default function TrainingStatusButtons({ currentStatus, onStatusChange }:
     <div className="flex justify-between items-center">
       <div className="flex gap-2">
         {mainStatuses.map((status) => (
-          <button
+          <BaseButton
             key={status}
+            type="button"
             onClick={() => onStatusChange(status)}
             disabled={status === currentStatus}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
@@ -41,10 +43,11 @@ export default function TrainingStatusButtons({ currentStatus, onStatusChange }:
             }`}
           >
             {statusConfig[status].displayName}
-          </button>
+          </BaseButton>
         ))}
       </div>
-      <button
+      <BaseButton
+        type="button"
         onClick={() => onStatusChange(cancelStatus)}
         disabled={cancelStatus === currentStatus}
         className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
@@ -52,7 +55,7 @@ export default function TrainingStatusButtons({ currentStatus, onStatusChange }:
         }`}
       >
         {statusConfig[cancelStatus].displayName}
-      </button>
+      </BaseButton>
     </div>
   );
 }

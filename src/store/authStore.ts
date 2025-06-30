@@ -69,7 +69,6 @@ export const authStore = create<props>((set, get) => ({
       return res;
     } catch (error: any) {
       set({ error: error.response.data.error });
-      console.log(error);
     }
   },
 

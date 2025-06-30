@@ -19,10 +19,12 @@ import { format, parseISO } from "date-fns";
 import ScoreDistanceChart from "@/components/ScoreDistanceChart";
 import ScoreDistanceTable from "@/components/ScoreDistnaceTable";
 import { ScoreTarget } from "@/types/score";
-import { BiAddToQueue } from "react-icons/bi";
 import TrainingPageScoreFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModal";
-import { Table, TableBody, TableHeader, TableRow, TableCell } from "@/ui/table";
-import BaseDashboardCard from "@/components/BaseDashboardCard";
+import { Plus } from "lucide-react";
+import TrainingScoresTable from "@/components/TrainingScoresTable";
+import ScoreDetailsModal from "@/components/ScoreDetailsModal";
+import BaseButton from "@/components/BaseButton";
+import { isMobile } from "react-device-detect";
 
 export default function TrainingPage() {
   const { id } = useParams();
@@ -30,18 +32,28 @@ export default function TrainingPage() {
   const { training, loadTrainingById, loadAssignments, createAssignment, assignments } = useStore(TrainingStore);
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
-  const { isOpen: isAddScoreOpen, setIsOpen: setIsAddScoreOpen } = useModal();
+  const { isOpen: isAddScoreOpen, setIsOpen: setIsAddScoreOpen, toggleIsOpen: toggleIsAddScoreOpen } = useModal();
 
   const { userRole } = useStore(userStore);
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  const { isLoading, setIsLoading } = useStore(loaderStore);
+  const [selectedScore, setSelectedScore] = useState<any>(null);
+  const [isScoreDetailsOpen, setIsScoreDetailsOpen] = useState(false);
+  const [newlyAddedScoreId, setNewlyAddedScoreId] = useState<string | null>(null);
+  const [editingScore, setEditingScore] = useState<any>(null);
+  const { setIsLoading } = useStore(loaderStore);
   const { members } = useStore(teamStore);
-  const { getScoresByTrainingId, scores, handleCreateScore: createScoreAction } = useStore(scoreStore);
-  const { getScoreRangesByTrainingId, scoreRanges } = useStore(scoreStore);
+  const {
+    getScoresByTrainingId,
+    scores,
+    handleCreateScore: createScoreAction,
+    getScoreRangesByTrainingId,
+    scoreRanges,
+    getScoreTargetsByScoreId,
+    handlePatchScore,
+  } = useStore(scoreStore);
 
   /* ------------ data loading ------------ */
   useEffect(() => {
@@ -53,7 +65,7 @@ export default function TrainingPage() {
       await getScoreRangesByTrainingId(id);
     };
     load();
-  }, [id, isLoading]);
+  }, [id]);
 
   /* ------------ handlers ------------ */
   const handleStatusChange = (newStatus: TrainingStatus) => {
@@ -89,108 +101,92 @@ export default function TrainingPage() {
   };
 
   const handleAddScore = async (data: any) => {
-    await createScoreAction(data);
+    if (editingScore?.id) {
+      handleUpdateScore(data);
+      return;
+    }
+    try {
+      const newScore = await createScoreAction(data);
+      setIsAddScoreOpen(false);
+      if (newScore?.[0]?.id) {
+        setNewlyAddedScoreId(newScore[0].id as string);
+      }
+      await getScoresByTrainingId(id as string);
+    } catch (error) {
+      console.error("Error adding score:", error);
+    }
+  };
+
+  const handleScoreClick = (score: any) => {
+    setSelectedScore(score);
+    getScoreTargetsByScoreId(score.id);
+    setIsScoreDetailsOpen(true);
+  };
+
+  const handleEditScore = (score: any) => {
+    setEditingScore(score);
+    getScoreTargetsByScoreId(score.id);
     setIsAddScoreOpen(true);
+  };
+
+  const handleUpdateScore = async (data: any) => {
+    try {
+      await handlePatchScore(data, editingScore.id);
+      setIsAddScoreOpen(false);
+      setEditingScore(null);
+      await getScoresByTrainingId(id as string);
+    } catch (error) {
+      console.error("Error updating score:", error);
+    }
   };
 
   const formattedDate = training?.date ? format(parseISO(training.date), "dd MMM yyyy") : "";
 
   /* ------------ ui ------------ */
   return (
-    <div className="min-h-screen  text-gray-100">
+    <div className="min-h-screen w-full  text-gray-100">
       <Header title="Training">
-        <span className="flex items-center rounded-full bg-indigo-500/20 py-1.5 px-3 text-xs font-medium text-indigo-300">{formattedDate}</span>
-        <button onClick={() => setIsAddScoreOpen(true)} className="p-1.5 rounded-lg hover:bg-white/5 transition-colors duration-200">
-          <BiAddToQueue className="text-indigo-400" />{" "}
-        </button>
+        <span className="flex items-center rounded-full bg-indigo-500/20 py-1.5 px-3 text-sm font-medium text-indigo-300">{formattedDate}</span>
       </Header>
 
-      <main className="mt-6 space-y-8 px-4 pb-10 md:px-6 2xl:px-10">
-        {/* stats bar */}
+      <main className="mt-6 space-y-4 px-4 pb-10 md:space-y-4 md:px-6 2xl:px-10 w-full">
+        <div className="flex items-center justify-end w-full mb-4">
+          {/* stats bar */}
 
-        <div className="grid gap-6 xl:grid-cols-12">
+          <BaseButton
+            type="button"
+            onClick={() => toggleIsAddScoreOpen()}
+            style="purple"
+            className={["px-4 py-1.5  flex items-center gap-2", isMobile && "w-full"].join(" ")}
+          >
+            <span className="text-xs font-medium">Add Score</span>
+            <Plus size={12} />
+          </BaseButton>
+        </div>
+
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-12">
           {/* distance accuracy – chart */}
-          <div className="xl:col-span-8">
+          <div className="col-span-1 lg:col-span-8">
             <ScoreDistanceChart rows={scoreRanges as unknown as ScoreTarget[]} />
           </div>
 
           {/* per-distance breakdown – table */}
-          <div className="xl:col-span-4">
+          <div className="col-span-1 lg:col-span-4">
             <ScoreDistanceTable rows={scoreRanges as unknown as ScoreTarget[]} />
           </div>
 
-          <div className="xl:col-span-12">
-            <BaseDashboardCard header="Scores">
-              <div className="rounded-xl ">
-                <Table className="w-full border-separate border-spacing-0">
-                  <TableHeader>
-                    <TableRow className="border-b border-gray-700/50">
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
-                        Assignment
-                      </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
-                        Participant
-                      </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
-                        Squad
-                      </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
-                        Position
-                      </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
-                        Day/Night
-                      </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
-                        Target Eliminated
-                      </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
-                        Time to Shot
-                      </TableCell>
-                      <TableCell isHeader className="text-left py-4 px-6 text-sm font-semibold text-gray-300 bg-gray-800/30">
-                        Date
-                      </TableCell>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {scores.map((score: any) => (
-                      <TableRow key={score.id} className="border-b border-gray-700/30 hover:bg-gray-800/20 transition-colors">
-                        <TableCell className="py-4 px-6 text-sm text-gray-100">
-                          {score.assignment_session?.assignment?.assignment_name || "N/A"}
-                        </TableCell>
-                        <TableCell className="py-4 px-6 text-sm text-gray-100">
-                          {score.score_participants?.[0]?.user
-                            ? `${score.score_participants[0].user.first_name} ${score.score_participants[0].user.last_name}`
-                            : "N/A"}
-                        </TableCell>
-                        <TableCell className="py-4 px-6 text-sm text-gray-100">
-                          {score.score_participants?.[0]?.user?.squad?.squad_name || "N/A"}
-                        </TableCell>
-                        <TableCell className="py-4 px-6 text-sm text-gray-100 capitalize">{score.position || "N/A"}</TableCell>
-                        <TableCell className="py-4 px-6 text-sm text-gray-100 capitalize">{score.day_night || "N/A"}</TableCell>
-                        <TableCell className="py-4 px-6">
-                          <span
-                            className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
-                              score.target_eliminated ? "bg-green-500/20 text-green-300" : "bg-red-500/20 text-red-300"
-                            }`}
-                          >
-                            {score.target_eliminated ? "Yes" : "No"}
-                          </span>
-                        </TableCell>
-                        <TableCell className="py-4 px-6 text-sm text-gray-100">
-                          {score.time_until_first_shot ? `${score.time_until_first_shot}s` : "N/A"}
-                        </TableCell>
-                        <TableCell className="py-4 px-6 text-sm text-gray-100">{format(parseISO(score.created_at), "dd MMM yyyy")}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </BaseDashboardCard>
+          <div className="col-span-1 lg:col-span-12">
+            <TrainingScoresTable
+              scores={scores}
+              onScoreClick={handleScoreClick}
+              onEditClick={handleEditScore}
+              newlyAddedScoreId={newlyAddedScoreId}
+            />
           </div>
 
           {/* commander-only status controls */}
           {isCommander(userRole) && (
-            <div className="xl:col-span-12">
+            <div className="col-span-1 lg:col-span-12">
               <TrainingPageChangeStatus training={training as TrainingSession} onStatusChange={handleStatusChange} />
             </div>
           )}
@@ -216,12 +212,17 @@ export default function TrainingPage() {
         <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
         <TrainingPageScoreFormModal
           trainingId={training?.id as string}
-          editingScore={null}
+          editingScore={editingScore}
           isOpen={isAddScoreOpen}
-          onClose={() => setIsAddScoreOpen(false)}
+          onClose={() => {
+            setIsAddScoreOpen(false);
+            setEditingScore(null);
+          }}
           onSubmit={handleAddScore}
           assignmentSessions={assignments}
         />
+
+        <ScoreDetailsModal isOpen={isScoreDetailsOpen} setIsOpen={setIsScoreDetailsOpen} score={selectedScore} />
       </main>
     </div>
   );
