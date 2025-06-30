@@ -63,10 +63,7 @@ export default function ScoreFormModal({
   const [showParticipantSelect, setShowParticipantSelect] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
-  const [teamMemberWithUserRole] = useState<any[]>([
-    ...teamMembers,
-    { id: user?.id, first_name: user?.first_name, last_name: user?.last_name, user_role: user?.user_role },
-  ]);
+  const [teamMemberWithUserRole, setTeamMemberWithUserRole] = useState<any[]>([]);
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const [formValues, setFormValues] = useState<ScoreFormValues>({
     assignment_session_id: "",
@@ -116,20 +113,13 @@ export default function ScoreFormModal({
 
   useEffect(() => {
     if (editingScore) {
-      console.log('editingScore FULL:', JSON.stringify(editingScore, null, 2)); // Full structure
-      console.log('score_participants:', editingScore.score_participants);
-      
       // Extract participants from score_participants
       const participants = editingScore.score_participants?.map((sp: any) => sp.user?.id || sp.user_id) || [];
-      console.log('extracted participants:', participants);
-      
-      // Extract duties, weapons, equipment from score_participants
       const duties: Record<string, string> = {};
       const weapons: Record<string, string> = {};
       const equipment: Record<string, string> = {};
-      
+
       editingScore.score_participants?.forEach((sp: any) => {
-        console.log('processing participant:', sp);
         const userId = sp.user?.id || sp.user_id;
         if (userId) {
           duties[userId] = sp.user_duty || sp.duty || "";
@@ -137,10 +127,6 @@ export default function ScoreFormModal({
           equipment[userId] = sp.equipment_id ? String(sp.equipment_id) : "";
         }
       });
-      
-      console.log('extracted duties:', duties);
-      console.log('extracted weapons:', weapons);
-      console.log('extracted equipment:', equipment);
 
       const formData = {
         assignment_session_id: editingScore.assignment_session_id || "",
@@ -157,18 +143,22 @@ export default function ScoreFormModal({
         weapons: weapons,
         equipment: equipment,
         training_id: trainingId,
-        scoreTargets: scoreTargetsByScoreId?.length > 0 ? scoreTargetsByScoreId.map((st: any) => ({
-          distance: st.distance,
-          shots_fired: st.shots_fired,
-          target_hits: st.target_hits,
-        })) : [{
-          distance: 100,
-          shots_fired: 0,
-          target_hits: 0,
-        }],
+        scoreTargets:
+          scoreTargetsByScoreId?.length > 0
+            ? scoreTargetsByScoreId.map((st: any) => ({
+                distance: st.distance,
+                shots_fired: st.shots_fired,
+                target_hits: st.target_hits,
+              }))
+            : [
+                {
+                  distance: 100,
+                  shots_fired: 0,
+                  target_hits: 0,
+                },
+              ],
       };
-      
-      console.log('Setting form values:', formData); // Debug log
+
       setFormValues(formData);
     } else {
       // Reset form for new score
@@ -193,6 +183,28 @@ export default function ScoreFormModal({
       });
     }
   }, [editingScore, trainingId, scoreTargetsByScoreId]);
+
+  // Update team member list when teamMembers or user changes
+  useEffect(() => {
+    const updatedTeamMembers = [
+      ...teamMembers,
+      { id: user?.id, first_name: user?.first_name, last_name: user?.last_name, user_role: user?.user_role },
+    ].filter(member => member.id); // Filter out undefined users
+    setTeamMemberWithUserRole(updatedTeamMembers);
+  }, [teamMembers, user]);
+
+  useEffect(() => {
+    const userId = user?.id;
+    if (userId) {
+      setFormValues({
+        ...formValues,
+        participants: [...formValues.participants, userId],
+        duties: { ...formValues.duties, [userId]: "Sniper" },
+        weapons: { ...formValues.weapons, [userId]: "1" },
+        equipment: { ...formValues.equipment, [userId]: "1" },
+      });
+    }
+  }, []);
 
   const validateForm = () => {
     const newErrors: string[] = [];
@@ -277,12 +289,14 @@ export default function ScoreFormModal({
         equipment_id: formValues.duties[userId] === "Spotter" ? formValues.equipment[userId] : null,
       }));
 
-      onSubmit({
+      const scoreData = {
         ...formValues,
         score_participants,
         training_id: trainingId,
-        assignment_session_id: formValues.assignment_session_id, // Ensure this is explicitly set
-      });
+        assignment_session_id: formValues.assignment_session_id,
+      };
+
+      onSubmit(scoreData);
       onClose();
     } catch (error) {
       if (error instanceof Error) {
@@ -333,10 +347,6 @@ export default function ScoreFormModal({
       setCurrentStep(currentStep - 1);
     }
   };
-
-  useEffect(() => {
-    console.log(formValues);
-  }, [formValues]);
 
   const renderStepIndicator = () => (
     <div className="flex items-center justify-center mb-6">
@@ -667,7 +677,7 @@ export default function ScoreFormModal({
 
         <div className="space-y-4">
           {formValues.participants.map((participantId: any) => {
-            const member = teamMembers.find((m) => m.id === participantId);
+            const member = teamMemberWithUserRole.find((m) => m.id === participantId);
             return (
               <div key={participantId} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-zinc-800/20 rounded-lg">
                 <div className="flex items-center justify-between md:col-span-2">

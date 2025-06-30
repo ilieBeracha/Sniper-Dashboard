@@ -52,6 +52,7 @@ export default function TrainingPage() {
     getScoreRangesByTrainingId,
     scoreRanges,
     getScoreTargetsByScoreId,
+    handlePatchScore,
   } = useStore(scoreStore);
 
   /* ------------ data loading ------------ */
@@ -100,6 +101,10 @@ export default function TrainingPage() {
   };
 
   const handleAddScore = async (data: any) => {
+    if (editingScore?.id) {
+      handleUpdateScore(data);
+      return;
+    }
     try {
       const newScore = await createScoreAction(data);
       setIsAddScoreOpen(false);
@@ -126,8 +131,7 @@ export default function TrainingPage() {
 
   const handleUpdateScore = async (data: any) => {
     try {
-      // TODO: Implement update score function
-      console.log("Update score:", data);
+      await handlePatchScore(data, editingScore.id);
       setIsAddScoreOpen(false);
       setEditingScore(null);
       await getScoresByTrainingId(id as string);
@@ -214,7 +218,7 @@ export default function TrainingPage() {
             setIsAddScoreOpen(false);
             setEditingScore(null);
           }}
-          onSubmit={editingScore ? handleUpdateScore : handleAddScore}
+          onSubmit={handleAddScore}
           assignmentSessions={assignments}
         />
 

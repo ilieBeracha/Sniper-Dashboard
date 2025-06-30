@@ -53,7 +53,6 @@ export async function getScoresByTrainingId(training_id: string) {
       )
       .eq("training_id", training_id)
       .order("created_at", { ascending: false });
-    console.log("Fetched scores:", data);
     if (error) {
       console.error("Error fetching scores:", error);
       throw new Error(`Failed to fetch scores: ${error.message}`);
@@ -106,4 +105,38 @@ export async function fetchScoreTargetsByScoreId(score_id: string) {
     console.error("Exception when fetching score targets:", error);
     throw error;
   }
+}
+
+export async function patchScore(score: any, scoreId: string) {
+  console.log("score", score);
+  console.log("scoreId", scoreId);
+  const { data, error } = await supabase.from("score").update(score).eq("id", scoreId).select("*");
+  if (error) throw error;
+  return data;
+}
+
+export async function patchScoreParticipant(participants: ScoreParticipant[], score_id: string, id: string) {
+  console.log("patchScoreParticipant-participants", participants);
+  console.log("patchScoreParticipant-score_id", score_id);
+  console.log("patchScoreParticipant-id", id);
+  const { data, error } = await supabase.from("score_participants").update(participants).eq("score_id", score_id).eq("id", id).select("*");
+  if (error) throw error;
+  return data;
+}
+
+export async function patchScoreTarget(targets: ScoreTarget[], score_id: string, id: string) {
+  console.log("patchScoreTarget-targets", targets);
+  console.log("patchScoreTarget-score_id", score_id);
+  console.log("patchScoreTargetid", id);
+  const { data, error } = await supabase.from("score_ranges").update(targets).eq("score_id", score_id).eq("id", id).select("*");
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchScoreParticipantsByScoreId(score_id: string) {
+  console.log("fetchScoreParticipantsByScoreId- score_id", score_id);
+  const { data, error } = await supabase.from("score_participants").select("*").eq("score_id", score_id);
+
+  if (error) throw error;
+  return data;
 }

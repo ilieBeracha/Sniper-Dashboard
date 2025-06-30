@@ -69,7 +69,6 @@ export default function TeamTable() {
               {members?.map((member: User) => {
                 const rowId = member.id;
                 const initials = member.first_name?.charAt(0).toUpperCase() + member.last_name?.charAt(0).toUpperCase();
-
                 return (
                   <tr
                     key={rowId}
