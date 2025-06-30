@@ -113,14 +113,12 @@ export default function ScoreDetailsModal({ isOpen, setIsOpen, score }: ScoreDet
               <h3 className="text-lg font-medium text-white mb-4">Shooting Performance</h3>
               <div className="space-y-4">
                 {scoreTargetsByScoreId.map((target: any, index: number) => {
-                  const accuracy = target.shots_fired > 0 ? ((target.target_hits / target.shots_fired) * 100).toFixed(1) : '0';
+                  const accuracy = target.shots_fired > 0 ? ((target.target_hits / target.shots_fired) * 100).toFixed(1) : "0";
                   return (
                     <div key={target.id} className="bg-zinc-900/40 rounded-lg p-4 border border-zinc-600/30">
                       <div className="flex items-center justify-between mb-3">
                         <h4 className="text-base font-medium text-white">Target #{index + 1}</h4>
-                        <span className="text-sm text-gray-400">
-                          {new Date(target.created_at).toLocaleDateString()}
-                        </span>
+                        <span className="text-sm text-gray-400">{new Date(target.created_at).toLocaleDateString()}</span>
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="text-center">
@@ -137,7 +135,9 @@ export default function ScoreDetailsModal({ isOpen, setIsOpen, score }: ScoreDet
                         </div>
                         <div className="text-center">
                           <span className="text-xs text-gray-400 block mb-1">Accuracy</span>
-                          <p className={`text-lg font-bold ${parseFloat(accuracy) >= 80 ? 'text-green-400' : parseFloat(accuracy) >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
+                          <p
+                            className={`text-lg font-bold ${parseFloat(accuracy) >= 80 ? "text-green-400" : parseFloat(accuracy) >= 60 ? "text-yellow-400" : "text-red-400"}`}
+                          >
                             {accuracy}%
                           </p>
                         </div>
@@ -149,10 +149,9 @@ export default function ScoreDetailsModal({ isOpen, setIsOpen, score }: ScoreDet
                           <span>{accuracy}%</span>
                         </div>
                         <div className="w-full bg-zinc-700 rounded-full h-2">
-                          <div 
+                          <div
                             className={`h-2 rounded-full transition-all duration-300 ${
-                              parseFloat(accuracy) >= 80 ? 'bg-green-500' : 
-                              parseFloat(accuracy) >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                              parseFloat(accuracy) >= 80 ? "bg-green-500" : parseFloat(accuracy) >= 60 ? "bg-yellow-500" : "bg-red-500"
                             }`}
                             style={{ width: `${accuracy}%` }}
                           ></div>
@@ -162,7 +161,7 @@ export default function ScoreDetailsModal({ isOpen, setIsOpen, score }: ScoreDet
                   );
                 })}
               </div>
-              
+
               {/* Summary if multiple targets */}
               {scoreTargetsByScoreId.length > 1 && (
                 <div className="mt-4 p-3 bg-indigo-900/20 rounded-lg border border-indigo-700/30">
@@ -183,10 +182,14 @@ export default function ScoreDetailsModal({ isOpen, setIsOpen, score }: ScoreDet
                     <div>
                       <span className="text-xs text-gray-400 block">Overall Accuracy</span>
                       <p className="text-sm font-bold text-indigo-400">
-                        {scoreTargetsByScoreId.reduce((sum: number, target: any) => sum + target.shots_fired, 0) > 0 
-                          ? ((scoreTargetsByScoreId.reduce((sum: number, target: any) => sum + target.target_hits, 0) / 
-                              scoreTargetsByScoreId.reduce((sum: number, target: any) => sum + target.shots_fired, 0)) * 100).toFixed(1)
-                          : '0'}%
+                        {scoreTargetsByScoreId.reduce((sum: number, target: any) => sum + target.shots_fired, 0) > 0
+                          ? (
+                              (scoreTargetsByScoreId.reduce((sum: number, target: any) => sum + target.target_hits, 0) /
+                                scoreTargetsByScoreId.reduce((sum: number, target: any) => sum + target.shots_fired, 0)) *
+                              100
+                            ).toFixed(1)
+                          : "0"}
+                        %
                       </p>
                     </div>
                   </div>
