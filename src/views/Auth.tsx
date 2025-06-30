@@ -8,6 +8,7 @@ import { authStore } from "@/store/authStore";
 import { ModernLogin } from "@/components/Auth/LoginForm";
 import AuthHero from "@/components/Auth/AuthHero";
 import { LoginUserData, RegisterUserData } from "@/types/auth";
+import BaseButton from "@/components/BaseButton";
 
 type AuthType = "login" | "team_manager_register" | "squad_manager_register" | "soldier_register";
 
@@ -100,7 +101,8 @@ export default function Auth() {
                 { type: "squad_manager_register", label: "Squad" },
                 { type: "soldier_register", label: "Soldier" },
               ].map(({ type, label }) => (
-                <button
+                <BaseButton
+                  type="button"
                   key={type}
                   onClick={() => setAuthType(type as AuthType)}
                   className={`flex-1 px-4 py-1.5  text-xs font-medium rounded-xl transition-all duration-200 ${
@@ -108,7 +110,7 @@ export default function Auth() {
                   }`}
                 >
                   {label}
-                </button>
+                </BaseButton>
               ))}
             </div>
           </div>

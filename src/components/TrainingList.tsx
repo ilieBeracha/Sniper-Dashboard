@@ -6,6 +6,7 @@ import TrainingListEmpty from "./TrainingListEmpty";
 import { useState } from "react";
 import TrainingCalendar from "./TrainingCalendar";
 import { Plus } from "lucide-react";
+import BaseButton from "./BaseButton";
 
 type Tab = "active" | "canceled";
 
@@ -49,15 +50,14 @@ export default function TrainingList({
             </button>
           ))}
         </div>
-
-        {/* create */}
-        <button
+        <BaseButton
+          type="button"
           onClick={() => setIsAddTrainingOpen(true)}
-          className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-2 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed flex items-center gap-2"
         >
           <span className="text-xs font-medium">Add Training</span>
           <Plus size={12} />
-        </button>
+        </BaseButton>
       </div>
 
       <div className="grid grid-cols-1 gap-8 px-2 pb-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-9">

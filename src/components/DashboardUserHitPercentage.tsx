@@ -29,13 +29,13 @@ export default function UserHitPercentage() {
   const hitColor = getColor(percentage);
 
   return (
-    <div className="flex w-full flex-col h-full justify-evenly col-auto text-sm">
+    <div className="flex w-full flex-col h-full justify-evenly col-auto text-sm p-4">
       <div className=" relative justify-between flex h-full flex-col gap-2">
         {!userHitPercentage.hit_percentage && userHitPercentage.total_shots === 0 ? (
           <NoDataDisplay />
         ) : (
           <>
-            <ResponsiveContainer width="100%" height={200} className="text-sm">
+            <ResponsiveContainer width="100%" height={200} className="text-sm ">
               <PieChart>
                 <Pie
                   data={gaugeData}

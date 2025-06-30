@@ -56,7 +56,7 @@ export async function getUserGroupingSummaryRpc(userId: string): Promise<Groupin
 }
 
 export async function getTopAccurateSnipers(teamId: string): Promise<User[]> {
-  const { data, error } = await supabase.rpc("get_top_snipers_by_team", {
+  const { data, error } = await supabase.rpc("  ", {
     team_uuid: teamId,
   });
 
@@ -106,5 +106,18 @@ export async function getSquadStatByTeamId(teamId: string, position: PositionSco
     console.error("Error fetching squad stats:", error);
     return;
   }
+  return data;
+}
+
+export async function getTopAccurateScores(teamId: string): Promise<User[]> {
+  const { data, error } = await supabase.rpc("get_top_accurate_scores ", {
+    team_uuid: teamId,
+  });
+
+  if (error) {
+    console.error("Error fetching top accurate snipers data:", error.message);
+    throw new Error("Failed to fetch top accurate snipers data");
+  }
+
   return data;
 }

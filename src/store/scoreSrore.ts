@@ -40,7 +40,8 @@ export interface NewScoreRange {
 interface ScoreStore {
   scores: Score[];
   scoreRanges: ScoreRangeRow[];
-  handleCreateScore: (score: Score) => Promise<any[]>;
+  handleCreateScore: (score: Score) => Promise<any[] | undefined>;
+  handleUpdateScore: (scoreId: string, scoreForm: any) => Promise<void>;
   getScoresByTrainingId: (trainingId: string) => Promise<void>;
   getScoreRangesByTrainingId: (trainingId: string) => Promise<void>;
   getScoreTargetsByScoreId: (scoreId: string) => Promise<ScoreTarget[]>;
@@ -75,7 +76,70 @@ export const scoreStore = create<ScoreStore>((set) => ({
     if (res) {
       await createScoreParticipant(scoreForm.score_participants, res[0].id);
       await createTarget(scoreForm.scoreTargets, res[0].id);
-      return res[0].id;
+      return res;
+    }
+  },
+
+  async handleUpdateScore(scoreId: string, scoreForm: any) {
+    try {
+      // Update main score record
+      const { error: scoreError } = await supabase
+        .from("scores")
+        .update({
+          assignment_session_id: scoreForm.assignment_session_id,
+          day_night: scoreForm.day_night,
+          position: scoreForm.position,
+          time_until_first_shot: scoreForm.time_until_first_shot,
+          first_shot_hit: scoreForm.first_shot_hit,
+          wind_strength: scoreForm.wind_strength,
+          wind_direction: scoreForm.wind_direction,
+          note: scoreForm.note,
+        })
+        .eq("id", scoreId);
+
+      if (scoreError) throw scoreError;
+
+      // Delete existing score_participants
+      const { error: deleteParticipantsError } = await supabase.from("score_participants").delete().eq("score_id", scoreId);
+
+      if (deleteParticipantsError) throw deleteParticipantsError;
+
+      // Delete existing score_targets
+      const { error: deleteTargetsError } = await supabase.from("score_targets").delete().eq("score_id", scoreId);
+
+      if (deleteTargetsError) throw deleteTargetsError;
+
+      // Re-create score_participants
+      if (scoreForm.participants && scoreForm.participants.length > 0) {
+        const participantData = scoreForm.participants.map((userId: string) => ({
+          score_id: scoreId,
+          user_id: userId,
+          duty: scoreForm.duties[userId] || "",
+          weapon_id: scoreForm.weapons[userId] || "",
+          equipment_id: scoreForm.equipment[userId] || "",
+        }));
+
+        const { error: participantsError } = await supabase.from("score_participants").insert(participantData);
+
+        if (participantsError) throw participantsError;
+      }
+
+      // Re-create score_targets
+      if (scoreForm.scoreTargets && scoreForm.scoreTargets.length > 0) {
+        const targetsData = scoreForm.scoreTargets.map((target: any) => ({
+          score_id: scoreId,
+          distance: target.distance,
+          shots_fired: target.shots_fired,
+          target_hits: target.target_hits,
+        }));
+
+        const { error: targetsError } = await supabase.from("score_ranges").insert(targetsData);
+        console.log(targetsError);
+        if (targetsError) throw targetsError;
+      }
+    } catch (error) {
+      console.error("Error updating score:", error);
+      throw error;
     }
   },
 

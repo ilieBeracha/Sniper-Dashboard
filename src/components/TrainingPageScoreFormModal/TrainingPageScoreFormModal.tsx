@@ -8,6 +8,7 @@ import { Target, Users, Crosshair, Info, Plus, X, ChevronLeft, ChevronRight } fr
 import { Assignment } from "@/types/training";
 import { userStore } from "@/store/userStore";
 import { TrainingStore } from "@/store/trainingStore";
+import { scoreStore } from "@/store/scoreSrore";
 import BaseMobileDrawer from "../BaseDrawer/BaseMobileDrawer";
 import { isMobile } from "react-device-detect";
 import AddAssignmentModal from "../AddAssignmentModal";
@@ -56,6 +57,7 @@ export default function ScoreFormModal({
   const { equipments } = useStore(equipmentStore);
   const { user } = useStore(userStore);
   const { members: teamMembers } = useStore(teamStore);
+  const { scoreTargetsByScoreId } = useStore(scoreStore);
   const [showOptionalFields, setShowOptionalFields] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [showParticipantSelect, setShowParticipantSelect] = useState(false);
@@ -114,31 +116,83 @@ export default function ScoreFormModal({
 
   useEffect(() => {
     if (editingScore) {
-      setFormValues({
+      console.log('editingScore FULL:', JSON.stringify(editingScore, null, 2)); // Full structure
+      console.log('score_participants:', editingScore.score_participants);
+      
+      // Extract participants from score_participants
+      const participants = editingScore.score_participants?.map((sp: any) => sp.user?.id || sp.user_id) || [];
+      console.log('extracted participants:', participants);
+      
+      // Extract duties, weapons, equipment from score_participants
+      const duties: Record<string, string> = {};
+      const weapons: Record<string, string> = {};
+      const equipment: Record<string, string> = {};
+      
+      editingScore.score_participants?.forEach((sp: any) => {
+        console.log('processing participant:', sp);
+        const userId = sp.user?.id || sp.user_id;
+        if (userId) {
+          duties[userId] = sp.user_duty || sp.duty || "";
+          weapons[userId] = sp.weapon_id ? String(sp.weapon_id) : "";
+          equipment[userId] = sp.equipment_id ? String(sp.equipment_id) : "";
+        }
+      });
+      
+      console.log('extracted duties:', duties);
+      console.log('extracted weapons:', weapons);
+      console.log('extracted equipment:', equipment);
+
+      const formData = {
         assignment_session_id: editingScore.assignment_session_id || "",
         day_night: editingScore.day_night || "day",
         position: editingScore.position || "",
         creator_id: editingScore.creator_id || "",
         time_until_first_shot: editingScore.time_until_first_shot || "",
-        first_shot_hit: editingScore.first_shot_hit,
-        wind_strength: editingScore.wind_strength,
-        wind_direction: editingScore.wind_direction,
-        note: editingScore.note,
-        participants: editingScore.participants || [],
-        duties: editingScore.duties || {},
-        weapons: editingScore.weapons || {},
-        equipment: editingScore.equipment || {},
+        first_shot_hit: editingScore.first_shot_hit || "",
+        wind_strength: editingScore.wind_strength || undefined,
+        wind_direction: editingScore.wind_direction || undefined,
+        note: editingScore.note || "",
+        participants: participants,
+        duties: duties,
+        weapons: weapons,
+        equipment: equipment,
         training_id: trainingId,
+        scoreTargets: scoreTargetsByScoreId?.length > 0 ? scoreTargetsByScoreId.map((st: any) => ({
+          distance: st.distance,
+          shots_fired: st.shots_fired,
+          target_hits: st.target_hits,
+        })) : [{
+          distance: 100,
+          shots_fired: 0,
+          target_hits: 0,
+        }],
+      };
+      
+      console.log('Setting form values:', formData); // Debug log
+      setFormValues(formData);
+    } else {
+      // Reset form for new score
+      setFormValues({
+        assignment_session_id: "",
+        creator_id: "",
+        day_night: "day",
+        position: "",
+        time_until_first_shot: "",
+        participants: [],
+        duties: {},
+        weapons: {},
+        equipment: {},
+        training_id: "",
         scoreTargets: [
           {
-            distance: editingScore.distance,
-            shots_fired: editingScore.shots_fired,
-            target_hits: editingScore.target_hits,
+            distance: 100,
+            shots_fired: 0,
+            target_hits: 0,
           },
-        ].filter((item) => item.distance !== undefined),
+        ],
       });
     }
-  }, [editingScore, trainingId]);
+  }, [editingScore, trainingId, scoreTargetsByScoreId]);
 
   const validateForm = () => {
     const newErrors: string[] = [];

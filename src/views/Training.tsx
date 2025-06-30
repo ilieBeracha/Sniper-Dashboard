@@ -23,6 +23,8 @@ import TrainingPageScoreFormModal from "@/components/TrainingPageScoreFormModal/
 import { Plus } from "lucide-react";
 import TrainingScoresTable from "@/components/TrainingScoresTable";
 import ScoreDetailsModal from "@/components/ScoreDetailsModal";
+import BaseButton from "@/components/BaseButton";
+import { isMobile } from "react-device-detect";
 
 export default function TrainingPage() {
   const { id } = useParams();
@@ -39,6 +41,8 @@ export default function TrainingPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedScore, setSelectedScore] = useState<any>(null);
   const [isScoreDetailsOpen, setIsScoreDetailsOpen] = useState(false);
+  const [newlyAddedScoreId, setNewlyAddedScoreId] = useState<string | null>(null);
+  const [editingScore, setEditingScore] = useState<any>(null);
   const { setIsLoading } = useStore(loaderStore);
   const { members } = useStore(teamStore);
   const {
@@ -97,8 +101,12 @@ export default function TrainingPage() {
 
   const handleAddScore = async (data: any) => {
     try {
-      await createScoreAction(data);
+      const newScore = await createScoreAction(data);
       setIsAddScoreOpen(false);
+      if (newScore?.[0]?.id) {
+        setNewlyAddedScoreId(newScore[0].id as string);
+      }
+      await getScoresByTrainingId(id as string);
     } catch (error) {
       console.error("Error adding score:", error);
     }
@@ -108,6 +116,24 @@ export default function TrainingPage() {
     setSelectedScore(score);
     getScoreTargetsByScoreId(score.id);
     setIsScoreDetailsOpen(true);
+  };
+
+  const handleEditScore = (score: any) => {
+    setEditingScore(score);
+    getScoreTargetsByScoreId(score.id);
+    setIsAddScoreOpen(true);
+  };
+
+  const handleUpdateScore = async (data: any) => {
+    try {
+      // TODO: Implement update score function
+      console.log("Update score:", data);
+      setIsAddScoreOpen(false);
+      setEditingScore(null);
+      await getScoresByTrainingId(id as string);
+    } catch (error) {
+      console.error("Error updating score:", error);
+    }
   };
 
   const formattedDate = training?.date ? format(parseISO(training.date), "dd MMM yyyy") : "";
@@ -122,13 +148,16 @@ export default function TrainingPage() {
       <main className="mt-6 space-y-4 px-4 pb-10 md:space-y-4 md:px-6 2xl:px-10 w-full">
         <div className="flex items-center justify-end w-full mb-4">
           {/* stats bar */}
-          <button
+
+          <BaseButton
+            type="button"
             onClick={() => toggleIsAddScoreOpen()}
-            className="px-4 py-1.s5  flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
+            style="purple"
+            className={["px-4 py-1.5  flex items-center gap-2", isMobile && "w-full"].join(" ")}
           >
             <span className="text-xs font-medium">Add Score</span>
             <Plus size={12} />
-          </button>
+          </BaseButton>
         </div>
 
         <div className="grid gap-4 grid-cols-1 lg:grid-cols-12">
@@ -143,7 +172,12 @@ export default function TrainingPage() {
           </div>
 
           <div className="col-span-1 lg:col-span-12">
-            <TrainingScoresTable scores={scores} onScoreClick={handleScoreClick} />
+            <TrainingScoresTable
+              scores={scores}
+              onScoreClick={handleScoreClick}
+              onEditClick={handleEditScore}
+              newlyAddedScoreId={newlyAddedScoreId}
+            />
           </div>
 
           {/* commander-only status controls */}
@@ -174,10 +208,13 @@ export default function TrainingPage() {
         <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
         <TrainingPageScoreFormModal
           trainingId={training?.id as string}
-          editingScore={null}
+          editingScore={editingScore}
           isOpen={isAddScoreOpen}
-          onClose={() => setIsAddScoreOpen(false)}
-          onSubmit={handleAddScore}
+          onClose={() => {
+            setIsAddScoreOpen(false);
+            setEditingScore(null);
+          }}
+          onSubmit={editingScore ? handleUpdateScore : handleAddScore}
           assignmentSessions={assignments}
         />
 

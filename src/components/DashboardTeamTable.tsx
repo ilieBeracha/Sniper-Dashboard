@@ -6,6 +6,7 @@ import { teamStore } from "@/store/teamStore";
 import { User } from "@/types/user";
 import { isCommander } from "@/utils/permissions";
 import { userStore } from "@/store/userStore";
+import BaseButton from "./BaseButton";
 
 export default function TeamTable() {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
@@ -112,15 +113,15 @@ export default function TeamTable() {
                     <td className="px-6 py-2 whitespace-nowrap text-sx text-white">
                       {isCommander(userRole) ? (
                         <div className="flex items-center space-x-2">
-                          <button className="p-1.5 rounded-md transition-colors hover:bg-white/10">
+                          <BaseButton onClick={() => {}} className="p-1.5 rounded-md transition-colors hover:bg-white/10">
                             <BiPencil className="text-dashboard-text-muted size-4 hover:text-blue-400" />
-                          </button>
-                          <button className="p-1.5 rounded-md transition-colors hover:bg-white/10">
+                          </BaseButton>
+                          <BaseButton onClick={() => {}} className="p-1.5 rounded-md transition-colors hover:bg-white/10">
                             <BiTrash className="text-gray-400 size-5 hover:text-[#F25F4C]" />
-                          </button>
-                          <button className="p-1.5 rounded-md transition-colors hover:bg-white/10">
+                          </BaseButton>
+                          <BaseButton onClick={() => {}} className="p-1.5 rounded-md transition-colors hover:bg-white/10">
                             <BiDotsHorizontalRounded className="text-dashboard-text-muted size-4 hover:text-white" />
-                          </button>
+                          </BaseButton>
                         </div>
                       ) : (
                         <span className="text-sx text-gray-500 italic">—</span>

@@ -2,13 +2,16 @@ import { format, parseISO } from "date-fns";
 import { Table, TableBody, TableHeader, TableRow, TableCell } from "@/ui/table";
 import BaseDashboardCard from "@/components/BaseDashboardCard";
 import { Badge } from "@/components/ui/badge";
+import { Edit, Eye } from "lucide-react";
 
 interface TrainingScoresTableProps {
   scores: any[];
   onScoreClick: (score: any) => void;
+  onEditClick: (score: any) => void;
+  newlyAddedScoreId?: string | null;
 }
 
-export default function TrainingScoresTable({ scores, onScoreClick }: TrainingScoresTableProps) {
+export default function TrainingScoresTable({ scores, onScoreClick, onEditClick, newlyAddedScoreId }: TrainingScoresTableProps) {
   return (
     <BaseDashboardCard header="Scores" withBtn>
       <div className="rounded-xl overflow-x-auto">
@@ -63,14 +66,25 @@ export default function TrainingScoresTable({ scores, onScoreClick }: TrainingSc
               >
                 Date
               </TableCell>
+              <TableCell
+                isHeader
+                className="text-center py-3 sm:text-sm md:text-base px-3 md:py-4 md:px-6 font-semibold text-gray-300 whitespace-nowrap"
+              >
+                Actions
+              </TableCell>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {scores.map((score: any) => (
-              <TableRow
-                key={score.id}
-                onClick={() => onScoreClick(score)}
-                className="border-b border-gray-700/30 hover:bg-gray-800/40 transition-colors cursor-pointer"
+            {scores.map((score: any) => {
+              const isNewlyAdded = newlyAddedScoreId === score.id;
+              return (
+                <TableRow
+                  key={score.id}
+                  className={`border-b border-gray-700/30 hover:bg-gray-800/40 transition-all duration-500 ${
+                    isNewlyAdded 
+                      ? "bg-indigo-500/20 border-indigo-400/50 animate-pulse" 
+                      : ""
+                  }`}
               >
                 <TableCell className="py-3 px-3 md:py-4 md:px-6 text-sm md:text-sm text-gray-100 whitespace-nowrap">
                   <div className="max-w-[120px] md:max-w-none truncate">{score.assignment_session?.assignment?.assignment_name || "N/A"}</div>
@@ -106,8 +120,33 @@ export default function TrainingScoresTable({ scores, onScoreClick }: TrainingSc
                 <TableCell className="py-3 px-3 md:py-4 md:px-6 text-sm md:text-sm text-gray-100 whitespace-nowrap">
                   {format(parseISO(score.created_at), "dd MMM yyyy")}
                 </TableCell>
+                <TableCell className="py-3 px-3 md:py-4 md:px-6 text-center whitespace-nowrap">
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onScoreClick(score);
+                      }}
+                      className="p-1.5 rounded-lg hover:bg-indigo-600/20 text-indigo-400 hover:text-indigo-300 transition-colors"
+                      title="View Details"
+                    >
+                      <Eye size={16} />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEditClick(score);
+                      }}
+                      className="p-1.5 rounded-lg hover:bg-amber-600/20 text-amber-400 hover:text-amber-300 transition-colors"
+                      title="Edit Score"
+                    >
+                      <Edit size={16} />
+                    </button>
+                  </div>
+                </TableCell>
               </TableRow>
-            ))}
+            );
+            })}
           </TableBody>
         </Table>
       </div>

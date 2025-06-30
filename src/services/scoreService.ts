@@ -53,9 +53,7 @@ export async function getScoresByTrainingId(training_id: string) {
       )
       .eq("training_id", training_id)
       .order("created_at", { ascending: false });
-
     console.log("Fetched scores:", data);
-
     if (error) {
       console.error("Error fetching scores:", error);
       throw new Error(`Failed to fetch scores: ${error.message}`);

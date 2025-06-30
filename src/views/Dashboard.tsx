@@ -9,8 +9,8 @@ import InviteModal from "@/components/InviteModal";
 import { TrainingStore } from "@/store/trainingStore";
 import { squadStore } from "@/store/squadStore";
 import { performanceStore } from "@/store/performance";
-import { getUserGroupingSummaryRpc } from "@/services/performance";
-// import DashboardRowKPI from "@/components/DashboardRowKPI";
+import { getTopAccurateScores, getUserGroupingSummaryRpc } from "@/services/performance";
+import DashboardRowKPI from "@/components/DashboardRowKPI";
 import Header from "@/Headers/Header";
 
 export default function Dashboard() {
@@ -37,6 +37,7 @@ export default function Dashboard() {
         await getTopAccurateSnipers(user.team_id);
         await getDayNightPerformance(user.team_id);
         await getSquadStats(user.team_id, null, null);
+        await getTopAccurateScores(user.team_id);
       }
 
       setLoading(false);
@@ -55,7 +56,7 @@ export default function Dashboard() {
       </Header>
       <div className="grid grid-cols-1 gap-4 p-4 md:p-6 2xl:p-10 ">
         <DashboardRowOne user={user} />
-        {/* <DashboardRowKPI /> */}
+        <DashboardRowKPI />
         <DashboardRowThree loading={loading} />
         <DashboardRowFour />
       </div>

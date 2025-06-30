@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import BaseInput from "./BaseInput";
+import BaseButton from "./BaseButton";
 
 type ListItem = {
   id: string;
@@ -59,7 +60,7 @@ export default function SearchableCheckboxList({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
+      <BaseButton
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between px-3 py-3 bg-white/5 text-white text-sm border border-white/10 rounded-md hover:bg-white/10 focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -74,7 +75,7 @@ export default function SearchableCheckboxList({
           )}
         </div>
         <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
-      </button>
+      </BaseButton>
 
       {isOpen && (
         <div className="absolute z-10 w-full mt-1 bg-[#151515] rounded-lg border border-white/10 shadow-lg">
