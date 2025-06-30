@@ -98,3 +98,14 @@ export async function createTarget(scoreData: Partial<ScoreTarget>[], score_id: 
     throw error;
   }
 }
+
+export async function fetchScoreTargetsByScoreId(score_id: string) {
+  try {
+    const { data, error } = await supabase.from("score_ranges").select("*").eq("score_id", score_id);
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Exception when fetching score targets:", error);
+    throw error;
+  }
+}

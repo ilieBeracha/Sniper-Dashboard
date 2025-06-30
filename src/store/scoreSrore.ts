@@ -1,4 +1,4 @@
-import { createScore, createScoreParticipant, getScoresByTrainingId, createTarget } from "@/services/scoreService";
+import { createScore, createScoreParticipant, getScoresByTrainingId, createTarget, fetchScoreTargetsByScoreId } from "@/services/scoreService";
 import { create } from "zustand";
 import { TrainingStore } from "./trainingStore";
 import { supabase } from "@/services/supabaseClient";
@@ -43,12 +43,14 @@ interface ScoreStore {
   handleCreateScore: (score: Score) => Promise<any[]>;
   getScoresByTrainingId: (trainingId: string) => Promise<void>;
   getScoreRangesByTrainingId: (trainingId: string) => Promise<void>;
+  getScoreTargetsByScoreId: (scoreId: string) => Promise<ScoreTarget[]>;
+  scoreTargetsByScoreId: ScoreTarget[];
 }
 
 export const scoreStore = create<ScoreStore>((set) => ({
   scores: [],
   scoreRanges: [],
-
+  scoreTargetsByScoreId: [],
   async handleCreateScore(scoreForm: any) {
     console.log(scoreForm);
     const training_id = TrainingStore.getState().training?.id;
@@ -87,5 +89,11 @@ export const scoreStore = create<ScoreStore>((set) => ({
     const { data, error } = await supabase.rpc("get_score_ranges_by_training_id", { training_id: trainingId });
     if (error) throw error;
     set({ scoreRanges: data });
+  },
+
+  getScoreTargetsByScoreId: async (scoreId: string) => {
+    const res = await fetchScoreTargetsByScoreId(scoreId);
+    set({ scoreTargetsByScoreId: res });
+    return res;
   },
 }));
