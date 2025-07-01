@@ -12,7 +12,7 @@ export default function DashboardCalendar() {
   return (
     <div className="h-full">
       <div className="w-full h-full flex flex-col justify-between">
-        <div className="relative border-l-2 border-white/10 pl-6 space-y-6">
+        <div className="relative border-l-2 border-white/10 pl-10 space-y-6">
           {last ? (
             <TrainingTimelineItem
               onClick={() => navigate(`/training/${last.id}`)}
@@ -60,7 +60,7 @@ function TrainingTimelineItem({
 
   return (
     <div className={`relative flex flex-col min-h-[100px] ${alignment === "right" ? "items-end" : "items-start"}`}>
-      <div className="absolute -left-[39px] top-0.5 w-4 h-4 bg-[#1E1E1E] border border-white/20 rounded-full flex items-center justify-center">
+      <div className="absolute -left-[30px] top-0.5 w-4 h-4 bg-[#1E1E1E] border border-white/20 rounded-full flex items-center justify-center">
         <CalendarDays className={`w-3 h-3 ${glowColor} text-sm`} />
       </div>
 

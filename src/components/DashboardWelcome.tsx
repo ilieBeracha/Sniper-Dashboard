@@ -31,7 +31,7 @@ export default function DashboardWelcome({ user }: { user: User }) {
   };
 
   return (
-    <div className="p-2 sm:p-3 md:px-4">
+    <div className="p-4 sm:p-3 md:px-4">
       <div className="flex md:items-center md:justify-between gap-2">
         {/* Left Side */}
         <div className="space-y-2 flex-1">
