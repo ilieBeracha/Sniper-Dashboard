@@ -50,7 +50,7 @@ export default function TrainingAddTrainingSessionModal({
           team_id: user.team_id,
         },
       ])
-      .select("id")
+      .select("*")
       .maybeSingle();
 
     toastService.success("Training session created successfully");

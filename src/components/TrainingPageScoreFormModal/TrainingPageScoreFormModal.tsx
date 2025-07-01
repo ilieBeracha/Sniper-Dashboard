@@ -113,7 +113,6 @@ export default function ScoreFormModal({
 
   useEffect(() => {
     if (editingScore) {
-      // Extract participants from score_participants
       const participants = editingScore.score_participants?.map((sp: any) => sp.user?.id || sp.user_id) || [];
       const duties: Record<string, string> = {};
       const weapons: Record<string, string> = {};
@@ -128,6 +127,9 @@ export default function ScoreFormModal({
         }
       });
 
+      const currentUserId = user?.id;
+      const finalParticipants = currentUserId && !participants.includes(currentUserId) ? [...participants, currentUserId] : participants;
+
       const formData = {
         assignment_session_id: editingScore.assignment_session_id || "",
         day_night: editingScore.day_night || "day",
@@ -138,7 +140,7 @@ export default function ScoreFormModal({
         wind_strength: editingScore.wind_strength || undefined,
         wind_direction: editingScore.wind_direction || undefined,
         note: editingScore.note || "",
-        participants: participants,
+        participants: finalParticipants,
         duties: duties,
         weapons: weapons,
         equipment: equipment,
@@ -189,21 +191,20 @@ export default function ScoreFormModal({
     const updatedTeamMembers = [
       ...teamMembers,
       { id: user?.id, first_name: user?.first_name, last_name: user?.last_name, user_role: user?.user_role },
-    ].filter(member => member.id); // Filter out undefined users
+    ].filter((member) => member.id); // Filter out undefined users
     setTeamMemberWithUserRole(updatedTeamMembers);
   }, [teamMembers, user]);
 
   // Add current user as default participant for new scores only
   useEffect(() => {
     const userId = user?.id;
-    console.log('Default participant useEffect:', { userId, editingScore, participants: formValues.participants });
-    
+
     if (userId && !editingScore && !formValues.participants.includes(userId)) {
-      console.log('Adding default user participant:', userId);
-      setFormValues(prev => ({
+      setFormValues((prev) => ({
         ...prev,
         assignment_session_id: training?.assignment_sessions?.[0]?.id || prev.assignment_session_id,
         creator_id: userId,
+
         participants: [...prev.participants, userId],
         duties: { ...prev.duties, [userId]: "Sniper" },
         weapons: { ...prev.weapons, [userId]: "1" },
@@ -331,6 +332,11 @@ export default function ScoreFormModal({
   };
 
   const removeParticipant = (userId: string) => {
+    // Prevent removing the current user
+    if (userId === user?.id) {
+      return;
+    }
+
     if (formValues.participants.length === 1) {
       return;
     }
@@ -693,9 +699,11 @@ export default function ScoreFormModal({
                     </span>
                     <span className="text-xs text-zinc-500">{member?.user_role}</span>
                   </div>
-                  <button type="button" onClick={() => removeParticipant(participantId)} className="text-zinc-500 hover:text-red-400">
-                    <X size={16} />
-                  </button>
+                  {participantId !== user?.id && (
+                    <button type="button" onClick={() => removeParticipant(participantId)} className="text-zinc-500 hover:text-red-400">
+                      <X size={16} />
+                    </button>
+                  )}
                 </div>
 
                 <div>

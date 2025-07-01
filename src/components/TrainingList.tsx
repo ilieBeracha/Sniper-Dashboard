@@ -30,8 +30,16 @@ export default function TrainingList({
 
   const today = new Date();
   const todaySessions = active.filter((s) => isToday(parseISO(s.date)));
-  const upcoming = active.filter((s) => isFuture(parseISO(s.date)) && !isToday(parseISO(s.date)));
-  const past = active.filter((s) => isPast(parseISO(s.date)) && !isToday(parseISO(s.date))).reverse();
+  const upcoming = active.filter((s) => {
+    const sessionDate = parseISO(s.date);
+    return isFuture(sessionDate) && !isToday(sessionDate);
+  });
+  const past = active.filter((s) => {
+    const sessionDate = parseISO(s.date);
+    const sessionDateEnd = new Date(sessionDate);
+    sessionDateEnd.setHours(23, 59, 59, 999);
+    return isPast(sessionDateEnd) && !isToday(sessionDate);
+  }).reverse();
 
   /* ---------- ui ---------- */
   return (
@@ -61,7 +69,7 @@ export default function TrainingList({
       </div>
 
       <div className="grid grid-cols-1 gap-8 px-2 pb-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-9">
-        <div className="col-span-6  overflow-y-auto custom-scrollbar sm:col-span-6 md:col-span-6 lg:col-span-6">
+        <div className="col-span-6  overflow-y-auto custom-scrollbar sm:col-span-6 md:col-span-6 lg:col-span-5">
           {activeTab === "active" ? (
             <>
               {todaySessions.length > 0 && (
@@ -97,11 +105,9 @@ export default function TrainingList({
           )}
         </div>
 
-        {/* (optional) calendar / sidebar slot */}
-        <aside className="sticky top-8 col-span-3 hidden h-fit space-y-6 border-l border-white/5 md:block">
-          {/* put Calendar or stats here later */}
+        <aside className="sticky top-8 col-span-4 hidden h-fit space-y-6 md:block">
           <div className="flex flex-col items-start justify-start gap-4">
-            <h4 className="text-sm font-semibold text-white">Training Calendar</h4>
+            <span className="text-sm font-semibold text-white">Training Calendar</span>
             <TrainingCalendar trainings={trainings} />
           </div>
         </aside>

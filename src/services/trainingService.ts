@@ -46,8 +46,8 @@ export async function getTrainingByTeamId(teamId: string, currentUserId?: string
       `,
     )
     .eq("team_id", teamId)
-    .order("date", { ascending: true })
-    .limit(30);
+    .order("created_at", { ascending: true })
+    .limit(1000);
 
   if (error) {
     console.error("Error fetching trainings:", error);

@@ -81,6 +81,7 @@ export const TrainingStore = create<TrainingStore>((set) => ({
 
   createTraining: async (sessionData: TrainingSession) => {
     const { data, error } = await insertTraining(sessionData);
+    console.log(data);
     if (error || !data?.id) return data;
   },
 
