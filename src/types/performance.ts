@@ -56,3 +56,10 @@ export interface SquadStats {
   out_elimination: number;
   out_coordination: number;
 }
+
+export interface OverallAccuracyStats {
+  total_scores: number;
+  total_shots_fired: number;
+  total_target_hits: number;
+  accuracy_percent: number;
+}

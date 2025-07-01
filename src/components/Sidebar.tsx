@@ -9,6 +9,7 @@ import { useStore } from "zustand";
 import { FaCrosshairs } from "react-icons/fa";
 import { isMobile } from "react-device-detect";
 import { useSidebarStore } from "@/store/sidebarStore";
+import { SparklesIcon } from "lucide-react";
 
 const navSections = [
   {
@@ -17,6 +18,7 @@ const navSections = [
       { name: "Dashboard", href: "/", icon: <BiSolidDashboard className="w-5 h-5" /> },
       { name: "Training", href: "/trainings", icon: <BsBarChartFill className="w-5 h-5" /> },
       { name: "Assets", href: "/assets", icon: <FaCrosshairs className="w-5 h-5" /> },
+      { name: "AI", href: "/ai", icon: <SparklesIcon className="w-5 h-5" /> },
     ],
   },
   {

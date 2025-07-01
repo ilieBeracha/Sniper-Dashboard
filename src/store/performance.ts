@@ -1,6 +1,6 @@
 // src/store/performanceStore.ts
 import { create } from "zustand";
-import { HitPercentageData, SquadStats, SquadWeaponPerformance, TrainingEffectiveness } from "@/types/performance";
+import { HitPercentageData, SquadStats, SquadWeaponPerformance, TrainingEffectiveness, OverallAccuracyStats } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
   getUserHitPercentageRpc,
@@ -8,6 +8,7 @@ import {
   getUserGroupingSummaryRpc,
   getTrainingEffectivenessByTeam,
   getSquadStatByTeamId,
+  overallAccuracyStats,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/score";
@@ -27,6 +28,11 @@ interface PerformanceStore {
 
   trainingEffectiveness: TrainingEffectiveness[];
   getTrainingEffectiveness: (teamId: string) => Promise<void>;
+
+  overallAccuracyStats: OverallAccuracyStats | null;
+  getOverallAccuracyStats: () => Promise<void>;
+
+  overallAccuracyStatsLoading: boolean;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
@@ -34,7 +40,20 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   isLoading: false,
   squadStats: [],
   trainingEffectiveness: [],
-
+  overallAccuracyStats: null,
+  overallAccuracyStatsLoading: false,
+  getOverallAccuracyStats: async () => {
+    try {
+      set({ overallAccuracyStatsLoading: true });
+      const data = await overallAccuracyStats();
+      set({ overallAccuracyStats: data });
+    } catch (error) {
+      console.error("Failed to load training summary stats:", error);
+      set({ overallAccuracyStats: null });
+    } finally {
+      set({ overallAccuracyStatsLoading: false });
+    }
+  },
   getSquadStats: async (teamId: string, position: PositionScore | null, distance: string | null) => {
     try {
       set({ isLoading: true });

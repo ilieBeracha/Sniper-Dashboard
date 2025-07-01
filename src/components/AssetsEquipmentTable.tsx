@@ -1,17 +1,17 @@
 import { Fragment } from "react";
-import { Weapon } from "@/types/weapon";
+import { Equipment } from "@/types/equipment";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
-  const weaponsByType = weapons.reduce((acc: { [key: string]: Weapon[] }, weapon) => {
-    const type = weapon.weapon_type || "Unspecified";
+export default function AssetsEquipmentTable({ equipments }: { equipments: Equipment[] }) {
+  const equipmentsByType = equipments.reduce((acc: { [key: string]: Equipment[] }, equipment) => {
+    const type = equipment.equipment_type || "Unspecified";
     if (!acc[type]) {
       acc[type] = [];
     }
-    acc[type].push(weapon);
+    acc[type].push(equipment);
     return acc;
   }, {});
 
@@ -25,7 +25,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
                 <tr>
                   <th className="py-4 pl-6 pr-3 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Serial Number</th>
                   <th className="px-3 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Team ID</th>
-                  <th className="px-3 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300">MV</th>
+                  <th className="px-3 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Day/Night</th>
                   <th className="px-3 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Created At</th>
                   <th className="relative py-4 pl-3 pr-6">
                     <span className="sr-only">Actions</span>
@@ -33,41 +33,43 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
                 </tr>
               </thead>
               <tbody className="text-white">
-                {Object.entries(weaponsByType).map(([weaponType, typeWeapons]) => (
-                  <Fragment key={weaponType}>
+                {Object.entries(equipmentsByType).map(([equipmentType, typeEquipments]) => (
+                  <Fragment key={equipmentType}>
                     <tr className="border-t border-white/10">
-                      <th scope="colgroup" colSpan={5} className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 py-3 pl-6 pr-3 text-left text-sm font-medium text-indigo-300 border-l-4 border-indigo-500">
+                      <th scope="colgroup" colSpan={5} className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 py-3 pl-6 pr-3 text-left text-sm font-medium text-emerald-300 border-l-4 border-emerald-500">
                         <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></div>
-                          {weaponType}
+                          <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
+                          {equipmentType}
                         </div>
                       </th>
                     </tr>
-                    {typeWeapons.map((weapon, weaponIdx) => (
-                      <tr key={weapon.id} className={classNames(weaponIdx === 0 ? "border-white/10" : "border-white/5", "border-t hover:bg-white/5 transition-colors duration-200")}>
+                    {typeEquipments.map((equipment, equipmentIdx) => (
+                      <tr key={equipment.id} className={classNames(equipmentIdx === 0 ? "border-white/10" : "border-white/5", "border-t hover:bg-white/5 transition-colors duration-200")}>
                         <td className="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-white">
                           <div className="flex items-center gap-3">
-                            <div className="w-2 h-2 bg-indigo-400 rounded-full flex-shrink-0"></div>
-                            {weapon.serial_number}
+                            <div className="w-2 h-2 bg-emerald-400 rounded-full flex-shrink-0"></div>
+                            {equipment.serial_number}
                           </div>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm">
                           <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-md text-xs font-medium border border-blue-500/30">
-                            {weapon.team_id}
+                            {equipment.team_id}
                           </span>
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+                        <td className="whitespace-nowrap px-3 py-4 text-sm">
                           <span className={`px-2 py-1 rounded-md text-xs font-medium ${
-                            weapon.mv ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                            equipment.day_night ? 
+                            (equipment.day_night.toLowerCase() === 'day' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' : 'bg-purple-500/20 text-purple-300 border border-purple-500/30') : 
+                            'bg-gray-500/20 text-gray-400 border border-gray-500/30'
                           }`}>
-                            {weapon.mv || "N/A"}
+                            {equipment.day_night || "N/A"}
                           </span>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-400">
-                          {new Date(weapon.created_at).toLocaleDateString()}
+                          {new Date(equipment.created_at).toLocaleDateString()}
                         </td>
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-6 text-right text-sm">
-                          <button className="px-3 py-1.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 hover:text-indigo-200 rounded-lg border border-indigo-500/30 hover:border-indigo-500/50 transition-all duration-200 text-xs font-medium">
+                          <button className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 hover:text-emerald-200 rounded-lg border border-emerald-500/30 hover:border-emerald-500/50 transition-all duration-200 text-xs font-medium">
                             Edit
                           </button>
                         </td>

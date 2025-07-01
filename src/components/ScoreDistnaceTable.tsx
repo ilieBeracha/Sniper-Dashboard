@@ -2,7 +2,6 @@ import { ScoreTarget } from "@/types/score";
 import BaseDashboardCard from "./BaseDashboardCard";
 
 export default function ScoreDistanceTable({ rows }: { rows: ScoreTarget[] }) {
-  // Group rows by distance, summing shots and hits
   const aggregated = Object.values(
     rows.reduce<Record<number, { bucket: number; shots_fired: number; target_hit: number }>>((acc, { distance, shots_fired, target_hit }) => {
       const bucket = Math.floor(distance / 100) * 100; // 100-m buckets
@@ -14,7 +13,6 @@ export default function ScoreDistanceTable({ rows }: { rows: ScoreTarget[] }) {
     }, {}),
   ).sort((a, b) => a.bucket - b.bucket);
 
-  // Add accuracy percentage
   const rowsWithPercentage = aggregated.map((row) => ({
     ...row,
     rangeLabel: `${row.bucket}-${row.bucket + 99}m`,

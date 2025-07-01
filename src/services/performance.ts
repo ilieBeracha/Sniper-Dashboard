@@ -94,3 +94,14 @@ export async function getSquadStatByTeamId(teamId: string, position: PositionSco
   }
   return data;
 }
+
+export async function overallAccuracyStats() {
+  const { data, error } = await supabase.rpc("overall_accuracy_stats");
+
+  if (error) {
+    console.error("Error fetching training summary stats:", error);
+    throw error;
+  }
+
+  return data[0];
+}

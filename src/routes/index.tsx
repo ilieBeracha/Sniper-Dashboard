@@ -4,6 +4,7 @@ import Training from "@/views/Training";
 import Assets from "@/views/Assets";
 import TrainingPage from "@/views/Training";
 import ErrorPage from "@/views/404";
+import Ai from "@/views/Ai";
 
 export const routes: RouteObject[] = [
   {
@@ -13,6 +14,10 @@ export const routes: RouteObject[] = [
   {
     path: "/training",
     element: <Training />,
+  },
+  {
+    path: "/ai",
+    element: <Ai />,
   },
   {
     path: "/assets",

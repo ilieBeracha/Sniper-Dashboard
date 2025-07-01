@@ -34,12 +34,14 @@ export default function TrainingList({
     const sessionDate = parseISO(s.date);
     return isFuture(sessionDate) && !isToday(sessionDate);
   });
-  const past = active.filter((s) => {
-    const sessionDate = parseISO(s.date);
-    const sessionDateEnd = new Date(sessionDate);
-    sessionDateEnd.setHours(23, 59, 59, 999);
-    return isPast(sessionDateEnd) && !isToday(sessionDate);
-  }).reverse();
+  const past = active
+    .filter((s) => {
+      const sessionDate = parseISO(s.date);
+      const sessionDateEnd = new Date(sessionDate);
+      sessionDateEnd.setHours(23, 59, 59, 999);
+      return isPast(sessionDateEnd) && !isToday(sessionDate);
+    })
+    .reverse();
 
   /* ---------- ui ---------- */
   return (
@@ -91,7 +93,7 @@ export default function TrainingList({
               {past.length > 0 && (
                 <TrainingSessionGroup title="Past Sessions" color="gray">
                   {past.map((s) => (
-                    <TrainingSessionCard key={s.id} session={s} />
+                    <TrainingSessionCard key={s.id} session={s} isPast />
                   ))}
                 </TrainingSessionGroup>
               )}
