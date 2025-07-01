@@ -40,7 +40,7 @@ export default function ScoreDistanceChart({ rows }: { rows: ScoreTarget[] | und
     <BaseDashboardCard header="Hits vs Shots per Distance">
       <div className="h-fit w-full">
         {data.length > 0 ? (
-          <ResponsiveContainer minHeight={350} width="100%" height="100%" className="w-full">
+          <ResponsiveContainer minHeight={500} width="100%" height="100%">
             <BarChart data={data} margin={{ top: 30, right: 30, left: 0, bottom: 5 }} barGap={2}>
               <CartesianGrid strokeDasharray="3 3" stroke="#2D3748" vertical={false} />
               <XAxis dataKey="distance" tick={{ fill: "#9CA3AF", fontSize: 12 }} axisLine={{ stroke: "#4B5563" }} tickLine={{ stroke: "#4B5563" }} />

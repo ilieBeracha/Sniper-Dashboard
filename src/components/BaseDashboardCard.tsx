@@ -5,11 +5,13 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 export default function BaseDashboardCard({
   header,
   children,
+  padding = "p-4",
   tooltipContent = "",
   withBtn = false,
 }: {
   header: string | React.ReactNode;
   children: React.ReactNode;
+  padding?: string;
   tooltipContent?: string;
   withBg?: boolean;
   withBtn?: boolean;
@@ -28,7 +30,7 @@ export default function BaseDashboardCard({
     <div
       className={`bg-[#121212] shadow-lg shadow-black/20 relative h-full flex flex-col transition-all text-sm duration-300 rounded-md border border-[#7a78783c]  ${isMobile ? "min-h-[200px]" : "h-full"}`}
     >
-      <div className="px-4 py-4 border-b border-white/40 mb-2">
+      <div className={`${padding} border-b border-white/40 mb-2`}>
         <div className="flex justify-between relative h-full items-center">
           {tooltipContent && (
             <BiInfoCircle

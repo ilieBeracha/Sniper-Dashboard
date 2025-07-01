@@ -12,6 +12,7 @@ import { performanceStore } from "@/store/performance";
 import { getUserGroupingSummaryRpc } from "@/services/performance";
 import DashboardRowKPI from "@/components/DashboardRowKPI";
 import Header from "@/Headers/Header";
+import BaseButton from "@/components/BaseButton";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
@@ -46,10 +47,9 @@ export default function Dashboard() {
   return (
     <div className="min-h-[calc(100dvh-100px)]  text-gray-100 ">
       <Header title="Overview">
-        {" "}
-        <p className="bg-gray-700 text-xs rounded-2xl px-4 py-1" onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}>
+        <BaseButton className="bg-gray-700 text-xs rounded-2xl px-4 py-1 cursor-pointer" onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}>
           Invite
-        </p>
+        </BaseButton>
       </Header>
       <div className="grid grid-cols-1 gap-4 p-4 md:p-6 2xl:p-10 ">
         <DashboardRowOne user={user} />
