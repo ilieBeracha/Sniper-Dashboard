@@ -36,6 +36,34 @@ export default function AiForm() {
         <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-blue-500/10  rounded-full blur-3xl" />
       </div>
       <div className="flex-1 overflow-y-auto p-4 pb-24">
+        {chatMessages.length === 0 ? (
+          <div className="max-w-4xl mx-auto space-y-4">
+            {chatMessages
+              .filter((m) => m.role !== "system")
+              .map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-in slide-in-from-bottom-2 duration-300`}
+                >
+                  <div
+                    className={`max-w-[80%] p-4 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed shadow-lg transition-all hover:shadow-xl
+                  ${
+                    msg.role === "user"
+                      ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-md border border-blue-500/20"
+                      : "bg-gradient-to-br from-slate-700/80 to-gray-700/80 text-gray-100 rounded-bl-md border border-slate-600/20 backdrop-blur-sm"
+                  }`}
+                  >
+                    <div>{msg.content}</div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        ) : (
+          <div className="flex justify-center items-center h-full">
+            <div className="text-gray-400 text-3xl">SnipeStates AI</div>
+          </div>
+        )}
+
         <div className="max-w-4xl mx-auto space-y-4">
           {chatMessages
             .filter((m) => m.role !== "system")
