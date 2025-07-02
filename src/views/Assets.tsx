@@ -23,7 +23,7 @@ export default function AssetsPage() {
       </Header>
       <div className="p-4 md:p-6 2xl:p-10">
         <div className="flex flex-col gap-8">
-          <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-2xl border border-white/10 shadow-lg shadow-black/20 transition-all duration-300  ">
+          <div className="bg-gradient-to-br rounded-2xl border border-white/10 shadow-lg shadow-black/20 transition-all duration-300  ">
             <div className="p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-2 h-8 bg-gradient-to-b from-indigo-500 to-purple-600 rounded-full"></div>
@@ -36,7 +36,7 @@ export default function AssetsPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-2xl border border-white/10 shadow-lg shadow-black/20 transition-all duration-300  ">
+          <div className="bg-gradient-to-br rounded-2xl border border-white/10 shadow-lg shadow-black/20 transition-all duration-300  ">
             <div className="p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-2 h-8 bg-gradient-to-b from-emerald-500 to-teal-600 rounded-full"></div>

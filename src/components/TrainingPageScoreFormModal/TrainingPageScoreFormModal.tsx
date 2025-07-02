@@ -131,7 +131,6 @@ export default function ScoreFormModal({
     formState: { errors },
     watch,
     setValue,
-    getValues,
     reset,
   } = methods;
   const formValues = watch();

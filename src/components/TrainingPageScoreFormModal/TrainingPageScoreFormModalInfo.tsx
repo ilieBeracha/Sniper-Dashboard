@@ -14,8 +14,7 @@ export default function TrainingPageScoreFormModalInfo({
   isAddAssignmentOpen: boolean;
   handleOnAddAssignment: (assignmentName: string) => void;
 }) {
-  const { register, watch } = useFormContext();
-  const formValues = watch();
+  const { register } = useFormContext();
 
   return (
     <div className="space-y-6">
@@ -72,10 +71,7 @@ export default function TrainingPageScoreFormModalInfo({
             <option value="night">Night</option>
           </select>
 
-          <select
-            {...register("position")}
-            className="w-full min-h-10 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white border border-zinc-700"
-          >
+          <select {...register("position")} className="w-full min-h-10 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white border border-zinc-700">
             <option value="">Select position</option>
             <option value="lying">Lying</option>
             <option value="standing">Standing</option>
