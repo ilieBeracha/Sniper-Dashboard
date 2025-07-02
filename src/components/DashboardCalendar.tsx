@@ -70,7 +70,6 @@ function TrainingTimelineItem({
         }`}
       >
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-emerald-500/10 to-yellow-500/10 rounded-full blur-3xl" /> */}
           <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-3xl" />
         </div>
         <div className="flex justify-between items-center mb-2">
@@ -78,7 +77,7 @@ function TrainingTimelineItem({
           <span className={`text-xs px-3 py-1 rounded-full ${tagColor}`}>{color === "gray" ? "Completed" : "Upcoming"}</span>
         </div>
 
-        <h4 className="text-sm font-semibold line-clamp-1">{session.session_name}</h4>
+        <h4 className="text-sm font-semibold ">{session.session_name}</h4>
         <div className="text-xs text-gray-400 mt-1 flex items-center gap-2">
           <CalendarDays className="w-4 h-4 text-gray-500" />
           <div className="flex items-center justify-between w-full gap-2">
