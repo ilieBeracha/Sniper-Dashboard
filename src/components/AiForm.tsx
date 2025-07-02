@@ -35,7 +35,7 @@ export default function AiForm() {
       <div className="absolute inset-0 overflow-hidden pointer-events-none ">
         <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-blue-500/10  rounded-full blur-3xl" />
       </div>
-      <div className="flex-1 overflow-y-auto p-4 pb-24">
+      <div className="flex-1 overflow-y-auto p-4 pb-36">
         {chatMessages.length === 0 ? (
           <div className="max-w-4xl mx-auto space-y-4">
             {chatMessages
