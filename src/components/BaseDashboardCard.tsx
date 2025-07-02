@@ -20,7 +20,7 @@ export default function BaseDashboardCard({
   if (!header) {
     return (
       <div
-        className={`bg-[#121212] shadow-lg shadow-black/20 relative h-full flex flex-col transition-all text-sm duration-300 rounded-md border border-[#7a78783c]  ${isMobile ? "min-h-[200px]" : "h-full"}`}
+        className={`bg-[#121212] shadow-lg shadow-black/20 relative h-full flex flex-col transition-all text-sm duration-300 rounded-md border border-[#7a78783c]  ${isMobile ? "" : "h-full"}`}
       >
         {children}
       </div>
@@ -28,7 +28,7 @@ export default function BaseDashboardCard({
   }
   return (
     <div
-      className={`bg-[#121212] shadow-lg shadow-black/20 relative h-full flex flex-col transition-all text-sm duration-300 rounded-md border border-[#7a78783c]  ${isMobile ? "min-h-[200px]" : "h-full"}`}
+      className={`bg-[#121212] shadow-lg shadow-black/20 relative h-full flex flex-col transition-all text-sm duration-300 rounded-md border border-[#7a78783c]  ${isMobile ? "" : "h-full"}`}
     >
       <div className={`${padding} border-b border-white/40 mb-2`}>
         <div className="flex justify-between relative h-full items-center">
