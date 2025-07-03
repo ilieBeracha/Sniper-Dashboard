@@ -8,7 +8,6 @@ import { authStore } from "@/store/authStore";
 import { ModernLogin } from "@/components/Auth/LoginForm";
 import AuthHero from "@/components/Auth/AuthHero";
 import { LoginUserData, RegisterUserData } from "@/types/auth";
-import BaseButton from "@/components/BaseButton";
 
 type AuthType = "login" | "team_manager_register" | "squad_manager_register" | "soldier_register";
 
@@ -92,29 +91,6 @@ export default function Auth() {
             <p className="text-gray-500 text-sm">{getAuthDescription()}</p>
           </div>
 
-          {/* Tabs */}
-          <div className="flex mb-4">
-            <div className="bg-[#1A1A1A] rounded-xl flex w-full border border-[#2A2A2A]">
-              {[
-                { type: "login", label: "Sign In" },
-                { type: "team_manager_register", label: "Commander" },
-                { type: "squad_manager_register", label: "Squad" },
-                { type: "soldier_register", label: "Soldier" },
-              ].map(({ type, label }) => (
-                <BaseButton
-                  type="button"
-                  key={type}
-                  onClick={() => setAuthType(type as AuthType)}
-                  className={`flex-1 px-4 py-1.5  text-xs font-medium rounded-xl transition-all duration-200 ${
-                    authType === type ? "bg-white text-[#0A0A0A]" : "text-gray-500 hover:text-gray-300"
-                  }`}
-                >
-                  {label}
-                </BaseButton>
-              ))}
-            </div>
-          </div>
-
           {/* Form Card */}
           <div className="relative">
             <div className="relative py-4 px-4  rounded-xl border border-[#2A2A2A]">
@@ -131,10 +107,18 @@ export default function Auth() {
               )}
 
               <div className="relative z-10">
-                {authType === "login" && <ModernLogin AuthSubmit={AuthSubmit} />}
-                {authType === "team_manager_register" && <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />}
-                {authType === "squad_manager_register" && <TeamMemberRegisterForm AuthSubmit={AuthSubmit} />}
-                {authType === "soldier_register" && <SoldierRegisterForm AuthSubmit={AuthSubmit} />}
+                {authType === "login" && <ModernLogin AuthSubmit={AuthSubmit} onRegisterClick={(type) => setAuthType(type as AuthType)} />}
+                {authType !== "login" && (
+                  <div>
+                    <p
+                      onClick={() => setAuthType("login")}
+                      className="mb-4  text-sm text-gray-400  hover:text-white transition-colors flex items-center"
+                    >
+                      ← Back to Sign In
+                    </p>
+                    <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />
+                  </div>
+                )}
               </div>
 
               {error && (

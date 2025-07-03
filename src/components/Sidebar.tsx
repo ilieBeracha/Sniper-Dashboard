@@ -39,7 +39,9 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   const SidebarContent = () => (
-    <div className={`flex flex-col bg-[#121212] border-r border-[#1D1D1F] ${collapsed ? "w-20" : "w-72"} h-full relative z-[100]`}>
+    <div
+      className={`transition-all duration-300 ease-in-out flex flex-col bg-[#121212] border-r border-[#1D1D1F] ${collapsed ? "w-20" : "w-72"} h-full relative z-[100] `}
+    >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-grad bient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-3xl" />
         <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-blue-500/10  rounded-full blur-3xl" />
@@ -65,7 +67,7 @@ export default function Sidebar() {
         </div>
       )}
 
-      <div className="flex-1 px-2 py-4 overflow-y-auto">
+      <div className="flex-1 px-2 py-4 overflow-y-auto transition-all">
         {navSections.map(({ title, items }) => (
           <div key={title} className="mb-4">
             {!collapsed && <h4 className="text-xs text-gray-500 px-4 mb-1 tracking-wide">{title}</h4>}
@@ -75,7 +77,7 @@ export default function Sidebar() {
                 to={href}
                 onClick={() => isMobile && toggleDrawer()}
                 className={({ isActive }) =>
-                  `flex items-center px-4 py-2 text-sm rounded-lg transition-colors duration-150 ${
+                  `flex items-center px-4 py-2 text-sm rounded-lg  transition-colors duration-150 ${
                     isActive ? "bg-[#1E1E20] text-white" : "text-gray-400 hover:text-white hover:bg-[#1D1D1F]"
                   } ${collapsed ? "justify-center" : "justify-start"}`
                 }
@@ -105,9 +107,11 @@ export default function Sidebar() {
   if (isMobile) {
     return (
       <>
-        <Dialog open={isDrawerOpen} onClose={() => toggleDrawer()} className="relative z-50">
-          <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-          <div className="fixed inset-y-0 left-0 max-w-xs bg-[#121212] shadow-xl">{SidebarContent()}</div>
+        <Dialog open={isDrawerOpen} onClose={() => toggleDrawer()} className="relative z-50 ">
+          <div className="fixed inset-0 bg-black/30 transition-opacity duration-300" aria-hidden="true" />
+          <div className="fixed inset-y-0 left-0 max-w-xs bg-[#121212] shadow-xl transform transition-transform duration-300 ease-in-out">
+            {SidebarContent()}
+          </div>
         </Dialog>
       </>
     );

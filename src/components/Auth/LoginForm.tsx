@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import BaseInput from "@/components/BaseInput";
 
-export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
+export function ModernLogin({ AuthSubmit, onRegisterClick }: { AuthSubmit: any; onRegisterClick?: (type: string) => any }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -92,6 +92,35 @@ export function ModernLogin({ AuthSubmit }: { AuthSubmit: any }) {
         >
           Sign In
         </button>
+
+        {onRegisterClick && (
+          <div className="mt-6 pt-4 border-t border-[#2A2A2A]">
+            <p className="text-gray-400 text-sm text-center mb-3">Don't have an account?</p>
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => onRegisterClick("team_manager_register")}
+                className="w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-[#1E1E20] rounded-lg transition-all duration-200"
+              >
+                Register as Team Commander
+              </button>
+              <button
+                type="button"
+                onClick={() => onRegisterClick("squad_manager_register")}
+                className="w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-[#1E1E20] rounded-lg transition-all duration-200"
+              >
+                Register as Squad Commander
+              </button>
+              <button
+                type="button"
+                onClick={() => onRegisterClick("soldier_register")}
+                className="w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-[#1E1E20] rounded-lg transition-all duration-200"
+              >
+                Register as Soldier
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </form>
   );
