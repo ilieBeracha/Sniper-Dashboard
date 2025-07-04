@@ -31,7 +31,7 @@ const scoreFormSchema = z
     assignment_session_id: z.string().min(1, "Assignment is required"),
     day_night: z.enum(["day", "night"]),
     position: z.string().min(1, "Position is required"),
-    time_until_first_shot: z.union([z.string(), z.number()]).transform((val) => String(val)),
+    time_until_first_shot: z.string().optional(),
     first_shot_hit: z.string().optional(),
     wind_strength: z.number().min(0, "Wind strength must be positive").optional(),
     wind_direction: z.number().min(0).max(360, "Wind direction must be between 0 and 360").optional(),

@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { format, parseISO } from "date-fns";
 import { Table, TableBody, TableHeader, TableRow, TableCell } from "@/ui/table";
 import BaseDashboardCard from "@/components/BaseDashboardCard";
