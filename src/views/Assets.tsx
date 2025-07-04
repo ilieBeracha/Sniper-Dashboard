@@ -12,11 +12,13 @@ import { useEffect, useState } from "react";
 import { userStore } from "@/store/userStore";
 import { isCommanderOrSquadCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function AssetsPage() {
   const { weapons, createWeapon } = useStore(weaponsStore);
   const { equipments, createEquipment } = useStore(equipmentStore);
   const { user } = useStore(userStore);
+  const { theme } = useTheme();
 
   const weaponsTypes = new Set(weapons.map((weapon) => weapon.weapon_type));
   const equipmentsTypes = new Set(equipments.map((equipment) => equipment.equipment_type));
@@ -68,14 +70,18 @@ export default function AssetsPage() {
   }
 
   const WeaponsContent = (
-    <div className="min-w-[600px] text-white p-4 space-y-6">
+    <div className={`min-w-[600px] p-4 space-y-6 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
       <div>
         <h2 className="text-xl font-semibold">New Weapon</h2>
-        <p className="mt-1 text-sm text-gray-400">Add a new weapon to the inventory.</p>
+        <p className={`mt-1 text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+          Add a new weapon to the inventory.
+        </p>
       </div>
 
       <select
-        className="w-full min-h-9 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white border border-zinc-700"
+        className={`w-full min-h-9 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
+          theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
+        }`}
         value={weaponForm.weapon_type}
         onChange={(e) => setWeaponForm({ ...weaponForm, weapon_type: e.target.value })}
       >
@@ -94,7 +100,7 @@ export default function AssetsPage() {
         value={weaponForm.serial_number}
         onChange={(e) => setWeaponForm({ ...weaponForm, serial_number: e.target.value })}
         placeholder="Enter serial number"
-        leftIcon={<FileQuestion size={16} className="text-gray-400" />}
+        leftIcon={<FileQuestion size={16} className={theme === "dark" ? "text-gray-400" : "text-gray-500"} />}
         containerClassName="bg-transparent"
       />
 
@@ -104,7 +110,7 @@ export default function AssetsPage() {
         value={weaponForm.mv}
         onChange={(e) => setWeaponForm({ ...weaponForm, mv: e.target.value })}
         placeholder="Enter MV"
-        leftIcon={<FileQuestion size={16} className="text-gray-400" />}
+        leftIcon={<FileQuestion size={16} className={theme === "dark" ? "text-gray-400" : "text-gray-500"} />}
         containerClassName="bg-transparent"
       />
 
@@ -112,7 +118,9 @@ export default function AssetsPage() {
         <button
           type="button"
           onClick={() => handleIsOpen("")}
-          className="px-4 py-1.5 bg-white/5 hover:bg-white/10 transition-colors rounded-md text-sm font-medium text-white"
+          className={`px-4 py-1.5 transition-colors rounded-md text-sm font-medium ${
+            theme === "dark" ? "bg-white/5 hover:bg-white/10 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+          }`}
         >
           Cancel
         </button>
@@ -128,14 +136,18 @@ export default function AssetsPage() {
   );
 
   const EquipmentContent = (
-    <div className="min-w-[600px] text-white p-4 space-y-6">
+    <div className={`min-w-[600px] p-4 space-y-6 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
       <div>
         <h2 className="text-xl font-semibold">New Equipment</h2>
-        <p className="mt-1 text-sm text-gray-400">Add new equipment to the inventory.</p>
+        <p className={`mt-1 text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+          Add new equipment to the inventory.
+        </p>
       </div>
 
       <select
-        className="w-full min-h-9 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white border border-zinc-700"
+        className={`w-full min-h-9 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
+          theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
+        }`}
         value={equipmentForm.equipment_type}
         onChange={(e) => setEquipmentForm({ ...equipmentForm, equipment_type: e.target.value })}
       >
@@ -155,14 +167,18 @@ export default function AssetsPage() {
         value={equipmentForm.serial_number}
         onChange={(e) => setEquipmentForm({ ...equipmentForm, serial_number: e.target.value })}
         placeholder="Enter serial number"
-        leftIcon={<FileQuestion size={16} className="text-gray-400" />}
+        leftIcon={<FileQuestion size={16} className={theme === "dark" ? "text-gray-400" : "text-gray-500"} />}
         containerClassName="bg-transparent"
       />
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-white">Day/Night</label>
+        <label className={`block text-sm font-medium transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+          Day/Night
+        </label>
         <select
-          className="w-full min-h-9 rounded-lg bg-zinc-800/50 px-3 py-2 text-sm text-white border border-zinc-700"
+          className={`w-full min-h-9 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
+            theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
+          }`}
           value={equipmentForm.day_night}
           onChange={(e) => setEquipmentForm({ ...equipmentForm, day_night: e.target.value })}
         >
@@ -176,7 +192,9 @@ export default function AssetsPage() {
         <button
           type="button"
           onClick={() => handleIsOpen("")}
-          className="px-4 py-1.5 bg-white/5 hover:bg-white/10 transition-colors rounded-md text-sm font-medium text-white"
+          className={`px-4 py-1.5 transition-colors rounded-md text-sm font-medium ${
+            theme === "dark" ? "bg-white/5 hover:bg-white/10 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+          }`}
         >
           Cancel
         </button>
@@ -202,7 +220,13 @@ export default function AssetsPage() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`rounded-full px-4 py-1.5 transition-colors ${
-                    activeTab === tab ? "bg-white/80 text-gray-900" : "bg-white/10 hover:bg-white/20 text-gray-200"
+                    activeTab === tab
+                      ? theme === "dark"
+                        ? "bg-white/80 text-gray-900"
+                        : "bg-gray-900 text-white"
+                      : theme === "dark"
+                        ? "bg-white/10 hover:bg-white/20 text-gray-200"
+                        : "bg-gray-200 hover:bg-gray-300 text-gray-600"
                   }`}
                 >
                   {tab === "weapons" ? "Weapons" : "Equipment"}
@@ -213,7 +237,11 @@ export default function AssetsPage() {
               <BaseButton
                 type="button"
                 onClick={() => handleIsOpen(activeTab)}
-                className="px-4 py-2 bg-white/10 border border-white/20 rounded text-sm font-medium text-white hover:bg-white/20 transition-all"
+                className={`px-4 py-2 rounded text-sm font-medium transition-all ${
+                  theme === "dark"
+                    ? "bg-white/10 border border-white/20 text-white hover:bg-white/20"
+                    : "bg-gray-100 border border-gray-300 text-gray-700 hover:bg-gray-200"
+                }`}
               >
                 Add {activeTab === "weapons" ? "Weapon" : "Equipment"}
               </BaseButton>
@@ -221,12 +249,22 @@ export default function AssetsPage() {
           </div>
 
           {activeTab === "weapons" ? (
-            <div className="bg-[#1A1A1A] rounded-lg border border-white/10">
+            <div
+              className={`rounded-lg border transition-colors duration-200 ${
+                theme === "dark" ? "bg-[#1A1A1A] border-white/10" : "bg-white border-gray-200"
+              }`}
+            >
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-1 h-6 bg-blue-400 rounded-full"></div>
-                  <h2 className="text-lg font-semibold text-white">Weapons Inventory</h2>
-                  <div className="px-3 py-1 bg-blue-500/20 text-blue-200 text-sm rounded border border-blue-500/30">
+                  <h2 className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                    Weapons Inventory
+                  </h2>
+                  <div
+                    className={`px-3 py-1 text-sm rounded border ${
+                      theme === "dark" ? "bg-blue-500/20 text-blue-200 border-blue-500/30" : "bg-blue-100 text-blue-700 border-blue-300"
+                    }`}
+                  >
                     {weapons.length} items
                   </div>
                 </div>
@@ -234,12 +272,24 @@ export default function AssetsPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-[#1A1A1A] rounded-lg border border-white/10">
+            <div
+              className={`rounded-lg border transition-colors duration-200 ${
+                theme === "dark" ? "bg-[#1A1A1A] border-white/10" : "bg-white border-gray-200"
+              }`}
+            >
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-1 h-6 bg-emerald-400 rounded-full"></div>
-                  <h2 className="text-lg font-semibold text-white">Equipment Inventory</h2>
-                  <div className="px-3 py-1 bg-emerald-500/20 text-emerald-200 text-sm rounded border border-emerald-500/30">
+                  <h2 className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                    Equipment Inventory
+                  </h2>
+                  <div
+                    className={`px-3 py-1 text-sm rounded border ${
+                      theme === "dark"
+                        ? "bg-emerald-500/20 text-emerald-200 border-emerald-500/30"
+                        : "bg-emerald-100 text-emerald-700 border-emerald-300"
+                    }`}
+                  >
                     {equipments.length} items
                   </div>
                 </div>

@@ -1,7 +1,9 @@
 import { TrainingSession } from "@/types/training";
 import { startOfMonth, getDaysInMonth, format, parseISO, addDays, isSameDay, isToday } from "date-fns";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function TrainingCalendar({ trainings }: { trainings: TrainingSession[] }) {
+  const { theme } = useTheme();
   const today = new Date();
   const start = startOfMonth(today);
   const daysInMonth = getDaysInMonth(today);
@@ -14,12 +16,19 @@ export default function TrainingCalendar({ trainings }: { trainings: TrainingSes
     <div className="w-full text-sm">
       <div className="w-full">
         <div className="flex justify-center items-center mb-3">
-          <h4 className="font-semibold text-white text-sm">{format(today, "MMMM yyyy")}</h4>
+          <h4 className={`font-semibold text-sm transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            {format(today, "MMMM yyyy")}
+          </h4>
         </div>
 
         <div className="grid grid-cols-7 gap-1">
           {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
-            <div key={day} className="font-medium text-gray-400 text-center pb-1 text-xs">
+            <div
+              key={day}
+              className={`font-medium text-center pb-1 text-xs transition-colors duration-200 ${
+                theme === "dark" ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
               {day}
             </div>
           ))}
@@ -33,13 +42,31 @@ export default function TrainingCalendar({ trainings }: { trainings: TrainingSes
               <div
                 key={index}
                 className={`
-                h-10 flex flex-col items-center justify-center rounded border transition-all text-xs
-                ${isTraining ? "border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20" : "border-white/5 bg-[#222] hover:bg-[#2A2A2A]"}
+                h-10 flex flex-col items-center justify-center rounded border transition-all text-xs duration-200
+                ${
+                  isTraining
+                    ? "border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20"
+                    : theme === "dark"
+                      ? "border-white/5 bg-[#222] hover:bg-[#2A2A2A]"
+                      : "border-gray-200 bg-gray-50 hover:bg-gray-100"
+                }
                 ${isCurrentDay ? "ring-1 ring-green-500" : ""}
                 hover:scale-[1.02]
               `}
               >
-                <span className={`text-xs ${isCurrentDay ? "font-bold text-green-400" : isTraining ? "font-medium text-white" : "text-gray-400"}`}>
+                <span
+                  className={`text-xs transition-colors duration-200 ${
+                    isCurrentDay
+                      ? "font-bold text-green-400"
+                      : isTraining
+                        ? theme === "dark"
+                          ? "font-medium text-white"
+                          : "font-medium text-gray-900"
+                        : theme === "dark"
+                          ? "text-gray-400"
+                          : "text-gray-600"
+                  }`}
+                >
                   {format(day, "d")}
                 </span>
 
@@ -56,7 +83,11 @@ export default function TrainingCalendar({ trainings }: { trainings: TrainingSes
           })}
         </div>
 
-        <div className="flex items-center justify-center mt-3 text-xs text-gray-400 gap-3">
+        <div
+          className={`flex items-center justify-center mt-3 text-xs gap-3 transition-colors duration-200 ${
+            theme === "dark" ? "text-gray-400" : "text-gray-600"
+          }`}
+        >
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-full border border-green-500"></div>
             <span className="text-xs">Today</span>

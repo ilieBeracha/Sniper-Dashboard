@@ -13,10 +13,12 @@ import { getUserGroupingSummaryRpc } from "@/services/performance";
 import DashboardRowKPI from "@/components/DashboardRowKPI";
 import Header from "@/Headers/Header";
 import BaseButton from "@/components/BaseButton";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
   const { getUserHitPercentage, getSquadStats } = useStore(performanceStore);
+  const { theme } = useTheme();
 
   const { getSquadMetricsByRole } = useStore(squadStore);
   const { loadNextAndLastTraining } = useStore(TrainingStore);
@@ -45,13 +47,22 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-[calc(100dvh-100px)]  text-gray-100 ">
+    <div className={`min-h-[calc(100dvh-100px)] transition-colors duration-200 ${
+      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+    }`}>
       <Header title="Overview">
-        <BaseButton className="bg-gray-700 text-xs rounded-2xl px-4 py-1 cursor-pointer" onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}>
+        <BaseButton 
+          className={`text-xs rounded-2xl px-4 py-1 cursor-pointer transition-colors duration-200 ${
+            theme === 'dark' 
+              ? 'bg-gray-700 text-white hover:bg-gray-600' 
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`} 
+          onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}
+        >
           Invite
         </BaseButton>
       </Header>
-      <div className="grid grid-cols-1 gap-4 p-4 md:p-6 2xl:p-10 ">
+      <div className="grid grid-cols-1 gap-4 p-4 md:p-6 2xl:p-10">
         <DashboardRowOne user={user} />
         <DashboardRowKPI />
         <DashboardRowThree loading={loading} />

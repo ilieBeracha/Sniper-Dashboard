@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type Position = "top" | "right" | "bottom" | "left" | "center";
 
@@ -74,6 +75,7 @@ export default function BaseModal({
 }: BaseModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const scrollLockRef = useRef<number>(0);
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (!closeOnEsc) return;
@@ -123,13 +125,19 @@ export default function BaseModal({
   return (
     <div className={cn(baseClasses, className)} onClick={handleOverlayClick}>
       {/* Overlay */}
-      <div className={cn("fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300", overlayClassName)} />
+      <div className={cn(`fixed inset-0 backdrop-blur-sm transition-opacity duration-300 ${
+        theme === 'dark' ? 'bg-black/50' : 'bg-black/30'
+      }`, overlayClassName)} />
 
       {/* Modal/Drawer Content */}
       <div
         ref={modalRef}
         className={cn(
-          "relative bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl transition-all duration-300 h-screen",
+          `relative rounded-lg shadow-xl transition-all duration-300 h-screen border ${
+            theme === 'dark' 
+              ? 'bg-zinc-900 border-zinc-800' 
+              : 'bg-white border-gray-200'
+          }`,
           positionClasses[position],
           positionAnimations[position].enter,
           !isDrawer && sizeClasses[size],
@@ -142,11 +150,21 @@ export default function BaseModal({
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-4 border-b border-zinc-800 sticky top-0 bg-zinc-900 z-10">
-            {title && <h2 className="text-lg font-semibold text-white">{title}</h2>}
+          <div className={`flex items-center justify-between p-4 border-b sticky top-0 z-10 transition-colors duration-200 ${
+            theme === 'dark' 
+              ? 'border-zinc-800 bg-zinc-900' 
+              : 'border-gray-200 bg-white'
+          }`}>
+            {title && <h2 className={`text-lg font-semibold transition-colors duration-200 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>{title}</h2>}
             {showCloseButton && (
-              <button onClick={onClose} className="p-1 rounded-lg hover:bg-zinc-800 transition-colors" aria-label="Close">
-                <X className="w-5 h-5 text-zinc-400" />
+              <button onClick={onClose} className={`p-1 rounded-lg transition-colors duration-200 ${
+                theme === 'dark' ? 'hover:bg-zinc-800' : 'hover:bg-gray-100'
+              }`} aria-label="Close">
+                <X className={`w-5 h-5 transition-colors duration-200 ${
+                  theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'
+                }`} />
               </button>
             )}
           </div>

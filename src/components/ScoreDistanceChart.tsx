@@ -1,8 +1,10 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from "recharts";
 import { ScoreTarget } from "@/types/score";
 import BaseDashboardCard from "./BaseDashboardCard";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function ScoreDistanceChart({ rows }: { rows: ScoreTarget[] | undefined }) {
+  const { theme } = useTheme();
   const data = rows
     ? Object.values(
         (rows as ScoreTarget[]).reduce<Record<number, { distance: string; target_hit: number; shots_fired: number; accuracy: number }>>(
@@ -25,11 +27,11 @@ export default function ScoreDistanceChart({ rows }: { rows: ScoreTarget[] | und
     if (active && payload && payload.length) {
       const accuracy = payload[0].payload.accuracy;
       return (
-        <div className="rounded-md border border-white/10 bg-black/80 p-3 shadow-lg backdrop-blur-sm">
-          <p className="mb-1 font-medium text-gray-200">{`Distance: ${label}`}</p>
+        <div className={`rounded-md border p-3 shadow-lg backdrop-blur-sm transition-colors duration-200 ${theme === "dark" ? "border-white/10 bg-black/80" : "border-gray-200 bg-white/90"}`}>
+          <p className={`mb-1 font-medium transition-colors duration-200 ${theme === "dark" ? "text-gray-200" : "text-gray-800"}`}>{`Distance: ${label}`}</p>
           <p className="text-sm text-indigo-300">{`Hits: ${payload[0].value}`}</p>
           <p className="text-sm text-blue-300">{`Shots: ${payload[1].value}`}</p>
-          <p className="mt-1 text-sm font-medium text-gray-200">{`Accuracy: ${accuracy}%`}</p>
+          <p className={`mt-1 text-sm font-medium transition-colors duration-200 ${theme === "dark" ? "text-gray-200" : "text-gray-800"}`}>{`Accuracy: ${accuracy}%`}</p>
         </div>
       );
     }
@@ -40,21 +42,21 @@ export default function ScoreDistanceChart({ rows }: { rows: ScoreTarget[] | und
     <BaseDashboardCard header="Hits vs Shots per Distance">
       <div className="h-fit w-full">
         {data.length > 0 ? (
-          <ResponsiveContainer minHeight={500} width="100%" height="100%">
+          <ResponsiveContainer minHeight={300} maxHeight={400} width="100%" height="100%">
             <BarChart data={data} margin={{ top: 30, right: 30, left: 0, bottom: 5 }} barGap={2}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2D3748" vertical={false} />
-              <XAxis dataKey="distance" tick={{ fill: "#9CA3AF", fontSize: 12 }} axisLine={{ stroke: "#4B5563" }} tickLine={{ stroke: "#4B5563" }} />
-              <YAxis tick={{ fill: "#9CA3AF", fontSize: 12 }} axisLine={{ stroke: "#4B5563" }} tickLine={{ stroke: "#4B5563" }} />
+              <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#374151" : "#e5e7eb"} vertical={false} />
+              <XAxis dataKey="distance" tick={{ fill: theme === "dark" ? "#9CA3AF" : "#6b7280", fontSize: 12 }} axisLine={{ stroke: theme === "dark" ? "#4B5563" : "#d1d5db" }} tickLine={{ stroke: theme === "dark" ? "#4B5563" : "#d1d5db" }} />
+              <YAxis tick={{ fill: theme === "dark" ? "#9CA3AF" : "#6b7280", fontSize: 12 }} axisLine={{ stroke: theme === "dark" ? "#4B5563" : "#d1d5db" }} tickLine={{ stroke: theme === "dark" ? "#4B5563" : "#d1d5db" }} />
               <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ paddingTop: 15 }} formatter={(value) => <span className="text-gray-300">{value}</span>} />
+              <Legend wrapperStyle={{ paddingTop: 15 }} formatter={(value) => <span className={`transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>{value}</span>} />
               <Bar name="Hits" dataKey="target_hit" fill="#818CF8" radius={[4, 4, 0, 0]} barSize={24} />
               <Bar name="Shots" dataKey="shots_fired" fill="#3B82F6" radius={[4, 4, 0, 0]} barSize={24} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center">
-            <div className="mb-2 rounded-full bg-gray-800 p-3">
-              <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className={`mb-2 rounded-full p-3 transition-colors duration-200 ${theme === "dark" ? "bg-gray-800" : "bg-gray-200"}`}>
+              <svg className={`h-6 w-6 transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -63,7 +65,7 @@ export default function ScoreDistanceChart({ rows }: { rows: ScoreTarget[] | und
                 />
               </svg>
             </div>
-            <p className="text-gray-400">No chart data available</p>
+            <p className={`transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>No chart data available</p>
           </div>
         )}
       </div>

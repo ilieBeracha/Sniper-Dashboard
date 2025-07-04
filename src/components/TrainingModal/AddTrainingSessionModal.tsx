@@ -13,6 +13,7 @@ import { toastService } from "@/services/toastService";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
 import { isMobile } from "react-device-detect";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function TrainingAddTrainingSessionModal({
   isOpen,
@@ -32,6 +33,7 @@ export default function TrainingAddTrainingSessionModal({
   const [date, setDate] = useState("");
   const [members, setMembers] = useState<string[]>([]);
   const [assignmentIds, setAssignmentIds] = useState<string[]>([]);
+  const { theme } = useTheme();
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { loadAssignments, createAssignment } = useStore(TrainingStore);
@@ -106,8 +108,10 @@ export default function TrainingAddTrainingSessionModal({
 
   const Content = (
     <>
-      <div className="border-b border-white/10 pb-4 w-full">
-        <p className="mt-1 text-sm text-gray-400">Plan a session, select assignments, and assign team members to participate.</p>
+      <div className={`border-b pb-4 w-full transition-colors duration-200 ${theme === "dark" ? "border-white/10" : "border-gray-200"}`}>
+        <p className={`mt-1 text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+          Plan a session, select assignments, and assign team members to participate.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-8 mt-4">
@@ -134,11 +138,17 @@ export default function TrainingAddTrainingSessionModal({
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-x-4 pt-4 border-t border-white/10 mt-4 text-sm">
+      <div
+        className={`flex items-center justify-end gap-x-4 pt-4 border-t mt-4 text-sm transition-colors duration-200 ${
+          theme === "dark" ? "border-white/10" : "border-gray-200"
+        }`}
+      >
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-1.5 bg-white/5 hover:bg-white/10 transition-colors rounded-md text-sm font-medium text-white"
+          className={`px-4 py-1.5 transition-colors rounded-md text-sm font-medium ${
+            theme === "dark" ? "bg-white/5 hover:bg-white/10 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+          }`}
         >
           Cancel
         </button>

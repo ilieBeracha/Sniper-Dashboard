@@ -18,6 +18,7 @@ import TrainingPageScoreFormModalParticipants from "./TrainingPageScoreFormModal
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const scoreTargetSchema = z.object({
   distance: z.number().min(100).max(900),
@@ -96,6 +97,7 @@ export default function ScoreFormModal({
   const { user } = useStore(userStore);
   const { members: teamMembers } = useStore(teamStore);
   const { scoreTargetsByScoreId } = useStore(scoreStore);
+  const { theme } = useTheme();
   const [showOptionalFields, setShowOptionalFields] = useState(false);
   const [showParticipantSelect, setShowParticipantSelect] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -329,12 +331,14 @@ export default function ScoreFormModal({
           <div key={step} className=" items-center mx-auto flex justify-center">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                currentStep >= step ? "bg-indigo-600 text-white" : "bg-gray-700 text-gray-400"
+                currentStep >= step ? "bg-indigo-600 text-white" : theme === "dark" ? "bg-gray-700 text-gray-400" : "bg-gray-300 text-gray-600"
               }`}
             >
               {step}
             </div>
-            {step < 3 && <div className={`w-8 h-0.5 mx-2 ${currentStep > step ? "bg-indigo-600" : "bg-gray-700"}`} />}
+            {step < 3 && (
+              <div className={`w-8 h-0.5 mx-2 ${currentStep > step ? "bg-indigo-600" : theme === "dark" ? "bg-gray-700" : "bg-gray-300"}`} />
+            )}
           </div>
         ))}
       </div>
@@ -420,14 +424,20 @@ export default function ScoreFormModal({
         <div className="flex gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-zinc-700 via-indigo-800 to-zinc-900 rounded-md"
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+              theme === "dark"
+                ? "text-white bg-gradient-to-br from-zinc-700 via-indigo-800 to-zinc-900"
+                : "text-gray-700 bg-gradient-to-br from-gray-200 via-indigo-200 to-gray-300"
+            }`}
           >
             Cancel
           </button>
           {currentStep > 1 && (
             <button
               onClick={prevStep}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 rounded-md"
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                theme === "dark" ? "text-white bg-gray-600 hover:bg-gray-700" : "text-gray-700 bg-gray-300 hover:bg-gray-400"
+              }`}
             >
               <ChevronLeft size={16} />
               Previous

@@ -64,6 +64,26 @@ button {
   border-radius: 9999px;
 }
 
+/* Theme-specific scrollbar styles */
+.light .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Theme transitions */
+.dark,
+.light {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+/* Light theme overrides */
+.light {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

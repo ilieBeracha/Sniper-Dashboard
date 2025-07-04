@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { ChevronRight, Clock, MapPin, Bookmark, UserCheck } from "lucide-react";
 import { isMobile } from "react-device-detect";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export function TrainingSessionCard({
   session,
@@ -17,6 +18,7 @@ export function TrainingSessionCard({
   isPast?: boolean;
 }) {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const sessionDate = parseISO(session.date);
 
   const participants = session.participants || [];
@@ -32,15 +34,17 @@ export function TrainingSessionCard({
       className={`
         relative
         pl-4 pr-4 py-2
-        border border-white/10 rounded-lg overflow-hidden
-        bg-gradient-to-br from-white/5 to-white/[0.02] 
-        hover:from-white/10 hover:to-white/[0.05] 
+        border rounded-lg overflow-hidden
         transition-all duration-500 ease-in-out
         cursor-pointer
         text-sm
         justify-center
         items-center
-        
+        ${
+          theme === "dark"
+            ? "border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] hover:from-white/10 hover:to-white/[0.05]"
+            : "border-gray-200 bg-white hover:bg-gray-50"
+        }
       `}
     >
       {/* Status */}
@@ -53,24 +57,36 @@ export function TrainingSessionCard({
           {isPast ? "Completed" : highlight ? "Today" : "Upcoming"}
         </span>
 
-        <ChevronRight className="w-4 h-4 text-gray-400" />
+        <ChevronRight className={`w-4 h-4 transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`} />
       </div>
       <div className="flex items-center justify-between text-sm ">
         {/* Date */}
         <div className="w-[100px] h-full text-sm">
-          <div className="flex flex-col items-center justify-center bg-white/5 rounded-lg p-2">
-            <span className="text-base font-semibold text-white">{showDate ? format(sessionDate, "d") : format(sessionDate, "h:mm")}</span>
-            <span className="text-xs text-gray-400">{showDate ? format(sessionDate, "MMM") : format(sessionDate, "a")}</span>
+          <div
+            className={`flex flex-col items-center justify-center rounded-lg p-2 transition-colors duration-200 ${
+              theme === "dark" ? "bg-white/5" : "bg-gray-100"
+            }`}
+          >
+            <span className={`text-base font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+              {showDate ? format(sessionDate, "d") : format(sessionDate, "h:mm")}
+            </span>
+            <span className={`text-xs transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+              {showDate ? format(sessionDate, "MMM") : format(sessionDate, "a")}
+            </span>
           </div>
         </div>
 
         {/* Main Info */}
         <div className="flex-1 ml-4">
           <div className="flex items-center gap-2">
-            <h4 className=" text-white text-sm">{session.session_name}</h4>
+            <h4 className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{session.session_name}</h4>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-4 mt-1 text-gray-400 text-xs">
+          <div
+            className={`flex flex-wrap items-center gap-x-4 mt-1 text-xs transition-colors duration-200 ${
+              theme === "dark" ? "text-gray-400" : "text-gray-600"
+            }`}
+          >
             {showDate && !isMobile && (
               <div className="flex items-center">
                 <Clock className="w-3 h-3 mr-1.5" />
@@ -93,7 +109,9 @@ export function TrainingSessionCard({
               {session.location ? (
                 <span className="truncate max-w-[120px]">{session.location}</span>
               ) : (
-                <span className="text-gray-500 italic">Unknown location</span>
+                <span className={`italic transition-colors duration-200 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
+                  Unknown location
+                </span>
               )}
             </div>
           </div>
