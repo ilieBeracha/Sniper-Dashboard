@@ -144,7 +144,6 @@ export default function TrainingPage() {
 
   const formattedDate = training?.date ? format(parseISO(training.date), "dd MMM yyyy") : "";
 
-  /* ------------ ui ------------ */
   return (
     <div className={`min-h-screen w-full transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>
       <Header title="Training">
@@ -153,8 +152,6 @@ export default function TrainingPage() {
 
       <main className="mt-6 space-y-4 px-4 pb-10 md:space-y-4 md:px-6 2xl:px-10 w-full">
         <div className="flex items-center justify-end w-full mb-4">
-          {/* stats bar */}
-
           <BaseButton
             type="button"
             onClick={() => toggleIsAddScoreOpen()}

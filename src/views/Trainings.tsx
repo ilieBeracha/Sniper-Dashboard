@@ -55,7 +55,7 @@ export default function Trainings() {
         </span>
       </Header>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 p-6">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 p-8 ">
         <BaseDashboardCard header="">
           <div className="p-4 flex items-center justify-between">
             <div>

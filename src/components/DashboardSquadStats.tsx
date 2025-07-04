@@ -102,11 +102,17 @@ export default function DashboardSquadStats() {
     <BaseDashboardCard
       header={
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 w-full text-sm">
-          <h2 className={`font-semibold text-sm flex items-center gap-2 flex-shrink-0 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Squad Stats</h2>
+          <h2
+            className={`font-semibold text-sm flex items-center gap-2 flex-shrink-0 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+          >
+            Squad Stats
+          </h2>
         </div>
       }
     >
-      <Card className={`bg-transparent justify-center rounded-xl w-full h-full flex flex-col items-center gap-4 text-sm transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+      <Card
+        className={`bg-transparent justify-center rounded-xl w-full h-full flex flex-col items-center gap-4 text-sm transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+      >
         <div className="w-full h-full flex flex-col items-center justify-center gap-4">
           <div className={`w-full h-full text-sm transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
             <div className="flex flex-col lg:flex-row items-start text-sm lg:items-center justify-between gap-4 w-full px-2 mt-2">
@@ -140,10 +146,16 @@ export default function DashboardSquadStats() {
             {isLoading ? (
               <div className="flex flex-col items-center justify-center h-[300px] w-full">
                 <div className="relative w-12 h-12 text-sm">
-                  <div className={`absolute top-0 left-0 w-full h-full border-4 rounded-full transition-colors duration-200 ${theme === "dark" ? "border-zinc-700" : "border-gray-300"}`}></div>
-                  <div className={`absolute top-0 left-0 w-full h-full border-4 border-t-4 rounded-full animate-spin transition-colors duration-200 ${theme === "dark" ? "border-t-zinc-400" : "border-t-gray-600"}`}></div>
+                  <div
+                    className={`absolute top-0 left-0 w-full h-full border-4 rounded-full transition-colors duration-200 ${theme === "dark" ? "border-zinc-700" : "border-gray-300"}`}
+                  ></div>
+                  <div
+                    className={`absolute top-0 left-0 w-full h-full border-4 border-t-4 rounded-full animate-spin transition-colors duration-200 ${theme === "dark" ? "border-t-zinc-400" : "border-t-gray-600"}`}
+                  ></div>
                 </div>
-                <p className={`mt-4 text-sm transition-colors duration-200 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Loading data...</p>
+                <p className={`mt-4 text-sm transition-colors duration-200 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                  Loading data...
+                </p>
               </div>
             ) : chartData.length === 0 ? (
               <NoDataDisplay />
@@ -155,7 +167,9 @@ export default function DashboardSquadStats() {
                   <Tooltip
                     cursor={{ fill: "transparent" }}
                     content={({ label, payload }) => (
-                      <div className={`p-2 rounded shadow transition-colors duration-200 ${theme === "dark" ? "bg-zinc-800 text-white hover:bg-zinc-700" : "bg-white text-gray-900 hover:bg-gray-50 border border-gray-200"}`}>
+                      <div
+                        className={`p-2 rounded shadow transition-colors duration-200 ${theme === "dark" ? "bg-zinc-800 text-white hover:bg-zinc-700" : "bg-white text-gray-900 hover:bg-gray-50 border border-gray-200"}`}
+                      >
                         <p className="text-xs font-semibold">{label}</p>
                         {payload?.map((p, i) => (
                           <p key={i} className="text-sm">
@@ -168,6 +182,8 @@ export default function DashboardSquadStats() {
                   <Legend iconType="circle" />
                   <Bar dataKey="performance" name="Performance" fill="url(#gradientPerformance)" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="accuracy" name="Accuracy" fill="url(#gradientAccuracy)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="elimination" name="Elimination" fill="url(#gradientElimination)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="coordination" name="Coordination" fill="url(#gradientCoordination)" radius={[4, 4, 0, 0]} />
                   <defs>
                     <linearGradient id="gradientPerformance" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#4ade80" stopOpacity={0.8} />
@@ -186,27 +202,6 @@ export default function DashboardSquadStats() {
                       <stop offset="100%" stopColor="#a78bfa" stopOpacity={0.2} />
                     </linearGradient>
                   </defs>
-
-                  <CartesianGrid strokeDasharray="3 3" stroke="transparent" />
-                  <XAxis dataKey="name" stroke={theme === "dark" ? "#9ca3af" : "#4b5563"} style={{ fontSize: "12px", paddingBottom: "10px" }} />
-                  <Tooltip
-                    cursor={{ fill: "transparent" }}
-                    content={({ label, payload }) => (
-                      <div className={`p-2 rounded shadow transition-colors duration-200 ${theme === "dark" ? "bg-zinc-800 text-white hover:bg-zinc-700" : "bg-white text-gray-900 hover:bg-gray-50 border border-gray-200"}`}>
-                        <p className="text-xs font-semibold">{label}</p>
-                        {payload?.map((p, i) => (
-                          <p key={i} className="text-sm">
-                            {p.name}: {formatValue(p.value as number, "number")}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                  />
-                  <Legend iconType="circle" />
-                  <Bar dataKey="performance" name="Performance" fill="url(#gradientPerformance)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="accuracy" name="Accuracy" fill="url(#gradientAccuracy)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="elimination" name="Elimination" fill="url(#gradientElimination)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="coordination" name="Coordination" fill="url(#gradientCoordination)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}

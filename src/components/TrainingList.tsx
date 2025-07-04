@@ -44,7 +44,7 @@ export default function TrainingList({
       <button
         type="button"
         onClick={() => setIsAddTrainingOpen(true)}
-        className={`px-2 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed flex items-center gap-2`}
+        className={` bg-indigo-600 hover:bg-indigo-500 justify-end  w-fit disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed flex items-center gap-2`}
       >
         <span className="text-xs font-medium">Add Training</span>
         <Plus size={12} />
