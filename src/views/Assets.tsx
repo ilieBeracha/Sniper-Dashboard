@@ -22,6 +22,7 @@ export default function AssetsPage() {
   const equipmentsTypes = new Set(equipments.map((equipment) => equipment.equipment_type));
 
   const [formType, setFormType] = useState<"weapons" | "equipments" | "">("");
+  const [activeTab, setActiveTab] = useState<"weapons" | "equipments">("weapons");
 
   const teamId = user?.team_id;
 
@@ -193,51 +194,59 @@ export default function AssetsPage() {
     <div className="min-h-screen">
       <Header title="Assets"> </Header>
       <div className="p-4 md:p-6 2xl:p-10">
-        <div className="flex flex-col gap-8">
-          <div className="bg-gradient-to-br rounded-2xl border border-white/10 shadow-lg shadow-black/20 transition-all duration-300 relative">
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              {(["weapons", "equipments"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`rounded-full px-4 py-1.5 transition-colors ${
+                    activeTab === tab ? "bg-white/80 text-gray-900" : "bg-white/10 hover:bg-white/20 text-gray-200"
+                  }`}
+                >
+                  {tab === "weapons" ? "Weapons" : "Equipment"}
+                </button>
+              ))}
+            </div>
             {isCommanderOrSquadCommander(user?.user_role as UserRole) && (
               <BaseButton
                 type="button"
-                onClick={() => handleIsOpen("weapons")}
-                className="px-4 py-2 bg-[#222] border border-white/10 rounded-lg text-sm font-medium text-white transition-all top-2 right-2 absolute"
+                onClick={() => handleIsOpen(activeTab)}
+                className="px-4 py-2 bg-white/10 border border-white/20 rounded text-sm font-medium text-white hover:bg-white/20 transition-all"
               >
-                Add Weapons
+                Add {activeTab === "weapons" ? "Weapon" : "Equipment"}
               </BaseButton>
             )}
-
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-2 h-8 bg-gradient-to-b from-indigo-500 to-purple-600 rounded-full"></div>
-                <h2 className="text-xl font-semibold text-white">Weapons Inventory</h2>
-                <div className="px-3 py-1 bg-indigo-500/20 text-indigo-300 text-sm rounded-full border border-indigo-500/30">
-                  {weapons.length} items
-                </div>
-              </div>
-              <AssetsWeaponsTable weapons={weapons} />
-            </div>
           </div>
 
-          <div className="bg-gradient-to-br rounded-2xl border border-white/10 shadow-lg shadow-black/20 transition-all duration-300 relative">
-            {isCommanderOrSquadCommander(user?.user_role as UserRole) && (
-              <BaseButton
-                type="button"
-                onClick={() => handleIsOpen("equipments")}
-                className="px-4 py-2 bg-[#222] border border-white/10 rounded-lg text-sm font-medium text-white transition-all top-2 right-2 absolute"
-              >
-                Add Equipments
-              </BaseButton>
-            )}
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-2 h-8 bg-gradient-to-b from-emerald-500 to-teal-600 rounded-full"></div>
-                <h2 className="text-xl font-semibold text-white">Equipment Inventory</h2>
-                <div className="px-3 py-1 bg-emerald-500/20 text-emerald-300 text-sm rounded-full border border-emerald-500/30">
-                  {equipments.length} items
+          {activeTab === "weapons" ? (
+            <div className="bg-[#1A1A1A] rounded-lg border border-white/10">
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-1 h-6 bg-blue-400 rounded-full"></div>
+                  <h2 className="text-lg font-semibold text-white">Weapons Inventory</h2>
+                  <div className="px-3 py-1 bg-blue-500/20 text-blue-200 text-sm rounded border border-blue-500/30">
+                    {weapons.length} items
+                  </div>
                 </div>
+                <AssetsWeaponsTable weapons={weapons} />
               </div>
-              <AssetsEquipmentTable equipments={equipments} />
             </div>
-          </div>
+          ) : (
+            <div className="bg-[#1A1A1A] rounded-lg border border-white/10">
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-1 h-6 bg-emerald-400 rounded-full"></div>
+                  <h2 className="text-lg font-semibold text-white">Equipment Inventory</h2>
+                  <div className="px-3 py-1 bg-emerald-500/20 text-emerald-200 text-sm rounded border border-emerald-500/30">
+                    {equipments.length} items
+                  </div>
+                </div>
+                <AssetsEquipmentTable equipments={equipments} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <BaseDesktopDrawer isOpen={isOpen} setIsOpen={() => handleIsOpen("")} title={`new ${formType}`}>

@@ -6,7 +6,6 @@ import TrainingListEmpty from "./TrainingListEmpty";
 import { useState } from "react";
 import TrainingCalendar from "./TrainingCalendar";
 import { Plus } from "lucide-react";
-import BaseButton from "./BaseButton";
 
 type Tab = "active" | "canceled";
 
@@ -19,11 +18,6 @@ export default function TrainingList({
 }) {
   const [activeTab, setActiveTab] = useState<Tab>("active");
 
-  // if (trainings.length === 0) {
-  //   return <TrainingListEmpty />;
-  // }
-
-  /* ---------- data prep ---------- */
   const sorted = [...trainings].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const active = sorted.filter((s) => s.status !== TrainingStatus.Canceled);
   const canceled = sorted.filter((s) => s.status === TrainingStatus.Canceled);
@@ -43,7 +37,6 @@ export default function TrainingList({
     })
     .reverse();
 
-  /* ---------- ui ---------- */
   return (
     <>
       <button
@@ -74,8 +67,8 @@ export default function TrainingList({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 px-2 pb-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-9">
-            <div className="col-span-6  overflow-y-auto custom-scrollbar sm:col-span-6 md:col-span-6 lg:col-span-5">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+            <div className="lg:col-span-8 space-y-6">
               {activeTab === "active" ? (
                 <>
                   {todaySessions.length > 0 && (
@@ -111,9 +104,9 @@ export default function TrainingList({
               )}
             </div>
 
-            <aside className="sticky top-8 col-span-4 hidden h-fit space-y-6 md:block">
-              <div className="flex flex-col items-start justify-start gap-4">
-                <span className="text-sm font-semibold text-white">Training Calendar</span>
+            <aside className="lg:col-span-4 hidden lg:block">
+              <div className="sticky top-8 bg-[#1A1A1A] border border-white/10 rounded-lg p-4">
+                <h3 className="text-sm font-semibold text-white mb-4">Training Calendar</h3>
                 <TrainingCalendar trainings={trainings} />
               </div>
             </aside>

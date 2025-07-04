@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStore } from "zustand";
 import TeamManagerRegisterForm from "@/components/Auth/TeamManagerRegisterForm";
-import TeamMemberRegisterForm from "@/components/Auth/SquadCommanderRegisterForm";
-import SoldierRegisterForm from "@/components/Auth/SoldierRegisterForm";
 import { authStore } from "@/store/authStore";
 import { ModernLogin } from "@/components/Auth/LoginForm";
 import AuthHero from "@/components/Auth/AuthHero";

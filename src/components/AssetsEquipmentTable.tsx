@@ -24,7 +24,6 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
               <thead>
                 <tr>
                   <th className="py-4 pl-6 pr-3 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Serial Number</th>
-                  <th className="px-3 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Team ID</th>
                   <th className="px-3 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Day/Night</th>
                   <th className="px-3 py-4 text-left text-xs font-medium uppercase tracking-wider text-gray-300">Created At</th>
                   <th className="relative py-4 pl-3 pr-6">
@@ -38,8 +37,8 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
                     <tr className="border-t border-white/10">
                       <th
                         scope="colgroup"
-                        colSpan={5}
-                        className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 py-3 pl-6 pr-3 text-left text-sm font-medium text-emerald-300 border-l-4 border-emerald-500"
+                        colSpan={6}
+                        className="bg-emerald-500/10 py-3 pl-6 pr-3 text-left text-sm font-medium text-emerald-200 border-l-2 border-emerald-400"
                       >
                         <div className="flex items-center gap-2">
                           <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
@@ -62,26 +61,13 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
                           </div>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm">
-                          <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-md text-xs font-medium border border-blue-500/30">
-                            {equipment.team_id}
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm">
-                          <span
-                            className={`px-2 py-1 rounded-md text-xs font-medium ${
-                              equipment.day_night
-                                ? equipment.day_night.toLowerCase() === "day"
-                                  ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
-                                  : "bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                                : "bg-gray-500/20 text-gray-400 border border-gray-500/30"
-                            }`}
-                          >
+                          <span className="px-2 py-1 bg-white/5 text-gray-300 rounded text-xs font-medium border border-white/10">
                             {equipment.day_night || "N/A"}
                           </span>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-400">{new Date(equipment.created_at).toLocaleDateString()}</td>
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-6 text-right text-sm">
-                          <button className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 hover:text-emerald-200 rounded-lg border border-emerald-500/30 hover:border-emerald-500/50 transition-all duration-200 text-xs font-medium">
+                          <button className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 hover:text-emerald-100 rounded border border-emerald-500/30 hover:border-emerald-500/50 transition-all duration-200 text-xs font-medium">
                             Edit
                           </button>
                         </td>
