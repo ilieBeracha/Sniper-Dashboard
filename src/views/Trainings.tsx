@@ -9,7 +9,6 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { useModal } from "@/hooks/useModal";
 import Header from "@/Headers/Header";
 import { performanceStore } from "@/store/performance";
-import BaseDashboardCard from "@/components/BaseDashboardCard";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Trainings() {
@@ -18,7 +17,7 @@ export default function Trainings() {
   const useUserStore = useStore(userStore);
   const teamStoreState = useStore(teamStore);
   const members = teamStoreState.members;
-  const { getOverallAccuracyStats, overallAccuracyStats } = useStore(performanceStore);
+  const { getOverallAccuracyStats } = useStore(performanceStore);
   const { isOpen: isAddTrainingOpen, setIsOpen: setIsAddTrainingOpen } = useModal();
   const { theme } = useTheme();
 
