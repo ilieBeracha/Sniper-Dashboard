@@ -252,23 +252,35 @@ export default function ScoreDetailsModal({ isOpen, setIsOpen, score }: ScoreDet
 
               {/* Summary if multiple targets */}
               {scoreTargetsByScoreId.length > 1 && (
-                <div className="mt-4 p-3 bg-indigo-900/20 rounded-lg border border-indigo-700/30">
-                  <h4 className="text-sm font-medium text-indigo-300 mb-2">Overall Summary</h4>
+                <div className={`mt-4 p-3 rounded-lg border transition-colors duration-200 ${
+                  theme === "dark" ? "bg-indigo-900/20 border-indigo-700/30" : "bg-indigo-50 border-indigo-200"
+                }`}>
+                  <h4 className={`text-sm font-medium mb-2 transition-colors duration-200 ${
+                    theme === "dark" ? "text-indigo-300" : "text-indigo-700"
+                  }`}>Overall Summary</h4>
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                      <span className="text-xs text-gray-400 block">Total Shots</span>
-                      <p className="text-sm font-bold text-white">
+                      <span className={`text-xs block transition-colors duration-200 ${
+                        theme === "dark" ? "text-gray-400" : "text-gray-600"
+                      }`}>Total Shots</span>
+                      <p className={`text-sm font-bold transition-colors duration-200 ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}>
                         {scoreTargetsByScoreId.reduce((sum: number, target: any) => sum + target.shots_fired, 0)}
                       </p>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-400 block">Total Hits</span>
+                      <span className={`text-xs block transition-colors duration-200 ${
+                        theme === "dark" ? "text-gray-400" : "text-gray-600"
+                      }`}>Total Hits</span>
                       <p className="text-sm font-bold text-green-400">
                         {scoreTargetsByScoreId.reduce((sum: number, target: any) => sum + target.target_hits, 0)}
                       </p>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-400 block">Overall Accuracy</span>
+                      <span className={`text-xs block transition-colors duration-200 ${
+                        theme === "dark" ? "text-gray-400" : "text-gray-600"
+                      }`}>Overall Accuracy</span>
                       <p className="text-sm font-bold text-indigo-400">
                         {scoreTargetsByScoreId.reduce((sum: number, target: any) => sum + target.shots_fired, 0) > 0
                           ? (
@@ -285,17 +297,25 @@ export default function ScoreDetailsModal({ isOpen, setIsOpen, score }: ScoreDet
               )}
             </div>
           ) : (
-            <div className="bg-zinc-800/30 rounded-lg p-4 border border-zinc-700/50">
-              <h3 className="text-lg font-medium text-white mb-3">Shooting Performance</h3>
+            <div className={`rounded-lg p-4 border transition-colors duration-200 ${
+              theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-300"
+            }`}>
+              <h3 className={`text-lg font-medium mb-3 transition-colors duration-200 ${
+                theme === "dark" ? "text-white" : "text-gray-900"
+              }`}>Shooting Performance</h3>
               <div className="text-center py-4">
-                <p className="text-gray-400">No shooting data available</p>
+                <p className={`transition-colors duration-200 ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-600"
+                }`}>No shooting data available</p>
               </div>
             </div>
           )}
         </div>
       ) : (
         <div className="text-center py-8">
-          <p className="text-gray-400">No score data available</p>
+          <p className={`transition-colors duration-200 ${
+            theme === "dark" ? "text-gray-400" : "text-gray-600"
+          }`}>No score data available</p>
         </div>
       )}
     </div>
