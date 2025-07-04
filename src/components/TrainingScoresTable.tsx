@@ -1,7 +1,6 @@
 import { format, parseISO } from "date-fns";
 import { Table, TableBody, TableHeader, TableRow, TableCell } from "@/ui/table";
 import BaseDashboardCard from "@/components/BaseDashboardCard";
-import { Badge } from "@/components/ui/badge";
 import { Edit, Eye } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
