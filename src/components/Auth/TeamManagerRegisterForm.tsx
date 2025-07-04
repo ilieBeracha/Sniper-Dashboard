@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import BaseInput from "@/components/BaseInput";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
   const [firstName, setFirstName] = useState("");
@@ -7,6 +8,7 @@ export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { theme } = useTheme();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,7 +16,9 @@ export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
   };
 
   const emailIcon = (
-    <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className={`h-5 w-5 transition-colors duration-200 ${
+      theme === 'dark' ? 'text-gray-600' : 'text-gray-500'
+    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -25,7 +29,9 @@ export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
   );
 
   const passwordIcon = (
-    <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className={`h-5 w-5 transition-colors duration-200 ${
+      theme === 'dark' ? 'text-gray-600' : 'text-gray-500'
+    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -36,7 +42,11 @@ export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
   );
 
   const togglePasswordIcon = (
-    <button type="button" onClick={() => setShowPassword(!showPassword)} className="h-5 w-5 text-gray-600 hover:text-gray-200 transition-colors">
+    <button type="button" onClick={() => setShowPassword(!showPassword)} className={`h-5 w-5 transition-colors duration-200 ${
+      theme === 'dark' 
+        ? 'text-gray-600 hover:text-gray-200' 
+        : 'text-gray-500 hover:text-gray-700'
+    }`}>
       {showPassword ? (
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -110,9 +120,13 @@ export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
       <div>
         <button
           type="submit"
-          className="w-full flex justify-center items-center px-4 py-3 rounded-2xl bg-white text-[#0A0A0A] font-semibold hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] transition-all duration-200"
+          className={`w-full flex justify-center items-center px-4 py-3 rounded-2xl font-semibold focus:outline-none focus:ring-2 transition-all duration-200 ${
+            theme === 'dark'
+              ? 'bg-white text-[#0A0A0A] hover:bg-gray-100 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]'
+              : 'bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-white'
+          }`}
         >
-          Register
+          Register as Team Manager
         </button>
       </div>
     </form>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { User } from "@/types/user";
 import SearchableCheckboxList from "../SearchableCheckboxList";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type TeamMembersSectionProps = {
   teamMembers: User[];
@@ -10,6 +11,7 @@ type TeamMembersSectionProps = {
 
 export default function TeamMembersSection({ teamMembers, members, setMembers }: TeamMembersSectionProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const { theme } = useTheme();
 
   const formattedMembers = teamMembers.map((member) => ({
     id: member.id,
@@ -19,9 +21,13 @@ export default function TeamMembersSection({ teamMembers, members, setMembers }:
   }));
 
   return (
-    <div className="bg-[#1A1A1A] rounded-lg border border-white/5 p-6 text-sm">
+    <div
+      className={`rounded-lg border p-6 text-sm transition-colors duration-200 ${
+        theme === "dark" ? "bg-[#1A1A1A] border-white/5" : "bg-white border-gray-200"
+      }`}
+    >
       <div className="flex items-center gap-2 mb-4">
-        <h4 className="text-sm font-medium text-white">Assign Members</h4>
+        <h4 className={`text-sm font-medium transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Assign Members</h4>
         {members.length > 0 && <div className="bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded text-xs">{members.length} selected</div>}
       </div>
 

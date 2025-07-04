@@ -1,4 +1,5 @@
 import type React from "react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface CheckboxProps {
   label?: string;
@@ -10,14 +11,19 @@ interface CheckboxProps {
 }
 
 const Checkbox: React.FC<CheckboxProps> = ({ label, checked, id, onChange, className = "", disabled = false }) => {
+  const { theme } = useTheme();
+
   return (
     <label className={`flex items-center space-x-3 group cursor-pointer ${disabled ? "cursor-not-allowed opacity-60" : ""}`}>
       <div className="relative w-5 h-5">
         <input
           id={id}
           type="checkbox"
-          className={`w-5 h-5 appearance-none cursor-pointer  border border-gray-300 checked:border-transparent rounded-md checked:bg-brand-500 disabled:opacity-60 
-          ${className}`}
+          className={`w-5 h-5 appearance-none cursor-pointer rounded-md checked:bg-brand-500 disabled:opacity-60 ${
+            theme === 'dark' 
+              ? 'border border-gray-300 checked:border-transparent' 
+              : 'border border-gray-400 checked:border-transparent'
+          } ${className}`}
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
           disabled={disabled}
@@ -47,7 +53,9 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, checked, id, onChange, class
           </svg>
         )}
       </div>
-      {label && <span className="text-sm font-medium text-gray-400 ">{label}</span>}
+      {label && <span className={`text-sm font-medium ${
+        theme === 'dark' ? 'text-gray-400' : 'text-gray-700'
+      }`}>{label}</span>}
     </label>
   );
 };

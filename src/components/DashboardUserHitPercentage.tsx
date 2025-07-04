@@ -2,9 +2,11 @@ import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
 import NoDataDisplay from "./BaseNoData";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function UserHitPercentage() {
   const { userHitPercentage } = useStore(performanceStore);
+  const { theme } = useTheme();
 
   if (!userHitPercentage) {
     return (
@@ -50,32 +52,32 @@ export default function UserHitPercentage() {
                   cornerRadius={6}
                 >
                   <Cell fill={hitColor} />
-                  <Cell fill="#333" />
+                  <Cell fill={theme === "dark" ? "#333" : "#e5e7eb"} />
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
 
             <div className="absolute inset-0 flex flex-col mt-1">
-              <span className="text-2xl font-bold text-white">{percentage ? percentage.toFixed(1) : 0}%</span>
-              <span className="text-xs text-gray-400 uppercase tracking-wider">Accuracy</span>
+              <span className={`text-2xl font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{percentage ? percentage.toFixed(1) : 0}%</span>
+              <span className={`text-xs uppercase tracking-wider transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Accuracy</span>
             </div>
             <div className="grid grid-cols-1 gap-3 mt-2">
-              <div className="bg-[#1A1A1A] p-2 rounded-lg">
+              <div className={`p-2 rounded-lg transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
                 <div className="flex justify-between">
-                  <span className="text-xs text-gray-400">Total Shots</span>
-                  <span className="text-xs px-1.5 py-0.5 bg-gray-800 rounded-md text-gray-300">{userHitPercentage.total_shots}</span>
+                  <span className={`text-xs transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Total Shots</span>
+                  <span className={`text-xs px-1.5 py-0.5 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}>{userHitPercentage.total_shots}</span>
                 </div>
-                <div className="mt-1 h-1 w-full bg-gray-800 rounded-full overflow-hidden">
+                <div className={`mt-1 h-1 w-full rounded-full overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-gray-800" : "bg-gray-300"}`}>
                   <div className="h-full rounded-full bg-blue-500" style={{ width: `100%` }}></div>
                 </div>
               </div>
 
-              <div className="bg-[#1A1A1A] p-2 rounded-lg">
+              <div className={`p-2 rounded-lg transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
                 <div className="flex justify-between">
-                  <span className="text-xs text-gray-400">Confirmed Hits</span>
-                  <span className="text-xs px-1.5 py-0.5 bg-gray-800 rounded-md text-gray-300">{userHitPercentage.total_hits}</span>
+                  <span className={`text-xs transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Confirmed Hits</span>
+                  <span className={`text-xs px-1.5 py-0.5 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}>{userHitPercentage.total_hits}</span>
                 </div>
-                <div className="mt-1 h-1 w-full bg-gray-800 rounded-full overflow-hidden">
+                <div className={`mt-1 h-1 w-full rounded-full overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-gray-800" : "bg-gray-300"}`}>
                   <div
                     className="h-full rounded-full"
                     style={{ width: `${(userHitPercentage.total_hits / userHitPercentage.total_shots) * 100}%`, backgroundColor: hitColor }}
@@ -83,8 +85,8 @@ export default function UserHitPercentage() {
                 </div>
               </div>
             </div>
-            <div className="mt-3 text-center text-xs text-gray-400">
-              <span className="bg-[#1A1A1A] px-2 py-0.5 rounded">{userHitPercentage.assignments_count} Assignments Completed</span>
+            <div className={`mt-3 text-center text-xs transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+              <span className={`px-2 py-0.5 rounded transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>{userHitPercentage.assignments_count} Assignments Completed</span>
             </div>
           </>
         )}

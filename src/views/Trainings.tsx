@@ -10,6 +10,7 @@ import { useModal } from "@/hooks/useModal";
 import Header from "@/Headers/Header";
 import { performanceStore } from "@/store/performance";
 import BaseDashboardCard from "@/components/BaseDashboardCard";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Trainings() {
   const { loadTrainingByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
@@ -19,6 +20,7 @@ export default function Trainings() {
   const members = teamStoreState.members;
   const { getOverallAccuracyStats, overallAccuracyStats } = useStore(performanceStore);
   const { isOpen: isAddTrainingOpen, setIsOpen: setIsAddTrainingOpen } = useModal();
+  const { theme } = useTheme();
 
   const user = useUserStore.user;
   const trainings = useTrainingStore.trainings || [];
@@ -41,9 +43,13 @@ export default function Trainings() {
     await loadTrainingByTeamId(teamId);
   }
   return (
-    <div className="min-h-screen bg-[#121212] text-gray-100">
+    <div className={`min-h-screen transition-colors duration-200 ${theme === "dark" ? "bg-[#121212] text-gray-100" : "bg-gray-50 text-gray-900"}`}>
       <Header title="Trainings">
-        <span className="flex items-center text-xs font-medium  text-indigo-300 py-1.5 px-3 rounded-full">
+        <span
+          className={`flex items-center text-xs font-medium py-1.5 px-3 rounded-full transition-colors duration-200 ${
+            theme === "dark" ? "text-indigo-300" : "text-indigo-600"
+          }`}
+        >
           <CalendarIcon className="w-3 h-3 mr-1.5" />
           {trainings.length}
         </span>
@@ -54,7 +60,7 @@ export default function Trainings() {
           <div className="p-4 flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold text-indigo-500">{overallAccuracyStats?.total_scores || "0"}</div>
-              <div className="text-sm text-gray-400">Total Scores</div>
+              <div className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Total Scores</div>
             </div>
             <svg className="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -66,7 +72,7 @@ export default function Trainings() {
           <div className="p-4 flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold text-indigo-500">{overallAccuracyStats?.accuracy_percent?.toFixed(1) || "0.0"}%</div>
-              <div className="text-sm text-gray-400">Accuracy</div>
+              <div className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Accuracy</div>
             </div>
             <svg className="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -78,7 +84,7 @@ export default function Trainings() {
           <div className="p-4 flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold text-indigo-500">{overallAccuracyStats?.total_shots_fired || "0"}</div>
-              <div className="text-sm text-gray-400">Shots Fired</div>
+              <div className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Shots Fired</div>
             </div>
             <svg className="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -95,7 +101,7 @@ export default function Trainings() {
           <div className="p-4 flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold text-indigo-500">{overallAccuracyStats?.total_target_hits || "0"}</div>
-              <div className="text-sm text-gray-400">Target Hits</div>
+              <div className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Target Hits</div>
             </div>
             <svg className="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path

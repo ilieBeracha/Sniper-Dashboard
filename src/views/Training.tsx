@@ -25,9 +25,11 @@ import TrainingScoresTable from "@/components/TrainingScoresTable";
 import ScoreDetailsModal from "@/components/ScoreDetailsModal";
 import BaseButton from "@/components/BaseButton";
 import { isMobile } from "react-device-detect";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function TrainingPage() {
   const { id } = useParams();
+  const { theme } = useTheme();
 
   const { training, loadTrainingById, loadAssignments, createAssignment, assignments } = useStore(TrainingStore);
 
@@ -144,7 +146,7 @@ export default function TrainingPage() {
 
   /* ------------ ui ------------ */
   return (
-    <div className="min-h-screen w-full  text-gray-100">
+    <div className={`min-h-screen w-full transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>
       <Header title="Training">
         <span className="flex items-center rounded-full bg-indigo-500/20 py-1.5 px-3 text-sm font-medium text-indigo-300">{formattedDate}</span>
       </Header>
