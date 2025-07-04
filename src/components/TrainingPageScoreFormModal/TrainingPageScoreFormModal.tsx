@@ -31,7 +31,7 @@ const scoreFormSchema = z
     assignment_session_id: z.string().min(1, "Assignment is required"),
     day_night: z.enum(["day", "night"]),
     position: z.string().min(1, "Position is required"),
-    time_until_first_shot: z.string().min(1, "Time until first shot is required"),
+    time_until_first_shot: z.union([z.string(), z.number()]).transform((val) => String(val)),
     first_shot_hit: z.string().optional(),
     wind_strength: z.number().min(0, "Wind strength must be positive").optional(),
     wind_direction: z.number().min(0).max(360, "Wind direction must be between 0 and 360").optional(),
@@ -181,7 +181,7 @@ export default function ScoreFormModal({
         day_night: editingScore.day_night || "day",
         position: editingScore.position || "",
         creator_id: editingScore.creator_id || "",
-        time_until_first_shot: editingScore.time_until_first_shot || "",
+        time_until_first_shot: String(editingScore.time_until_first_shot || ""),
         first_shot_hit: editingScore.first_shot_hit || "",
         wind_strength: editingScore.wind_strength || undefined,
         wind_direction: editingScore.wind_direction || undefined,
@@ -194,9 +194,9 @@ export default function ScoreFormModal({
         scoreTargets:
           scoreTargetsByScoreId?.length > 0
             ? scoreTargetsByScoreId.map((st: any) => ({
-                distance: st.distance,
-                shots_fired: st.shots_fired,
-                target_hits: st.target_hits,
+                distance: Number(st.distance) || 100,
+                shots_fired: Number(st.shots_fired) || 0,
+                target_hits: Number(st.target_hits) || 0,
               }))
             : [
                 {
