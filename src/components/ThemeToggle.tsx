@@ -1,5 +1,6 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { isMobile } from "react-device-detect";
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -8,19 +9,16 @@ export default function ThemeToggle() {
     <button
       onClick={toggleTheme}
       className={`
-        p-2 rounded-lg transition-all duration-200 
-        ${theme === 'dark' 
-          ? 'bg-white/10 hover:bg-white/20 text-gray-200 hover:text-white' 
-          : 'bg-gray-200 hover:bg-gray-300 text-gray-700 hover:text-gray-900'
+        p-2 rounded-lg transition-all duration-200 ${isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-base" : "px-6 py-2.5 rounded-lg text-sm hover:shadow-lg"}
+        ${
+          theme === "dark"
+            ? "bg-white/5 hover:bg-white/10 text-gray-200 hover:text-white"
+            : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
         }
       `}
       aria-label="Toggle theme"
     >
-      {theme === 'dark' ? (
-        <Sun size={20} />
-      ) : (
-        <Moon size={20} />
-      )}
+      {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
     </button>
   );
 }

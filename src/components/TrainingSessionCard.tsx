@@ -1,7 +1,7 @@
-import { TrainingSession } from "@/types/training";
+import { TrainingSession, TrainingStatus } from "@/types/training";
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
-import { ChevronRight, Clock, MapPin, Bookmark, UserCheck } from "lucide-react";
+import { ChevronRight, Clock, MapPin, Bookmark, UserCheck, User } from "lucide-react";
 import { isMobile } from "react-device-detect";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -22,12 +22,102 @@ export function TrainingSessionCard({
   const sessionDate = parseISO(session.date);
 
   const participants = session.participants || [];
-  const assignments = session.assignment_sessions || [];
 
   const handleSessionClick = () => {
     navigate(`/training/${session.id}`);
   };
 
+  // Mobile-first design like the event cards in the image
+  if (isMobile) {
+    return (
+      <div
+        onClick={handleSessionClick}
+        className={`
+          relative
+          p-4
+          rounded-2xl
+          transition-all duration-  200
+          cursor-pointer
+          ${theme === "dark" ? "bg-zinc-900 border border-zinc-800" : "bg-white border border-gray-100 shadow-sm"}
+        `}
+      >
+        <div className="flex items-start justify-between mb-3">
+          {/* Date/Time info */}
+          <div className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+            {format(sessionDate, "d MMM, hh:mm")} to {format(sessionDate, "hh:mmaaa")}
+          </div>
+
+          {/* Status badge */}
+          {(isPast || highlight) && (
+            <span
+              className={`text-xs px-2 py-1 rounded-full font-medium ${
+                isPast
+                  ? theme === "dark"
+                    ? "bg-gray-800 text-gray-400"
+                    : "bg-gray-100 text-gray-600"
+                  : theme === "dark"
+                    ? "bg-red-500/20 text-red-400"
+                    : "bg-red-50 text-red-600"
+              }`}
+            >
+              {isPast && session.status !== TrainingStatus.Completed
+                ? "Finished"
+                : isPast && session.status === TrainingStatus.Completed
+                  ? "Completed"
+                  : "Today"}
+            </span>
+          )}
+        </div>
+
+        {/* Title */}
+        <h3 className={`text-lg font-semibold mb-3 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+          {session.session_name}
+        </h3>
+
+        {/* Participants and Price */}
+        <div className="flex items-center gap-2 justify-between">
+          {/* Participant avatars */}
+          <div className="flex items-center">
+            <div className="flex -space-x-2">
+              {participants.slice(0, 3).map((participant, idx) => (
+                <div
+                  key={idx}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border-2 ${
+                    theme === "dark" ? "bg-zinc-700 border-zinc-900 text-zinc-300" : "bg-gray-200 border-white text-gray-700"
+                  }`}
+                >
+                  {participant.user?.first_name?.charAt(0).toUpperCase() || "U"}
+                </div>
+              ))}
+              {participants.length > 3 && (
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border-2 ${
+                    theme === "dark" ? "bg-zinc-800 border-zinc-900 text-zinc-400" : "bg-gray-100 border-white text-gray-600"
+                  }`}
+                >
+                  +{participants.length - 3}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Assignment count as "price" */}
+          <div
+            className={`text-lg flex items-center gap-2  justify-between w-full font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+          >
+            <div className="flex justify-center items-center gap-2">
+              <User className="w-4 h-4 mr-1.5" />
+              <span className="text-sm">{session.creator_id?.first_name}</span>
+            </div>
+            {session.assignments && session.assignments.length > 0 && session.assignments.length}{" "}
+            {session.assignments && session.assignments.length === 1 ? "task" : "tasks"}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop design (existing)
   return (
     <div
       onClick={handleSessionClick}
@@ -54,7 +144,7 @@ export function TrainingSessionCard({
               ${isPast ? "bg-gray-500/10 text-gray-400" : highlight ? "bg-indigo-500/20 text-indigo-300" : "bg-green-500/10 text-green-400"}
             `}
         >
-          {isPast ? "Completed" : highlight ? "Today" : "Upcoming"}
+          {isPast ? "Finished" : highlight ? "Today" : "Upcoming"}
         </span>
 
         <ChevronRight className={`w-4 h-4 transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`} />
@@ -98,10 +188,10 @@ export function TrainingSessionCard({
               <UserCheck className="w-3 h-3 mr-1.5" />
               {participants.length} participants
             </div>
-            {assignments.length > 0 && (
+            {session.assignments && session.assignments.length > 0 && (
               <div className="flex items-center">
                 <Bookmark className="w-3 h-3 mr-1.5" />
-                {assignments.length} assignments
+                {session.assignments.length} assignments
               </div>
             )}
             <div className="flex items-center mt-1 *:text-xs">

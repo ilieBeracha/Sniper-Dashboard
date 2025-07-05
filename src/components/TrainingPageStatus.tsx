@@ -41,7 +41,7 @@ export default function TrainingPageStatus({ status, date }: TrainingPageStatusP
     },
   };
 
-  const config = statusConfig[status];
+  const config = statusConfig[status as keyof typeof statusConfig];
   const Icon = config.icon;
 
   return (

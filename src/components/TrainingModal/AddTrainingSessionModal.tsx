@@ -7,7 +7,7 @@ import AssignmentsSection from "@/components/TrainingModal/AddTrainingSessionMod
 import TeamMembersSection from "@/components/TrainingModal/AddTrainingSessionModalMembers";
 import { useStore } from "zustand";
 import { TrainingStore } from "@/store/trainingStore";
-import { Assignment } from "@/types/training";
+import { Assignment, TrainingStatus } from "@/types/training";
 import { useModal } from "@/hooks/useModal";
 import { toastService } from "@/services/toastService";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
@@ -39,13 +39,24 @@ export default function TrainingAddTrainingSessionModal({
   const { loadAssignments, createAssignment } = useStore(TrainingStore);
   const { user } = useStore(userStore);
 
+  const handleSetStatus = async () => {
+    if (date && date < new Date().toISOString()) {
+      return TrainingStatus.Finished;
+    }
+    return TrainingStatus.Scheduled;
+  };
+
   async function handleSubmit() {
     if (!user?.team_id) return alert("Missing team ID");
 
+    if (date) {
+      handleSetStatus();
+    }
     const { data: newTraining, error: sessionError } = await supabase
       .from("training_session")
       .insert([
         {
+          creator_id: user.id,
           session_name: sessionName,
           location,
           date: new Date(date).toISOString(),

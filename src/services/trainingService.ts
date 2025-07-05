@@ -24,7 +24,13 @@ export async function getTrainingByTeamId(teamId: string, currentUserId?: string
       session_name,
       location,
       status,
-      assignment_session:assignment_session(
+      creator_id:creator_id(
+        id,
+        first_name,
+        last_name,
+        email
+      ),
+        assignment_session:assignment_session(
         id,
         assignment:assignment_id(
           id,

@@ -6,6 +6,7 @@ import BaseDesktopDrawer from "./BaseDrawer/BaseDesktopDrawer";
 import BaseMobileDrawer from "./BaseDrawer/BaseMobileDrawer";
 import { isMobile } from "react-device-detect";
 import BaseButton from "./BaseButton";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boolean; setIsOpen: (open: boolean) => void; userId: string }) {
   const useInvitationStore = useStore(InvitationStore);
@@ -14,6 +15,7 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
   const [inviteFetched, setInviteFetched] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const { theme } = useTheme();
 
   const handleInvite = async () => {
     setLoading(true);
@@ -47,19 +49,31 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
   };
 
   const Content = (
-    <div className="flex flex-col items-center text-center  py-4 space-y-6 h-full w-full">
-      <div className="p-4 rounded-full bg-zinc-800/50 border border-zinc-700/50 shadow-lg">
-        <UserPlus className="w-8 h-8 sm:w-10 sm:h-10 text-indigo-400" />
+    <div className="flex flex-col items-center text-center py-4 space-y-6 h-full w-full">
+      <div
+        className={`p-4 rounded-full shadow-lg transition-colors duration-200 ${
+          theme === "dark" ? "bg-zinc-800/50 border border-zinc-700/50" : "bg-gray-100 border border-gray-300"
+        }`}
+      >
+        <UserPlus className={`w-8 h-8 sm:w-10 sm:h-10 transition-colors duration-200 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} />
       </div>
 
       {inviteFetched ? (
         <div className="w-full space-y-4">
           {/* Token Display */}
-          <div className="relative flex items-center justify-evenly px-4 py-3 rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-white font-mono text-sm">
+          <div
+            className={`relative flex items-center justify-evenly px-4 py-3 rounded-lg font-mono text-sm transition-colors duration-200 ${
+              theme === "dark" ? "bg-zinc-800/50 border border-zinc-700/50 text-white" : "bg-gray-100 border border-gray-300 text-gray-900"
+            }`}
+          >
             <span className="truncate pr-4">{invitation?.token}</span>
             <BaseButton
               onClick={handleCopy}
-              className="flex-shrink-0 px-3 py-1.5 rounded-md bg-zinc-700/50 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-600"
+              className={`flex-shrink-0 px-3 py-1.5 rounded-md transition-colors focus:outline-none focus:ring-2 ${
+                theme === "dark"
+                  ? "bg-zinc-700/50 hover:bg-zinc-700 text-zinc-300 hover:text-white focus:ring-zinc-600"
+                  : "bg-gray-200 hover:bg-gray-300 text-gray-700 hover:text-gray-900 focus:ring-gray-400"
+              }`}
               type="button"
             >
               {copied ? (
@@ -73,8 +87,12 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
           </div>
 
           {/* Instructions */}
-          <div className="text-left space-y-3 text-sm text-zinc-400 bg-zinc-800/30 p-4 rounded-lg border border-zinc-700/50">
-            <h3 className="font-medium text-white">Next Steps:</h3>
+          <div
+            className={`text-left space-y-3 text-sm p-4 rounded-lg border transition-colors duration-200 ${
+              theme === "dark" ? "text-zinc-400 bg-zinc-800/30 border-zinc-700/50" : "text-gray-600 bg-gray-50 border-gray-200"
+            }`}
+          >
+            <h3 className={`font-medium transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Next Steps:</h3>
             <ol className="list-decimal list-inside space-y-2">
               <li>Share this token securely with your chosen Squad Commander</li>
               <li>They will use this token to register and join your team</li>
@@ -85,7 +103,11 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
 
           <BaseButton
             onClick={onCloseModal}
-            className="w-full px-4 py-2.5 text-sm font-medium text-zinc-300 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-600"
+            className={`w-full px-4 py-2.5 text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 ${
+              theme === "dark"
+                ? "text-zinc-300 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 focus:ring-zinc-600"
+                : "text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 focus:ring-gray-400"
+            }`}
           >
             Close
           </BaseButton>
@@ -93,22 +115,34 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
       ) : (
         <div className="flex flex-col items-center text-center px-4 sm:px-6 h-full w-full space-y-6">
           <div className="space-y-2">
-            <h2 className="text-lg sm:text-xl font-semibold text-white">Invite Your Squad Commander</h2>
-            <p className="text-sm text-zinc-400 max-w-md">Generate and share the invite token below to onboard your Squad Commander.</p>
+            <h2 className={`text-lg sm:text-xl font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+              Invite Your Squad Commander
+            </h2>
+            <p className={`text-sm max-w-md transition-colors duration-200 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+              Generate and share the invite token below to onboard your Squad Commander.
+            </p>
           </div>
 
           <BaseButton
             onClick={() => setShowInfo(!showInfo)}
-            className="flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-300 transition-colors"
+            className={`flex items-center gap-2 text-sm transition-colors ${
+              theme === "dark" ? "text-zinc-400 hover:text-zinc-300" : "text-gray-600 hover:text-gray-700"
+            }`}
           >
             <Info className="w-4 h-4" />
             {showInfo ? "Hide Process Details" : "Show Process Details"}
           </BaseButton>
 
           {showInfo && (
-            <div className="w-full text-left space-y-4 text-sm text-zinc-400 bg-zinc-800/30 p-4 rounded-lg border border-zinc-700/50">
+            <div
+              className={`w-full text-left space-y-4 text-sm p-4 rounded-lg border transition-colors duration-200 ${
+                theme === "dark" ? "text-zinc-400 bg-zinc-800/30 border-zinc-700/50" : "text-gray-600 bg-gray-50 border-gray-200"
+              }`}
+            >
               <div className="space-y-3">
-                <h3 className="font-medium text-white">Team Manager Process:</h3>
+                <h3 className={`font-medium transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  Team Manager Process:
+                </h3>
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Generate a unique invitation token</li>
                   <li>Share the token securely with your Squad Commander</li>
@@ -118,7 +152,9 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
               </div>
 
               <div className="space-y-3">
-                <h3 className="font-medium text-white">Squad Commander Process:</h3>
+                <h3 className={`font-medium transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  Squad Commander Process:
+                </h3>
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Receive the invitation token from Team Manager</li>
                   <li>Use the token to register and join the team</li>
@@ -132,7 +168,11 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
           <button
             onClick={handleInvite}
             disabled={loading}
-            className="w-full px-4 py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-900 disabled:opacity-60 disabled:cursor-not-allowed"
+            className={`w-full px-4 py-2.5 text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed ${
+              theme === "dark"
+                ? "text-white bg-indigo-600 hover:bg-indigo-500 focus:ring-indigo-500 focus:ring-offset-zinc-900"
+                : "text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-gray-50"
+            }`}
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
