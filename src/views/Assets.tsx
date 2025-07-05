@@ -249,35 +249,25 @@ export default function AssetsPage() {
           </div>
 
           {activeTab === "weapons" ? (
-            <div
-              className={`rounded-lg border transition-colors duration-200 ${
-                theme === "dark" ? "bg-[#1A1A1A] border-white/10" : "bg-white border-gray-200"
-              }`}
-            >
-              <div className="p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-1 h-6 bg-blue-400 rounded-full"></div>
-                  <h2 className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                    Weapons Inventory
-                  </h2>
-                  <div
-                    className={`px-3 py-1 text-sm rounded border ${
-                      theme === "dark" ? "bg-blue-500/20 text-blue-200 border-blue-500/30" : "bg-blue-100 text-blue-700 border-blue-300"
-                    }`}
-                  >
-                    {weapons.length} items
-                  </div>
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-1 h-6 bg-blue-400 rounded-full"></div>
+                <h2 className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  Weapons Inventory
+                </h2>
+                <div
+                  className={`px-3 py-1 text-sm rounded border ${
+                    theme === "dark" ? "bg-blue-500/20 text-blue-200 border-blue-500/30" : "bg-blue-100 text-blue-700 border-blue-300"
+                  }`}
+                >
+                  {weapons.length} items
                 </div>
-                <AssetsWeaponsTable weapons={weapons} />
               </div>
+              <AssetsWeaponsTable weapons={weapons} />
             </div>
           ) : (
-            <div
-              className={`rounded-lg border transition-colors duration-200 ${
-                theme === "dark" ? "bg-[#1A1A1A] border-white/10" : "bg-white border-gray-200"
-              }`}
-            >
-              <div className="p-6">
+            <div>
+              <div>
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-1 h-6 bg-emerald-400 rounded-full"></div>
                   <h2 className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
@@ -293,8 +283,8 @@ export default function AssetsPage() {
                     {equipments.length} items
                   </div>
                 </div>
-                <AssetsEquipmentTable equipments={equipments} />
               </div>
+              <AssetsEquipmentTable equipments={equipments} />
             </div>
           )}
         </div>

@@ -24,6 +24,7 @@ export enum TrainingStatus {
   InProgress = "in_progress",
   Completed = "completed",
   Canceled = "canceled",
+  Finished = "finished",
 }
 
 export interface WeeklyAssignmentStats {
@@ -51,10 +52,17 @@ export interface TrainingSession {
   date: string; // ISO string
   session_name: string;
   location: string;
+  assignments?: Assignment[];
   team_id?: string;
   assignment_sessions?: Assignment[];
   participants?: TrainingParticipant[];
   status: TrainingStatus;
+  creator_id: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+  };
 }
 
 export interface TrainingSessionChart {

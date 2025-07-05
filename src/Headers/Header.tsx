@@ -29,7 +29,11 @@ export default function Header({ children, title }: { children: React.ReactNode;
       </div>
       <div className="flex items-center">
         {isMobile && <List className={`w-5 h-5 mr-3 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} onClick={toggleDrawer} />}
-        <h2 className={`text-xl font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{title}</h2>
+        <span
+          className={`${isMobile ? "text-lg" : "text-xl"} font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+        >
+          {title}
+        </span>
       </div>
       <div className="flex items-center gap-2">
         {children}

@@ -2,14 +2,11 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { TrainingStore } from "@/store/trainingStore";
 import { useStore } from "zustand";
-import { TrainingSession, TrainingStatus } from "@/types/training";
-import { isCommander } from "@/utils/permissions";
-import { userStore } from "@/store/userStore";
+import { TrainingStatus } from "@/types/training";
 import ConfirmStatusChangeModal from "@/components/ConfirmStatusChangeModal";
 import { supabase } from "@/services/supabaseClient";
 import EditTrainingSessionModal from "@/components/EditTrainingSessionModal";
 import { teamStore } from "@/store/teamStore";
-import TrainingPageChangeStatus from "@/components/TrainingPageChangeStatus";
 import { scoreStore } from "@/store/scoreSrore";
 import { loaderStore } from "@/store/loaderStore";
 import { useModal } from "@/hooks/useModal";
@@ -17,26 +14,26 @@ import AddAssignmentModal from "@/components/AddAssignmentModal";
 import Header from "@/Headers/Header";
 import { format, parseISO } from "date-fns";
 import ScoreDistanceChart from "@/components/ScoreDistanceChart";
-import ScoreDistanceTable from "@/components/ScoreDistnaceTable";
 import { ScoreTarget } from "@/types/score";
 import TrainingPageScoreFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModal";
-import { Plus } from "lucide-react";
-import TrainingScoresTable from "@/components/TrainingScoresTable";
+import { Plus, Calendar, Activity, Target, User, Edit, Eye } from "lucide-react";
 import ScoreDetailsModal from "@/components/ScoreDetailsModal";
 import BaseButton from "@/components/BaseButton";
 import { isMobile } from "react-device-detect";
 import { useTheme } from "@/contexts/ThemeContext";
+import { BiCurrentLocation } from "react-icons/bi";
+import TrainingStatusButtons from "@/components/TrainingStatusButtons";
+import { isCommander } from "@/utils/permissions";
+import { userStore } from "@/store/userStore";
 
 export default function TrainingPage() {
   const { id } = useParams();
   const { theme } = useTheme();
-
+  const { userRole } = useStore(userStore);
   const { training, loadTrainingById, loadAssignments, createAssignment, assignments } = useStore(TrainingStore);
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { isOpen: isAddScoreOpen, setIsOpen: setIsAddScoreOpen, toggleIsOpen: toggleIsAddScoreOpen } = useModal();
-
-  const { userRole } = useStore(userStore);
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
@@ -45,6 +42,7 @@ export default function TrainingPage() {
   const [isScoreDetailsOpen, setIsScoreDetailsOpen] = useState(false);
   const [newlyAddedScoreId, setNewlyAddedScoreId] = useState<string | null>(null);
   const [editingScore, setEditingScore] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<"scores" | "analytics" | "status">("scores");
   const { setIsLoading } = useStore(loaderStore);
   const { members } = useStore(teamStore);
   const {
@@ -146,47 +144,267 @@ export default function TrainingPage() {
 
   return (
     <div className={`min-h-screen w-full transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>
-      <Header title="Training">
-        <span className="flex items-center rounded-full bg-indigo-500/20 py-1.5 px-3 text-sm font-medium text-indigo-300">{formattedDate}</span>
-      </Header>
+      <Header title="Training Session"> </Header>
 
-      <main className="mt-6 space-y-4 px-4 pb-10 md:space-y-4 md:px-6 2xl:px-10 w-full">
-        <div className="flex items-center justify-end w-full mb-4">
-          <BaseButton
-            type="button"
-            onClick={() => toggleIsAddScoreOpen()}
-            style="purple"
-            className={["px-4 py-1.5  flex items-center gap-2", isMobile && "w-full"].join(" ")}
-          >
-            <span className="text-xs font-medium">Add Score</span>
-            <Plus size={12} />
-          </BaseButton>
+      <main className="mt-2 space-y-4 px-4 pb-10 md:space-y-4 md:px-6 2xl:px-10 w-full">
+        {/* Session Header Card */}
+
+        <div className={`p-4 rounded-2xl transition-all duration-200`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className={`p-3 rounded-xl ${theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"}`}>
+                <BiCurrentLocation className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+              </div>
+              <div>
+                <h2 className={`text-lg font-bold ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>{training?.session_name}</h2>
+                <div className="flex items-center gap-4 mt-1">
+                  <div className={`flex items-center gap-1.5 text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                    <Calendar className="w-4 h-4" />
+                    <span>{formattedDate}</span>
+                  </div>
+                  {training?.status && (
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs  ${
+                        training.status === TrainingStatus.Scheduled
+                          ? theme === "dark"
+                            ? "bg-blue-500/20 text-blue-300"
+                            : "bg-blue-100 text-blue-700"
+                          : training.status === TrainingStatus.InProgress
+                            ? theme === "dark"
+                              ? "bg-yellow-500/20 text-yellow-300"
+                              : "bg-yellow-100 text-yellow-700"
+                            : theme === "dark"
+                              ? "bg-green-500/20 text-green-300"
+                              : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      <Activity className="w-3 h-3" />
+                      {training.status}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Add Score Button */}
+            <BaseButton
+              type="button"
+              disabled={training?.status === TrainingStatus.Completed}
+              onClick={() => toggleIsAddScoreOpen()}
+              style="purple"
+              className={`flex mt-2 items-center gap-2 font-medium transition-all duration-200 ${
+                isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-sm " : "px-4 py-2.5 rounded-lg text-sm hover:shadow-lg"
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              <Plus size={16} />
+              <span>Add Score</span>
+            </BaseButton>
+          </div>
         </div>
 
-        <div className="grid gap-4 grid-cols-1 lg:grid-cols-12">
-          {/* distance accuracy – chart */}
-          <div className="col-span-1 lg:col-span-8">
-            <ScoreDistanceChart rows={scoreRanges as unknown as ScoreTarget[]} />
-          </div>
+        {/* Tabs */}
+        <div className={`border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+          <nav className="flex space-x-8" aria-label="Tabs">
+            {[
+              { id: "scores", label: "Scores", icon: Target },
+              { id: "analytics", label: "Analytics", icon: Activity },
+              { id: "status", label: "Status", icon: Calendar },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as "scores" | "analytics" | "status")}
+                  className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                    activeTab === tab.id
+                      ? theme === "dark"
+                        ? "border-purple-400 text-purple-400"
+                        : "border-purple-500 text-purple-600"
+                      : theme === "dark"
+                        ? "border-transparent text-gray-400 hover:text-gray-300"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
 
-          {/* per-distance breakdown – table */}
-          <div className="col-span-1 lg:col-span-4">
-            <ScoreDistanceTable rows={scoreRanges as unknown as ScoreTarget[]} />
-          </div>
+        {/* Tab Content */}
+        <div className="mt-6">
+          {activeTab === "scores" && (
+            <div className="space-y-4">
+              {/* Scores Grid */}
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                {scores.map((score: any) => {
+                  const isNewlyAdded = newlyAddedScoreId === score.id;
+                  return (
+                    <div
+                      key={score.id}
+                      className={`
+                        relative p-4 rounded-2xl transition-all duration-300 cursor-pointer
+                        ${
+                          theme === "dark"
+                            ? "bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700"
+                            : "bg-white border border-gray-100 shadow-sm hover:shadow-md"
+                        }
+                        ${isNewlyAdded ? "bg-indigo-500/20 border-indigo-400/50 animate-pulse" : ""}
+                      `}
+                      onClick={() => handleScoreClick(score)}
+                    >
+                      {/* Assignment Name */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <Target className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                        <h3
+                          className={`text-sm font-semibold truncate transition-colors duration-200 ${
+                            theme === "dark" ? "text-white" : "text-gray-900"
+                          }`}
+                        >
+                          {score.assignment_session?.assignment?.assignment_name || "N/A"}
+                        </h3>
+                      </div>
 
-          <div className="col-span-1 lg:col-span-12">
-            <TrainingScoresTable
-              scores={scores}
-              onScoreClick={handleScoreClick}
-              onEditClick={handleEditScore}
-              newlyAddedScoreId={newlyAddedScoreId}
-            />
-          </div>
+                      {/* Participant Info */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <User className="w-4 h-4 text-gray-500" />
+                        <span className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                          {score.score_participants?.[0]?.user
+                            ? `${score.score_participants[0].user.first_name} ${score.score_participants[0].user.last_name}`
+                            : "N/A"}
+                        </span>
+                      </div>
 
-          {/* commander-only status controls */}
-          {isCommander(userRole) && (
-            <div className="col-span-1 lg:col-span-12">
-              <TrainingPageChangeStatus training={training as TrainingSession} onStatusChange={handleStatusChange} />
+                      {/* Position/Status */}
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-gray-200" : "text-gray-900"}`}
+                        >
+                          {score.position || "N/A"}
+                        </span>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleScoreClick(score);
+                            }}
+                            className={`p-2 rounded-lg transition-colors ${
+                              theme === "dark"
+                                ? "hover:bg-indigo-600/20 text-indigo-400 hover:text-indigo-300"
+                                : "hover:bg-indigo-100 text-indigo-600 hover:text-indigo-700"
+                            }`}
+                            title="View Details"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditScore(score);
+                            }}
+                            className={`p-2 rounded-lg transition-colors ${
+                              theme === "dark"
+                                ? "hover:bg-amber-600/20 text-amber-400 hover:text-amber-300"
+                                : "hover:bg-amber-100 text-amber-600 hover:text-amber-700"
+                            }`}
+                            title="Edit Score"
+                          >
+                            <Edit size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Empty State */}
+              {scores.length === 0 && (
+                <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+                  <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <h3 className="text-lg font-medium mb-2">No scores yet</h3>
+                  <p className="text-sm">Add your first score to get started</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "analytics" && (
+            <div className="space-y-6">
+              <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+                {/* Chart */}
+                <div className="lg:col-span-2">
+                  <ScoreDistanceChart rows={scoreRanges as unknown as ScoreTarget[]} />
+                </div>
+
+                {/* Analytics placeholder */}
+                <div className={`p-6 rounded-2xl ${theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-white border border-gray-100"}`}>
+                  <h3 className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Performance Analytics</h3>
+                  <div className={`text-center py-8 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+                    <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-sm">Analytics dashboard coming soon</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "status" && (
+            <div className="space-y-6">
+              {/* Status Controls */}
+              {isCommander(userRole) && (
+                <div className={`p-6 rounded-2xl ${theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-white border border-gray-100"}`}>
+                  <h3 className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Training Status Management</h3>
+                  <TrainingStatusButtons currentStatus={training?.status as TrainingStatus} onStatusChange={handleStatusChange} />
+                </div>
+              )}
+
+              {/* Status Information */}
+              <div className={`p-6 rounded-2xl ${theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-white border border-gray-100"}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Session Information</h3>
+                <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Current Status</label>
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${
+                        training?.status === TrainingStatus.Scheduled
+                          ? theme === "dark"
+                            ? "bg-blue-500/20 text-blue-300"
+                            : "bg-blue-100 text-blue-700"
+                          : training?.status === TrainingStatus.InProgress
+                            ? theme === "dark"
+                              ? "bg-yellow-500/20 text-yellow-300"
+                              : "bg-yellow-100 text-yellow-700"
+                            : theme === "dark"
+                              ? "bg-green-500/20 text-green-300"
+                              : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      {training?.status}
+                    </span>
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Participants</label>
+                    <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                      {training?.participants?.length || 0} registered
+                    </span>
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Total Scores</label>
+                    <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>{scores.length} recorded</span>
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Assignments</label>
+                    <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                      {training?.assignments?.length || 0} assigned
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>

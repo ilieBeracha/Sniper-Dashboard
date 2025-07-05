@@ -10,6 +10,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import BaseDashboardCard from "./BaseDashboardCard";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
+import { isMobile } from "react-device-detect";
 
 type Tab = "active" | "canceled";
 
@@ -49,17 +50,82 @@ export default function TrainingList({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setIsAddTrainingOpen(true)}
-        className={` bg-indigo-600 hover:bg-indigo-500 justify-end  w-fit disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed flex items-center gap-2`}
-      >
-        <span className="text-xs font-medium">Add Training</span>
-        <Plus size={12} />
-      </button>
-      {trainings.length == 0 ? (
-        <TrainingListEmpty />
+      {/* Mobile Layout */}
+      {isMobile ? (
+        <div className="space-y-4">
+          {/* Add Training Button */}
+
+          {/* Category Pills */}
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            <button
+              onClick={() => setActiveTab("active")}
+              className={`flex-1 px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                activeTab === "active" ? "bg-zinc-600 text-white" : theme === "dark" ? "bg-zinc-800 text-zinc-400" : "bg-gray-100 text-gray-600"
+              }`}
+            >
+              Active
+            </button>
+            <button
+              onClick={() => setActiveTab("canceled")}
+              className={`flex-1 px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                activeTab === "canceled" ? "bg-zinc-600 text-white" : theme === "dark" ? "bg-zinc-800 text-zinc-400" : "bg-gray-100 text-gray-600"
+              }`}
+            >
+              Canceled
+            </button>
+          </div>
+
+          {/* Sessions List */}
+          <div className="space-y-3">
+            {activeTab === "active" ? (
+              <>
+                {todaySessions.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                      <div className="h-3 w-3 bg-green-400 rounded-full"></div> Today
+                    </h3>
+                    {todaySessions.map((s) => (
+                      <TrainingSessionCard key={s.id} session={s} highlight showDate={false} />
+                    ))}
+                  </div>
+                )}
+
+                {upcoming.length > 0 && (
+                  <div className="space-y-3 mt-6">
+                    <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                      <div className="h-3 w-3 bg-blue-600 rounded-full"></div> Upcoming <span className="text-xs">{upcoming.length}</span>
+                    </h3>
+                    {upcoming.map((s) => (
+                      <TrainingSessionCard key={s.id} session={s} />
+                    ))}
+                  </div>
+                )}
+
+                {past.length > 0 && (
+                  <div className="space-y-3 mt-6">
+                    <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                      <div className="h-3 w-3 bg-gray-600 rounded-full"></div> Past Sessions
+                    </h3>
+                    {past.map((s) => (
+                      <TrainingSessionCard key={s.id} session={s} isPast />
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="space-y-3">
+                <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                  <div className="h-3 w-3 bg-red-600 rounded-full"></div> Canceled Sessions
+                </h3>
+                {canceled.map((s) => (
+                  <TrainingSessionCard key={s.id} session={s} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       ) : (
+        // Desktop Layout (existing)
         <>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className={`flex items-center gap-2 text-sm font-medium transition-colors duration-200`}>
