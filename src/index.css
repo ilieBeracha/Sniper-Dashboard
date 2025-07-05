@@ -1,27 +1,6 @@
 @import "tailwindcss";
 @plugin "flowbite-react/plugin/tailwindcss";
 @source "../.flowbite-react/class-list.json";
-/* src/index.css */
-/* body {
-  font-family: "Roboto", sans-serif;
-}
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-input,
-textarea,
-select,
-label,
-span,
-button,
-a,
-div {
-  color: white !important;
-} */
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -72,7 +51,9 @@ button {
 /* Theme transitions */
 .dark,
 .light {
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
 }
 
 /* Light theme overrides */

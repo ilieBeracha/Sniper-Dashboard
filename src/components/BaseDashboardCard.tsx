@@ -21,7 +21,7 @@ export default function BaseDashboardCard({
   const { theme } = useTheme();
 
   const cardClassName = `relative h-full flex flex-col transition-all text-sm duration-300 rounded-lg border ${
-    theme === "dark" ? "bg-[#1A1A1A] border-white/10 shadow-lg shadow-black/20" : "bg-white border-gray-200 shadow-sm shadow-gray-200/50"
+    theme === "dark" ? "bg-[#1A1AA] border-white/10 shadow-lg shadow-black/20" : "bg-white border-gray-200 shadow-sm shadow-gray-200/50"
   } ${isMobile ? "" : "h-full"}`;
 
   if (!header) {

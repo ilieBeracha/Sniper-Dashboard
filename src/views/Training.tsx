@@ -285,15 +285,14 @@ export default function TrainingPage() {
         <div className="mt-6">
           {activeTab === "scores" && (
             <div className="space-y-4 w-full">
-              {/* Scores Grid */}
-              <TrainingScoresTable
-                scores={scores}
-                onScoreClick={handleScoreClick}
-                onEditClick={handleEditScore}
-                newlyAddedScoreId={newlyAddedScoreId}
-              />
-
-              {/* Empty State */}
+              {scores.length > 0 && (
+                <TrainingScoresTable
+                  scores={scores}
+                  onScoreClick={handleScoreClick}
+                  onEditClick={handleEditScore}
+                  newlyAddedScoreId={newlyAddedScoreId}
+                />
+              )}
               {scores.length === 0 && (
                 <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
                   <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
