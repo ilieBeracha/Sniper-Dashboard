@@ -1,19 +1,22 @@
-import { TrainingSession, TrainingStatus } from "@/types/training";
+import { TrainingSession } from "@/types/training";
 import { parseISO, isToday, isPast, isFuture } from "date-fns";
 import { TrainingSessionCard } from "./TrainingSessionCard";
 import TrainingSessionGroup from "./TrainingSessionGroup";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import TrainingCalendar from "./TrainingCalendar";
 import { useTheme } from "@/contexts/ThemeContext";
 import BaseDashboardCard from "./BaseDashboardCard";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
 import { isMobile } from "react-device-detect";
+import { Target } from "lucide-react";
 
-type Tab = "active" | "canceled";
+interface TrainingListProps {
+  trainings: TrainingSession[];
+  totalCount?: number;
+}
 
-export default function TrainingList({ trainings }: { trainings: TrainingSession[] }) {
-  const [activeTab, setActiveTab] = useState<Tab>("active");
+export default function TrainingList({ trainings, totalCount }: TrainingListProps) {
   const { theme } = useTheme();
   const { getOverallAccuracyStats, overallAccuracyStats } = useStore(performanceStore);
 
@@ -21,9 +24,8 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
     getOverallAccuracyStats();
   }, []);
 
-  const sorted = [...trainings].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  const active = sorted.filter((s) => s.status !== TrainingStatus.Canceled);
-  const canceled = sorted.filter((s) => s.status === TrainingStatus.Canceled);
+  // Use provided trainings directly
+  const active = trainings;
 
   const today = new Date();
   const todaySessions = active.filter((s) => isToday(parseISO(s.date)));
@@ -45,134 +47,93 @@ export default function TrainingList({ trainings }: { trainings: TrainingSession
       {/* Mobile Layout */}
       {isMobile ? (
         <div className="space-y-4">
-          {/* Add Training Button */}
-
-          {/* Category Pills */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            <button
-              onClick={() => setActiveTab("active")}
-              className={`flex-1 px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                activeTab === "active" ? "bg-zinc-600 text-white" : theme === "dark" ? "bg-zinc-800 text-zinc-400" : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              Active
-            </button>
-            <button
-              onClick={() => setActiveTab("canceled")}
-              className={`flex-1 px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                activeTab === "canceled" ? "bg-zinc-600 text-white" : theme === "dark" ? "bg-zinc-800 text-zinc-400" : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              Canceled
-            </button>
+          {/* Tabs */}
+          <div className={`border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+            <nav className="flex space-x-8  items-center" aria-label="Tabs">
+              <button
+                className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                  theme === "dark" ? "border-purple-400 text-purple-400" : "border-purple-500 text-purple-600"
+                }`}
+              >
+                <Target className="w-4 h-4" />
+                Active {totalCount ? `(${totalCount})` : ""}
+              </button>
+            </nav>
           </div>
 
           {/* Sessions List */}
           <div className="space-y-3">
-            {activeTab === "active" ? (
-              <>
-                {todaySessions.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                      <div className="h-3 w-3 bg-green-400 rounded-full"></div> Today
-                    </h3>
-                    {todaySessions.map((s) => (
-                      <TrainingSessionCard key={s.id} session={s} highlight showDate={false} />
-                    ))}
-                  </div>
-                )}
-
-                {upcoming.length > 0 && (
-                  <div className="space-y-3 mt-6">
-                    <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                      <div className="h-3 w-3 bg-blue-600 rounded-full"></div> Upcoming <span className="text-xs">{upcoming.length}</span>
-                    </h3>
-                    {upcoming.map((s) => (
-                      <TrainingSessionCard key={s.id} session={s} />
-                    ))}
-                  </div>
-                )}
-
-                {past.length > 0 && (
-                  <div className="space-y-3 mt-6">
-                    <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                      <div className="h-3 w-3 bg-gray-600 rounded-full"></div> Past Sessions
-                    </h3>
-                    {past.map((s) => (
-                      <TrainingSessionCard key={s.id} session={s} isPast />
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : (
+            {todaySessions.length > 0 && (
               <div className="space-y-3">
                 <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                  <div className="h-3 w-3 bg-red-600 rounded-full"></div> Canceled Sessions
+                  <div className="h-3 w-3 bg-green-400 rounded-full"></div> Today
                 </h3>
-                {canceled.map((s) => (
+                {todaySessions.map((s) => (
+                  <TrainingSessionCard key={s.id} session={s} highlight showDate={false} />
+                ))}
+              </div>
+            )}
+
+            {upcoming.length > 0 && (
+              <div className="space-y-3 mt-6">
+                <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                  <div className="h-3 w-3 bg-blue-600 rounded-full"></div> Upcoming <span className="text-xs">{upcoming.length}</span>
+                </h3>
+                {upcoming.map((s) => (
                   <TrainingSessionCard key={s.id} session={s} />
+                ))}
+              </div>
+            )}
+
+            {past.length > 0 && (
+              <div className="space-y-3 mt-6">
+                <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                  <div className="h-3 w-3 bg-gray-600 rounded-full"></div> Past Sessions
+                </h3>
+                {past.map((s) => (
+                  <TrainingSessionCard key={s.id} session={s} isPast />
                 ))}
               </div>
             )}
           </div>
         </div>
       ) : (
-        // Desktop Layout (existing)
         <>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className={`flex items-center gap-2 text-sm font-medium transition-colors duration-200`}>
-              {(["active", "canceled"] as Tab[]).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`rounded-full px-4 py-1.5 transition-colors duration-200 ${
-                    activeTab === tab
-                      ? theme === "dark"
-                        ? "bg-white/80 text-gray-900"
-                        : "bg-gray-900 text-white"
-                      : theme === "dark"
-                        ? "bg-white/10 hover:bg-white/20 text-gray-200"
-                        : "bg-gray-200 hover:bg-gray-300 text-gray-600"
-                  }`}
-                >
-                  {tab === "active" ? "Active" : "Canceled"}
-                </button>
-              ))}
-            </div>
+          <div className={`border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+            <nav className="flex space-x-8 items-center" aria-label="Tabs">
+              <button
+                className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                  theme === "dark" ? "border-purple-400 text-purple-400" : "border-purple-500 text-purple-600"
+                }`}
+              >
+                <Target className="w-4 h-4" />
+                Active {totalCount ? `(${totalCount})` : ""}
+              </button>
+            </nav>
           </div>
 
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
             <div className="lg:col-span-8 space-y-6">
-              {activeTab === "active" ? (
-                <>
-                  {todaySessions.length > 0 && (
-                    <TrainingSessionGroup title="Today" color="green" date={today}>
-                      {todaySessions.map((s) => (
-                        <TrainingSessionCard key={s.id} session={s} highlight showDate={false} />
-                      ))}
-                    </TrainingSessionGroup>
-                  )}
+              {todaySessions.length > 0 && (
+                <TrainingSessionGroup title="Today" color="green" date={today}>
+                  {todaySessions.map((s) => (
+                    <TrainingSessionCard key={s.id} session={s} highlight showDate={false} />
+                  ))}
+                </TrainingSessionGroup>
+              )}
 
-                  {upcoming.length > 0 && (
-                    <TrainingSessionGroup title="Upcoming" color="blue">
-                      {upcoming.map((s) => (
-                        <TrainingSessionCard key={s.id} session={s} />
-                      ))}
-                    </TrainingSessionGroup>
-                  )}
-
-                  {past.length > 0 && (
-                    <TrainingSessionGroup title="Past Sessions" color="gray">
-                      {past.map((s) => (
-                        <TrainingSessionCard key={s.id} session={s} isPast />
-                      ))}
-                    </TrainingSessionGroup>
-                  )}
-                </>
-              ) : (
-                <TrainingSessionGroup title="Canceled Sessions" color="red">
-                  {canceled.map((s) => (
+              {upcoming.length > 0 && (
+                <TrainingSessionGroup title="Upcoming" color="blue">
+                  {upcoming.map((s) => (
                     <TrainingSessionCard key={s.id} session={s} />
+                  ))}
+                </TrainingSessionGroup>
+              )}
+
+              {past.length > 0 && (
+                <TrainingSessionGroup title="Past Sessions" color="gray">
+                  {past.map((s) => (
+                    <TrainingSessionCard key={s.id} session={s} isPast />
                   ))}
                 </TrainingSessionGroup>
               )}

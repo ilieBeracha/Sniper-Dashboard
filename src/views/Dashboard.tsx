@@ -47,22 +47,18 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className={`min-h-[calc(100dvh-100px)] transition-colors duration-200 ${
-      theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-    }`}>
+    <div className={`min-h-[calc(100dvh-100px)] transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>
       <Header title="Overview">
-        <BaseButton 
+        <BaseButton
           className={`text-xs rounded-2xl px-4 py-1 cursor-pointer transition-colors duration-200 ${
-            theme === 'dark' 
-              ? 'bg-gray-700 text-white hover:bg-gray-600' 
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          }`} 
+            theme === "dark" ? "bg-gray-700 text-white hover:bg-gray-600" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
           onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}
         >
           Invite
         </BaseButton>
       </Header>
-      <div className="grid grid-cols-1 gap-4 p-4 md:p-6 2xl:p-10">
+      <div className="grid grid-cols-1 gap-4 px-4 md:px-6 py-4 2xl:px-6">
         <DashboardRowOne user={user} />
         <DashboardRowKPI />
         <DashboardRowThree loading={loading} />

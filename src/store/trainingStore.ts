@@ -4,6 +4,7 @@ import {
   getNextAndLastTraining,
   getTrainingById,
   getTrainingByTeamId,
+  getTrainingCountByTeamId,
   insertTraining,
   getWeeklyAssignmentsStats,
   insertAssignment,
@@ -19,7 +20,8 @@ interface TrainingStore {
   trainingsChartDisplay: TrainingsNextLastChart;
   weeklyAssignmentsStats: WeeklyAssignmentStats[] | [];
   loadNextAndLastTraining: (team_id: string) => Promise<void>;
-  loadTrainingByTeamId: (team_id: string) => Promise<void>;
+  loadTrainingByTeamId: (team_id: string, limit: number, range: number) => Promise<TrainingSession[] | any>;
+  getTrainingCountByTeamId: (team_id: string) => Promise<number>;
   loadAssignments: () => Promise<Assignment[] | any>;
   createTraining: (payload: TrainingSession) => Promise<TrainingSession | any>;
   loadTrainingById: (trainingId: string) => Promise<void>;
@@ -43,9 +45,14 @@ export const TrainingStore = create<TrainingStore>((set) => ({
     set({ training: res });
   },
 
-  loadTrainingByTeamId: async (teamId: string) => {
-    const res = await getTrainingByTeamId(teamId);
+  loadTrainingByTeamId: async (teamId: string, limit: number = 0, range: number = 0) => {
+    const res = await getTrainingByTeamId(teamId, limit, range);
     set({ trainings: res as any });
+    return res;
+  },
+
+  getTrainingCountByTeamId: async (teamId: string) => {
+    return await getTrainingCountByTeamId(teamId);
   },
 
   loadNextAndLastTraining: async (team_id: string) => {
