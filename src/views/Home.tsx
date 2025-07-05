@@ -57,43 +57,64 @@ export default function AppRoutes() {
     <Routes>
       {token ? (
         <Route element={<DefaultLayout />}>
-          <Route path="/" element={
-            <Suspense fallback={<LoadingFallback />}>
-              <Dashboard />
-            </Suspense>
-          } />
-          <Route path="/trainings" element={
-            <Suspense fallback={<LoadingFallback />}>
-              <Training />
-            </Suspense>
-          } />
-          <Route path="/ai" element={
-            <Suspense fallback={<LoadingFallback />}>
-              <Ai />
-            </Suspense>
-          } />
-          <Route path="/assets" element={
-            <Suspense fallback={<LoadingFallback />}>
-              <Assets />
-            </Suspense>
-          } />
-          <Route path="/training/:id" element={
-            <Suspense fallback={<LoadingFallback />}>
-              <TrainingPage />
-            </Suspense>
-          } />
-          <Route path="*" element={
+          <Route
+            path="/"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <Dashboard />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/trainings"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <Training />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/ai"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <Ai />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/assets"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <Assets />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/training/:id"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <TrainingPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <ErrorPage />
+              </Suspense>
+            }
+          />
+        </Route>
+      ) : (
+        <Route
+          path="*"
+          element={
             <Suspense fallback={<LoadingFallback />}>
               <ErrorPage />
             </Suspense>
-          } />
-        </Route>
-      ) : (
-        <Route path="*" element={
-          <Suspense fallback={<LoadingFallback />}>
-            <ErrorPage />
-          </Suspense>
-        } />
+          }
+        />
       )}
     </Routes>
   );

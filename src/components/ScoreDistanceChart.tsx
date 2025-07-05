@@ -7,12 +7,12 @@ export default function ScoreDistanceChart({ rows }: { rows: ScoreTarget[] | und
   const { theme } = useTheme();
   const data = rows
     ? Object.values(
-        (rows as ScoreTarget[]).reduce<Record<number, { distance: string; target_hit: number; shots_fired: number; accuracy: number }>>(
-          (acc, { distance, target_hit, shots_fired }) => {
-            const d = acc[distance] || { distance: `${distance}m`, target_hit: 0, shots_fired: 0, accuracy: 0 };
-            d.target_hit += target_hit;
+        (rows as ScoreTarget[]).reduce<Record<number, { distance: string; target_hits: number; shots_fired: number; accuracy: number }>>(
+          (acc, { distance, target_hits, shots_fired }) => {
+            const d = acc[distance] || { distance: `${distance}m`, target_hits: 0, shots_fired: 0, accuracy: 0 };
+            d.target_hits += target_hits || 0;
             d.shots_fired += shots_fired;
-            d.accuracy = d.shots_fired > 0 ? Math.round((d.target_hit / d.shots_fired) * 100) : 0;
+            d.accuracy = d.shots_fired > 0 ? Math.round((d.target_hits / d.shots_fired) * 100) : 0;
             acc[distance] = d;
             return acc;
           },

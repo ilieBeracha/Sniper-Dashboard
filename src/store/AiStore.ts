@@ -1,10 +1,6 @@
 import { create } from "zustand";
-import { createOpenAI } from "@ai-sdk/openai";
-import { generateText, type Message } from "ai";
-import { f3cPrompt, getUserFullProfile } from "@/services/ai";
-import { userStore } from "@/store/userStore";
-
-const openai = createOpenAI({ apiKey: import.meta.env.VITE_OPENAI_API_KEY });
+import { type Message } from "ai";
+import { askAssistant } from "@/services/embeddingService";
 
 interface AiStore {
   isLoading: boolean;
@@ -20,8 +16,6 @@ interface AiStore {
   addMessage: (message: Message) => void;
   clearMessages: () => void;
   resetChat: () => void;
-  fetchUserProfile: (user_id: string) => Promise<void>;
-  initializeAi: (userFullProfile: string) => Promise<void>;
   generateAnswer: (prompt: string) => Promise<string>;
 }
 
@@ -40,56 +34,34 @@ export const useAiStore = create<AiStore>((set, get) => ({
   clearMessages: () => set({ chatMessages: [] }),
   resetChat: () => set({ chatMessages: [], aiResponse: "", isLoading: false, isError: false }),
 
-  fetchUserProfile: async (user_id) => {
-    const { data, error } = await getUserFullProfile(user_id);
-    if (error) throw error;
-
-    set({ userFullProfile: data });
-
-    await get().initializeAi(data); // ✅ must pass data into the prompt
-  },
-
-  initializeAi: async (userFullProfile: string) => {
-    const systemMessage: Message = {
-      id: `system-${Date.now()}`,
-      role: "system",
-      content:
-        f3cPrompt +
-        "\n\nF3C Records:\n" +
-        userFullProfile +
-        "\n\nUser: " +
-        JSON.stringify(userStore.getState().user, null, 2) +
-        "\n\nAnswer only using this data. and keep in mind that user is relevant to the conversation. he is the one who is asking the questions. and has a full training profile. with identifiers",
-    };
-    set({ chatMessages: [systemMessage] });
-  },
-
-  generateAnswer: async (prompt: string) => {
+  generateAnswer: async (prompt: string): Promise<string> => {
     const { chatMessages } = get();
+
+    console.log(chatMessages);
 
     const messages: Message[] = [...chatMessages, { id: `user-${Date.now()}`, role: "user", content: prompt }];
 
+    console.log(messages);
     set({ isLoading: true, isError: false, chatMessages: messages });
-
+    
     try {
-      const { text } = await generateText({
-        model: openai("gpt-3.5-turbo"),
-        messages: messages.map(({ role, content }) => ({ role, content })),
-      });
-
+      const text = await askAssistant(prompt);
+      console.log(text);
+      
       const aiMessage: Message = {
         id: `ai-${Date.now()}`,
         role: "assistant",
-        content: text,
+        content: text || "",
       };
+      console.log(aiMessage);
 
       set({
-        aiResponse: text,
+        aiResponse: text || "",
         chatMessages: [...messages, aiMessage],
         isLoading: false,
       });
 
-      return text;
+      return text || "";
     } catch (err) {
       console.error("Error generating text:", err);
       set({

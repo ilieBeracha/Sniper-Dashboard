@@ -1,23 +1,9 @@
-import { useEffect } from "react";
-import { useStore } from "zustand";
-import { useAiStore } from "@/store/AiStore";
-import { userStore } from "@/store/userStore";
 import AiForm from "@/components/AiForm";
 import Header from "@/Headers/Header";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function Ai() {
-  const { fetchUserProfile } = useAiStore();
-  const { user } = useStore(userStore);
   const isMobile = useIsMobile();
-  useEffect(() => {
-    const initialize = async () => {
-      if (user?.id) {
-        await fetchUserProfile(user.id);
-      }
-    };
-    initialize();
-  }, [user]);
 
   return (
     <div className="h-screen flex flex-col text-gray-100  `">

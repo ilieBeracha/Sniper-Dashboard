@@ -78,7 +78,9 @@ export const TrainingStore = create<TrainingStore>((set) => ({
 
   loadAssignments: async () => {
     try {
-      const res = await getAssignments();
+      const { user } = userStore.getState();
+      if (!user?.team_id) return;
+      const res = await getAssignments(user.team_id);
       set({ assignments: res });
       return res;
     } catch (error) {

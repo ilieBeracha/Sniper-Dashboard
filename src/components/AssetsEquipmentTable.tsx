@@ -52,7 +52,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
 
   const handleSaveEquipment = async () => {
     if (!editingEquipment?.id) return;
-    
+
     try {
       await updateEquipment(editingEquipment.id, editForm);
       setEditingEquipment(null);
@@ -96,7 +96,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
                 } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
               />
             </div>
-            
+
             {/* Equipment Type Filter */}
             <select
               value={equipmentTypeFilter}
@@ -164,7 +164,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
               <th className="px-4 py-3">Equipment Type</th>
               <th className="px-4 py-3">Serial Number</th>
               <th className="px-4 py-3">Day/Night</th>
-              <th className="px-4 py-3">Created</th>
+              {equipments.some((equipment) => equipment.created_at) && <th className="px-4 py-3">Created</th>}
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
@@ -186,9 +186,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
                         value={editForm.equipment_type || ""}
                         onChange={(e) => setEditForm({ ...editForm, equipment_type: e.target.value })}
                         className={`w-full px-2 py-1 rounded border text-sm ${
-                          theme === "dark"
-                            ? "border-zinc-600 bg-zinc-700 text-white"
-                            : "border-gray-300 bg-white text-gray-900"
+                          theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
                         }`}
                       >
                         <option value="">Select type</option>
@@ -209,9 +207,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
                         value={editForm.serial_number || ""}
                         onChange={(e) => setEditForm({ ...editForm, serial_number: e.target.value })}
                         className={`w-full px-2 py-1 rounded border text-sm ${
-                          theme === "dark"
-                            ? "border-zinc-600 bg-zinc-700 text-white"
-                            : "border-gray-300 bg-white text-gray-900"
+                          theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
                         }`}
                       />
                     ) : (
@@ -224,9 +220,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
                         value={editForm.day_night || ""}
                         onChange={(e) => setEditForm({ ...editForm, day_night: e.target.value })}
                         className={`w-full px-2 py-1 rounded border text-sm ${
-                          theme === "dark"
-                            ? "border-zinc-600 bg-zinc-700 text-white"
-                            : "border-gray-300 bg-white text-gray-900"
+                          theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
                         }`}
                       >
                         <option value="">Select</option>
@@ -243,7 +237,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3">{format(new Date(equipment.created_at), "yyyy-MM-dd HH:mm")}</td>
+                  {equipment.created_at && <td className="px-4 py-3">{format(new Date(equipment.created_at), "yyyy-MM-dd HH:mm")}</td>}
                   <td className="px-4 py-3 text-right">
                     <div className="inline-flex gap-2">
                       {isEditing ? (
@@ -259,9 +253,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className={`p-2 rounded hover:bg-red-100 dark:hover:bg-red-800/40 ${
-                              theme === "dark" ? "text-red-400" : "text-red-600"
-                            }`}
+                            className={`p-2 rounded hover:bg-red-100 dark:hover:bg-red-800/40 ${theme === "dark" ? "text-red-400" : "text-red-600"}`}
                             title="Cancel"
                           >
                             <X size={16} />

@@ -18,6 +18,8 @@ import { Link } from "react-router-dom";
 import { isMobile } from "react-device-detect";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import { toast } from "react-toastify";
+import { BASE_EQUIPMENTS } from "@/utils/BaseData/BaseEquipments";
+import { BASE_WEAPONS } from "@/utils/BaseData/BaseWeapons";
 
 export default function AssetsPage() {
   const { weapons, createWeapon } = useStore(weaponsStore);
@@ -30,6 +32,9 @@ export default function AssetsPage() {
 
   const [formType, setFormType] = useState<"weapons" | "equipments" | "">("");
   const [activeTab, setActiveTab] = useState<"weapons" | "equipments">("weapons");
+
+  const baseEquipments = BASE_EQUIPMENTS.map((equipment) => ({ ...equipment, team_id: user?.team_id }));
+  const baseWeapons = BASE_WEAPONS.map((weapon) => ({ ...weapon, team_id: user?.team_id }));
 
   const teamId = user?.team_id;
 
@@ -101,6 +106,11 @@ export default function AssetsPage() {
         onChange={(e) => setWeaponForm({ ...weaponForm, weapon_type: e.target.value })}
       >
         <option value="">Select weapon</option>
+        {baseWeapons.map((weapon) => (
+          <option key={weapon.id} value={weapon.weapon_type}>
+            {weapon.weapon_type}
+          </option>
+        ))}
         {Array.from(weaponsTypes)?.map((weaponType, index) => {
           return (
             <option key={index} value={weaponType}>
@@ -167,6 +177,11 @@ export default function AssetsPage() {
         onChange={(e) => setEquipmentForm({ ...equipmentForm, equipment_type: e.target.value })}
       >
         <option value="">Select equipment</option>
+        {baseEquipments.map((equipment) => (
+          <option key={equipment.id} value={equipment.equipment_type}>
+            {equipment.equipment_type}
+          </option>
+        ))}
         {Array.from(equipmentsTypes)?.map((equipmentsType, index) => {
           return (
             <option key={index} value={equipmentsType}>

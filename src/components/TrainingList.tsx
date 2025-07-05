@@ -5,7 +5,6 @@ import TrainingSessionGroup from "./TrainingSessionGroup";
 import { useEffect } from "react";
 import TrainingCalendar from "./TrainingCalendar";
 import { useTheme } from "@/contexts/ThemeContext";
-import BaseDashboardCard from "./BaseDashboardCard";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
 import { isMobile } from "react-device-detect";
@@ -18,7 +17,7 @@ interface TrainingListProps {
 
 export default function TrainingList({ trainings, totalCount }: TrainingListProps) {
   const { theme } = useTheme();
-  const { getOverallAccuracyStats, overallAccuracyStats } = useStore(performanceStore);
+  const { getOverallAccuracyStats } = useStore(performanceStore);
 
   useEffect(() => {
     getOverallAccuracyStats();
@@ -150,7 +149,7 @@ export default function TrainingList({ trainings, totalCount }: TrainingListProp
                 </h3>
                 <TrainingCalendar trainings={trainings} />
               </div>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-1 py-4 ">
+              {/* <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-1 py-4 ">
                 <BaseDashboardCard header="">
                   <div className="p-4 flex items-center justify-between">
                     <div>
@@ -214,7 +213,7 @@ export default function TrainingList({ trainings, totalCount }: TrainingListProp
                     </svg>
                   </div>
                 </BaseDashboardCard>
-              </div>
+              </div> */}
             </aside>
           </div>
         </>

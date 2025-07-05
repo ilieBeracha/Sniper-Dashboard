@@ -1,5 +1,5 @@
+import { compressToF3C } from "@/utils/compressToF3C";
 import { supabase } from "./supabaseClient";
-import { sha256 } from "crypto-hash";
 
 type TrainingRecord = {
   user_id: string;
@@ -21,41 +21,6 @@ export const getUserFullProfile = async (user_id: string) => {
   const compressedData = data.map((record: TrainingRecord) => compressToF3C(record)).join("\n");
   return { data: compressedData, error };
 };
-
-function compressToF3C(record: TrainingRecord): string {
-  const shortUid = async (uid: string): Promise<string> => (await sha256(uid)).slice(0, 6);
-
-  const shortDate = (iso?: string) => {
-    if (!iso) return "";
-    try {
-      const d = new Date(iso);
-      return d.toISOString().slice(2, 10).replace(/-/g, "");
-    } catch {
-      return "";
-    }
-  };
-
-  const boolToBin = (val?: boolean) => (val === true ? "1" : val === false ? "0" : "");
-
-  const parts1 = [
-    record.training_date ? `t:${shortDate(record.training_date)}` : "",
-    record.accuracy_percent !== undefined ? `a:${record.accuracy_percent}` : "",
-    record.target_eliminated !== undefined ? `e:${boolToBin(record.target_eliminated)}` : "",
-  ].filter(Boolean);
-
-  const parts2 = [record.weapon_type ? `w:${record.weapon_type}` : "", record.weapon_serial ? `s:${record.weapon_serial}` : ""].filter(Boolean);
-
-  const parts3 = [
-    record.distance !== undefined ? `d:${record.distance}` : "",
-    record.target_hits !== undefined ? `h:${record.target_hits}` : "",
-    record.shots_fired !== undefined ? `f:${record.shots_fired}` : "",
-  ].filter(Boolean);
-
-  const segments = [parts1.join(","), parts2.join(","), parts3.join(",")].filter(Boolean);
-  const uid = shortUid(record.user_id);
-
-  return `${uid}::${segments.join(";")}`;
-}
 
 export const f3cPrompt = `
 You are a smart, memory-based assistant. You are given a compressed dataset using the F3C format. Your first job is to decode the data internally into full structured memory, without ever telling the user what you’re doing.

@@ -184,8 +184,8 @@ export async function assignParticipantsToTraining(training_id: string, particip
   if (error) throw new Error(error.message);
 }
 
-export async function getAssignments(): Promise<Assignment[] | []> {
-  const { data, error } = await supabase.from("assignment").select("*");
+export async function getAssignments(teamId: string): Promise<Assignment[] | []> {
+  const { data, error } = await supabase.from("assignment").select("*").eq("team_id", teamId);
 
   if (error) {
     console.error("Failed to fetch assignments:", error.message);
