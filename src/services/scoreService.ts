@@ -1,6 +1,5 @@
 import { Score, ScoreParticipant, ScoreTarget } from "@/types/score";
 import { supabase } from "./supabaseClient";
-// import { ScoreFormValues } from "@/hooks/useScoreForm";
 
 export async function getUserGroupingScoresRpc(userId: string) {
   const { data, error } = await supabase.rpc("get_user_grouping_scores", {
@@ -19,10 +18,7 @@ export async function createScore(scoreData: Partial<Score>) {
 }
 export async function getScoresCountByTrainingId(training_id: string) {
   try {
-    const { count, error } = await supabase
-      .from("score")
-      .select("*", { count: "exact", head: true })
-      .eq("training_id", training_id);
+    const { count, error } = await supabase.from("score").select("*", { count: "exact", head: true }).eq("training_id", training_id);
 
     if (error) {
       console.error("Error fetching scores count:", error);
@@ -84,7 +80,7 @@ export async function getScoresByTrainingId(training_id: string, limit: number =
     }
 
     const { data, error } = await query;
-    
+
     if (error) {
       console.error("Error fetching scores:", error);
       throw new Error(`Failed to fetch scores: ${error.message}`);
