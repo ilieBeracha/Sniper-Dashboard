@@ -22,7 +22,7 @@ export default function TrainingCalendar({ trainings }: { trainings: TrainingSes
         </div>
 
         <div className="grid grid-cols-7 gap-1">
-          {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
             <div
               key={day}
               className={`font-medium text-center pb-1 text-xs transition-colors duration-200 ${

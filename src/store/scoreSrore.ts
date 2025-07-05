@@ -2,6 +2,7 @@ import {
   createScore,
   createScoreParticipant,
   getScoresByTrainingId,
+  getScoresCountByTrainingId,
   createTarget,
   fetchScoreTargetsByScoreId,
   patchScore,
@@ -50,7 +51,8 @@ interface ScoreStore {
   scoreRanges: ScoreRangeRow[];
   handleCreateScore: (score: Score) => Promise<any[] | undefined>;
   handlePatchScore: (scoreForm: any, scoreId: string) => Promise<void>;
-  getScoresByTrainingId: (trainingId: string) => Promise<void>;
+  getScoresByTrainingId: (trainingId: string, limit?: number, range?: number) => Promise<Score[]>;
+  getScoresCountByTrainingId: (trainingId: string) => Promise<number>;
   getScoreRangesByTrainingId: (trainingId: string) => Promise<void>;
   getScoreTargetsByScoreId: (scoreId: string) => Promise<ScoreTarget[]>;
   scoreTargetsByScoreId: ScoreTarget[];
@@ -88,9 +90,20 @@ export const scoreStore = create<ScoreStore>((set) => ({
     }
   },
 
-  async getScoresByTrainingId(training_id: string) {
-    const res = await getScoresByTrainingId(training_id);
-    set({ scores: res });
+  async getScoresByTrainingId(training_id: string, limit: number = 0, range: number = 0) {
+    const res = await getScoresByTrainingId(training_id, limit, range);
+    if (limit > 0) {
+      // For pagination, return the scores without setting them in global state
+      return res as Score[];
+    } else {
+      // For non-paginated requests, maintain existing behavior
+      set({ scores: res });
+      return res as Score[];
+    }
+  },
+
+  async getScoresCountByTrainingId(training_id: string) {
+    return await getScoresCountByTrainingId(training_id);
   },
 
   // pulls all ranges for *every* score in the training (1 query)

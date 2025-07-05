@@ -16,7 +16,7 @@ import { format, parseISO } from "date-fns";
 import ScoreDistanceChart from "@/components/ScoreDistanceChart";
 import { ScoreTarget } from "@/types/score";
 import TrainingPageScoreFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModal";
-import { Plus, Calendar, Activity, Target, User, Edit, Eye } from "lucide-react";
+import { Plus, Calendar, Activity, Target, Loader2 } from "lucide-react";
 import ScoreDetailsModal from "@/components/ScoreDetailsModal";
 import BaseButton from "@/components/BaseButton";
 import { isMobile } from "react-device-detect";
@@ -25,6 +25,9 @@ import { BiCurrentLocation } from "react-icons/bi";
 import TrainingStatusButtons from "@/components/TrainingStatusButtons";
 import { isCommander } from "@/utils/permissions";
 import { userStore } from "@/store/userStore";
+import TrainingScoresTable from "@/components/TrainingScoresTable";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
+import { Link } from "react-router-dom";
 
 export default function TrainingPage() {
   const { id } = useParams();
@@ -43,7 +46,7 @@ export default function TrainingPage() {
   const [newlyAddedScoreId, setNewlyAddedScoreId] = useState<string | null>(null);
   const [editingScore, setEditingScore] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"scores" | "analytics" | "status">("scores");
-  const { setIsLoading } = useStore(loaderStore);
+  const { setIsLoading, isLoading } = useStore(loaderStore);
   const { members } = useStore(teamStore);
   const {
     getScoresByTrainingId,
@@ -57,12 +60,14 @@ export default function TrainingPage() {
 
   /* ------------ data loading ------------ */
   useEffect(() => {
+    setIsLoading(true);
     const load = async () => {
       if (!id) return;
       await loadAssignments();
       await loadTrainingById(id);
       await getScoresByTrainingId(id);
       await getScoreRangesByTrainingId(id);
+      setIsLoading(false);
     };
     load();
   }, [id]);
@@ -144,9 +149,52 @@ export default function TrainingPage() {
 
   return (
     <div className={`min-h-screen w-full transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>
-      <Header title="Training Session"> </Header>
+      {isLoading ? (
+        <div className="flex justify-center items-center h-screen">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      ) : (
+        <Header title="Training Session"> </Header>
+      )}
 
-      <main className="mt-2 space-y-4 px-4 pb-10 md:space-y-4 md:px-6 2xl:px-10 w-full">
+      <main className="space-y-4 pb-10 md:space-y-4 px-4 md:px-6 py-4 2xl:px-6 w-full">
+        {/* Breadcrumb */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link
+                  to="/"
+                  className={`hover:text-purple-500 transition-colors ${
+                    theme === "dark" ? "text-gray-400 hover:text-purple-400" : "text-gray-600 hover:text-purple-600"
+                  }`}
+                >
+                  Dashboard
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link
+                  to="/trainings"
+                  className={`hover:text-purple-500 transition-colors ${
+                    theme === "dark" ? "text-gray-400 hover:text-purple-400" : "text-gray-600 hover:text-purple-600"
+                  }`}
+                >
+                  Trainings
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className={`${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                {training?.session_name || "Training Session"}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         {/* Session Header Card */}
 
         <div className={`p-4 rounded-2xl transition-all duration-200`}>
@@ -204,7 +252,7 @@ export default function TrainingPage() {
 
         {/* Tabs */}
         <div className={`border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
-          <nav className="flex space-x-8" aria-label="Tabs">
+          <nav className={`flex space-x-8 ${isMobile ? "justify-center" : "justify-start"} items-center`} aria-label="Tabs">
             {[
               { id: "scores", label: "Scores", icon: Target },
               { id: "analytics", label: "Analytics", icon: Activity },
@@ -236,91 +284,14 @@ export default function TrainingPage() {
         {/* Tab Content */}
         <div className="mt-6">
           {activeTab === "scores" && (
-            <div className="space-y-4">
+            <div className="space-y-4 w-full">
               {/* Scores Grid */}
-              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                {scores.map((score: any) => {
-                  const isNewlyAdded = newlyAddedScoreId === score.id;
-                  return (
-                    <div
-                      key={score.id}
-                      className={`
-                        relative p-4 rounded-2xl transition-all duration-300 cursor-pointer
-                        ${
-                          theme === "dark"
-                            ? "bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700"
-                            : "bg-white border border-gray-100 shadow-sm hover:shadow-md"
-                        }
-                        ${isNewlyAdded ? "bg-indigo-500/20 border-indigo-400/50 animate-pulse" : ""}
-                      `}
-                      onClick={() => handleScoreClick(score)}
-                    >
-                      {/* Assignment Name */}
-                      <div className="flex items-center gap-2 mb-3">
-                        <Target className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                        <h3
-                          className={`text-sm font-semibold truncate transition-colors duration-200 ${
-                            theme === "dark" ? "text-white" : "text-gray-900"
-                          }`}
-                        >
-                          {score.assignment_session?.assignment?.assignment_name || "N/A"}
-                        </h3>
-                      </div>
-
-                      {/* Participant Info */}
-                      <div className="flex items-center gap-2 mb-3">
-                        <User className="w-4 h-4 text-gray-500" />
-                        <span className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-                          {score.score_participants?.[0]?.user
-                            ? `${score.score_participants[0].user.first_name} ${score.score_participants[0].user.last_name}`
-                            : "N/A"}
-                        </span>
-                      </div>
-
-                      {/* Position/Status */}
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-gray-200" : "text-gray-900"}`}
-                        >
-                          {score.position || "N/A"}
-                        </span>
-
-                        {/* Actions */}
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleScoreClick(score);
-                            }}
-                            className={`p-2 rounded-lg transition-colors ${
-                              theme === "dark"
-                                ? "hover:bg-indigo-600/20 text-indigo-400 hover:text-indigo-300"
-                                : "hover:bg-indigo-100 text-indigo-600 hover:text-indigo-700"
-                            }`}
-                            title="View Details"
-                          >
-                            <Eye size={16} />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditScore(score);
-                            }}
-                            className={`p-2 rounded-lg transition-colors ${
-                              theme === "dark"
-                                ? "hover:bg-amber-600/20 text-amber-400 hover:text-amber-300"
-                                : "hover:bg-amber-100 text-amber-600 hover:text-amber-700"
-                            }`}
-                            title="Edit Score"
-                          >
-                            <Edit size={16} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <TrainingScoresTable
+                scores={scores}
+                onScoreClick={handleScoreClick}
+                onEditClick={handleEditScore}
+                newlyAddedScoreId={newlyAddedScoreId}
+              />
 
               {/* Empty State */}
               {scores.length === 0 && (

@@ -18,3 +18,12 @@ export async function createEquipment(equipment: Equipment) {
   }
   return data;
 }
+
+export async function updateEquipment(id: string, equipment: Partial<Equipment>) {
+  const { data, error } = await supabase.from("equipment").update(equipment).eq("id", id).select().single();
+  if (error) {
+    console.error("Error updating equipment:", error);
+    return null;
+  }
+  return data;
+}

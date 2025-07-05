@@ -13,6 +13,11 @@ import { userStore } from "@/store/userStore";
 import { isCommanderOrSquadCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
 import { useTheme } from "@/contexts/ThemeContext";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
+import { Link } from "react-router-dom";
+import { isMobile } from "react-device-detect";
+import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
+import { toast } from "react-toastify";
 
 export default function AssetsPage() {
   const { weapons, createWeapon } = useStore(weaponsStore);
@@ -58,19 +63,29 @@ export default function AssetsPage() {
   }, []);
 
   async function handleCreateWeapon() {
+    if (weaponForm.weapon_type === "" || weaponForm.serial_number === "" || weaponForm.mv === "") {
+      toast.info("Please fill all the fields");
+      return;
+    }
     console.log("Creating weapon:", weaponForm);
     await createWeapon(weaponForm as any);
     handleIsOpen("");
   }
 
   async function handleCreateEquipment() {
+    if (equipmentForm.equipment_type === "" || equipmentForm.serial_number === "" || equipmentForm.day_night === "") {
+      toast.info("Please fill all the fields");
+      return;
+    }
     console.log("Creating equipment:", equipmentForm);
     await createEquipment(equipmentForm as any);
     handleIsOpen("");
   }
 
   const WeaponsContent = (
-    <div className={`min-w-[600px] p-4 space-y-6 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+    <div
+      className={` ${isMobile ? "w-full" : "w-[600px]"} p-4 space-y-6 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+    >
       <div>
         <h2 className="text-xl font-semibold">New Weapon</h2>
         <p className={`mt-1 text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
@@ -209,9 +224,30 @@ export default function AssetsPage() {
     </div>
   );
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen ">
       <Header title="Assets"> </Header>
-      <div className="p-4 md:p-6 2xl:p-10">
+      <div className="px-4 md:px-6 py-4 2xl:px-6">
+        {/* Breadcrumb */}
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link
+                  to="/"
+                  className={`hover:text-purple-500 transition-colors ${
+                    theme === "dark" ? "text-gray-400 hover:text-purple-400" : "text-gray-600 hover:text-purple-600"
+                  }`}
+                >
+                  Dashboard
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className={`${theme === "dark" ? "text-white" : "text-gray-900"}`}>Assets</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-sm font-medium">
@@ -289,9 +325,16 @@ export default function AssetsPage() {
           )}
         </div>
       </div>
-      <BaseDesktopDrawer isOpen={isOpen} setIsOpen={() => handleIsOpen("")} title={`new ${formType}`}>
-        {formType === "weapons" ? WeaponsContent : EquipmentContent}
-      </BaseDesktopDrawer>
+      {!isMobile && (
+        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={() => handleIsOpen("")} title={`new ${formType}`}>
+          {formType === "weapons" ? WeaponsContent : EquipmentContent}
+        </BaseDesktopDrawer>
+      )}
+      {isMobile && (
+        <BaseMobileDrawer isOpen={isOpen} setIsOpen={() => handleIsOpen("")} title={`new ${formType}`}>
+          {formType === "weapons" ? WeaponsContent : EquipmentContent}
+        </BaseMobileDrawer>
+      )}
     </div>
   );
 }

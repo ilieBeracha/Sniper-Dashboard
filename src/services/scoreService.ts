@@ -17,9 +17,28 @@ export async function createScore(scoreData: Partial<Score>) {
   if (error) throw error;
   return data;
 }
-export async function getScoresByTrainingId(training_id: string) {
+export async function getScoresCountByTrainingId(training_id: string) {
   try {
-    const { data, error } = await supabase
+    const { count, error } = await supabase
+      .from("score")
+      .select("*", { count: "exact", head: true })
+      .eq("training_id", training_id);
+
+    if (error) {
+      console.error("Error fetching scores count:", error);
+      return 0;
+    }
+
+    return count || 0;
+  } catch (error) {
+    console.error("Exception when fetching scores count:", error);
+    return 0;
+  }
+}
+
+export async function getScoresByTrainingId(training_id: string, limit: number = 0, range: number = 0) {
+  try {
+    let query = supabase
       .from("score")
       .select(
         `
@@ -53,11 +72,25 @@ export async function getScoresByTrainingId(training_id: string) {
       )
       .eq("training_id", training_id)
       .order("created_at", { ascending: false });
+
+    // Apply pagination if limit is specified and greater than 0
+    if (limit > 0) {
+      console.log("Applying score pagination: limit:", limit, "offset:", range);
+      const rangeEnd = range + limit - 1;
+      console.log("Using score range pagination from", range, "to", rangeEnd);
+      query = query.range(range, rangeEnd);
+    } else {
+      console.log("No score pagination applied - returning all scores");
+    }
+
+    const { data, error } = await query;
+    
     if (error) {
       console.error("Error fetching scores:", error);
       throw new Error(`Failed to fetch scores: ${error.message}`);
     }
 
+    console.log("Raw scores received:", data?.length || 0);
     return data;
   } catch (error) {
     console.error("Exception when fetching scores:", error);

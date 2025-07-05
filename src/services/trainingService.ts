@@ -1,5 +1,6 @@
 import { Assignment } from "@/types/training";
 import { supabase } from "./supabaseClient";
+import { userStore } from "@/store/userStore";
 
 export async function getTrainingById(trainingId: string) {
   const { data, error } = await supabase.rpc("get_trainings_with_assignment_sessions", {
@@ -14,8 +15,28 @@ export async function getTrainingById(trainingId: string) {
   return data[0];
 }
 
-export async function getTrainingByTeamId(teamId: string, currentUserId?: string) {
-  const { data: trainings, error } = await supabase
+export async function getTrainingCountByTeamId(teamId: string) {
+  try {
+    const { count, error } = await supabase
+      .from("training_session")
+      .select("*", { count: "exact", head: true })
+      .eq("team_id", teamId)
+      .neq("status", "canceled");
+
+    if (error) {
+      console.error("Error fetching training count:", error);
+      return 0;
+    }
+
+    return count || 0;
+  } catch (error) {
+    console.error("Exception when fetching training count:", error);
+    return 0;
+  }
+}
+
+export async function getTrainingByTeamId(teamId: string, limit: number = 0, range: number = 0) {
+  let query = supabase
     .from("training_session")
     .select(
       `
@@ -52,18 +73,36 @@ export async function getTrainingByTeamId(teamId: string, currentUserId?: string
       `,
     )
     .eq("team_id", teamId)
-    .order("created_at", { ascending: true })
-    .limit(1000);
+    .neq("status", "canceled")
+    .order("date", { ascending: false });
+
+  // Apply pagination if limit is specified and greater than 0
+  if (limit > 0) {
+    console.log("Applying pagination: limit:", limit, "offset:", range);
+    // Always use range for consistent pagination (from offset to offset + limit - 1)
+    const rangeEnd = range + limit - 1;
+    console.log("Using range pagination from", range, "to", rangeEnd);
+    query = query.range(range, rangeEnd);
+  } else {
+    console.log("No pagination applied - returning all trainings");
+  }
+
+  const { data: trainings, error } = await query;
 
   if (error) {
     console.error("Error fetching trainings:", error);
     return [];
   }
 
+  console.log("Raw trainings received:", trainings?.length || 0);
+
   const processedTrainings = (trainings || []).map((training) => {
     const assignments = training.assignment_session.map((item) => item.assignment).filter(Boolean);
     const participantsCount = training.participants ? training.participants.length : 0;
-    const isParticipating = currentUserId && training.participants ? training.participants.some((p) => p.participant_id === currentUserId) : false;
+    const isParticipating =
+      userStore.getState().user?.id && training.participants
+        ? training.participants.some((p) => p.participant_id === userStore.getState().user?.id)
+        : false;
 
     return {
       ...training,
@@ -74,6 +113,7 @@ export async function getTrainingByTeamId(teamId: string, currentUserId?: string
     };
   });
 
+  console.log("Processed trainings count:", processedTrainings.length);
   return processedTrainings;
 }
 
