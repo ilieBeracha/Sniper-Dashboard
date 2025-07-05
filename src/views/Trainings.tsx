@@ -91,7 +91,7 @@ export default function Trainings() {
           </div>
         </div>
 
-        <TrainingList trainings={trainings} setIsAddTrainingOpen={setIsAddTrainingOpen} />
+        <TrainingList trainings={trainings} />
 
         <TrainingAddTrainingSessionModal
           isOpen={isAddTrainingOpen}

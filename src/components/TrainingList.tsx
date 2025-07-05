@@ -2,10 +2,8 @@ import { TrainingSession, TrainingStatus } from "@/types/training";
 import { parseISO, isToday, isPast, isFuture } from "date-fns";
 import { TrainingSessionCard } from "./TrainingSessionCard";
 import TrainingSessionGroup from "./TrainingSessionGroup";
-import TrainingListEmpty from "./TrainingListEmpty";
 import { useEffect, useState } from "react";
 import TrainingCalendar from "./TrainingCalendar";
-import { Plus } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import BaseDashboardCard from "./BaseDashboardCard";
 import { useStore } from "zustand";
@@ -14,13 +12,7 @@ import { isMobile } from "react-device-detect";
 
 type Tab = "active" | "canceled";
 
-export default function TrainingList({
-  trainings,
-  setIsAddTrainingOpen,
-}: {
-  trainings: TrainingSession[];
-  setIsAddTrainingOpen: (open: boolean) => void;
-}) {
+export default function TrainingList({ trainings }: { trainings: TrainingSession[] }) {
   const [activeTab, setActiveTab] = useState<Tab>("active");
   const { theme } = useTheme();
   const { getOverallAccuracyStats, overallAccuracyStats } = useStore(performanceStore);
