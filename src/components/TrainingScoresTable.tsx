@@ -282,7 +282,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
               const isLastRow = index === filteredScores.length - 1;
 
               const participant = score.score_participants?.[0]?.user;
-              const wind = score.wind_direction || score.wind_strength ? `${score.wind_direction ?? "?"}° @ ${score.wind_strength ?? "?"}` : "N/A";
+              // const wind = score.wind_direction || score.wind_strength ? `${score.wind_direction ?? "?"}° @ ${score.wind_strength ?? "?"}` : "N/A";
 
               return (
                 <tr
