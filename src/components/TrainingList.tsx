@@ -62,11 +62,13 @@ export default function TrainingList({ trainings, totalCount }: TrainingListProp
 
           {/* Sessions List */}
           <div className="space-y-3">
+            {active.length === 0 && <div className="text-center text-gray-500 h-80 flex items-center justify-center">No active trainings</div>}
             {todaySessions.length > 0 && (
               <div className="space-y-3">
                 <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
                   <div className="h-3 w-3 bg-green-400 rounded-full"></div> Today
                 </h3>
+
                 {todaySessions.map((s) => (
                   <TrainingSessionCard key={s.id} session={s} highlight showDate={false} />
                 ))}
@@ -113,6 +115,13 @@ export default function TrainingList({ trainings, totalCount }: TrainingListProp
 
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
             <div className="lg:col-span-8 space-y-6">
+              {!trainings.length && (
+                <div className="text-center text-gray-500 h-80 flex flex-col items-center justify-center">
+                  <p className="text-lg font-medium">No trainings found</p>
+                  <p className="text-sm">You can create one</p>
+                </div>
+              )}
+
               {todaySessions.length > 0 && (
                 <TrainingSessionGroup title="Today" color="green" date={today}>
                   {todaySessions.map((s) => (

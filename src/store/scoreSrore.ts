@@ -121,13 +121,11 @@ export const scoreStore = create<ScoreStore>((set) => ({
 
   handlePatchScore: async (scoreForm: any, scoreId: string) => {
     try {
-      // Update main score record
       const scoreData = {
         assignment_session_id: scoreForm.assignment_session_id,
         time_until_first_shot: scoreForm.time_until_first_shot,
         wind_strength: scoreForm.wind_strength,
         first_shot_hit: false,
-        squad_id: userStore.getState().user?.squad_id || "",
         team_id: userStore.getState().user?.team_id || "",
         wind_direction: scoreForm.wind_direction,
         day_night: scoreForm.day_night,
@@ -137,7 +135,6 @@ export const scoreStore = create<ScoreStore>((set) => ({
 
       await patchScore(scoreData, scoreId);
 
-      // Delete existing participants and targets to replace with new data
       const { error: deleteParticipantsError } = await supabase.from("score_participants").delete().eq("score_id", scoreId);
 
       if (deleteParticipantsError) throw deleteParticipantsError;

@@ -1,4 +1,4 @@
-import { Target, Plus, Crosshair } from "lucide-react";
+import { Target, Plus } from "lucide-react";
 import AddAssignmentModal from "../AddAssignmentModal";
 import { Assignment } from "@/types/training";
 import { useFormContext } from "react-hook-form";
@@ -45,6 +45,7 @@ export default function TrainingPageScoreFormModalInfo({
             <Plus size={14} />
           </button>
         </div>
+
         <select
           {...register("assignment_session_id")}
           className={`w-full min-h-9 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
@@ -67,52 +68,6 @@ export default function TrainingPageScoreFormModalInfo({
             handleOnAddAssignment(assignmentName);
           }}
         />
-      </div>
-
-      {/* Combat Details */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Crosshair className={` transition-colors duration-200 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} size={16} />
-          <h4 className={`text-sm font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-            Combat Details
-          </h4>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-          <select
-            {...register("day_night")}
-            className={`w-full min-h-10 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
-              theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
-            }`}
-          >
-            <option value="day">Day</option>
-            <option value="night">Night</option>
-          </select>
-
-          <select
-            {...register("position")}
-            className={`w-full min-h-10 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
-              theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
-            }`}
-          >
-            <option value="">Select position</option>
-            <option value="lying">Lying</option>
-            <option value="standing">Standing</option>
-            <option value="sitting">Sitting</option>
-            <option value="operational">Operational</option>
-          </select>
-
-          <input
-            type="number"
-            {...register("time_until_first_shot")}
-            placeholder="Time until first shot (seconds)"
-            className={`w-full min-h-10 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
-              theme === "dark"
-                ? "bg-zinc-800/50 text-white border-zinc-700 placeholder-gray-400"
-                : "bg-white text-gray-900 border-gray-300 placeholder-gray-500"
-            }`}
-          />
-        </div>
       </div>
     </div>
   );

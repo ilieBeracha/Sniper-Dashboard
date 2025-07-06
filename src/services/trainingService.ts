@@ -1,9 +1,8 @@
 import { Assignment } from "@/types/training";
 import { supabase } from "./supabaseClient";
-import { userStore } from "@/store/userStore";
 
 export async function getTrainingById(trainingId: string) {
-  const { data, error } = await supabase.rpc("get_trainings_with_assignment_sessions", {
+  const { data, error } = await supabase.rpc("get_training_by_id", {
     training_id: trainingId,
   });
 
@@ -58,17 +57,6 @@ export async function getTrainingByTeamId(teamId: string, limit: number = 0, ran
           assignment_name,
           created_at
         )
-      ),
-      participants:trainings_participants(
-        id,
-        participant_id,
-        created_at,
-        user:participant_id(
-          id, 
-          first_name,
-          last_name,
-          email
-        )
       )
       `,
     )
@@ -98,17 +86,10 @@ export async function getTrainingByTeamId(teamId: string, limit: number = 0, ran
 
   const processedTrainings = (trainings || []).map((training) => {
     const assignments = training.assignment_session.map((item) => item.assignment).filter(Boolean);
-    const participantsCount = training.participants ? training.participants.length : 0;
-    const isParticipating =
-      userStore.getState().user?.id && training.participants
-        ? training.participants.some((p) => p.participant_id === userStore.getState().user?.id)
-        : false;
 
     return {
       ...training,
       assignments,
-      participantsCount,
-      isParticipating,
       assignment_session: undefined,
     };
   });

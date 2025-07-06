@@ -270,12 +270,8 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
               <th className="px-2 sm:px-4 py-3">Assignment</th>
               <th className="px-2 sm:px-4 py-3">Participant</th>
               <th className="px-2 sm:px-4 py-3  sm:table-cell">Position</th>
-              <th className="px-2 sm:px-4 py-3  md:table-cell">First Shot (sec)</th>
               <th className="px-2 sm:px-4 py-3  lg:table-cell">Day/Night</th>
               <th className="px-2 sm:px-4 py-3  lg:table-cell">Target Eliminated</th>
-              <th className="px-2 sm:px-4 py-3  lg:table-cell">First Shot Hit</th>
-              <th className="px-2 sm:px-4 py-3  lg:table-cell">Wind</th>
-              <th className="px-2 sm:px-4 py-3  lg:table-cell">Note</th>
               <th className="px-2 sm:px-4 py-3  md:table-cell">Created</th>
               <th className="px-2 sm:px-4 py-3 text-right">Actions</th>
             </tr>
@@ -304,14 +300,10 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
                     {participant ? `${participant.first_name} ${participant.last_name}` : "N/A"}
                   </td>
                   <td className="px-2 sm:px-4 py-3 capitalize  sm:table-cell">{score.position || "N/A"}</td>
-                  <td className="px-2 sm:px-4 py-3  md:table-cell">{score.time_until_first_shot ?? "N/A"}</td>
                   <td className="px-2 sm:px-4 py-3 capitalize  lg:table-cell">{score.day_night || "N/A"}</td>
                   <td className="px-2 sm:px-4 py-3  lg:table-cell">
                     {score.target_eliminated === null ? "N/A" : score.target_eliminated ? "✅" : "❌"}
                   </td>
-                  <td className="px-2 sm:px-4 py-3  lg:table-cell">{score.first_shot_hit === null ? "N/A" : score.first_shot_hit ? "✅" : "❌"}</td>
-                  <td className="px-2 sm:px-4 py-3  lg:table-cell">{wind}</td>
-                  <td className="px-2 sm:px-4 py-3 truncate max-w-[120px]  lg:table-cell">{score.note || "—"}</td>
                   <td className="px-2 sm:px-4 py-3  md:table-cell">{format(score.created_at, "yyyy-MM-dd HH:mm")}</td>
                   <td className="px-2 sm:px-4 py-3 text-right">
                     <div className="inline-flex gap-1 sm:gap-2">

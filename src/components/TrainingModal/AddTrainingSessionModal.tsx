@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { supabase } from "@/services/supabaseClient";
 import { userStore } from "@/store/userStore";
-import { User } from "@/types/user";
 import BasicInfoSection from "@/components/TrainingModal/AddTrainingSessionModalBasicInfo";
 import AssignmentsSection from "@/components/TrainingModal/AddTrainingSessionModalAssignments";
-import TeamMembersSection from "@/components/TrainingModal/AddTrainingSessionModalMembers";
 import { useStore } from "zustand";
 import { TrainingStore } from "@/store/trainingStore";
 import { Assignment, TrainingSession, TrainingStatus } from "@/types/training";
@@ -22,19 +20,16 @@ export default function TrainingAddTrainingSessionModal({
   isOpen,
   onClose,
   onSuccess,
-  teamMembers,
   assignments,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  teamMembers: User[];
   assignments: Assignment[];
 }) {
   const [sessionName, setSessionName] = useState("");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
-  const [members, setMembers] = useState<string[]>([]);
   const [assignmentIds, setAssignmentIds] = useState<string[]>([]);
   const { theme } = useTheme();
 
@@ -52,12 +47,6 @@ export default function TrainingAddTrainingSessionModal({
 
   async function handleSubmit() {
     if (!user?.team_id) return alert("Missing team ID");
-
-    // Validation: Check if user has squad_id, weapons, and assignments
-    if (!user?.squad_id) {
-      toastService.error("Cannot create training: User must be assigned to a squad");
-      return;
-    }
 
     if (!weapons || weapons.length === 0) {
       toastService.error("Cannot create training: No weapons assigned to the team");
@@ -97,20 +86,6 @@ export default function TrainingAddTrainingSessionModal({
 
     const trainingId = newTraining.id;
 
-    if (members.length > 0) {
-      const participants = members.map((memberId) => ({
-        training_id: trainingId,
-        participant_id: memberId,
-      }));
-
-      const { error: participantsError } = await supabase.from("trainings_participants").insert(participants);
-
-      if (participantsError) {
-        console.error("Adding participants failed:", participantsError);
-        return alert("Training created, but adding participants failed.");
-      }
-    }
-
     if (assignmentIds.length) {
       const assignmentData = assignmentIds.map((assignmentId) => ({
         training_id: trainingId,
@@ -147,14 +122,20 @@ export default function TrainingAddTrainingSessionModal({
         </p>
       </div>
 
-      {(!user?.squad_id || !weapons?.length || !assignments?.length) && (
-        <div className={`p-4 rounded-lg border transition-colors duration-200 ${
-          theme === "dark" ? "bg-red-900/20 border-red-800/50 text-red-400" : "bg-red-50 border-red-200 text-red-700"
-        }`}>
+      {(!weapons?.length || !assignments?.length) && (
+        <div
+          className={`p-4 rounded-lg border transition-colors duration-200 ${
+            theme === "dark" ? "bg-red-900/20 border-red-800/50 text-red-400" : "bg-red-50 border-red-200 text-red-700"
+          }`}
+        >
           <div className="flex items-start">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
             <div className="ml-3">
@@ -162,7 +143,6 @@ export default function TrainingAddTrainingSessionModal({
               <div className="mt-2 text-sm">
                 <p>The following requirements are missing:</p>
                 <ul className="list-disc list-inside mt-1 space-y-1">
-                  {!user?.squad_id && <li>User must be assigned to a squad</li>}
                   {!weapons?.length && <li>Team must have weapons assigned</li>}
                   {!assignments?.length && <li>Team must have assignments available</li>}
                 </ul>
@@ -191,7 +171,7 @@ export default function TrainingAddTrainingSessionModal({
               isAddAssignmentOpen={isAddAssignmentOpen}
               setIsAddAssignmentOpen={setIsAddAssignmentOpen}
             />
-            <TeamMembersSection teamMembers={teamMembers} members={members} setMembers={setMembers} />
+            {/* <TeamMembersSection teamMembers={teamMembers} members={members} setMembers={setMembers} /> */}
           </div>
         </div>
       </div>
@@ -212,7 +192,7 @@ export default function TrainingAddTrainingSessionModal({
         </button>
         <button
           onClick={handleSubmit}
-          disabled={!sessionName || !location || !date || !user?.squad_id || !weapons?.length || !assignments?.length}
+          disabled={!sessionName || !location || !date || !weapons?.length || !assignments?.length}
           className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
         >
           Create Session

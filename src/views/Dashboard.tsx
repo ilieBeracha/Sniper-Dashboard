@@ -34,10 +34,10 @@ export default function Dashboard() {
     const load = async () => {
       if (user?.team_id) {
         await getUserGroupingSummaryRpc(user.id);
-        await getUserHitPercentage(user.id);
-        await loadNextAndLastTraining(user.team_id);
-        await getSquadMetricsByRole(user.id);
-        await getSquadStats(user.team_id, null, null);
+        await getUserHitPercentage(user?.id);
+        await loadNextAndLastTraining(user?.team_id);
+        await getSquadMetricsByRole(user?.id);
+        await getSquadStats(user?.team_id, null, null);
       }
 
       setLoading(false);

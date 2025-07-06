@@ -123,7 +123,7 @@ export function TrainingSessionCard({
       onClick={handleSessionClick}
       className={`
         relative
-        pl-4 pr-4 py-2
+        pl-4 pr-4 py-4
         border rounded-lg overflow-hidden
         transition-all duration-500 ease-in-out
         cursor-pointer
