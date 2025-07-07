@@ -60,9 +60,11 @@ export default function AppRoutes() {
           <Route
             path="/"
             element={
-              <Suspense fallback={<LoadingFallback />}>
-                <Dashboard />
-              </Suspense>
+              <div className="w-full overflow-x-hidden">
+                <Suspense fallback={<LoadingFallback />}>
+                  <Dashboard />
+                </Suspense>
+              </div>
             }
           />
           <Route

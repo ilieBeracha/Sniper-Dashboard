@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import BaseInput from "@/components/BaseInput";
 import { useTheme } from "@/contexts/ThemeContext";
+import { validateAuthForm } from "@/lib/formValidation";
 
 export default function SoldierRegisterForm({
   AuthSubmit,
@@ -13,10 +14,30 @@ export default function SoldierRegisterForm({
   const [password, setPassword] = useState("");
   const [inviteCode, setInviteCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
   const { theme } = useTheme();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
+    const validationError = validateAuthForm({
+      firstName,
+      lastName,
+      email,
+      password,
+    });
+
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    if (!inviteCode.trim()) {
+      setError("Squad invite code is required");
+      return;
+    }
+
     AuthSubmit({
       first_name: firstName,
       last_name: lastName,
@@ -107,6 +128,15 @@ export default function SoldierRegisterForm({
 
   return (
     <form className="space-y-4 h-fit" onSubmit={handleSubmit}>
+      {error && (
+        <div
+          className={`p-3 rounded-lg text-sm ${
+            theme === "dark" ? "bg-red-900/50 text-red-300 border border-red-800" : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
+          {error}
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-4">
         <BaseInput
           label="First name"

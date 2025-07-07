@@ -5,16 +5,17 @@ import BasicInfoSection from "@/components/TrainingModal/AddTrainingSessionModal
 import AssignmentsSection from "@/components/TrainingModal/AddTrainingSessionModalAssignments";
 import { useStore } from "zustand";
 import { TrainingStore } from "@/store/trainingStore";
-import { Assignment, TrainingSession, TrainingStatus } from "@/types/training";
+import { Assignment, TrainingStatus } from "@/types/training";
 import { useModal } from "@/hooks/useModal";
 import { toastService } from "@/services/toastService";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
 import { isMobile } from "react-device-detect";
 import { useTheme } from "@/contexts/ThemeContext";
-import { embedTraining } from "@/services/embeddingService";
 import { useStore as useZustandStore } from "zustand";
 import { weaponsStore } from "@/store/weaponsStore";
+import { insertAssignment } from "@/services/trainingService";
+import { validateTrainingForm } from "@/lib/formValidation";
 
 export default function TrainingAddTrainingSessionModal({
   isOpen,
@@ -31,10 +32,11 @@ export default function TrainingAddTrainingSessionModal({
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
   const [assignmentIds, setAssignmentIds] = useState<string[]>([]);
+  const [error, setError] = useState("");
   const { theme } = useTheme();
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
-  const { loadAssignments, createAssignment } = useStore(TrainingStore);
+  const { loadAssignments } = useStore(TrainingStore);
   const { user } = useStore(userStore);
   const { weapons } = useZustandStore(weaponsStore);
 
@@ -48,13 +50,27 @@ export default function TrainingAddTrainingSessionModal({
   async function handleSubmit() {
     if (!user?.team_id) return alert("Missing team ID");
 
+    setError("");
+
+    const validationError = validateTrainingForm({
+      session_name: sessionName,
+      location,
+      date,
+      assignmentIds,
+    });
+
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     if (!weapons || weapons.length === 0) {
-      toastService.error("Cannot create training: No weapons assigned to the team");
+      setError("Cannot create training: No weapons assigned to the team");
       return;
     }
 
     if (!assignments || assignments.length === 0) {
-      toastService.error("Cannot create training: No assignments available for the team");
+      setError("Cannot create training: No assignments available for the team");
       return;
     }
 
@@ -74,8 +90,6 @@ export default function TrainingAddTrainingSessionModal({
       ])
       .select("*")
       .maybeSingle();
-
-    await embedTraining(newTraining as TrainingSession, newTraining?.id || "");
 
     toastService.success("Training session created successfully");
 
@@ -101,17 +115,26 @@ export default function TrainingAddTrainingSessionModal({
     }
 
     onSuccess();
-    onClose();
   }
 
   const handleAddAssignment = async (assignmentName: string) => {
-    const { id } = await createAssignment(assignmentName, true);
+    const { id } = await insertAssignment(assignmentName, user?.team_id || "");
+    console.log(id);
     setAssignmentIds((prev) => {
       const next = [...prev, id];
       return next;
     });
     await loadAssignments();
     setIsAddAssignmentOpen(false);
+  };
+
+  // Reset form fields when closing the modal
+  const handleClose = () => {
+    setAssignmentIds([]);
+    setSessionName("");
+    setLocation("");
+    setDate("");
+    onClose();
   };
 
   const Content = (
@@ -121,6 +144,16 @@ export default function TrainingAddTrainingSessionModal({
           Plan a session, select assignments, and assign team members to participate.
         </p>
       </div>
+
+      {error && (
+        <div
+          className={`p-3 rounded-lg text-sm ${
+            theme === "dark" ? "bg-red-900/50 text-red-300 border border-red-800" : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
+          {error}
+        </div>
+      )}
 
       {(!weapons?.length || !assignments?.length) && (
         <div
@@ -183,7 +216,7 @@ export default function TrainingAddTrainingSessionModal({
       >
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           className={`px-4 py-1.5 transition-colors rounded-md text-sm font-medium ${
             theme === "dark" ? "bg-white/5 hover:bg-white/10 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
           }`}

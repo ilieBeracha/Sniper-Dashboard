@@ -5,6 +5,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useStore } from "zustand";
 import { scoreStore } from "@/store/scoreSrore";
 import { useParams } from "react-router-dom";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface TrainingScoresTableProps {
   scores: any[];
@@ -17,12 +18,12 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
   const { theme } = useTheme();
   const { id } = useParams();
   const { getScoresByTrainingId, getScoresCountByTrainingId } = useStore(scoreStore);
-
+  const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState("");
   const [positionFilter, setPositionFilter] = useState("");
   const [dayNightFilter, setDayNightFilter] = useState("");
   const [targetEliminatedFilter, setTargetEliminatedFilter] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(!isMobile); // Always show on desktop, hidden by default on mobile
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
@@ -56,6 +57,11 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
       setIsLoading(false);
     }
   };
+
+  // Update showFilters when screen size changes
+  useEffect(() => {
+    setShowFilters(!isMobile);
+  }, [isMobile]);
 
   // Load initial scores and total count
   useEffect(() => {
@@ -148,16 +154,24 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
         <div className="space-y-4">
           {/* Filter Toggle Button */}
           <div className="flex items-center justify-between">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
-                theme === "dark"
-                  ? "bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300"
-              }`}
-            >
-              <Filter className="w-4 h-4" />
-              Filters
+            <div className="flex items-center gap-2">
+              {isMobile && (
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
+                    theme === "dark" ? "bg-zinc-800 text-gray-300 hover:bg-zinc-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  <Filter className="w-4 h-4" />
+                  {showFilters ? "Hide" : "Show"} Filters
+                </button>
+              )}
+              {!isMobile && (
+                <>
+                  <Filter className="w-4 h-4" />
+                  <span>Filters</span>
+                </>
+              )}
               {hasActiveFilters && (
                 <span
                   className={`inline-flex items-center justify-center w-5 h-5 text-xs rounded-full ${
@@ -167,9 +181,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
                   {[searchTerm, positionFilter, dayNightFilter, targetEliminatedFilter].filter(Boolean).length}
                 </span>
               )}
-            </button>
-
-            {/* Results Count */}
+            </div>
           </div>
 
           {/* Collapsible Filter Controls */}

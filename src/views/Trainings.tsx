@@ -77,7 +77,17 @@ export default function Trainings() {
     if (!teamId) return;
     const result = await loadTrainingByTeamId(teamId, LIMIT, currentPage * LIMIT);
     setTrainings(result || []);
+    setIsAddTrainingOpen(false);
   }
+
+  // Add function to handle modal close and reload assignments
+  const handleModalClose = async () => {
+    setIsAddTrainingOpen(false);
+    // Reload assignments to ensure new ones appear
+    if (user?.team_id) {
+      await loadAssignments();
+    }
+  };
 
   // Scroll to top when page changes
   const [isPageChanging, setIsPageChanging] = useState(false);
@@ -166,18 +176,20 @@ export default function Trainings() {
                   </div>
                 </div>
 
-                {/* Add Training Button */}
-                <BaseButton
-                  type="button"
-                  onClick={() => setIsAddTrainingOpen(true)}
-                  style="purple"
-                  className={`flex mt-2 items-center gap-2 font-medium transition-all duration-200 ${
-                    isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-sm" : "px-4 py-2.5 rounded-lg text-sm hover:shadow-lg"
-                  }`}
-                >
-                  <Plus size={16} />
-                  <span>Add Training</span>
-                </BaseButton>
+                <div className="flex items-center gap-2">
+                  {/* Add Training Button */}
+                  <BaseButton
+                    type="button"
+                    onClick={() => setIsAddTrainingOpen(true)}
+                    style="purple"
+                    className={`flex mt-2 items-center gap-2 font-medium transition-all duration-200 ${
+                      isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-sm" : "px-4 py-2.5 rounded-lg text-sm hover:shadow-lg"
+                    }`}
+                  >
+                    <Plus size={16} />
+                    <span>Add Training</span>
+                  </BaseButton>
+                </div>
               </div>
             </div>
 
@@ -227,7 +239,7 @@ export default function Trainings() {
 
             <TrainingAddTrainingSessionModal
               isOpen={isAddTrainingOpen}
-              onClose={() => setIsAddTrainingOpen(false)}
+              onClose={handleModalClose}
               onSuccess={fetchTrainings}
               // teamMembers={members}
               assignments={assignments}

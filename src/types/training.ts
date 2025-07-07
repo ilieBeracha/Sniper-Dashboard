@@ -5,6 +5,14 @@ export interface Assignment {
   team_id: string;
 }
 
+export interface AssignmentSession {
+  id: string;
+  assignment_id: string;
+  team_id: string;
+  training_id: string;
+  created_at: string;
+}
+
 export interface TrainingParticipant {
   id: string;
   training_id: string;

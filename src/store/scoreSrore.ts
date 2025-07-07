@@ -84,9 +84,9 @@ export const scoreStore = create<ScoreStore>((set) => ({
     const res = await createScore(score);
 
     if (res) {
-      await embedScore(score as any, res[0].id, training_id || "", scoreForm.scoreTargets, scoreForm.score_participants);
       await createScoreParticipant(scoreForm.score_participants, res[0].id);
       await createTarget(scoreForm.scoreTargets, res[0].id);
+      await embedScore(score as any, res[0].id, training_id || "", scoreForm.scoreTargets, scoreForm.score_participants);
       return res;
     }
   },

@@ -34,7 +34,6 @@ export default function ScoreDistanceChart({ rows }: { rows: ScoreTarget[] | und
             className={`mb-1 font-medium transition-colors duration-200 ${theme === "dark" ? "text-gray-200" : "text-gray-800"}`}
           >{`Distance: ${label}`}</p>
           <p className="text-sm text-indigo-300">{`Hits: ${payload[0].value}`}</p>
-          <p className="text-sm text-blue-300">{`Shots: ${payload[1].value}`}</p>
           <p
             className={`mt-1 text-sm font-medium transition-colors duration-200 ${theme === "dark" ? "text-gray-200" : "text-gray-800"}`}
           >{`Accuracy: ${accuracy}%`}</p>

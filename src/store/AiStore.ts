@@ -43,25 +43,25 @@ export const useAiStore = create<AiStore>((set, get) => ({
 
     console.log(messages);
     set({ isLoading: true, isError: false, chatMessages: messages });
-    
+
     try {
       const text = await askAssistant(prompt);
-      console.log(text);
-      
+
       const aiMessage: Message = {
         id: `ai-${Date.now()}`,
         role: "assistant",
-        content: text || "",
+        content: text.suggestions?.map((s: any) => `🔹 ${s.topic}\n${s.issue}\n💡 ${s.recommendation}`).join("\n\n") || "No suggestions found.",
       };
+
       console.log(aiMessage);
 
       set({
-        aiResponse: text || "",
+        aiResponse: aiMessage.content,
         chatMessages: [...messages, aiMessage],
         isLoading: false,
       });
 
-      return text || "";
+      return text.suggestions || [];
     } catch (err) {
       console.error("Error generating text:", err);
       set({

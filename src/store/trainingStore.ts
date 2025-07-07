@@ -11,12 +11,14 @@ import {
   insertAssignmentSession,
 } from "@/services/trainingService";
 import { TrainingsNextLastChart, TrainingSession, Assignment, WeeklyAssignmentStats } from "@/types/training";
+import { AssignmentSession } from "@/types/training";
 import { userStore } from "./userStore";
 
 interface TrainingStore {
   training: TrainingSession | null;
   trainings: TrainingSession[] | [];
   assignments: Assignment[] | [];
+  assignmentSessions: AssignmentSession[] | [];
   trainingsChartDisplay: TrainingsNextLastChart;
   weeklyAssignmentsStats: WeeklyAssignmentStats[] | [];
   loadNextAndLastTraining: (team_id: string) => Promise<void>;
@@ -27,6 +29,7 @@ interface TrainingStore {
   loadTrainingById: (trainingId: string) => Promise<void>;
   loadWeeklyAssignmentsStats: (team_id: string) => Promise<void>;
   createAssignment: (assignmentName: string, isInTraining: boolean, trainingId?: string) => Promise<Assignment | any>;
+  createAssignmentSession: (assignmentId: string, teamId: string, trainingId: string) => Promise<any>;
   resetTraining: () => void;
 }
 
@@ -39,7 +42,7 @@ export const TrainingStore = create<TrainingStore>((set) => ({
     next: null,
     last: null,
   },
-
+  assignmentSessions: [] as AssignmentSession[],
   loadTrainingById: async (trainingId: string) => {
     const res = await getTrainingById(trainingId);
     set({ training: res });
@@ -107,6 +110,11 @@ export const TrainingStore = create<TrainingStore>((set) => ({
     } catch (error) {
       console.error("Failed to create assignment:", error);
     }
+  },
+
+  createAssignmentSession: async (assignmentId: string, teamId: string, trainingId: string) => {
+    const res = await insertAssignmentSession(assignmentId, teamId, trainingId);
+    return res;
   },
 
   resetTraining: () => {

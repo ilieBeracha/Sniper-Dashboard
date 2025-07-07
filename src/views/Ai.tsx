@@ -1,4 +1,4 @@
-import AiForm from "@/components/AiForm";
+import AiSuggestionGenerator from "@/components/AiSuggestionGenerator";
 import Header from "@/Headers/Header";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
@@ -18,7 +18,9 @@ export default function Ai() {
           <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-3xl" />
           <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-blue-500/10  rounded-full blur-3xl" />
         </div>
-        <AiForm />
+        <div className="flex flex-col gap-4 w-1/2 mx-auto">
+          <AiSuggestionGenerator />
+        </div>
       </div>
     </div>
   );

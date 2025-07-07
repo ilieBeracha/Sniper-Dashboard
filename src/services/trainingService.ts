@@ -206,6 +206,16 @@ export async function insertAssignment(assignmentName: string, teamId: string) {
   return data;
 }
 
+export async function getAssignmentSessions(assignmentId: string) {
+  const { data, error } = await supabase.from("assignment_session").select("*").eq("assignment_id", assignmentId);
+
+  console.log(data);
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
 export async function insertAssignmentSession(assignmentId: string, teamId: string, trainingId: string) {
   const { data, error } = await supabase
     .from("assignment_session")

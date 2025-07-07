@@ -7,11 +7,10 @@ import { authStore } from "@/store/authStore";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { FaCrosshairs } from "react-icons/fa";
-import { isMobile } from "react-device-detect";
 import { useSidebarStore } from "@/store/sidebarStore";
 import { SparklesIcon } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-
+import { useIsMobile } from "@/hooks/useIsMobile";
 const navSections = [
   {
     title: "OVERVIEW",
@@ -34,7 +33,7 @@ export default function Sidebar() {
   const { isDrawerOpen, toggleDrawer } = useStore(useSidebarStore);
   const { theme } = useTheme();
   const userInitial = user?.first_name?.[0] || "U";
-
+  const isMobile = useIsMobile();
   const [collapsed, setCollapsed] = useState(false);
 
   const SidebarContent = () => (
