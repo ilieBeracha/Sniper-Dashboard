@@ -3,6 +3,7 @@ import { OpenAI } from "openai";
 import { Score, ScoreParticipant, ScoreTarget } from "@/types/score";
 import { userStore } from "@/store/userStore";
 import { TrainingSession } from "@/types/training";
+import { SuggestionData } from "@/store/AiStore";
 
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -50,8 +51,6 @@ export async function embedAndInsertChunk({
     console.error("Insert error:", error.message);
     throw new Error(error.message);
   }
-
-  console.log(`✅ Inserted ${sourceType} [${sourceId}]`);
 }
 
 export async function embedTraining(training: TrainingSession, trainingId: string) {
@@ -143,9 +142,6 @@ export async function embedScore(
     });
   }
 
-  console.log("benchmarks", benchmarkCombos);
-
-  // Embed original score
   const data = {
     ...score,
     score_targets: scoreTargets,
@@ -244,7 +240,7 @@ export async function askAssistant(userPrompt: string) {
       });
     }
 
-    return structuredOutput;
+    return structuredOutput as SuggestionData[];
   }
 }
 const tools = [
@@ -267,7 +263,10 @@ const tools = [
                 topic: { type: "string" },
                 issue: { type: "string" },
                 recommendation: { type: "string" },
-                objective: { type: "string", description: "What the user should work on with a measurable outcome" },
+                objective: {
+                  type: "string",
+                  description: "Short measurable target. Use real values only. Max 8 words.",
+                },
               },
               required: ["topic", "issue", "recommendation", "objective"],
             },
@@ -290,7 +289,9 @@ export async function getEmbedding(userPrompt: string) {
   return embedData[0]?.embedding || [];
 }
 
-export async function getTasks(user_id: string) {
+export async function getSuggestions(user_id: string) {
   const { data: tasks } = await supabase.from("user_ai_tasks").select("*").eq("user_id", user_id);
+  console.log(tasks);
+
   return tasks || [];
 }

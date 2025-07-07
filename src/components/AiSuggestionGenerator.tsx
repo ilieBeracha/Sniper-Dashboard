@@ -1,127 +1,194 @@
-import { useState, useEffect } from "react";
-import { useTheme } from "@/contexts/ThemeContext";
-import { askAssistant, getTasks } from "@/services/embeddingService";
+import { useEffect, useState } from "react";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
-import { AlertTriangle, CheckCircle, Brain, User, Award, ChevronRight, Lightbulb } from "lucide-react";
-
-interface Suggestion {
-  topic: string;
-  issue: string;
-  recommendation: string;
-}
-
-interface SuggestionData {
-  user_id: string;
-  role: string;
-  topic: string;
-  issue: string;
-  recommendation: string;
-  objective: string;
-  suggestions: Suggestion[];
-  last_training_id: string;
-  last_training_date: string;
-}
+import { useTheme } from "@/contexts/ThemeContext";
+import {
+  Activity,
+  Database,
+  Brain,
+  User,
+  ArrowUpRight,
+  Target,
+  Clock,
+  BarChart3,
+  AlertCircle,
+  CheckCircle2,
+  Plus,
+  Calendar,
+  TrendingUp,
+  Award,
+  Bell,
+} from "lucide-react";
+import { SuggestionData, useAiStore } from "@/store/AiStore";
+import BaseDashboardCard from "./BaseDashboardCard";
+import BaseButton from "./BaseButton";
 
 export default function AiSuggestionGenerator() {
   const { theme } = useTheme();
   const { user } = useStore(userStore);
-  const [suggestions, setSuggestions] = useState<SuggestionData[] | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>("");
+  const { suggestions, isLoading, generateSuggestions, setSuggestions, getSuggestions } = useStore(useAiStore);
+  const [isNewSuggestions, setIsNewSuggestions] = useState(false);
+  const [previousCount, setPreviousCount] = useState(0);
 
-  const generateSuggestions = async () => {
-    if (!user?.id) return;
-
-    setIsLoading(true);
-    setError("");
-
-    try {
-      const result = await askAssistant("Generate performance suggestions");
-      if (result && typeof result === "object") {
-        setSuggestions(result as unknown as SuggestionData[]);
-      } else {
-        setError("Unable to generate suggestions at this time");
-      }
-    } catch (err) {
-      console.error("Error generating suggestions:", err);
-      setError("Failed to generate suggestions. Please try again.");
-    } finally {
-      setIsLoading(false);
+  const handleGenerateSuggestions = async () => {
+    const tasks = await generateSuggestions();
+    setSuggestions(tasks as unknown as SuggestionData[]);
+    if (tasks && tasks.length > previousCount) {
+      setIsNewSuggestions(true);
+      setTimeout(() => setIsNewSuggestions(false), 5000);
     }
+    setPreviousCount(tasks?.length || 0);
   };
 
   useEffect(() => {
     if (user?.id) {
-      const fetchTasks = async () => {
-        const tasks = await getTasks(user.id);
-        setSuggestions(tasks as unknown as SuggestionData[]);
-        // generateSuggestions();
-      };
-      fetchTasks();
+      (async () => {
+        await getSuggestions(user?.id || "");
+      })();
     }
-  }, [user?.id]);
+  }, [user?.id, suggestions]);
 
-  const getPriorityColor = (index: number, theme: string) => {
+  const getThemeClasses = () => {
     if (theme === "dark") {
-      return index === 0
-        ? "from-red-600/20 to-red-800/10 border-red-500/20 ring-1 ring-red-900/30"
-        : index === 1
-          ? "from-amber-600/20 to-amber-700/10 border-amber-500/20 ring-1 ring-amber-900/30"
-          : "from-blue-600/20 to-blue-700/10 border-blue-500/20 ring-1 ring-blue-900/20";
+      return {
+        background: "bg-gradient-to-br from-zinc-950/98 via-zinc-900/95 to-zinc-950/98",
+        headerBg: "bg-gradient-to-r from-zinc-900/80 to-zinc-800/60",
+        cardBg: "bg-gradient-to-r from-zinc-900/90 to-zinc-800/90 border-zinc-700/50",
+        text: "text-zinc-100",
+        textSecondary: "text-zinc-400",
+        textMuted: "text-zinc-500",
+        border: "border-zinc-800/50",
+        infoBanner: "bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-800/30",
+      };
     } else {
-      return index === 0
-        ? "from-red-50 to-red-100 border-red-200 ring-1 ring-red-100"
-        : index === 1
-          ? "from-amber-50 to-amber-100 border-amber-200 ring-1 ring-amber-100"
-          : "from-blue-50 to-blue-100 border-blue-200 ring-1 ring-blue-100";
+      return {
+        background: "bg-gradient-to-br from-gray-50/98 via-white/95 to-gray-50/98",
+        headerBg: "bg-gradient-to-r from-white/80 to-gray-50/60",
+        cardBg: "bg-gradient-to-r from-white/90 to-gray-50/90 border-gray-300/50",
+        text: "text-gray-900",
+        textSecondary: "text-gray-600",
+        textMuted: "text-gray-500",
+        border: "border-gray-200/50",
+        infoBanner: "bg-gradient-to-r from-blue-100/20 to-purple-100/20 border-blue-200/30",
+      };
     }
   };
 
-  const getPriorityLabel = (index: number) => {
+  const themeClasses = getThemeClasses();
+
+  const getPriorityIcon = (index: number) => {
     switch (index) {
       case 0:
-        return "High Priority";
+        return <AlertCircle className="w-4 h-4" />;
       case 1:
-        return "Medium Priority";
+        return <Clock className="w-4 h-4" />;
       default:
-        return "Low Priority";
+        return <BarChart3 className="w-4 h-4" />;
+    }
+  };
+
+  const getPriorityColor = (index: number) => {
+    switch (index) {
+      case 0:
+        return "text-red-400 bg-red-500/10 border-red-500/20";
+      case 1:
+        return "text-amber-400 bg-amber-500/10 border-amber-500/20";
+      default:
+        return "text-blue-400 bg-blue-500/10 border-blue-500/20";
     }
   };
 
   return (
-    <div className={`w-full bg-amber-00/20 absolute top-0 left-0 space-y-6 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-      {/* Header */}
-
-      {/* Error State */}
-      {error && (
-        <div
-          className={`p-4 rounded-lg border ${
-            theme === "dark" ? "bg-red-900/20 border-red-800/50 text-red-400" : "bg-red-50 border-red-200 text-red-700"
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5" />
-            <span>{error}</span>
+    <div className={`w-full absolute top-0 left-0 ${themeClasses.background} backdrop-blur-sm`}>
+      {/* New Suggestions Notification */}
+      {isNewSuggestions && (
+        <div className="absolute top-4 right-4 z-50 animate-bounce">
+          <div
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme === "dark" ? "bg-green-900/90 border border-green-700/50" : "bg-green-100/90 border border-green-300/50"} shadow-lg`}
+          >
+            <Bell className="w-4 h-4 text-green-400" />
+            <span className={`text-sm font-medium ${theme === "dark" ? "text-green-400" : "text-green-700"}`}>New recommendations available!</span>
           </div>
         </div>
       )}
 
+      {/* Header */}
+      <div className={`border-b ${themeClasses.border} ${themeClasses.headerBg} backdrop-blur-sm`}>
+        <div className="flex items-center justify-between p-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-lg border border-blue-500/30 shadow-lg">
+              <Brain className="w-6 h-6 text-blue-400" />
+            </div>
+            <div>
+              <h2 className={`text-xl font-bold ${themeClasses.text} tracking-wide`}>AI Intelligence Terminal</h2>
+              <p className={`text-sm ${themeClasses.textSecondary}`}>Advanced Performance Analysis & Tactical Enhancement System</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <BaseButton
+              onClick={() => handleGenerateSuggestions()}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 flex items-center gap-2 px-4 py-2 shadow-lg border border-blue-500/30"
+            >
+              <Plus className="text-white h-4 w-4" />
+              <span className="text-sm text-white font-medium">Generate Analysis</span>
+            </BaseButton>
+            <div className="flex items-center gap-2">
+              <div
+                className={`flex items-center gap-2 px-3 py-1 rounded-full ${theme === "dark" ? "bg-zinc-800/50 border border-zinc-700" : "bg-gray-200/50 border border-gray-300"}`}
+              >
+                {!suggestions && !isLoading && (
+                  <>
+                    <Activity className="w-4 h-4 text-green-400" />
+                    <span className="text-xs text-green-400 font-medium">READY</span>
+                  </>
+                )}
+                {suggestions && !isLoading && (
+                  <>
+                    <Activity className="w-4 h-4 text-blue-400" />
+                    <span className="text-xs text-blue-400 font-medium">ACTIVE</span>
+                  </>
+                )}
+                {isLoading && (
+                  <>
+                    <Activity className="w-4 h-4 text-yellow-400 animate-pulse" />
+                    <span className="text-xs text-yellow-400 font-medium">ANALYZING</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Information Banner */}
+      <div className={`${themeClasses.infoBanner} border-b border-blue-800/30 p-4`}>
+        <div className="flex items-center gap-3">
+          <Calendar className="w-5 h-5 text-blue-400" />
+          <div>
+            <p className={`text-sm ${themeClasses.text} font-medium`}>Bi-Weekly Assessment Protocol</p>
+            <p className={`text-xs ${themeClasses.textSecondary}`}>
+              System automatically generates tactical assessments every 2 weeks to track advancement and optimize training performance
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Loading State */}
       {isLoading && (
-        <div className={`p-8 rounded-lg border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-gray-50 border-gray-200"}`}>
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <div className="relative">
-              <div
-                className={`w-12 h-12 rounded-full border-4 border-purple-200 ${theme === "dark" ? "border-purple-800" : "border-purple-200"}`}
-              ></div>
-              <div className={`absolute top-0 left-0 w-12 h-12 rounded-full border-4 border-transparent border-t-purple-600 animate-spin`}></div>
-            </div>
-            <div className="text-center">
-              <p className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Analyzing Performance Data</p>
-              <p className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                Our AI is reviewing your training history and generating personalized insights...
-              </p>
+        <div className="p-6">
+          <div className="rounded-lg p-6 bg-gradient-to-r from-zinc-900/90 to-zinc-800/90 border border-zinc-700/50 shadow-xl">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="w-10 h-10 border-3 border-zinc-600 rounded-full"></div>
+                <div className="absolute top-0 left-0 w-10 h-10 border-3 border-transparent border-t-blue-400 rounded-full animate-spin"></div>
+              </div>
+              <div className="flex-1">
+                <p className="text-zinc-100 font-semibold text-lg">PROCESSING TACTICAL DATA</p>
+                <p className="text-sm text-zinc-400 mb-2">Analyzing performance metrics and combat effectiveness...</p>
+                <div className="w-full bg-zinc-700 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full animate-pulse" style={{ width: "60%" }}></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -129,147 +196,161 @@ export default function AiSuggestionGenerator() {
 
       {/* Suggestions Content */}
       {suggestions && !isLoading && suggestions.length > 0 && (
-        <div className="space-y-6">
-          {/* User Info Card */}
-          <div
-            className={`p-4 rounded-lg border ${
-              theme === "dark"
-                ? "bg-gradient-to-r from-zinc-900/50 to-zinc-800/50 border-zinc-700"
-                : "bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200"
-            }`}
-          >
-            <div className="flex items-center flex-col gap-4">
-              <div className="flex items-center gap-4">
-                <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800 border border-zinc-700" : "bg-white border border-gray-200"}`}>
-                  <User className={`w-5 h-5 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
+        <div className="p-6 space-y-6">
+          {/* Operator Info */}
+          <div className="bg-gradient-to-r from-zinc-900/90 to-zinc-800/90 rounded-lg p-5 border border-zinc-700/50 shadow-lg">
+            <div className="grid grid-cols-4 gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-green-600/20 to-emerald-600/20 rounded border border-green-500/30">
+                  <User className="w-4 h-4 text-green-400" />
                 </div>
                 <div>
-                  <div className="flex items-center  gap-2">
-                    <Award className={`w-4 h-4 ${theme === "dark" ? "text-yellow-400" : "text-yellow-600"}`} />
-                    <span className={`font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{suggestions[0].role}</span>
-                  </div>
-                  <p className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                    Last Training:{" "}
-                    {suggestions[0].last_training_date !== "Unknown" ? new Date(suggestions[0].last_training_date).toLocaleDateString() : "Unknown"}
+                  <p className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">OPERATOR</p>
+                  <p className="text-zinc-100 font-medium">{suggestions[0].role}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded border border-blue-500/30">
+                  <Clock className="w-4 h-4 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">LAST DRILL</p>
+                  <p className="text-zinc-100 font-medium">
+                    {suggestions[0].last_training_date !== "Unknown" ? new Date(suggestions[0].last_training_date).toLocaleDateString() : "N/A"}
                   </p>
                 </div>
               </div>
-
-              <div className="text-right flex items-center gap-2">
-                <p className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>{suggestions.length} Recommendations</p>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-purple-600/20 to-violet-600/20 rounded border border-purple-500/30">
+                  <Database className="w-4 h-4 text-purple-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">RECOMMENDATIONS</p>
+                  <p className="text-zinc-100 font-medium">{suggestions.length}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-orange-600/20 to-red-600/20 rounded border border-orange-500/30">
+                  <TrendingUp className="w-4 h-4 text-orange-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">NEXT CYCLE</p>
+                  <p className="text-zinc-100 font-medium">14 Days</p>
+                </div>
               </div>
             </div>
           </div>
-          {/* Suggestions List */}
-          <div className="space-y-4">
-            {suggestions.map((suggestion, index) => (
-              <div
-                key={index}
-                className={`group p-6 rounded-xl backdrop-blur-lg shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.01] ${getPriorityColor(index, theme)}`}
-              >
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className={`font-semibold text-lg ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{suggestion.topic}</h3>
-                          <span
-                            className={`px-2 py-1 text-xs rounded-full font-medium ${
-                              index === 0
-                                ? theme === "dark"
-                                  ? "bg-red-500/20 text-red-400"
-                                  : "bg-red-100 text-red-700"
-                                : index === 1
-                                  ? theme === "dark"
-                                    ? "bg-amber-500/20 text-amber-400"
-                                    : "bg-amber-100 text-amber-700"
-                                  : theme === "dark"
-                                    ? "bg-blue-500/20 text-blue-400"
-                                    : "bg-blue-100 text-blue-700"
-                            }`}
-                          >
-                            {getPriorityLabel(index)}
-                          </span>
+          {/* Tactical Recommendations */}
+          <div className="space-y-3">
+            <BaseDashboardCard header="">
+              {suggestions?.map((suggestion, index) => (
+                <div key={index} className=" rounded overflow-hidden">
+                  <div className="border-l-4 border-zinc-700">
+                    {/* Header */}
+                    <div className="p-4 border-b border-zinc-800/50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-1.5 rounded border ${getPriorityColor(index)}`}>{getPriorityIcon(index)}</div>
+                          <div>
+                            <h3 className="text-zinc-100 font-medium text-sm uppercase tracking-wider">{suggestion.topic}</h3>
+                            <p className="text-xs text-zinc-500">TACTICAL ASSESSMENT #{index + 1}</p>
+                          </div>
+                        </div>
+                        <ArrowUpRight className="w-4 h-4 text-zinc-500" />
+                      </div>
+                    </div>
+
+                    {/* Content Grid */}
+                    <div className="p-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        {/* Problem Analysis */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                            <p className="text-xs text-zinc-500 uppercase tracking-wider font-medium">DEFICIENCY IDENTIFIED</p>
+                          </div>
+                          <p className="text-sm text-zinc-300 leading-relaxed">{suggestion.issue}</p>
+                        </div>
+
+                        {/* Tactical Solution */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <p className="text-xs text-zinc-500 uppercase tracking-wider font-medium">CORRECTIVE ACTION</p>
+                          </div>
+                          <p className="text-sm text-zinc-300 leading-relaxed">{suggestion.recommendation}</p>
                         </div>
                       </div>
-                    </div>
-                    <ChevronRight
-                      className={`w-5 h-5 transition-transform duration-200 group-hover:translate-x-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
-                    />
-                  </div>
 
-                  {/* Issue Block */}
-                  <div
-                    className={`p-4 rounded-lg ${theme === "dark" ? "bg-red-900/20 border border-red-800/30" : "bg-red-50 border border-red-200"}`}
-                  >
-                    <div className="flex items-start gap-2">
-                      <AlertTriangle className={`w-4 h-4 mt-0.5 flex-shrink-0 ${theme === "dark" ? "text-red-400" : "text-red-600"}`} />
-                      <div>
-                        <p className={`text-xs uppercase font-semibold tracking-wide mb-1 ${theme === "dark" ? "text-red-300" : "text-red-500"}`}>
-                          Problem
-                        </p>
-                        <p className={`text-sm mt-1 ${theme === "dark" ? "text-red-300" : "text-red-600"}`}>{suggestion.issue}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Recommendation Block */}
-                  <div
-                    className={`p-4 rounded-lg ${theme === "dark" ? "bg-green-900/20 border border-green-800/30" : "bg-green-50 border border-green-200"}`}
-                  >
-                    <div className="flex items-start gap-2">
-                      <Lightbulb className={`w-4 h-4 mt-0.5 flex-shrink-0 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} />
-                      <div>
-                        <p className={`text-xs uppercase font-semibold tracking-wide mb-1 ${theme === "dark" ? "text-green-300" : "text-green-600"}`}>
-                          Suggestion
-                        </p>
-                        <p className={`text-sm mt-1 ${theme === "dark" ? "text-green-300" : "text-green-600"}`}>{suggestion.recommendation}</p>
-                      </div>
+                      {/* Objective */}
+                      {suggestion.objective && (
+                        <div className="mt-4 pt-3 border-t border-zinc-800/50">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Target className="w-3 h-3 text-zinc-500" />
+                            <p className="text-xs text-zinc-500 uppercase tracking-wider font-medium">MISSION OBJECTIVE</p>
+                          </div>
+                          <p className="text-sm text-zinc-400 font-mono">{suggestion.objective}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </BaseDashboardCard>
           </div>
-          {/* Footer */}
-          <div
-            className={`p-4 rounded-lg border ${
-              theme === "dark" ? "bg-zinc-900/30 border-zinc-800 text-zinc-400" : "bg-gray-50 border-gray-200 text-gray-600"
-            }`}
-          >
-            <div className="flex items-center gap-2 text-sm">
-              <CheckCircle className="w-4 h-4" />
-              <span>
-                Recommendations generated based on your training data and performance metrics. Review and implement these suggestions during your next
-                training sessions.
-              </span>
+          {/* System Status */}
+          <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-700/50 rounded-lg p-5 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-green-600/20 rounded border border-green-500/30">
+                  <CheckCircle2 className="w-5 h-5 text-green-400" />
+                </div>
+                <div>
+                  <p className="text-zinc-100 font-semibold text-lg">ANALYSIS COMPLETE</p>
+                  <p className="text-xs text-zinc-400">Tactical assessment generated from performance data</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Award className="w-3 h-3 text-green-400" />
+                    <span className="text-xs text-green-400 font-medium">Performance tracking active • Next analysis in 14 days</span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-xs text-zinc-500 font-mono">{new Date().toLocaleString()}</div>
+                <div className="text-xs text-zinc-400 mt-1">System Status: OPERATIONAL</div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {/* Empty State */}
-      {!suggestions && !isLoading && !error && (
-        <div className={`p-8 rounded-lg border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-gray-50 border-gray-200"}`}>
-          <div className="text-center space-y-4">
-            <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}>
-              <Brain className={`w-8 h-8 ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`} />
+      {!suggestions && !isLoading && (
+        <div className="p-6">
+          <div className="bg-gradient-to-br from-zinc-900/90 to-zinc-800/90 border border-zinc-700/50 rounded-lg p-10 text-center shadow-xl">
+            <div className="space-y-6">
+              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-lg flex items-center justify-center shadow-lg">
+                <Brain className="w-10 h-10 text-blue-400" />
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold text-zinc-100">AWAITING TRAINING DATA</h3>
+                <p className="text-sm text-zinc-400 max-w-md mx-auto leading-relaxed">
+                  Insufficient performance data for tactical analysis. The AI system requires completed training sessions to generate personalized
+                  recommendations and track your advancement.
+                </p>
+                <div className="bg-blue-900/20 border border-blue-700/30 rounded-lg p-3 mt-4">
+                  <div className="flex items-center gap-2 justify-center">
+                    <Calendar className="w-4 h-4 text-blue-400" />
+                    <span className="text-xs text-blue-400 font-medium">Automated Analysis Every 14 Days</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => handleGenerateSuggestions()}
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border border-blue-500/30 text-white rounded-lg transition-all font-semibold shadow-lg transform hover:scale-105"
+              >
+                INITIATE ANALYSIS
+              </button>
             </div>
-            <div>
-              <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>No Suggestions Available</h3>
-              <p className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                Complete some training sessions to get personalized AI recommendations.
-              </p>
-            </div>
-            <button
-              onClick={generateSuggestions}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                theme === "dark" ? "bg-purple-600 hover:bg-purple-700 text-white" : "bg-purple-600 hover:bg-purple-700 text-white"
-              }`}
-            >
-              Generate Suggestions
-            </button>
-            ;
           </div>
         </div>
       )}

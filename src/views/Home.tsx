@@ -17,7 +17,6 @@ const Training = lazy(() => import("./Trainings"));
 const TrainingPage = lazy(() => import("./Training"));
 const Assets = lazy(() => import("./Assets"));
 const ErrorPage = lazy(() => import("./404"));
-const Ai = lazy(() => import("./Ai"));
 
 export default function AppRoutes() {
   const { token } = useStore(authStore);
@@ -75,14 +74,7 @@ export default function AppRoutes() {
               </Suspense>
             }
           />
-          <Route
-            path="/ai"
-            element={
-              <Suspense fallback={<LoadingFallback />}>
-                <Ai />
-              </Suspense>
-            }
-          />
+
           <Route
             path="/assets"
             element={

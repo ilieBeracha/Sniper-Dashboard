@@ -8,7 +8,6 @@ import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { FaCrosshairs } from "react-icons/fa";
 import { useSidebarStore } from "@/store/sidebarStore";
-import { SparklesIcon } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 const navSections = [
@@ -18,7 +17,6 @@ const navSections = [
       { name: "Dashboard", href: "/", icon: <BiSolidDashboard className="w-5 h-5" /> },
       { name: "Training", href: "/trainings", icon: <BsBarChartFill className="w-5 h-5" /> },
       { name: "Assets", href: "/assets", icon: <FaCrosshairs className="w-5 h-5" /> },
-      { name: "AI", href: "/ai", icon: <SparklesIcon className="w-5 h-5" /> },
     ],
   },
   {

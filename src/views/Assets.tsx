@@ -8,7 +8,7 @@ import BaseButton from "@/components/BaseButton";
 import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
 import BaseInput from "@/components/BaseInput";
 import { FileQuestion } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { userStore } from "@/store/userStore";
 import { isCommanderOrSquadCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
@@ -63,16 +63,12 @@ export default function AssetsPage() {
     }
     setIsOpen(!isOpen);
   }
-  useEffect(() => {
-    console.log(user?.user_role);
-  }, []);
 
   async function handleCreateWeapon() {
     if (weaponForm.weapon_type === "" || weaponForm.serial_number === "" || weaponForm.mv === "") {
       toast.info("Please fill all the fields");
       return;
     }
-    console.log("Creating weapon:", weaponForm);
     await createWeapon(weaponForm as any);
     handleIsOpen("");
   }
@@ -82,7 +78,6 @@ export default function AssetsPage() {
       toast.info("Please fill all the fields");
       return;
     }
-    console.log("Creating equipment:", equipmentForm);
     await createEquipment(equipmentForm as any);
     handleIsOpen("");
   }

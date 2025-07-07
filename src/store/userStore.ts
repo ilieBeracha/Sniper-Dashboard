@@ -24,7 +24,6 @@ export const userStore = create<UserStore>((set) => ({
 
   setUserFromAuth: (authUser: SupabaseAuthUser) => {
     if (!authUser) return;
-    console.log("authUser", authUser);
     const meta = authUser.app_metadata || {};
 
     const mappedUser = {

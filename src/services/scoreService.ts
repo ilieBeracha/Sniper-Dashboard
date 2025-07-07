@@ -71,12 +71,8 @@ export async function getScoresByTrainingId(training_id: string, limit: number =
 
     // Apply pagination if limit is specified and greater than 0
     if (limit > 0) {
-      console.log("Applying score pagination: limit:", limit, "offset:", range);
       const rangeEnd = range + limit - 1;
-      console.log("Using score range pagination from", range, "to", rangeEnd);
       query = query.range(range, rangeEnd);
-    } else {
-      console.log("No score pagination applied - returning all scores");
     }
 
     const { data, error } = await query;
@@ -86,7 +82,6 @@ export async function getScoresByTrainingId(training_id: string, limit: number =
       throw new Error(`Failed to fetch scores: ${error.message}`);
     }
 
-    console.log("Raw scores received:", data?.length || 0);
     return data;
   } catch (error) {
     console.error("Exception when fetching scores:", error);

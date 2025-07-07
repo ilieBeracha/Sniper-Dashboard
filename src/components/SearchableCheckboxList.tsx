@@ -2,8 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import BaseInput from "./BaseInput";
 import BaseButton from "./BaseButton";
-import { useStore } from "zustand";
-import { TrainingStore } from "@/store/trainingStore";
 
 type ListItem = {
   id: string;
@@ -38,14 +36,6 @@ export default function SearchableCheckboxList({
 }: SearchableCheckboxListProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const trainingStore = useStore(TrainingStore);
-
-  console.log(trainingStore.assignments);
-
-  useEffect(() => {
-    console.log(trainingStore.assignments);
-    console.log(selectedIds);
-  }, [trainingStore.assignments]);
 
   const filteredItems = items.filter(
     (item) =>
@@ -67,14 +57,6 @@ export default function SearchableCheckboxList({
   }, []);
 
   const selectedItems = items?.filter((item) => selectedIds?.includes(item.id));
-
-  useEffect(() => {
-    console.log(selectedItems);
-    console.log(selectedIds);
-  }, [selectedItems, selectedIds]);
-
-  console.log(selectedItems);
-  console.log(selectedIds);
 
   return (
     <div className="relative" ref={dropdownRef}>

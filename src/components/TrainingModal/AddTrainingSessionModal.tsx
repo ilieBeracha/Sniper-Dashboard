@@ -119,7 +119,6 @@ export default function TrainingAddTrainingSessionModal({
 
   const handleAddAssignment = async (assignmentName: string) => {
     const { id } = await insertAssignment(assignmentName, user?.team_id || "");
-    console.log(id);
     setAssignmentIds((prev) => {
       const next = [...prev, id];
       return next;

@@ -50,9 +50,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
 
       setHasMore(result.length === SCORES_LIMIT);
       setCurrentPage(page);
-      console.log(`Score pagination: Page ${page}, Loaded ${result.length} scores, HasMore: ${result.length === SCORES_LIMIT}`);
     } catch (error) {
-      console.error("Error loading scores:", error);
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +72,6 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
       try {
         const count = await getScoresCountByTrainingId(id);
         setTotalCount(count);
-        console.log(`Total scores in training: ${count}`);
       } catch (error) {
         console.error("Error loading total count:", error);
       }

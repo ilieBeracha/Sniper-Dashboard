@@ -53,8 +53,6 @@ export default function Trainings() {
       } else {
         setHasMore(true);
       }
-
-      console.log(`Loaded ${result?.length || 0} trainings, Total: ${count}`);
     }
     loadTrainings();
   }, [user?.team_id, currentPage]);

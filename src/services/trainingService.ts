@@ -66,13 +66,9 @@ export async function getTrainingByTeamId(teamId: string, limit: number = 0, ran
 
   // Apply pagination if limit is specified and greater than 0
   if (limit > 0) {
-    console.log("Applying pagination: limit:", limit, "offset:", range);
     // Always use range for consistent pagination (from offset to offset + limit - 1)
     const rangeEnd = range + limit - 1;
-    console.log("Using range pagination from", range, "to", rangeEnd);
     query = query.range(range, rangeEnd);
-  } else {
-    console.log("No pagination applied - returning all trainings");
   }
 
   const { data: trainings, error } = await query;
@@ -81,8 +77,6 @@ export async function getTrainingByTeamId(teamId: string, limit: number = 0, ran
     console.error("Error fetching trainings:", error);
     return [];
   }
-
-  console.log("Raw trainings received:", trainings?.length || 0);
 
   const processedTrainings = (trainings || []).map((training) => {
     const assignments = training.assignment_session.map((item) => item.assignment).filter(Boolean);
@@ -94,7 +88,6 @@ export async function getTrainingByTeamId(teamId: string, limit: number = 0, ran
     };
   });
 
-  console.log("Processed trainings count:", processedTrainings.length);
   return processedTrainings;
 }
 
@@ -208,8 +201,6 @@ export async function insertAssignment(assignmentName: string, teamId: string) {
 
 export async function getAssignmentSessions(assignmentId: string) {
   const { data, error } = await supabase.from("assignment_session").select("*").eq("assignment_id", assignmentId);
-
-  console.log(data);
 
   if (error) throw new Error(error.message);
 
