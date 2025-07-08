@@ -2,7 +2,7 @@ import { Score, ScoreParticipant, ScoreTarget } from "@/types/score";
 import { supabase } from "./supabaseClient";
 
 export async function getUserGroupingScoresRpc(userId: string) {
-  const { data, error } = await supabase.rpc("get_user_grouping_scores", {
+  const { data, error } = await supabase.rpc("get_user_grouping", {
     user_id: userId,
   });
   if (error) {
