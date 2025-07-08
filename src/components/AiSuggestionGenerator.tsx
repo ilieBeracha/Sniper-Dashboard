@@ -3,7 +3,6 @@ import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { useTheme } from "@/contexts/ThemeContext";
 import {
-  Activity,
   Database,
   Brain,
   User,
@@ -13,20 +12,29 @@ import {
   BarChart3,
   AlertCircle,
   CheckCircle2,
-  Plus,
   Calendar,
   TrendingUp,
   Award,
   Bell,
 } from "lucide-react";
-import { SuggestionData, useAiStore } from "@/store/AiStore";
+import { SuggestionData } from "@/store/AiStore";
 import BaseDashboardCard from "./BaseDashboardCard";
-import BaseButton from "./BaseButton";
 
-export default function AiSuggestionGenerator() {
+export default function AiSuggestionGenerator({
+  suggestions,
+  isLoading,
+  generateSuggestions,
+  setSuggestions,
+  getSuggestions,
+}: {
+  suggestions: any;
+  isLoading: boolean;
+  generateSuggestions: () => Promise<any[]>;
+  setSuggestions: (suggestions: any[]) => void;
+  getSuggestions: (user_id: string) => Promise<any[]>;
+}) {
   const { theme } = useTheme();
   const { user } = useStore(userStore);
-  const { suggestions, isLoading, generateSuggestions, setSuggestions, getSuggestions } = useStore(useAiStore);
   const [isNewSuggestions, setIsNewSuggestions] = useState(false);
   const [previousCount, setPreviousCount] = useState(0);
 
@@ -46,7 +54,7 @@ export default function AiSuggestionGenerator() {
         await getSuggestions(user?.id || "");
       })();
     }
-  }, [user?.id, suggestions]);
+  }, [user?.id]);
 
   const getThemeClasses = () => {
     if (theme === "dark") {
@@ -99,74 +107,26 @@ export default function AiSuggestionGenerator() {
   };
 
   return (
-    <div className={`w-full absolute top-0 left-0 ${themeClasses.background} backdrop-blur-sm`}>
+    <div className={`w-full absolute top-0 left-0 ${themeClasses.background} backdrop-blur-sm overflow-x-hidden`}>
       {/* New Suggestions Notification */}
       {isNewSuggestions && (
-        <div className="absolute top-4 right-4 z-50 animate-bounce">
+        <div className="absolute top-2 right-2 md:top-4 md:right-4 z-50 animate-bounce">
           <div
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme === "dark" ? "bg-green-900/90 border border-green-700/50" : "bg-green-100/90 border border-green-300/50"} shadow-lg`}
+            className={`flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 rounded-lg ${theme === "dark" ? "bg-green-900/90 border border-green-700/50" : "bg-green-100/90 border border-green-300/50"} shadow-lg`}
           >
             <Bell className="w-4 h-4 text-green-400" />
-            <span className={`text-sm font-medium ${theme === "dark" ? "text-green-400" : "text-green-700"}`}>New recommendations available!</span>
+            <span className={`text-xs md:text-sm font-medium ${theme === "dark" ? "text-green-400" : "text-green-700"}`}>New recommendations!</span>
           </div>
         </div>
       )}
 
-      {/* Header */}
-      <div className={`border-b ${themeClasses.border} ${themeClasses.headerBg} backdrop-blur-sm`}>
-        <div className="flex items-center justify-between p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-lg border border-blue-500/30 shadow-lg">
-              <Brain className="w-6 h-6 text-blue-400" />
-            </div>
-            <div>
-              <h2 className={`text-xl font-bold ${themeClasses.text} tracking-wide`}>AI Intelligence Terminal</h2>
-              <p className={`text-sm ${themeClasses.textSecondary}`}>Advanced Performance Analysis & Tactical Enhancement System</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <BaseButton
-              onClick={() => handleGenerateSuggestions()}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 flex items-center gap-2 px-4 py-2 shadow-lg border border-blue-500/30"
-            >
-              <Plus className="text-white h-4 w-4" />
-              <span className="text-sm text-white font-medium">Generate Analysis</span>
-            </BaseButton>
-            <div className="flex items-center gap-2">
-              <div
-                className={`flex items-center gap-2 px-3 py-1 rounded-full ${theme === "dark" ? "bg-zinc-800/50 border border-zinc-700" : "bg-gray-200/50 border border-gray-300"}`}
-              >
-                {!suggestions && !isLoading && (
-                  <>
-                    <Activity className="w-4 h-4 text-green-400" />
-                    <span className="text-xs text-green-400 font-medium">READY</span>
-                  </>
-                )}
-                {suggestions && !isLoading && (
-                  <>
-                    <Activity className="w-4 h-4 text-blue-400" />
-                    <span className="text-xs text-blue-400 font-medium">ACTIVE</span>
-                  </>
-                )}
-                {isLoading && (
-                  <>
-                    <Activity className="w-4 h-4 text-yellow-400 animate-pulse" />
-                    <span className="text-xs text-yellow-400 font-medium">ANALYZING</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Information Banner */}
-      <div className={`${themeClasses.infoBanner} border-b border-blue-800/30 p-4`}>
-        <div className="flex items-center gap-3">
-          <Calendar className="w-5 h-5 text-blue-400" />
+      <div className={`${themeClasses.infoBanner} border-b border-blue-800/30 p-3 md:p-4`}>
+        <div className="flex items-start md:items-center gap-3">
+          <Calendar className="w-4 md:w-5 h-4 md:h-5 text-blue-400 flex-shrink-0 mt-0.5 md:mt-0" />
           <div>
-            <p className={`text-sm ${themeClasses.text} font-medium`}>Bi-Weekly Assessment Protocol</p>
-            <p className={`text-xs ${themeClasses.textSecondary}`}>
+            <p className={`text-xs md:text-sm ${themeClasses.text} font-medium`}>Bi-Weekly Assessment Protocol</p>
+            <p className={`text-xs ${themeClasses.textSecondary} leading-relaxed`}>
               System automatically generates tactical assessments every 2 weeks to track advancement and optimize training performance
             </p>
           </div>
@@ -175,18 +135,21 @@ export default function AiSuggestionGenerator() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="p-6">
-          <div className="rounded-lg p-6 bg-gradient-to-r from-zinc-900/90 to-zinc-800/90 border border-zinc-700/50 shadow-xl">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <div className="w-10 h-10 border-3 border-zinc-600 rounded-full"></div>
-                <div className="absolute top-0 left-0 w-10 h-10 border-3 border-transparent border-t-blue-400 rounded-full animate-spin"></div>
+        <div className="p-4 md:p-6">
+          <div className="rounded-lg p-4 md:p-6 bg-gradient-to-r from-zinc-900/90 to-zinc-800/90 border border-zinc-700/50 shadow-xl">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="relative flex-shrink-0">
+                <div className="w-8 md:w-10 h-8 md:h-10 border-2 md:border-3 border-zinc-600 rounded-full"></div>
+                <div className="absolute top-0 left-0 w-8 md:w-10 h-8 md:h-10 border-2 md:border-3 border-transparent border-t-blue-400 rounded-full animate-spin"></div>
               </div>
               <div className="flex-1">
-                <p className="text-zinc-100 font-semibold text-lg">PROCESSING TACTICAL DATA</p>
-                <p className="text-sm text-zinc-400 mb-2">Analyzing performance metrics and combat effectiveness...</p>
-                <div className="w-full bg-zinc-700 rounded-full h-2">
-                  <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full animate-pulse" style={{ width: "60%" }}></div>
+                <p className="text-zinc-100 font-semibold text-base md:text-lg">PROCESSING TACTICAL DATA</p>
+                <p className="text-xs md:text-sm text-zinc-400 mb-2">Analyzing performance metrics and combat effectiveness...</p>
+                <div className="w-full bg-zinc-700 rounded-full h-1.5 md:h-2">
+                  <div
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 md:h-2 rounded-full animate-pulse"
+                    style={{ width: "60%" }}
+                  ></div>
                 </div>
               </div>
             </div>
@@ -196,46 +159,46 @@ export default function AiSuggestionGenerator() {
 
       {/* Suggestions Content */}
       {suggestions && !isLoading && suggestions.length > 0 && (
-        <div className="p-6 space-y-6">
+        <div className="p-4 md:p-6 space-y-4 md:space-y-6">
           {/* Operator Info */}
-          <div className="bg-gradient-to-r from-zinc-900/90 to-zinc-800/90 rounded-lg p-5 border border-zinc-700/50 shadow-lg">
-            <div className="grid grid-cols-4 gap-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-green-600/20 to-emerald-600/20 rounded border border-green-500/30">
-                  <User className="w-4 h-4 text-green-400" />
+          <div className="bg-gradient-to-r from-zinc-900/90 to-zinc-800/90 rounded-lg p-4 md:p-5 border border-zinc-700/50 shadow-lg">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="p-1.5 md:p-2 bg-gradient-to-br from-green-600/20 to-emerald-600/20 rounded border border-green-500/30">
+                  <User className="w-3 md:w-4 h-3 md:h-4 text-green-400" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">OPERATOR</p>
-                  <p className="text-zinc-100 font-medium">{suggestions[0].role}</p>
+                  <p className="text-zinc-100 font-medium text-sm truncate">{suggestions[0].role}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded border border-blue-500/30">
-                  <Clock className="w-4 h-4 text-blue-400" />
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="p-1.5 md:p-2 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded border border-blue-500/30">
+                  <Clock className="w-3 md:w-4 h-3 md:h-4 text-blue-400" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">LAST DRILL</p>
-                  <p className="text-zinc-100 font-medium">
+                  <p className="text-zinc-100 font-medium text-sm truncate">
                     {suggestions[0].last_training_date !== "Unknown" ? new Date(suggestions[0].last_training_date).toLocaleDateString() : "N/A"}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-purple-600/20 to-violet-600/20 rounded border border-purple-500/30">
-                  <Database className="w-4 h-4 text-purple-400" />
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="p-1.5 md:p-2 bg-gradient-to-br from-purple-600/20 to-violet-600/20 rounded border border-purple-500/30">
+                  <Database className="w-3 md:w-4 h-3 md:h-4 text-purple-400" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">RECOMMENDATIONS</p>
-                  <p className="text-zinc-100 font-medium">{suggestions.length}</p>
+                  <p className="text-zinc-100 font-medium text-sm">{suggestions.length}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-orange-600/20 to-red-600/20 rounded border border-orange-500/30">
-                  <TrendingUp className="w-4 h-4 text-orange-400" />
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="p-1.5 md:p-2 bg-gradient-to-br from-orange-600/20 to-red-600/20 rounded border border-orange-500/30">
+                  <TrendingUp className="w-3 md:w-4 h-3 md:h-4 text-orange-400" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">NEXT CYCLE</p>
-                  <p className="text-zinc-100 font-medium">14 Days</p>
+                  <p className="text-zinc-100 font-medium text-sm">14 Days</p>
                 </div>
               </div>
             </div>
@@ -243,53 +206,53 @@ export default function AiSuggestionGenerator() {
           {/* Tactical Recommendations */}
           <div className="space-y-3">
             <BaseDashboardCard header="">
-              {suggestions?.map((suggestion, index) => (
-                <div key={index} className=" rounded overflow-hidden">
+              {suggestions?.map((suggestion: any, index: number) => (
+                <div key={index} className="rounded overflow-hidden">
                   <div className="border-l-4 border-zinc-700">
                     {/* Header */}
-                    <div className="p-4 border-b border-zinc-800/50">
+                    <div className="p-3 md:p-4 border-b border-zinc-800/50">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-1.5 rounded border ${getPriorityColor(index)}`}>{getPriorityIcon(index)}</div>
-                          <div>
-                            <h3 className="text-zinc-100 font-medium text-sm uppercase tracking-wider">{suggestion.topic}</h3>
+                        <div className="flex items-center gap-2 md:gap-3">
+                          <div className={`p-1 md:p-1.5 rounded border ${getPriorityColor(index)}`}>{getPriorityIcon(index)}</div>
+                          <div className="min-w-0">
+                            <h3 className="text-zinc-100 font-medium text-xs md:text-sm uppercase tracking-wider truncate">{suggestion.topic}</h3>
                             <p className="text-xs text-zinc-500">TACTICAL ASSESSMENT #{index + 1}</p>
                           </div>
                         </div>
-                        <ArrowUpRight className="w-4 h-4 text-zinc-500" />
+                        <ArrowUpRight className="w-3 md:w-4 h-3 md:h-4 text-zinc-500 flex-shrink-0" />
                       </div>
                     </div>
 
                     {/* Content Grid */}
-                    <div className="p-4">
-                      <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3 md:p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                         {/* Problem Analysis */}
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                            <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></div>
                             <p className="text-xs text-zinc-500 uppercase tracking-wider font-medium">DEFICIENCY IDENTIFIED</p>
                           </div>
-                          <p className="text-sm text-zinc-300 leading-relaxed">{suggestion.issue}</p>
+                          <p className="text-xs md:text-sm text-zinc-300 leading-relaxed">{suggestion.issue}</p>
                         </div>
 
                         {/* Tactical Solution */}
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
                             <p className="text-xs text-zinc-500 uppercase tracking-wider font-medium">CORRECTIVE ACTION</p>
                           </div>
-                          <p className="text-sm text-zinc-300 leading-relaxed">{suggestion.recommendation}</p>
+                          <p className="text-xs md:text-sm text-zinc-300 leading-relaxed">{suggestion.recommendation}</p>
                         </div>
                       </div>
 
                       {/* Objective */}
                       {suggestion.objective && (
-                        <div className="mt-4 pt-3 border-t border-zinc-800/50">
+                        <div className="mt-3 md:mt-4 pt-3 border-t border-zinc-800/50">
                           <div className="flex items-center gap-2 mb-2">
-                            <Target className="w-3 h-3 text-zinc-500" />
+                            <Target className="w-3 h-3 text-zinc-500 flex-shrink-0" />
                             <p className="text-xs text-zinc-500 uppercase tracking-wider font-medium">MISSION OBJECTIVE</p>
                           </div>
-                          <p className="text-sm text-zinc-400 font-mono">{suggestion.objective}</p>
+                          <p className="text-xs md:text-sm text-zinc-400 font-mono">{suggestion.objective}</p>
                         </div>
                       )}
                     </div>
@@ -299,14 +262,14 @@ export default function AiSuggestionGenerator() {
             </BaseDashboardCard>
           </div>
           {/* System Status */}
-          <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-700/50 rounded-lg p-5 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-green-600/20 rounded border border-green-500/30">
-                  <CheckCircle2 className="w-5 h-5 text-green-400" />
+          <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-700/50 rounded-lg p-4 md:p-5 shadow-lg">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-0">
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="p-1.5 md:p-2 bg-green-600/20 rounded border border-green-500/30">
+                  <CheckCircle2 className="w-4 md:w-5 h-4 md:h-5 text-green-400" />
                 </div>
                 <div>
-                  <p className="text-zinc-100 font-semibold text-lg">ANALYSIS COMPLETE</p>
+                  <p className="text-zinc-100 font-semibold text-base md:text-lg">ANALYSIS COMPLETE</p>
                   <p className="text-xs text-zinc-400">Tactical assessment generated from performance data</p>
                   <div className="flex items-center gap-2 mt-1">
                     <Award className="w-3 h-3 text-green-400" />
@@ -314,7 +277,7 @@ export default function AiSuggestionGenerator() {
                   </div>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-left md:text-right w-full md:w-auto">
                 <div className="text-xs text-zinc-500 font-mono">{new Date().toLocaleString()}</div>
                 <div className="text-xs text-zinc-400 mt-1">System Status: OPERATIONAL</div>
               </div>
@@ -325,28 +288,28 @@ export default function AiSuggestionGenerator() {
 
       {/* Empty State */}
       {!suggestions && !isLoading && (
-        <div className="p-6">
-          <div className="bg-gradient-to-br from-zinc-900/90 to-zinc-800/90 border border-zinc-700/50 rounded-lg p-10 text-center shadow-xl">
-            <div className="space-y-6">
-              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-lg flex items-center justify-center shadow-lg">
-                <Brain className="w-10 h-10 text-blue-400" />
+        <div className="p-4 md:p-6">
+          <div className="bg-gradient-to-br from-zinc-900/90 to-zinc-800/90 border border-zinc-700/50 rounded-lg p-6 md:p-10 text-center shadow-xl">
+            <div className="space-y-4 md:space-y-6">
+              <div className="w-16 md:w-20 h-16 md:h-20 mx-auto bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-lg flex items-center justify-center shadow-lg">
+                <Brain className="w-8 md:w-10 h-8 md:h-10 text-blue-400" />
               </div>
               <div className="space-y-3">
-                <h3 className="text-xl font-bold text-zinc-100">AWAITING TRAINING DATA</h3>
-                <p className="text-sm text-zinc-400 max-w-md mx-auto leading-relaxed">
+                <h3 className="text-lg md:text-xl font-bold text-zinc-100">AWAITING TRAINING DATA</h3>
+                <p className="text-xs md:text-sm text-zinc-400 max-w-md mx-auto leading-relaxed px-4 md:px-0">
                   Insufficient performance data for tactical analysis. The AI system requires completed training sessions to generate personalized
                   recommendations and track your advancement.
                 </p>
                 <div className="bg-blue-900/20 border border-blue-700/30 rounded-lg p-3 mt-4">
                   <div className="flex items-center gap-2 justify-center">
-                    <Calendar className="w-4 h-4 text-blue-400" />
+                    <Calendar className="w-3 md:w-4 h-3 md:h-4 text-blue-400" />
                     <span className="text-xs text-blue-400 font-medium">Automated Analysis Every 14 Days</span>
                   </div>
                 </div>
               </div>
               <button
                 onClick={() => handleGenerateSuggestions()}
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border border-blue-500/30 text-white rounded-lg transition-all font-semibold shadow-lg transform hover:scale-105"
+                className="px-6 md:px-8 py-2.5 md:py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border border-blue-500/30 text-white rounded-lg transition-all font-semibold shadow-lg transform hover:scale-105 text-sm md:text-base"
               >
                 INITIATE ANALYSIS
               </button>
