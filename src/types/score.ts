@@ -28,6 +28,7 @@ export interface Score {
   distance?: number | null;
   shots_fired?: number | null;
   target_hit?: number | null;
+  team_id: string;
 
   /*  misc  */
   day_night?: DayNight | null;
@@ -51,7 +52,7 @@ export interface ScoreTarget {
 
   distance: number; // metres
   shots_fired: number;
-  target_hit: number;
+  target_hits?: number;
 
   created_at?: string; // timestamptz (DB default now())
 }
@@ -64,7 +65,7 @@ export interface ScoreParticipant {
   id?: string;
   score_id?: string;
   user_id: string;
-  user: { first_name: string; last_name: string; email: string };
+  user?: { first_name: string; last_name: string; email: string };
   user_duty: UserDuty;
 
   weapon_id?: string;
@@ -77,9 +78,9 @@ export interface ScoreParticipant {
 /*──────────────────────────── misc enums ───────────────────────────*/
 export type DayNight = "day" | "night";
 
-export interface UserDuty {
-  SNIPER: "sniper";
-  SPOTTER: "spotter";
+export enum UserDuty {
+  SNIPER = "sniper",
+  SPOTTER = "spotter",
 }
 
 export enum PositionScore {

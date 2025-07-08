@@ -1,11 +1,11 @@
 import { Outlet } from "react-router-dom";
-import { isMobile } from "react-device-detect";
 import Sidebar from "@/components/Sidebar";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function DefaultLayout() {
   const { theme } = useTheme();
-
+  const isMobile = useIsMobile();
   return (
     <div
       className={`flex w-screen relative ${isMobile ? "flex-col" : "flex-row"} transition-colors duration-200 ${

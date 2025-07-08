@@ -5,8 +5,6 @@ import { useStore } from "zustand";
 import { TrainingStatus } from "@/types/training";
 import ConfirmStatusChangeModal from "@/components/ConfirmStatusChangeModal";
 import { supabase } from "@/services/supabaseClient";
-import EditTrainingSessionModal from "@/components/EditTrainingSessionModal";
-import { teamStore } from "@/store/teamStore";
 import { scoreStore } from "@/store/scoreSrore";
 import { loaderStore } from "@/store/loaderStore";
 import { useModal } from "@/hooks/useModal";
@@ -28,26 +26,28 @@ import { userStore } from "@/store/userStore";
 import TrainingScoresTable from "@/components/TrainingScoresTable";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
+import AddGroupScoreModal from "@/components/TrainingPageScoreFormModal/TrainingPageGroupFormModal";
+import { useModal as useGroupModal } from "@/hooks/useModal";
 
 export default function TrainingPage() {
   const { id } = useParams();
   const { theme } = useTheme();
   const { userRole } = useStore(userStore);
-  const { training, loadTrainingById, loadAssignments, createAssignment, assignments } = useStore(TrainingStore);
+  const { training, loadTrainingById, loadAssignments, createAssignment } = useStore(TrainingStore);
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { isOpen: isAddScoreOpen, setIsOpen: setIsAddScoreOpen, toggleIsOpen: toggleIsAddScoreOpen } = useModal();
+  const { isOpen: isAddGroupScoreOpen, setIsOpen: setIsAddGroupScoreOpen, toggleIsOpen: toggleIsAddGroupScoreOpen } = useGroupModal();
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedScore, setSelectedScore] = useState<any>(null);
   const [isScoreDetailsOpen, setIsScoreDetailsOpen] = useState(false);
   const [newlyAddedScoreId, setNewlyAddedScoreId] = useState<string | null>(null);
   const [editingScore, setEditingScore] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"scores" | "analytics" | "status">("scores");
+  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const { setIsLoading, isLoading } = useStore(loaderStore);
-  const { members } = useStore(teamStore);
   const {
     getScoresByTrainingId,
     scores,
@@ -90,8 +90,6 @@ export default function TrainingPage() {
     }
   };
 
-  const handleEditSuccess = () => training?.id && loadTrainingById(training.id);
-
   const handleAddAssignment = async (assignmentName: string) => {
     try {
       setIsLoading(true);
@@ -112,9 +110,9 @@ export default function TrainingPage() {
     }
     try {
       const newScore = await createScoreAction(data);
-      setIsAddScoreOpen(false);
       if (newScore?.[0]?.id) {
         setNewlyAddedScoreId(newScore[0].id as string);
+        setIsAddScoreOpen(false);
       }
       await getScoresByTrainingId(id as string);
     } catch (error) {
@@ -235,18 +233,49 @@ export default function TrainingPage() {
             </div>
 
             {/* Add Score Button */}
-            <BaseButton
-              type="button"
-              disabled={training?.status === TrainingStatus.Completed}
-              onClick={() => toggleIsAddScoreOpen()}
-              style="purple"
-              className={`flex mt-2 items-center gap-2 font-medium transition-all duration-200 ${
-                isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-sm " : "px-4 py-2.5 rounded-lg text-sm hover:shadow-lg"
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              <Plus size={16} />
-              <span>Add Score</span>
-            </BaseButton>
+            <div className="flex gap-2 flex-wrap">
+              <div className="relative">
+                <BaseButton
+                  type="button"
+                  disabled={training?.status === TrainingStatus.Completed}
+                  onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
+                  style="purple"
+                  className={`flex items-center gap-2 font-medium transition-all duration-200 ${
+                    isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-sm" : "px-4 py-2.5 rounded-lg text-sm hover:shadow-lg"
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <Plus size={16} />
+                  <span>Add Score</span>
+                </BaseButton>
+
+                {isAddMenuOpen && (
+                  <div
+                    className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg z-50 ${
+                      theme === "dark" ? "bg-zinc-800 border border-zinc-700" : "bg-white border border-gray-200"
+                    }`}
+                  >
+                    <button
+                      onClick={() => {
+                        setIsAddMenuOpen(false);
+                        toggleIsAddScoreOpen();
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-purple-100 dark:hover:bg-zinc-700 transition-colors"
+                    >
+                      ➤ Add Target Score
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsAddMenuOpen(false);
+                        toggleIsAddGroupScoreOpen();
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-purple-100 dark:hover:bg-zinc-700 transition-colors"
+                    >
+                      ➤ Add Group Score
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -285,15 +314,14 @@ export default function TrainingPage() {
         <div className="mt-6">
           {activeTab === "scores" && (
             <div className="space-y-4 w-full">
-              {/* Scores Grid */}
-              <TrainingScoresTable
-                scores={scores}
-                onScoreClick={handleScoreClick}
-                onEditClick={handleEditScore}
-                newlyAddedScoreId={newlyAddedScoreId}
-              />
-
-              {/* Empty State */}
+              {scores.length > 0 && (
+                <TrainingScoresTable
+                  scores={scores}
+                  onScoreClick={handleScoreClick}
+                  onEditClick={handleEditScore}
+                  newlyAddedScoreId={newlyAddedScoreId}
+                />
+              )}
               {scores.length === 0 && (
                 <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
                   <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -380,16 +408,6 @@ export default function TrainingPage() {
           )}
         </div>
 
-        {/* modals */}
-        <EditTrainingSessionModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onSuccess={handleEditSuccess}
-          teamMembers={members}
-          assignments={assignments}
-          training={training}
-        />
-
         <ConfirmStatusChangeModal
           isOpen={isConfirmModalOpen}
           onClose={() => setIsConfirmModalOpen(false)}
@@ -407,7 +425,18 @@ export default function TrainingPage() {
             setEditingScore(null);
           }}
           onSubmit={handleAddScore}
-          assignmentSessions={assignments}
+        />
+        <AddGroupScoreModal
+          isOpen={isAddGroupScoreOpen}
+          onClose={() => setIsAddGroupScoreOpen(false)}
+          onSubmit={async (data) => {
+            try {
+              await supabase.from("group_scores").insert(data);
+              setIsAddGroupScoreOpen(false);
+            } catch (error) {
+              console.error("Error adding group score:", error);
+            }
+          }}
         />
 
         <ScoreDetailsModal isOpen={isScoreDetailsOpen} setIsOpen={setIsScoreDetailsOpen} score={selectedScore} />

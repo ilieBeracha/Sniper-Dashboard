@@ -1,4 +1,4 @@
-import { Target } from "lucide-react";
+import { Crosshair, Target } from "lucide-react";
 import { Plus } from "lucide-react";
 import { X } from "lucide-react";
 import { useFormContext } from "react-hook-form";
@@ -8,6 +8,8 @@ interface scoreTargets {
   distance?: number;
   shots_fired?: number;
   target_hits?: number;
+  day_night?: string;
+  position?: string;
 }
 
 export default function TrainingPageScoreFormModalStats({
@@ -19,31 +21,21 @@ export default function TrainingPageScoreFormModalStats({
   removeDistanceEntry: (index: number) => void;
   updateDistanceEntry: (index: number, field: keyof scoreTargets, value: number) => void;
 }) {
-  const { watch } = useFormContext();
+  const { watch, setValue } = useFormContext();
   const { theme } = useTheme();
   const formValues = watch();
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Target className={`transition-colors duration-200 ${theme === "dark" ? "text-orange-400" : "text-orange-600"}`} size={16} />
-          <h2 className={`text-base font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-            Shooting Performance
-          </h2>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Crosshair className={` transition-colors duration-200 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} size={16} />
+            <h4 className={`text-sm font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+              Combat Details
+            </h4>
+          </div>
         </div>
-        <button
-          type="button"
-          onClick={addDistanceEntry}
-          className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border transition-colors duration-200 ${
-            theme === "dark"
-              ? "text-indigo-400 hover:text-indigo-300 bg-indigo-900/20 border-indigo-700/50"
-              : "text-indigo-600 hover:text-indigo-700 bg-indigo-50 border-indigo-200"
-          }`}
-        >
-          <Plus size={14} />
-          Add Distance
-        </button>
       </div>
 
       {formValues.scoreTargets.length === 0 && (
@@ -62,6 +54,53 @@ export default function TrainingPageScoreFormModalStats({
         </div>
       )}
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <select
+          value={formValues.day_night}
+          onChange={(e) => setValue("day_night", e.target.value as string)}
+          className={`w-full min-h-10 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
+            theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
+          }`}
+        >
+          <option value="">Select day/night</option>
+          <option value="day">Day</option>
+          <option value="night">Night</option>
+        </select>
+
+        <select
+          value={formValues.position}
+          onChange={(e) => setValue("position", e.target.value as string)}
+          className={`w-full min-h-10 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
+            theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
+          }`}
+        >
+          <option value="">Select position</option>
+          <option value="lying">Lying</option>
+          <option value="standing">Standing</option>
+          <option value="sitting">Sitting</option>
+          <option value="operational">Operational</option>
+        </select>
+      </div>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Target className={`transition-colors duration-200 ${theme === "dark" ? "text-orange-400" : "text-orange-600"}`} size={16} />
+          <h2 className={`text-base font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            Shooting Performance
+          </h2>
+        </div>
+        <button
+          type="button"
+          onClick={addDistanceEntry}
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border transition-colors duration-200 ${
+            theme === "dark"
+              ? "text-indigo-400 hover:text-indigo-300 bg-indigo-900/20 border-indigo-700/50"
+              : "text-indigo-600 hover:text-indigo-700 bg-indigo-50 border-indigo-200"
+          }`}
+        >
+          <Plus size={14} />
+          Add Another Target
+        </button>
+      </div>
       <div className="space-y-4">
         {formValues.scoreTargets.map((entry: any, index: number) => (
           <div

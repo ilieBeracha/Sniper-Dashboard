@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import BaseInput from "@/components/BaseInput";
 import { useTheme } from "@/contexts/ThemeContext";
+import { validateAuthForm } from "@/lib/formValidation";
 
 export default function SoldierRegisterForm({
   AuthSubmit,
@@ -13,10 +14,30 @@ export default function SoldierRegisterForm({
   const [password, setPassword] = useState("");
   const [inviteCode, setInviteCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
   const { theme } = useTheme();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
+    const validationError = validateAuthForm({
+      firstName,
+      lastName,
+      email,
+      password,
+    });
+
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    if (!inviteCode.trim()) {
+      setError("Squad invite code is required");
+      return;
+    }
+
     AuthSubmit({
       first_name: firstName,
       last_name: lastName,
@@ -27,9 +48,12 @@ export default function SoldierRegisterForm({
   };
 
   const emailIcon = (
-    <svg className={`h-5 w-5 transition-colors duration-200 ${
-      theme === 'dark' ? 'text-gray-600' : 'text-gray-500'
-    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className={`h-5 w-5 transition-colors duration-200 ${theme === "dark" ? "text-gray-600" : "text-gray-500"}`}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -40,9 +64,12 @@ export default function SoldierRegisterForm({
   );
 
   const passwordIcon = (
-    <svg className={`h-5 w-5 transition-colors duration-200 ${
-      theme === 'dark' ? 'text-gray-600' : 'text-gray-500'
-    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className={`h-5 w-5 transition-colors duration-200 ${theme === "dark" ? "text-gray-600" : "text-gray-500"}`}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -53,9 +80,12 @@ export default function SoldierRegisterForm({
   );
 
   const inviteCodeIcon = (
-    <svg className={`h-5 w-5 transition-colors duration-200 ${
-      theme === 'dark' ? 'text-gray-600' : 'text-gray-500'
-    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className={`h-5 w-5 transition-colors duration-200 ${theme === "dark" ? "text-gray-600" : "text-gray-500"}`}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -66,11 +96,13 @@ export default function SoldierRegisterForm({
   );
 
   const togglePasswordIcon = (
-    <button type="button" onClick={() => setShowPassword(!showPassword)} className={`h-5 w-5 transition-colors duration-200 ${
-      theme === 'dark' 
-        ? 'text-gray-600 hover:text-gray-200' 
-        : 'text-gray-500 hover:text-gray-700'
-    }`}>
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className={`h-5 w-5 transition-colors duration-200 ${
+        theme === "dark" ? "text-gray-600 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"
+      }`}
+    >
       {showPassword ? (
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -95,7 +127,16 @@ export default function SoldierRegisterForm({
   );
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form className="space-y-4 h-fit" onSubmit={handleSubmit}>
+      {error && (
+        <div
+          className={`p-3 rounded-lg text-sm ${
+            theme === "dark" ? "bg-red-900/50 text-red-300 border border-red-800" : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
+          {error}
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-4">
         <BaseInput
           label="First name"
@@ -156,9 +197,9 @@ export default function SoldierRegisterForm({
         <button
           type="submit"
           className={`w-full flex justify-center items-center px-4 py-3 rounded-2xl font-semibold focus:outline-none focus:ring-2 transition-all duration-200 ${
-            theme === 'dark'
-              ? 'bg-white text-[#0A0A0A] hover:bg-gray-100 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]'
-              : 'bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-white'
+            theme === "dark"
+              ? "bg-white text-[#0A0A0A] hover:bg-gray-100 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
+              : "bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-white"
           }`}
         >
           Register as Soldier

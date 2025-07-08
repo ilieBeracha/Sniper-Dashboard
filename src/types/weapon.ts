@@ -1,8 +1,8 @@
 export interface Weapon {
-  id: string;
+  id?: string;
   weapon_type: string;
   serial_number: string;
-  team_id: string;
-  created_at: string;
+  team_id?: string;
+  created_at?: string;
   mv: string | null;
 }

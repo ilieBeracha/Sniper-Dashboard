@@ -6,3 +6,8 @@ export interface Equipment {
   team_id: string;
   created_at: string;
 }
+
+export enum DayNight {
+  DAY = "day",
+  NIGHT = "night",
+}
