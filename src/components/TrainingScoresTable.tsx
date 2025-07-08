@@ -276,7 +276,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
             }`}
           >
             <tr>
-              <th className="px-2 sm:px-4 py-3">Assignment</th>
+              <th className="px-4 sm:px-4 py-3">Assignment</th>
               <th className="px-2 sm:px-4 py-3">Participant</th>
               <th className="px-2 sm:px-4 py-3  sm:table-cell">Position</th>
               <th className="px-2 sm:px-4 py-3  lg:table-cell">Day/Night</th>
@@ -302,7 +302,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
                     isNew ? "bg-indigo-100/40 dark:bg-indigo-800/20 animate-pulse" : theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-gray-50"
                   }`}
                 >
-                  <td className="px-2 sm:px-4 py-3 font-medium truncate max-w-[100px] sm:max-w-[150px]">
+                  <td className="px-4 sm:px-4 py-3 font-medium truncate max-w-[100px] sm:max-w-[150px]">
                     {score.assignment_session?.assignment?.assignment_name || "N/A"}
                   </td>
                   <td className="px-2 sm:px-4 py-3 truncate max-w-[80px] sm:max-w-none">

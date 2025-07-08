@@ -25,19 +25,13 @@ export default function BaseDesktopDrawer({
         <div className="absolute inset-0 overflow-hidden">
           <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
             <DialogPanel className={`pointer-events-auto w-[${width}] transform transition duration-500 ease-in-out data-[closed]:translate-x-full`}>
-              <div className={`flex h-full flex-col overflow-y-scroll py-6 shadow-xl ${
-                theme === 'dark' ? 'bg-[#161616]' : 'bg-white'
-              }`}>
+              <div className={`flex h-full flex-col overflow-y-scroll py-6 shadow-xl ${theme === "dark" ? "bg-[#161616]" : "bg-white"}`}>
                 <div className="px-6 flex items-center justify-between">
-                  <DialogTitle className={`text-lg ${
-                    theme === 'dark' ? 'text-white' : 'text-gray-900'
-                  }`}>{title}</DialogTitle>
-                  <button 
-                    onClick={() => setIsOpen(false)} 
+                  <DialogTitle className={`text-lg ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{title}</DialogTitle>
+                  <button
+                    onClick={() => setIsOpen(false)}
                     className={`focus:outline-none transition-colors ${
-                      theme === 'dark' 
-                        ? 'text-white hover:text-gray-400' 
-                        : 'text-gray-600 hover:text-gray-800'
+                      theme === "dark" ? "text-white hover:text-gray-400" : "text-gray-600 hover:text-gray-800"
                     }`}
                   >
                     <X className="size-4" />
