@@ -12,12 +12,12 @@ import { TrainingStore } from "./trainingStore";
 import { supabase } from "@/services/supabaseClient";
 import { DayNight, PositionScore, ScoreParticipant, ScoreTarget } from "@/types/score";
 import { userStore } from "./userStore";
+import { embedScore } from "@/services/embeddingService";
 
 export interface Score {
   id?: string;
   training_id: string;
   creator_id: string;
-  squad_id: string;
   assignment_session_id: string;
   time_until_first_shot: number | null;
   note: string | null;
@@ -26,6 +26,7 @@ export interface Score {
   wind_direction: number | null;
   day_night: DayNight | null;
   position: PositionScore;
+  team_id: string;
   score_ranges?: ScoreTarget[];
   score_participants?: ScoreParticipant[];
 }
@@ -70,7 +71,7 @@ export const scoreStore = create<ScoreStore>((set) => ({
       creator_id: userStore.getState().user?.id || "",
       time_until_first_shot: scoreForm.time_until_first_shot,
       note: scoreForm.note,
-
+      team_id: userStore.getState().user?.team_id || "",
       wind_strength: scoreForm.wind_strength,
       first_shot_hit: scoreForm.first_shot_hit,
       position: scoreForm.position,
@@ -78,7 +79,6 @@ export const scoreStore = create<ScoreStore>((set) => ({
       day_night: scoreForm.day_night,
       assignment_session_id: scoreForm.assignment_session_id,
       training_id: training_id || "",
-      squad_id: scoreForm.squad_id,
     };
 
     const res = await createScore(score);
@@ -86,6 +86,7 @@ export const scoreStore = create<ScoreStore>((set) => ({
     if (res) {
       await createScoreParticipant(scoreForm.score_participants, res[0].id);
       await createTarget(scoreForm.scoreTargets, res[0].id);
+      embedScore(score as any, res[0].id, training_id || "", scoreForm.scoreTargets, scoreForm.score_participants);
       return res;
     }
   },
@@ -96,7 +97,6 @@ export const scoreStore = create<ScoreStore>((set) => ({
       // For pagination, return the scores without setting them in global state
       return res as Score[];
     } else {
-      // For non-paginated requests, maintain existing behavior
       set({ scores: res });
       return res as Score[];
     }
@@ -121,12 +121,12 @@ export const scoreStore = create<ScoreStore>((set) => ({
 
   handlePatchScore: async (scoreForm: any, scoreId: string) => {
     try {
-      // Update main score record
       const scoreData = {
         assignment_session_id: scoreForm.assignment_session_id,
         time_until_first_shot: scoreForm.time_until_first_shot,
         wind_strength: scoreForm.wind_strength,
         first_shot_hit: false,
+        team_id: userStore.getState().user?.team_id || "",
         wind_direction: scoreForm.wind_direction,
         day_night: scoreForm.day_night,
         note: scoreForm.note,
@@ -135,7 +135,6 @@ export const scoreStore = create<ScoreStore>((set) => ({
 
       await patchScore(scoreData, scoreId);
 
-      // Delete existing participants and targets to replace with new data
       const { error: deleteParticipantsError } = await supabase.from("score_participants").delete().eq("score_id", scoreId);
 
       if (deleteParticipantsError) throw deleteParticipantsError;

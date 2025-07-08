@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStore } from "zustand";
 import TeamManagerRegisterForm from "@/components/Auth/TeamManagerRegisterForm";
+import SquadCommanderRegisterForm from "@/components/Auth/SquadCommanderRegisterForm";
+import SoldierRegisterForm from "@/components/Auth/SoldierRegisterForm";
 import { authStore } from "@/store/authStore";
 import { ModernLogin } from "@/components/Auth/LoginForm";
 import AuthHero from "@/components/Auth/AuthHero";
@@ -71,17 +73,17 @@ export default function Auth() {
   };
 
   return (
-    <div className={`flex h-screen overflow-hidden transition-colors duration-200 ${
-      theme === 'dark' ? 'bg-[#121212]' : 'bg-gray-100'
-    }`}>
-      <div className={`absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-200 ${
-        theme === 'dark' ? 'opacity-5' : 'opacity-10'
-      }`}>
+    <div className={`flex h-screen overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-[#121212]" : "bg-gray-100"}`}>
+      <div
+        className={`absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-200 ${
+          theme === "dark" ? "opacity-5" : "opacity-10"
+        }`}
+      >
         <div
           className="absolute inset-0"
           style={{
             backgroundImage: `radial-gradient(circle at 1px 1px, ${
-              theme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.05)'
+              theme === "dark" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.05)"
             } 1px, transparent 1px)`,
             backgroundSize: "24px 24px",
           }}
@@ -90,42 +92,48 @@ export default function Auth() {
 
       <AuthHero />
 
-      <div className={`w-full md:w-3/5 flex items-center justify-center p-6 sm:p-8 md:p-8 relative z-10 transition-all duration-200 ${
-        theme === 'dark' ? 'shadow-black shadow-2xl' : 'shadow-gray-300 shadow-lg'
-      }`}>
+      <div
+        className={`w-full md:w-3/5 flex items-center justify-center p-6 sm:p-8 md:p-8 relative z-10 transition-all duration-200 ${
+          theme === "dark" ? "shadow-black shadow-2xl" : "shadow-gray-300 shadow-lg"
+        }`}
+      >
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h2 className={`text-lg font-semibold mb-2 transition-colors duration-200 ${
-              theme === 'dark' ? 'text-white' : 'text-gray-900'
-            }`}>{getAuthTitle()}</h2>
-            <p className={`text-sm transition-colors duration-200 ${
-              theme === 'dark' ? 'text-gray-500' : 'text-gray-600'
-            }`}>{getAuthDescription()}</p>
+            <h2 className={`text-lg font-semibold mb-2 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+              {getAuthTitle()}
+            </h2>
+            <p className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-500" : "text-gray-600"}`}>{getAuthDescription()}</p>
           </div>
 
           {/* Form Card */}
           <div className="relative">
-            <div className={`relative py-4 px-4 rounded-xl border transition-colors duration-200 ${
-              theme === 'dark' 
-                ? 'border-[#2A2A2A] bg-black/20' 
-                : 'border-gray-300 bg-white/80 backdrop-blur-sm'
-            }`}>
+            <div
+              className={`relative py-4 px-4 rounded-xl border transition-colors duration-200 ${
+                theme === "dark" ? "border-[#2A2A2A] bg-black/20" : "border-gray-300 bg-white/80 backdrop-blur-sm"
+              }`}
+            >
               {isLoading && (
-                <div className={`absolute inset-0 flex items-center justify-center z-10 rounded-3xl backdrop-blur-sm transition-colors duration-200 ${
-                  theme === 'dark' ? 'bg-black/50' : 'bg-white/70'
-                }`}>
+                <div
+                  className={`absolute inset-0 flex items-center justify-center z-10 rounded-3xl backdrop-blur-sm transition-colors duration-200 ${
+                    theme === "dark" ? "bg-black/50" : "bg-white/70"
+                  }`}
+                >
                   <div className="flex flex-col items-center">
                     <div className="relative">
-                      <div className={`w-12 h-12 border-2 rounded-full transition-colors duration-200 ${
-                        theme === 'dark' ? 'border-gray-700' : 'border-gray-300'
-                      }`} />
-                      <div className={`absolute inset-0 w-12 h-12 border-t-2 rounded-full animate-spin transition-colors duration-200 ${
-                        theme === 'dark' ? 'border-white' : 'border-gray-700'
-                      }`} />
+                      <div
+                        className={`w-12 h-12 border-2 rounded-full transition-colors duration-200 ${
+                          theme === "dark" ? "border-gray-700" : "border-gray-300"
+                        }`}
+                      />
+                      <div
+                        className={`absolute inset-0 w-12 h-12 border-t-2 rounded-full animate-spin transition-colors duration-200 ${
+                          theme === "dark" ? "border-white" : "border-gray-700"
+                        }`}
+                      />
                     </div>
-                    <p className={`mt-4 text-sm transition-colors duration-200 ${
-                      theme === 'dark' ? 'text-white' : 'text-gray-700'
-                    }`}>Authenticating...</p>
+                    <p className={`mt-4 text-sm transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-700"}`}>
+                      Authenticating...
+                    </p>
                   </div>
                 </div>
               )}
@@ -137,14 +145,14 @@ export default function Auth() {
                     <p
                       onClick={() => setAuthType("login")}
                       className={`mb-4 text-sm cursor-pointer transition-colors flex items-center ${
-                        theme === 'dark' 
-                          ? 'text-gray-400 hover:text-white' 
-                          : 'text-gray-600 hover:text-gray-900'
+                        theme === "dark" ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"
                       }`}
                     >
                       ← Back to Sign In
                     </p>
-                    <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />
+                    {authType === "team_manager_register" && <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />}
+                    {authType === "squad_manager_register" && <SquadCommanderRegisterForm AuthSubmit={AuthSubmit} />}
+                    {authType === "soldier_register" && <SoldierRegisterForm AuthSubmit={AuthSubmit} />}
                   </div>
                 )}
               </div>

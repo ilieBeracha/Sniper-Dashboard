@@ -8,7 +8,7 @@ import BaseButton from "@/components/BaseButton";
 import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
 import BaseInput from "@/components/BaseInput";
 import { FileQuestion } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { userStore } from "@/store/userStore";
 import { isCommanderOrSquadCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
@@ -18,6 +18,8 @@ import { Link } from "react-router-dom";
 import { isMobile } from "react-device-detect";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import { toast } from "react-toastify";
+import { BASE_EQUIPMENTS } from "@/utils/BaseData/BaseEquipments";
+import { BASE_WEAPONS } from "@/utils/BaseData/BaseWeapons";
 
 export default function AssetsPage() {
   const { weapons, createWeapon } = useStore(weaponsStore);
@@ -30,6 +32,9 @@ export default function AssetsPage() {
 
   const [formType, setFormType] = useState<"weapons" | "equipments" | "">("");
   const [activeTab, setActiveTab] = useState<"weapons" | "equipments">("weapons");
+
+  const baseEquipments = BASE_EQUIPMENTS.map((equipment) => ({ ...equipment, team_id: user?.team_id }));
+  const baseWeapons = BASE_WEAPONS.map((weapon) => ({ ...weapon, team_id: user?.team_id }));
 
   const teamId = user?.team_id;
 
@@ -58,16 +63,12 @@ export default function AssetsPage() {
     }
     setIsOpen(!isOpen);
   }
-  useEffect(() => {
-    console.log(user?.user_role);
-  }, []);
 
   async function handleCreateWeapon() {
     if (weaponForm.weapon_type === "" || weaponForm.serial_number === "" || weaponForm.mv === "") {
       toast.info("Please fill all the fields");
       return;
     }
-    console.log("Creating weapon:", weaponForm);
     await createWeapon(weaponForm as any);
     handleIsOpen("");
   }
@@ -77,7 +78,6 @@ export default function AssetsPage() {
       toast.info("Please fill all the fields");
       return;
     }
-    console.log("Creating equipment:", equipmentForm);
     await createEquipment(equipmentForm as any);
     handleIsOpen("");
   }
@@ -101,6 +101,11 @@ export default function AssetsPage() {
         onChange={(e) => setWeaponForm({ ...weaponForm, weapon_type: e.target.value })}
       >
         <option value="">Select weapon</option>
+        {baseWeapons.map((weapon) => (
+          <option key={weapon.id} value={weapon.weapon_type}>
+            {weapon.weapon_type}
+          </option>
+        ))}
         {Array.from(weaponsTypes)?.map((weaponType, index) => {
           return (
             <option key={index} value={weaponType}>
@@ -167,6 +172,11 @@ export default function AssetsPage() {
         onChange={(e) => setEquipmentForm({ ...equipmentForm, equipment_type: e.target.value })}
       >
         <option value="">Select equipment</option>
+        {baseEquipments.map((equipment) => (
+          <option key={equipment.id} value={equipment.equipment_type}>
+            {equipment.equipment_type}
+          </option>
+        ))}
         {Array.from(equipmentsTypes)?.map((equipmentsType, index) => {
           return (
             <option key={index} value={equipmentsType}>

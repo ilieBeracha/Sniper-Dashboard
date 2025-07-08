@@ -5,8 +5,6 @@ import { useStore } from "zustand";
 import { TrainingStatus } from "@/types/training";
 import ConfirmStatusChangeModal from "@/components/ConfirmStatusChangeModal";
 import { supabase } from "@/services/supabaseClient";
-import EditTrainingSessionModal from "@/components/EditTrainingSessionModal";
-import { teamStore } from "@/store/teamStore";
 import { scoreStore } from "@/store/scoreSrore";
 import { loaderStore } from "@/store/loaderStore";
 import { useModal } from "@/hooks/useModal";
@@ -33,21 +31,19 @@ export default function TrainingPage() {
   const { id } = useParams();
   const { theme } = useTheme();
   const { userRole } = useStore(userStore);
-  const { training, loadTrainingById, loadAssignments, createAssignment, assignments } = useStore(TrainingStore);
+  const { training, loadTrainingById, loadAssignments, createAssignment } = useStore(TrainingStore);
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { isOpen: isAddScoreOpen, setIsOpen: setIsAddScoreOpen, toggleIsOpen: toggleIsAddScoreOpen } = useModal();
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedScore, setSelectedScore] = useState<any>(null);
   const [isScoreDetailsOpen, setIsScoreDetailsOpen] = useState(false);
   const [newlyAddedScoreId, setNewlyAddedScoreId] = useState<string | null>(null);
   const [editingScore, setEditingScore] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"scores" | "analytics" | "status">("scores");
   const { setIsLoading, isLoading } = useStore(loaderStore);
-  const { members } = useStore(teamStore);
   const {
     getScoresByTrainingId,
     scores,
@@ -90,8 +86,6 @@ export default function TrainingPage() {
     }
   };
 
-  const handleEditSuccess = () => training?.id && loadTrainingById(training.id);
-
   const handleAddAssignment = async (assignmentName: string) => {
     try {
       setIsLoading(true);
@@ -112,9 +106,9 @@ export default function TrainingPage() {
     }
     try {
       const newScore = await createScoreAction(data);
-      setIsAddScoreOpen(false);
       if (newScore?.[0]?.id) {
         setNewlyAddedScoreId(newScore[0].id as string);
+        setIsAddScoreOpen(false);
       }
       await getScoresByTrainingId(id as string);
     } catch (error) {
@@ -285,15 +279,14 @@ export default function TrainingPage() {
         <div className="mt-6">
           {activeTab === "scores" && (
             <div className="space-y-4 w-full">
-              {/* Scores Grid */}
-              <TrainingScoresTable
-                scores={scores}
-                onScoreClick={handleScoreClick}
-                onEditClick={handleEditScore}
-                newlyAddedScoreId={newlyAddedScoreId}
-              />
-
-              {/* Empty State */}
+              {scores.length > 0 && (
+                <TrainingScoresTable
+                  scores={scores}
+                  onScoreClick={handleScoreClick}
+                  onEditClick={handleEditScore}
+                  newlyAddedScoreId={newlyAddedScoreId}
+                />
+              )}
               {scores.length === 0 && (
                 <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
                   <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -380,16 +373,6 @@ export default function TrainingPage() {
           )}
         </div>
 
-        {/* modals */}
-        <EditTrainingSessionModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onSuccess={handleEditSuccess}
-          teamMembers={members}
-          assignments={assignments}
-          training={training}
-        />
-
         <ConfirmStatusChangeModal
           isOpen={isConfirmModalOpen}
           onClose={() => setIsConfirmModalOpen(false)}
@@ -407,7 +390,6 @@ export default function TrainingPage() {
             setEditingScore(null);
           }}
           onSubmit={handleAddScore}
-          assignmentSessions={assignments}
         />
 
         <ScoreDetailsModal isOpen={isScoreDetailsOpen} setIsOpen={setIsScoreDetailsOpen} score={selectedScore} />

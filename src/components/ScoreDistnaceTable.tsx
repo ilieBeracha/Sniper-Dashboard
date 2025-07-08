@@ -6,11 +6,11 @@ export default function ScoreDistanceTable({ rows }: { rows: ScoreTarget[] }) {
   const { theme } = useTheme();
 
   const aggregated = Object.values(
-    rows.reduce<Record<number, { bucket: number; shots_fired: number; target_hit: number }>>((acc, { distance, shots_fired, target_hit }) => {
+    rows.reduce<Record<number, { bucket: number; shots_fired: number; target_hit: number }>>((acc, { distance, shots_fired, target_hits }) => {
       const bucket = Math.floor(distance / 100) * 100; // 100-m buckets
       const item = acc[bucket] || { bucket, shots_fired: 0, target_hit: 0 };
       item.shots_fired += shots_fired;
-      item.target_hit += target_hit;
+      item.target_hit += target_hits || 0;
       acc[bucket] = item;
       return acc;
     }, {}),

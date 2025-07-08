@@ -11,7 +11,6 @@ import { scoreStore } from "@/store/scoreSrore";
 import BaseMobileDrawer from "../BaseDrawer/BaseMobileDrawer";
 import { isMobile } from "react-device-detect";
 import { useModal } from "@/hooks/useModal";
-import { Assignment } from "@/types/training";
 import TrainingPageScoreFormModalInfo from "./TrainingPageScoreFormModalInfo";
 import TrainingPageScoreFormModalStats from "./TrainingPageScoreFormModalStats";
 import TrainingPageScoreFormModalParticipants from "./TrainingPageScoreFormModalParticipants";
@@ -19,6 +18,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTheme } from "@/contexts/ThemeContext";
+import TrainingPageScoreFormModalExtra from "./TrainingPageScoreFormModalExtra";
 
 const scoreTargetSchema = z.object({
   distance: z.number().min(100).max(900),
@@ -31,8 +31,6 @@ const scoreFormSchema = z
     assignment_session_id: z.string().min(1, "Assignment is required"),
     day_night: z.enum(["day", "night"]),
     position: z.string().min(1, "Position is required"),
-    time_until_first_shot: z.string().optional(),
-    first_shot_hit: z.string().optional(),
     wind_strength: z.number().min(0, "Wind strength must be positive").optional(),
     wind_direction: z.number().min(0).max(360, "Wind direction must be between 0 and 360").optional(),
     note: z.string().optional(),
@@ -75,6 +73,8 @@ interface scoreTargets {
   distance?: number;
   shots_fired?: number;
   target_hits?: number;
+  day_night?: string;
+  position?: string;
 }
 
 export default function ScoreFormModal({
@@ -88,7 +88,6 @@ export default function ScoreFormModal({
   onClose: () => void;
   onSubmit: (data: any) => void;
   editingScore?: any;
-  assignmentSessions?: Assignment[];
   trainingId: string;
 }) {
   const { training, createAssignment, loadTrainingById } = useStore(TrainingStore);
@@ -101,7 +100,7 @@ export default function ScoreFormModal({
   const [showOptionalFields, setShowOptionalFields] = useState(false);
   const [showParticipantSelect, setShowParticipantSelect] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 3;
+  const totalSteps = 2;
   const [teamMemberWithUserRole, setTeamMemberWithUserRole] = useState<any[]>([]);
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
 
@@ -112,7 +111,6 @@ export default function ScoreFormModal({
       creator_id: "",
       day_night: "day",
       position: "",
-      time_until_first_shot: "",
       participants: [],
       duties: {},
       weapons: {},
@@ -181,8 +179,6 @@ export default function ScoreFormModal({
         day_night: editingScore.day_night || "day",
         position: editingScore.position || "",
         creator_id: editingScore.creator_id || "",
-        time_until_first_shot: String(editingScore.time_until_first_shot || ""),
-        first_shot_hit: editingScore.first_shot_hit || "",
         wind_strength: editingScore.wind_strength || undefined,
         wind_direction: editingScore.wind_direction || undefined,
         note: editingScore.note || "",
@@ -215,7 +211,6 @@ export default function ScoreFormModal({
         creator_id: "",
         day_night: "day",
         position: "",
-        time_until_first_shot: "",
         participants: [],
         duties: {},
         weapons: {},
@@ -327,7 +322,7 @@ export default function ScoreFormModal({
   const renderStepIndicator = () => (
     <div className="flex items-center justify-center mb-6">
       <div className="flex items-center space-x-4  min-w-[00px] ">
-        {[1, 2, 3].map((step) => (
+        {[1, 2].map((step) => (
           <div key={step} className=" items-center mx-auto flex justify-center">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -336,7 +331,7 @@ export default function ScoreFormModal({
             >
               {step}
             </div>
-            {step < 3 && (
+            {step < 2 && (
               <div className={`w-8 h-0.5 mx-2 ${currentStep > step ? "bg-indigo-600" : theme === "dark" ? "bg-gray-700" : "bg-gray-300"}`} />
             )}
           </div>
@@ -369,36 +364,37 @@ export default function ScoreFormModal({
     switch (currentStep) {
       case 1:
         return (
-          <TrainingPageScoreFormModalInfo
-            setIsAddAssignmentOpen={setIsAddAssignmentOpen}
-            filteredAssignments={filteredAssignments}
-            isAddAssignmentOpen={isAddAssignmentOpen}
-            handleOnAddAssignment={handleOnAddAssignment}
-          />
+          <>
+            <TrainingPageScoreFormModalInfo
+              setIsAddAssignmentOpen={setIsAddAssignmentOpen}
+              filteredAssignments={filteredAssignments}
+              isAddAssignmentOpen={isAddAssignmentOpen}
+              handleOnAddAssignment={handleOnAddAssignment}
+            />
+            <div className="my-4 border-t border-gray-200 dark:border-gray-800" />
+            <TrainingPageScoreFormModalParticipants
+              teamMembers={teamMembers}
+              user={user}
+              weapons={weapons}
+              equipments={equipments}
+              showParticipantSelect={showParticipantSelect}
+              setShowParticipantSelect={setShowParticipantSelect}
+              addParticipant={addParticipant}
+              removeParticipant={removeParticipant}
+              teamMemberWithUserRole={teamMemberWithUserRole}
+            />
+          </>
         );
       case 2:
         return (
-          <TrainingPageScoreFormModalStats
-            addDistanceEntry={addDistanceEntry}
-            removeDistanceEntry={removeDistanceEntry}
-            updateDistanceEntry={updateDistanceEntry}
-          />
-        );
-      case 3:
-        return (
-          <TrainingPageScoreFormModalParticipants
-            showOptionalFields={showOptionalFields}
-            setShowOptionalFields={setShowOptionalFields}
-            teamMembers={teamMembers}
-            user={user}
-            weapons={weapons}
-            equipments={equipments}
-            showParticipantSelect={showParticipantSelect}
-            setShowParticipantSelect={setShowParticipantSelect}
-            addParticipant={addParticipant}
-            removeParticipant={removeParticipant}
-            teamMemberWithUserRole={teamMemberWithUserRole}
-          />
+          <>
+            <TrainingPageScoreFormModalStats
+              addDistanceEntry={addDistanceEntry}
+              removeDistanceEntry={removeDistanceEntry}
+              updateDistanceEntry={updateDistanceEntry}
+            />
+            <TrainingPageScoreFormModalExtra showOptionalFields={showOptionalFields} setShowOptionalFields={setShowOptionalFields} />
+          </>
         );
       default:
         return <></>;

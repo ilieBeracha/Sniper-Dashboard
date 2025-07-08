@@ -46,6 +46,7 @@ export const authStore = create<props>((set, get) => ({
         const {
           data: { user },
         } = await supabase.auth.getUser();
+
         if (user) {
           userStore.getState().setUserFromAuth(user);
         }

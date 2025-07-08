@@ -1,6 +1,5 @@
 import TrainingAddTrainingSessionModal from "@/components/TrainingModal/AddTrainingSessionModal";
 import TrainingList from "@/components/TrainingList";
-import { teamStore } from "@/store/teamStore";
 import { TrainingStore } from "@/store/trainingStore";
 import { userStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
@@ -21,8 +20,6 @@ export default function Trainings() {
   const { loadTrainingByTeamId, getTrainingCountByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
   const useTrainingStore = useStore(TrainingStore);
   const useUserStore = useStore(userStore);
-  const teamStoreState = useStore(teamStore);
-  const members = teamStoreState.members;
   const { getOverallAccuracyStats } = useStore(performanceStore);
   const { isOpen: isAddTrainingOpen, setIsOpen: setIsAddTrainingOpen } = useModal();
   const { theme } = useTheme();
@@ -56,8 +53,6 @@ export default function Trainings() {
       } else {
         setHasMore(true);
       }
-
-      console.log(`Loaded ${result?.length || 0} trainings, Total: ${count}`);
     }
     loadTrainings();
   }, [user?.team_id, currentPage]);
@@ -80,7 +75,17 @@ export default function Trainings() {
     if (!teamId) return;
     const result = await loadTrainingByTeamId(teamId, LIMIT, currentPage * LIMIT);
     setTrainings(result || []);
+    setIsAddTrainingOpen(false);
   }
+
+  // Add function to handle modal close and reload assignments
+  const handleModalClose = async () => {
+    setIsAddTrainingOpen(false);
+    // Reload assignments to ensure new ones appear
+    if (user?.team_id) {
+      await loadAssignments();
+    }
+  };
 
   // Scroll to top when page changes
   const [isPageChanging, setIsPageChanging] = useState(false);
@@ -169,68 +174,72 @@ export default function Trainings() {
                   </div>
                 </div>
 
-                {/* Add Training Button */}
-                <BaseButton
-                  type="button"
-                  onClick={() => setIsAddTrainingOpen(true)}
-                  style="purple"
-                  className={`flex mt-2 items-center gap-2 font-medium transition-all duration-200 ${
-                    isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-sm" : "px-4 py-2.5 rounded-lg text-sm hover:shadow-lg"
-                  }`}
-                >
-                  <Plus size={16} />
-                  <span>Add Training</span>
-                </BaseButton>
+                <div className="flex items-center gap-2">
+                  {/* Add Training Button */}
+                  <BaseButton
+                    type="button"
+                    onClick={() => setIsAddTrainingOpen(true)}
+                    style="purple"
+                    className={`flex mt-2 items-center gap-2 font-medium transition-all duration-200 ${
+                      isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-sm" : "px-4 py-2.5 rounded-lg text-sm hover:shadow-lg"
+                    }`}
+                  >
+                    <Plus size={16} />
+                    <span>Add Training</span>
+                  </BaseButton>
+                </div>
               </div>
             </div>
 
             <TrainingList trainings={trainings} totalCount={totalCount} />
 
+            {trainings.length > 0 && (
+              <div className="flex items-center justify-between mt-6">
+                <div className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                  Page {currentPage + 1} of {Math.ceil(totalCount / LIMIT)} • Showing {trainings.length} of {LIMIT} trainings
+                  {totalCount > 0 && ` • ${totalCount} total trainings`}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={prevPageWithScroll}
+                    disabled={currentPage === 0}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
+                      currentPage === 0
+                        ? "opacity-50 cursor-not-allowed"
+                        : theme === "dark"
+                          ? "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </button>
+
+                  <button
+                    onClick={nextPageWithScroll}
+                    disabled={!hasMore}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
+                      !hasMore
+                        ? "opacity-50 cursor-not-allowed"
+                        : theme === "dark"
+                          ? "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
             {/* Pagination Controls */}
-            <div className="flex items-center justify-between mt-6">
-              <div className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                Page {currentPage + 1} of {Math.ceil(totalCount / LIMIT)} • Showing {trainings.length} of {LIMIT} trainings
-                {totalCount > 0 && ` • ${totalCount} total trainings`}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={prevPageWithScroll}
-                  disabled={currentPage === 0}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
-                    currentPage === 0
-                      ? "opacity-50 cursor-not-allowed"
-                      : theme === "dark"
-                        ? "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </button>
-
-                <button
-                  onClick={nextPageWithScroll}
-                  disabled={!hasMore}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
-                    !hasMore
-                      ? "opacity-50 cursor-not-allowed"
-                      : theme === "dark"
-                        ? "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
 
             <TrainingAddTrainingSessionModal
               isOpen={isAddTrainingOpen}
-              onClose={() => setIsAddTrainingOpen(false)}
+              onClose={handleModalClose}
               onSuccess={fetchTrainings}
-              teamMembers={members}
+              // teamMembers={members}
               assignments={assignments}
             />
           </main>

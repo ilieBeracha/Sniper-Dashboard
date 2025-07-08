@@ -1,6 +1,5 @@
 import { Score, ScoreParticipant, ScoreTarget } from "@/types/score";
 import { supabase } from "./supabaseClient";
-// import { ScoreFormValues } from "@/hooks/useScoreForm";
 
 export async function getUserGroupingScoresRpc(userId: string) {
   const { data, error } = await supabase.rpc("get_user_grouping_scores", {
@@ -19,10 +18,7 @@ export async function createScore(scoreData: Partial<Score>) {
 }
 export async function getScoresCountByTrainingId(training_id: string) {
   try {
-    const { count, error } = await supabase
-      .from("score")
-      .select("*", { count: "exact", head: true })
-      .eq("training_id", training_id);
+    const { count, error } = await supabase.from("score").select("*", { count: "exact", head: true }).eq("training_id", training_id);
 
     if (error) {
       console.error("Error fetching scores count:", error);
@@ -75,22 +71,17 @@ export async function getScoresByTrainingId(training_id: string, limit: number =
 
     // Apply pagination if limit is specified and greater than 0
     if (limit > 0) {
-      console.log("Applying score pagination: limit:", limit, "offset:", range);
       const rangeEnd = range + limit - 1;
-      console.log("Using score range pagination from", range, "to", rangeEnd);
       query = query.range(range, rangeEnd);
-    } else {
-      console.log("No score pagination applied - returning all scores");
     }
 
     const { data, error } = await query;
-    
+
     if (error) {
       console.error("Error fetching scores:", error);
       throw new Error(`Failed to fetch scores: ${error.message}`);
     }
 
-    console.log("Raw scores received:", data?.length || 0);
     return data;
   } catch (error) {
     console.error("Exception when fetching scores:", error);

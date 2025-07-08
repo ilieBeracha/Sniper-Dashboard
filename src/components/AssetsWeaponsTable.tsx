@@ -49,7 +49,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
 
   const handleSaveWeapon = async () => {
     if (!editingWeapon?.id) return;
-    
+
     try {
       await updateWeapon(editingWeapon.id, editForm);
       setEditingWeapon(null);
@@ -93,7 +93,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
                 } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
               />
             </div>
-            
+
             {/* Weapon Type Filter */}
             <select
               value={weaponTypeFilter}
@@ -146,7 +146,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
               <th className="px-4 py-3">Weapon Type</th>
               <th className="px-4 py-3">Serial Number</th>
               <th className="px-4 py-3">MV</th>
-              <th className="px-4 py-3">Created</th>
+              {weapons.some((weapon) => weapon.created_at) && <th className="px-4 py-3">Created</th>}
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
@@ -168,9 +168,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
                         value={editForm.weapon_type || ""}
                         onChange={(e) => setEditForm({ ...editForm, weapon_type: e.target.value })}
                         className={`w-full px-2 py-1 rounded border text-sm ${
-                          theme === "dark"
-                            ? "border-zinc-600 bg-zinc-700 text-white"
-                            : "border-gray-300 bg-white text-gray-900"
+                          theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
                         }`}
                       >
                         <option value="">Select type</option>
@@ -191,9 +189,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
                         value={editForm.serial_number || ""}
                         onChange={(e) => setEditForm({ ...editForm, serial_number: e.target.value })}
                         className={`w-full px-2 py-1 rounded border text-sm ${
-                          theme === "dark"
-                            ? "border-zinc-600 bg-zinc-700 text-white"
-                            : "border-gray-300 bg-white text-gray-900"
+                          theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
                         }`}
                       />
                     ) : (
@@ -207,16 +203,15 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
                         value={editForm.mv || ""}
                         onChange={(e) => setEditForm({ ...editForm, mv: e.target.value })}
                         className={`w-full px-2 py-1 rounded border text-sm ${
-                          theme === "dark"
-                            ? "border-zinc-600 bg-zinc-700 text-white"
-                            : "border-gray-300 bg-white text-gray-900"
+                          theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
                         }`}
                       />
                     ) : (
                       weapon.mv || "N/A"
                     )}
                   </td>
-                  <td className="px-4 py-3">{format(new Date(weapon.created_at), "yyyy-MM-dd HH:mm")}</td>
+
+                  {weapon.created_at && <td className="px-4 py-3">{format(new Date(weapon.created_at), "yyyy-MM-dd HH:mm")}</td>}
                   <td className="px-4 py-3 text-right">
                     <div className="inline-flex gap-2">
                       {isEditing ? (
@@ -232,9 +227,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className={`p-2 rounded hover:bg-red-100 dark:hover:bg-red-800/40 ${
-                              theme === "dark" ? "text-red-400" : "text-red-600"
-                            }`}
+                            className={`p-2 rounded hover:bg-red-100 dark:hover:bg-red-800/40 ${theme === "dark" ? "text-red-400" : "text-red-600"}`}
                             title="Cancel"
                           >
                             <X size={16} />
