@@ -16,6 +16,7 @@ export const routes: RouteObject[] = [
     path: "/training",
     element: <Training />,
   },
+
   {
     path: "/assets",
     element: <Assets />,

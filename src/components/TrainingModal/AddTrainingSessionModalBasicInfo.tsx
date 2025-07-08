@@ -1,4 +1,5 @@
 import BaseInput from "@/components/BaseInput";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type BasicInfoSectionProps = {
   sessionName: string;
@@ -10,9 +11,17 @@ type BasicInfoSectionProps = {
 };
 
 export default function BasicInfoSection({ sessionName, setSessionName, location, setLocation, date, setDate }: BasicInfoSectionProps) {
+  const { theme } = useTheme();
+
   return (
-    <div className="bg-[#1A1A1A] rounded-lg border border-white/5 p-6">
-      <h4 className="text-sm font-medium text-white mb-4">Basic Information</h4>
+    <div
+      className={`rounded-lg border p-6 transition-colors duration-200 ${
+        theme === "dark" ? "bg-[#1A1A1A] border-white/5" : "bg-white border-gray-200"
+      }`}
+    >
+      <h4 className={`text-sm font-medium mb-4 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+        Basic Information
+      </h4>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <BaseInput
@@ -22,7 +31,6 @@ export default function BasicInfoSection({ sessionName, setSessionName, location
           onChange={(e) => setSessionName(e.target.value)}
           placeholder="Sniper Weekly Training"
           containerClassName="bg-transparent"
-          labelClassName="text-gray-400"
         />
 
         <BaseInput
@@ -32,7 +40,6 @@ export default function BasicInfoSection({ sessionName, setSessionName, location
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Base A - Range 3"
           containerClassName="bg-transparent"
-          labelClassName="text-gray-400"
         />
       </div>
 
@@ -43,7 +50,6 @@ export default function BasicInfoSection({ sessionName, setSessionName, location
           value={date}
           onChange={(e) => setDate(e.target.value)}
           containerClassName="bg-transparent md:w-1/2"
-          labelClassName="text-gray-400"
         />
       </div>
     </div>

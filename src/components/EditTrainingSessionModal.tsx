@@ -5,8 +5,7 @@ import { User } from "@/types/user";
 import { Assignment, TrainingSession } from "@/types/training";
 import BasicInfoSection from "./TrainingModal/AddTrainingSessionModalBasicInfo";
 import AssignmentsSection from "./TrainingModal/AddTrainingSessionModalAssignments";
-import TeamMembersSection from "./TrainingModal/AddTrainingSessionModalMembers";
-import PreviewSection from "./TrainingModal/AddTrainingSessionModalPreview";
+import BaseButton from "./BaseButton";
 
 type EditTrainingSessionModalProps = {
   isOpen: boolean;
@@ -17,11 +16,10 @@ type EditTrainingSessionModalProps = {
   training: TrainingSession | null;
 };
 
-export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, teamMembers, assignments, training }: EditTrainingSessionModalProps) {
+export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, assignments, training }: EditTrainingSessionModalProps) {
   const [sessionName, setSessionName] = useState("");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
-  const [members, setMembers] = useState<string[]>([]);
   const [assignmentIds, setAssignmentIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -31,7 +29,6 @@ export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, t
       const trainingDate = new Date(training.date);
       const formattedDate = trainingDate.toISOString().slice(0, 16);
       setDate(formattedDate);
-      setMembers(training.participants?.map((p) => p.participant_id) || []);
       setAssignmentIds(training.assignment_sessions?.map((a) => a.id) || []);
     }
   }, [training]);
@@ -51,22 +48,6 @@ export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, t
     if (sessionError) {
       console.error("Error updating training session:", sessionError);
       return alert("Failed to update training session.");
-    }
-
-    if (members.length > 0) {
-      await supabase.from("trainings_participants").delete().eq("training_id", training.id);
-
-      const participants = members.map((memberId) => ({
-        training_id: training.id,
-        participant_id: memberId,
-      }));
-
-      const { error: participantsError } = await supabase.from("trainings_participants").insert(participants);
-
-      if (participantsError) {
-        console.error("Updating participants failed:", participantsError);
-        return alert("Training updated, but assigning participants failed.");
-      }
     }
 
     if (assignmentIds.length) {
@@ -121,36 +102,21 @@ export default function EditTrainingSessionModal({ isOpen, onClose, onSuccess, t
             setIsAddAssignmentOpen={() => {}}
           />
 
-          <TeamMembersSection teamMembers={teamMembers} members={members} setMembers={setMembers} />
+          {/* <TeamMembersSection teamMembers={teamMembers} members={members} setMembers={setMembers} /> */}
         </div>
-
-        {/* Right Column - Preview */}
-        <PreviewSection
-          sessionName={sessionName}
-          location={location}
-          date={date}
-          assignments={assignments}
-          assignmentIds={assignmentIds}
-          teamMembers={teamMembers}
-          members={members}
-        />
       </div>
 
       <div className="flex items-center justify-end gap-x-4 pt-4 border-t border-white/10 mt-4">
-        <button
+        <BaseButton
           type="button"
           onClick={onClose}
           className="px-4 py-1.5 bg-white/5 hover:bg-white/10 transition-colors rounded-md text-sm font-medium text-white"
         >
           Cancel
-        </button>
-        <button
-          onClick={handleSubmit}
-          disabled={!sessionName || !location || !date}
-          className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
-        >
+        </BaseButton>
+        <BaseButton onClick={handleSubmit} disabled={!sessionName || !location || !date}>
           Save Changes
-        </button>
+        </BaseButton>
       </div>
     </BaseModal>
   );

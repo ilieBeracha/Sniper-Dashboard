@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { loaderStore } from "@/store/loaderStore";
 import { useStore } from "zustand";
-import { toastService } from "@/services/toastService";
 import BaseMobileDrawer from "./BaseDrawer/BaseMobileDrawer";
 import BaseDesktopDrawer from "./BaseDrawer/BaseDesktopDrawer";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import BaseInput from "./BaseInput";
 import { FileQuestion } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
+import { validateAssignmentForm } from "@/lib/formValidation";
 
 export default function AddAssignmentModal({
   isOpen,
@@ -18,12 +19,17 @@ export default function AddAssignmentModal({
   onSuccess: (assignmentName: string) => void;
 }) {
   const [assignmentName, setAssignmentName] = useState("");
+  const [error, setError] = useState("");
   const { isLoading } = useStore(loaderStore);
   const isMobile = useIsMobile();
+  const { theme } = useTheme();
 
   const handleSubmit = () => {
-    if (!assignmentName.trim()) {
-      toastService.error("Please enter an assignment name");
+    setError("");
+
+    const validationError = validateAssignmentForm({ assignmentName });
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -32,11 +38,23 @@ export default function AddAssignmentModal({
   };
 
   const Content = (
-    <div className="w-full text-white p-4 space-y-6">
+    <div className={`w-full p-4 space-y-6 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
       <div>
-        <h2 className="text-xl font-semibold">New Assignment</h2>
-        <p className="mt-1 text-sm text-gray-400">Create a new assignment to be used in training sessions.</p>
+        <h2 className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>New Assignment</h2>
+        <p className={`mt-1 text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+          Create a new assignment to be used in training sessions.
+        </p>
       </div>
+
+      {error && (
+        <div
+          className={`p-3 rounded-lg text-sm ${
+            theme === "dark" ? "bg-red-900/50 text-red-300 border border-red-800" : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
+          {error}
+        </div>
+      )}
 
       <BaseInput
         label="Assignment Name"
@@ -44,7 +62,7 @@ export default function AddAssignmentModal({
         value={assignmentName}
         onChange={(e) => setAssignmentName(e.target.value)}
         placeholder="Enter assignment name"
-        leftIcon={<FileQuestion size={16} className="text-gray-400" />}
+        leftIcon={<FileQuestion size={16} className={theme === "dark" ? "text-gray-400" : "text-gray-500"} />}
         containerClassName="bg-transparent"
       />
 
@@ -52,7 +70,9 @@ export default function AddAssignmentModal({
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-1.5 bg-white/5 hover:bg-white/10 transition-colors rounded-md text-sm font-medium text-white"
+          className={`px-4 py-1.5 transition-colors rounded-md text-sm font-medium ${
+            theme === "dark" ? "bg-white/5 hover:bg-white/10 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+          }`}
         >
           Cancel
         </button>

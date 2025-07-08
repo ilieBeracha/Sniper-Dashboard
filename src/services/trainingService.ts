@@ -2,7 +2,7 @@ import { Assignment } from "@/types/training";
 import { supabase } from "./supabaseClient";
 
 export async function getTrainingById(trainingId: string) {
-  const { data, error } = await supabase.rpc("get_trainings_with_assignment_sessions", {
+  const { data, error } = await supabase.rpc("get_training_by_id", {
     training_id: trainingId,
   });
 
@@ -14,8 +14,28 @@ export async function getTrainingById(trainingId: string) {
   return data[0];
 }
 
-export async function getTrainingByTeamId(teamId: string, currentUserId?: string) {
-  const { data: trainings, error } = await supabase
+export async function getTrainingCountByTeamId(teamId: string) {
+  try {
+    const { count, error } = await supabase
+      .from("training_session")
+      .select("*", { count: "exact", head: true })
+      .eq("team_id", teamId)
+      .neq("status", "canceled");
+
+    if (error) {
+      console.error("Error fetching training count:", error);
+      return 0;
+    }
+
+    return count || 0;
+  } catch (error) {
+    console.error("Exception when fetching training count:", error);
+    return 0;
+  }
+}
+
+export async function getTrainingByTeamId(teamId: string, limit: number = 0, range: number = 0) {
+  let query = supabase
     .from("training_session")
     .select(
       `
@@ -24,30 +44,34 @@ export async function getTrainingByTeamId(teamId: string, currentUserId?: string
       session_name,
       location,
       status,
-      assignment_session:assignment_session(
+      creator_id:creator_id(
+        id,
+        first_name,
+        last_name,
+        email
+      ),
+        assignment_session:assignment_session(
         id,
         assignment:assignment_id(
           id,
           assignment_name,
           created_at
         )
-      ),
-      participants:trainings_participants(
-        id,
-        participant_id,
-        created_at,
-        user:participant_id(
-          id, 
-          first_name,
-          last_name,
-          email
-        )
       )
       `,
     )
     .eq("team_id", teamId)
-    .order("date", { ascending: true })
-    .limit(30);
+    .neq("status", "canceled")
+    .order("date", { ascending: false });
+
+  // Apply pagination if limit is specified and greater than 0
+  if (limit > 0) {
+    // Always use range for consistent pagination (from offset to offset + limit - 1)
+    const rangeEnd = range + limit - 1;
+    query = query.range(range, rangeEnd);
+  }
+
+  const { data: trainings, error } = await query;
 
   if (error) {
     console.error("Error fetching trainings:", error);
@@ -56,14 +80,10 @@ export async function getTrainingByTeamId(teamId: string, currentUserId?: string
 
   const processedTrainings = (trainings || []).map((training) => {
     const assignments = training.assignment_session.map((item) => item.assignment).filter(Boolean);
-    const participantsCount = training.participants ? training.participants.length : 0;
-    const isParticipating = currentUserId && training.participants ? training.participants.some((p) => p.participant_id === currentUserId) : false;
 
     return {
       ...training,
       assignments,
-      participantsCount,
-      isParticipating,
       assignment_session: undefined,
     };
   });
@@ -138,8 +158,8 @@ export async function assignParticipantsToTraining(training_id: string, particip
   if (error) throw new Error(error.message);
 }
 
-export async function getAssignments(): Promise<Assignment[] | []> {
-  const { data, error } = await supabase.from("assignment").select("*");
+export async function getAssignments(teamId: string): Promise<Assignment[] | []> {
+  const { data, error } = await supabase.from("assignment").select("*").eq("team_id", teamId);
 
   if (error) {
     console.error("Failed to fetch assignments:", error.message);
@@ -175,6 +195,14 @@ export async function insertAssignment(assignmentName: string, teamId: string) {
     console.error("Error inserting assignment:", error.message);
     return null;
   }
+
+  return data;
+}
+
+export async function getAssignmentSessions(assignmentId: string) {
+  const { data, error } = await supabase.from("assignment_session").select("*").eq("assignment_id", assignmentId);
+
+  if (error) throw new Error(error.message);
 
   return data;
 }

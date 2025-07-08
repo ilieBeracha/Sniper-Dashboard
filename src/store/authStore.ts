@@ -46,6 +46,7 @@ export const authStore = create<props>((set, get) => ({
         const {
           data: { user },
         } = await supabase.auth.getUser();
+
         if (user) {
           userStore.getState().setUserFromAuth(user);
         }
@@ -69,7 +70,6 @@ export const authStore = create<props>((set, get) => ({
       return res;
     } catch (error: any) {
       set({ error: error.response.data.error });
-      console.log(error);
     }
   },
 

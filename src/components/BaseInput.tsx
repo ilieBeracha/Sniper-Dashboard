@@ -1,6 +1,6 @@
 import { forwardRef, InputHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
-
+import { useTheme } from "@/contexts/ThemeContext";
 export interface BaseInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
@@ -13,10 +13,13 @@ export interface BaseInputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
   ({ label, error, leftIcon, rightIcon, className, containerClassName, labelClassName, errorClassName, disabled, ...props }, ref) => {
+    const { theme } = useTheme();
     return (
       <div className={cn("w-full", containerClassName)}>
         {label && (
-          <label htmlFor={props.id} className={cn("block text-sm font-medium text-white text-left mb-1.5", labelClassName)}>
+          <label htmlFor={props.id} className={cn(`block text-sm font-medium text-left mb-1.5 transition-colors duration-200 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`, labelClassName)}>
             {label}
           </label>
         )}
@@ -25,11 +28,10 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
           <input
             ref={ref}
             className={cn(
-              "block w-full rounded-md text-white border border-[#2A2A2A] bg-zinc-900 px-1 py-1.5 text-sm",
-              "focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              "placeholder:text-white placeholder:text-sm",
-              "transition-all duration-200 placeholder:pl-2 placeholder:text-white placeholder:text-sm",
+              "w-full appearance-none px-4 py-2 text-sm shadow-theme-xs focus:outline-hidden focus:ring-3 transition-all duration-200 border rounded-lg bg-transparent",
+              theme === 'dark' 
+                ? "text-gray-300 placeholder:text-gray-400 border-gray-700 focus:border-gray-500 focus:ring-gray-500/20" 
+                : "text-gray-900 placeholder:text-gray-500 border-gray-300 focus:border-gray-500 focus:ring-gray-500/20 bg-white",
               leftIcon && "pl-10",
               rightIcon && "pr-10",
               error && "border-red-500 focus:border-red-500 focus:ring-red-500",

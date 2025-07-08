@@ -5,6 +5,14 @@ export interface Assignment {
   team_id: string;
 }
 
+export interface AssignmentSession {
+  id: string;
+  assignment_id: string;
+  team_id: string;
+  training_id: string;
+  created_at: string;
+}
+
 export interface TrainingParticipant {
   id: string;
   training_id: string;
@@ -24,6 +32,7 @@ export enum TrainingStatus {
   InProgress = "in_progress",
   Completed = "completed",
   Canceled = "canceled",
+  Finished = "finished",
 }
 
 export interface WeeklyAssignmentStats {
@@ -51,10 +60,17 @@ export interface TrainingSession {
   date: string; // ISO string
   session_name: string;
   location: string;
+  assignments?: Assignment[];
   team_id?: string;
   assignment_sessions?: Assignment[];
   participants?: TrainingParticipant[];
   status: TrainingStatus;
+  creator_id: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+  };
 }
 
 export interface TrainingSessionChart {
@@ -70,7 +86,6 @@ export interface TrainingsNextLastChart {
 
 export interface TrainingPageParticipantsScoreData {
   shots_fired: number | null;
-  hits: number | null;
   time_until_first_shot: number | null;
   distance: number | null;
   target_hit: number | null;

@@ -180,8 +180,164 @@ export default function AssetsPage() {
         {equipments.map((equipment) => (
           <div key={equipment.id}>{equipment.equipment_type}</div>
         ))}
+        {Array.from(equipmentsTypes)?.map((equipmentsType, index) => {
+          return (
+            <option key={index} value={equipmentsType}>
+              {equipmentsType}
+            </option>
+          );
+        })}
+      </select>
+
+      <BaseInput
+        label="Serial Number (Name)"
+        type="text"
+        value={equipmentForm.serial_number}
+        onChange={(e) => setEquipmentForm({ ...equipmentForm, serial_number: e.target.value })}
+        placeholder="Enter serial number"
+        leftIcon={<FileQuestion size={16} className={theme === "dark" ? "text-gray-400" : "text-gray-500"} />}
+        containerClassName="bg-transparent"
+      />
+
+      <div className="space-y-2">
+        <label className={`block text-sm font-medium transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+          Day/Night
+        </label>
+        <select
+          className={`w-full min-h-9 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
+            theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
+          }`}
+          value={equipmentForm.day_night}
+          onChange={(e) => setEquipmentForm({ ...equipmentForm, day_night: e.target.value })}
+        >
+          <option value="">Select day/night</option>
+          <option value="day">Day</option>
+          <option value="night">Night</option>
+        </select>
       </div>
 
+      <div className="flex items-center justify-end gap-x-4">
+        <button
+          type="button"
+          onClick={() => handleIsOpen("")}
+          className={`px-4 py-1.5 transition-colors rounded-md text-sm font-medium ${
+            theme === "dark" ? "bg-white/5 hover:bg-white/10 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+          }`}
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleCreateEquipment}
+          type="button"
+          className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
+        >
+          Create
+        </button>
+      </div>
+    </div>
+  );
+  return (
+    <div className="min-h-screen ">
+      <Header title="Assets"> </Header>
+      <div className="px-4 md:px-6 py-4 2xl:px-6">
+        {/* Breadcrumb */}
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link
+                  to="/"
+                  className={`hover:text-purple-500 transition-colors ${
+                    theme === "dark" ? "text-gray-400 hover:text-purple-400" : "text-gray-600 hover:text-purple-600"
+                  }`}
+                >
+                  Dashboard
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className={`${theme === "dark" ? "text-white" : "text-gray-900"}`}>Assets</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              {(["weapons", "equipments"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`rounded-full px-4 py-1.5 transition-colors ${
+                    activeTab === tab
+                      ? theme === "dark"
+                        ? "bg-white/80 text-gray-900"
+                        : "bg-gray-900 text-white"
+                      : theme === "dark"
+                        ? "bg-white/10 hover:bg-white/20 text-gray-200"
+                        : "bg-gray-200 hover:bg-gray-300 text-gray-600"
+                  }`}
+                >
+                  {tab === "weapons" ? "Weapons" : "Equipment"}
+                </button>
+              ))}
+            </div>
+            {isCommanderOrSquadCommander(user?.user_role as UserRole) && (
+              <BaseButton
+                type="button"
+                onClick={() => handleIsOpen(activeTab)}
+                className={`px-4 py-2 rounded text-sm font-medium transition-all ${
+                  theme === "dark"
+                    ? "bg-white/10 border border-white/20 text-white hover:bg-white/20"
+                    : "bg-gray-100 border border-gray-300 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                Add {activeTab === "weapons" ? "Weapon" : "Equipment"}
+              </BaseButton>
+            )}
+          </div>
+
+          {activeTab === "weapons" ? (
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-1 h-6 bg-blue-400 rounded-full"></div>
+                <h2 className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  Weapons Inventory
+                </h2>
+                <div
+                  className={`px-3 py-1 text-sm rounded border ${
+                    theme === "dark" ? "bg-blue-500/20 text-blue-200 border-blue-500/30" : "bg-blue-100 text-blue-700 border-blue-300"
+                  }`}
+                >
+                  {weapons.length} items
+                </div>
+              </div>
+              <AssetsWeaponsTable weapons={weapons} />
+            </div>
+          ) : (
+            <div>
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-1 h-6 bg-emerald-400 rounded-full"></div>
+                  <h2 className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                    Equipment Inventory
+                  </h2>
+                  <div
+                    className={`px-3 py-1 text-sm rounded border ${
+                      theme === "dark"
+                        ? "bg-emerald-500/20 text-emerald-200 border-emerald-500/30"
+                        : "bg-emerald-100 text-emerald-700 border-emerald-300"
+                    }`}
+                  >
+                    {equipments.length} items
+                  </div>
+                </div>
+              </div>
+              <AssetsEquipmentTable equipments={equipments} />
+            </div>
+          )}
+        </div>
+      </div>
       {isCommander && isMobile ? (
         <BaseMobileDrawer isOpen={isModalOpen} setIsOpen={setIsModalOpen} title="Add Asset">
           {AssetForm}
@@ -191,6 +347,7 @@ export default function AssetsPage() {
           {AssetForm}
         </BaseDesktopDrawer>
       ) : null}
+
     </div>
   );
 }

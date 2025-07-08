@@ -1,28 +1,22 @@
 // src/store/performanceStore.ts
 import { create } from "zustand";
-import { DayNightPerformance, HitPercentageData, SquadStats, SquadWeaponPerformance, TrainingEffectiveness } from "@/types/performance";
+import { HitPercentageData, SquadStats, SquadWeaponPerformance, TrainingEffectiveness, OverallAccuracyStats } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
   getUserHitPercentageRpc,
   getWeaponPerformanceBySquadAndWeapon,
   getUserGroupingSummaryRpc,
-  getTopAccurateSnipers,
-  getDayNightPerformanceByTeam,
   getTrainingEffectivenessByTeam,
   getSquadStatByTeamId,
+  overallAccuracyStats,
 } from "@/services/performance";
 import { userStore } from "./userStore";
-import { User } from "@supabase/supabase-js";
 import { PositionScore } from "@/types/score";
 
 interface PerformanceStore {
   squadWeaponPerformance: SquadWeaponPerformance[];
   isLoading: boolean;
-  topAccurateSnipers: User[];
-  getTopAccurateSnipers: (teamId: string) => Promise<void>;
   getSquadWeaponPerformance: (teamId: string) => Promise<void>;
-  dayNightPerformance: DayNightPerformance[];
-  getDayNightPerformance: (teamId: string) => Promise<void>;
   squadStats: SquadStats[];
   getSquadStats: (teamId: string, position: PositionScore | null, distance: string | null) => Promise<void>;
   userHitPercentage: HitPercentageData | null;
@@ -34,26 +28,38 @@ interface PerformanceStore {
 
   trainingEffectiveness: TrainingEffectiveness[];
   getTrainingEffectiveness: (teamId: string) => Promise<void>;
+
+  overallAccuracyStats: OverallAccuracyStats | null;
+  getOverallAccuracyStats: () => Promise<void>;
+
+  overallAccuracyStatsLoading: boolean;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
   squadWeaponPerformance: [],
   isLoading: false,
-  topAccurateSnipers: [],
-  dayNightPerformance: [],
-  squadPerformance: [],
   squadStats: [],
-
   trainingEffectiveness: [],
-
-  userPerformanceConfig: [],
-  bestSquadConfigurations: [],
-
+  overallAccuracyStats: null,
+  overallAccuracyStatsLoading: false,
+  getOverallAccuracyStats: async () => {
+    try {
+      set({ overallAccuracyStatsLoading: true });
+      const data = await overallAccuracyStats();
+      set({ overallAccuracyStats: data });
+    } catch (error) {
+      console.error("Failed to load training summary stats:", error);
+      set({ overallAccuracyStats: null });
+    } finally {
+      set({ overallAccuracyStatsLoading: false });
+    }
+  },
   getSquadStats: async (teamId: string, position: PositionScore | null, distance: string | null) => {
     try {
       set({ isLoading: true });
       const data = await getSquadStatByTeamId(teamId, position, distance);
-      set({ squadStats: data });
+
+      set({ squadStats: data as any });
     } catch (error) {
       console.error("Failed to load squad stats:", error);
       set({ squadStats: [] });
@@ -69,19 +75,6 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     } catch (error) {
       console.error("Failed to load training effectiveness:", error);
       set({ trainingEffectiveness: [] });
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  getTopAccurateSnipers: async (teamId: string) => {
-    try {
-      set({ isLoading: true });
-      const data = await getTopAccurateSnipers(teamId);
-      set({ topAccurateSnipers: data });
-    } catch (error) {
-      console.error("Failed to load top accurate snipers:", error);
-      set({ topAccurateSnipers: [] });
     } finally {
       set({ isLoading: false });
     }
@@ -104,6 +97,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   getUserHitPercentage: async (userId: string) => {
     try {
       const data = await getUserHitPercentageRpc(userId);
+
       set({ userHitPercentage: data });
       return data;
     } catch (error) {
@@ -130,19 +124,6 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       set({ groupingSummary: null });
     } finally {
       set({ groupingSummaryLoading: false });
-    }
-  },
-
-  getDayNightPerformance: async (teamId: string) => {
-    try {
-      set({ isLoading: true });
-      const data = await getDayNightPerformanceByTeam(teamId);
-      set({ dayNightPerformance: data });
-    } catch (error) {
-      console.error("Failed to load day/night performance:", error);
-      set({ dayNightPerformance: [] });
-    } finally {
-      set({ isLoading: false });
     }
   },
 }));
