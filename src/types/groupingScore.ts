@@ -14,11 +14,11 @@ export interface GroupingScore {
   weapon_serial: string;
 }
 
-// New interfaces for the summary data
 export interface GroupingSummary {
-  avg_dispersion: number;
-  best_dispersion: number;
-  total_groups: number;
+  avg_dispersion: number | null;
+  best_dispersion: number | null;
+  avg_time_to_group: number | null;
+  total_groupings: number;
   weapon_breakdown: WeaponBreakdown[];
   last_five_groups: RecentGroup[];
 }

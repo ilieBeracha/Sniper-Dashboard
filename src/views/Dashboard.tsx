@@ -9,7 +9,7 @@ import InviteModal from "@/components/InviteModal";
 import { TrainingStore } from "@/store/trainingStore";
 import { squadStore } from "@/store/squadStore";
 import { performanceStore } from "@/store/performance";
-import { getUserGroupingSummaryRpc } from "@/services/performance";
+import { getUserGroupingStatsRpc } from "@/services/performance";
 import DashboardRowKPI from "@/components/DashboardRowKPI";
 import Header from "@/Headers/Header";
 import BaseButton from "@/components/BaseButton";
@@ -36,11 +36,11 @@ export default function Dashboard() {
   useEffect(() => {
     const load = async () => {
       if (user?.team_id) {
-        await getUserGroupingSummaryRpc(user.id);
+        await getUserGroupingStatsRpc(user.id);
         await getUserHitPercentage(user?.id);
         await loadNextAndLastTraining(user?.team_id);
         await getSquadMetricsByRole(user?.id);
-        await getSquadStats(user?.team_id, null, null);
+        await getSquadStats(null, null);
       }
 
       setLoading(false);

@@ -5,10 +5,10 @@ import { GroupingSummary } from "@/types/groupingScore";
 import {
   getUserHitPercentageRpc,
   getWeaponPerformanceBySquadAndWeapon,
-  getUserGroupingSummaryRpc,
   getTrainingEffectivenessByTeam,
-  getSquadStatByTeamId,
   overallAccuracyStats,
+  getSquadRoleHitPercentages,
+  getUserGroupingStatsRpc,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/score";
@@ -18,7 +18,7 @@ interface PerformanceStore {
   isLoading: boolean;
   getSquadWeaponPerformance: (teamId: string) => Promise<void>;
   squadStats: SquadStats[];
-  getSquadStats: (teamId: string, position: PositionScore | null, distance: string | null) => Promise<void>;
+  getSquadStats: (position: PositionScore | null, distance: string | null) => Promise<void>;
   userHitPercentage: HitPercentageData | null;
   getUserHitPercentage: (userId: string) => Promise<HitPercentageData>;
 
@@ -54,19 +54,38 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       set({ overallAccuracyStatsLoading: false });
     }
   },
-  getSquadStats: async (teamId: string, position: PositionScore | null, distance: string | null) => {
-    try {
-      set({ isLoading: true });
-      const data = await getSquadStatByTeamId(teamId, position, distance);
+  // getSquadStats: async (teamId: string, position: PositionScore | null, distance: string | null) => {
+  //   try {
+  //     set({ isLoading: true });
+  //     const data = await getSquadStatByTeamId(teamId, position, distance);
 
-      set({ squadStats: data as any });
-    } catch (error) {
-      console.error("Failed to load squad stats:", error);
-      set({ squadStats: [] });
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+  //     set({ squadStats: data as any });
+  //   } catch (error) {
+  //     console.error("Failed to load squad stats:", error);
+  //     set({ squadStats: [] });
+  //   } finally {
+  //     set({ isLoading: false });
+  //   }
+  // },
+
+
+getSquadStats: async (_position: PositionScore | null, distance: string | null) => {
+  const squadId = userStore.getState().user?.squad_id;
+  try {
+    set({ isLoading: true });
+    const data = await getSquadRoleHitPercentages(squadId!, distance);
+    set({ squadStats: data });
+  } catch (error) {
+    console.error("Failed to load squad stats:", error);
+    set({ squadStats: [] });
+  } finally {
+    set({ isLoading: false });
+  }
+},
+
+
+  
+
   getTrainingEffectiveness: async (teamId: string) => {
     try {
       set({ isLoading: true });
@@ -117,7 +136,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
         return;
       }
 
-      const data = await getUserGroupingSummaryRpc(userId);
+      const data = await getUserGroupingStatsRpc(userId);
       set({ groupingSummary: data });
     } catch (error) {
       console.error("Failed to load grouping summary:", error);

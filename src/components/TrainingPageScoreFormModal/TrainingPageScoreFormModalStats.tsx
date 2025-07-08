@@ -98,7 +98,7 @@ export default function TrainingPageScoreFormModalStats({
           }`}
         >
           <Plus size={14} />
-          Add Distance
+          Add Another Target
         </button>
       </div>
       <div className="space-y-4">

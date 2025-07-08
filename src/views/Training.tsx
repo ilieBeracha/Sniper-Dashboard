@@ -26,6 +26,8 @@ import { userStore } from "@/store/userStore";
 import TrainingScoresTable from "@/components/TrainingScoresTable";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
+import AddGroupScoreModal from "@/components/TrainingPageScoreFormModal/TrainingPageGroupFormModal";
+import { useModal as useGroupModal } from "@/hooks/useModal";
 
 export default function TrainingPage() {
   const { id } = useParams();
@@ -35,6 +37,7 @@ export default function TrainingPage() {
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { isOpen: isAddScoreOpen, setIsOpen: setIsAddScoreOpen, toggleIsOpen: toggleIsAddScoreOpen } = useModal();
+  const { isOpen: isAddGroupScoreOpen, setIsOpen: setIsAddGroupScoreOpen, toggleIsOpen: toggleIsAddGroupScoreOpen } = useGroupModal();
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
@@ -43,6 +46,7 @@ export default function TrainingPage() {
   const [newlyAddedScoreId, setNewlyAddedScoreId] = useState<string | null>(null);
   const [editingScore, setEditingScore] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"scores" | "analytics" | "status">("scores");
+  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const { setIsLoading, isLoading } = useStore(loaderStore);
   const {
     getScoresByTrainingId,
@@ -229,18 +233,49 @@ export default function TrainingPage() {
             </div>
 
             {/* Add Score Button */}
-            <BaseButton
-              type="button"
-              disabled={training?.status === TrainingStatus.Completed}
-              onClick={() => toggleIsAddScoreOpen()}
-              style="purple"
-              className={`flex mt-2 items-center gap-2 font-medium transition-all duration-200 ${
-                isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-sm " : "px-4 py-2.5 rounded-lg text-sm hover:shadow-lg"
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              <Plus size={16} />
-              <span>Add Score</span>
-            </BaseButton>
+            <div className="flex gap-2 flex-wrap">
+              <div className="relative">
+                <BaseButton
+                  type="button"
+                  disabled={training?.status === TrainingStatus.Completed}
+                  onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
+                  style="purple"
+                  className={`flex items-center gap-2 font-medium transition-all duration-200 ${
+                    isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-sm" : "px-4 py-2.5 rounded-lg text-sm hover:shadow-lg"
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <Plus size={16} />
+                  <span>Add Score</span>
+                </BaseButton>
+
+                {isAddMenuOpen && (
+                  <div
+                    className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg z-50 ${
+                      theme === "dark" ? "bg-zinc-800 border border-zinc-700" : "bg-white border border-gray-200"
+                    }`}
+                  >
+                    <button
+                      onClick={() => {
+                        setIsAddMenuOpen(false);
+                        toggleIsAddScoreOpen();
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-purple-100 dark:hover:bg-zinc-700 transition-colors"
+                    >
+                      ➤ Add Target Score
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsAddMenuOpen(false);
+                        toggleIsAddGroupScoreOpen();
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-purple-100 dark:hover:bg-zinc-700 transition-colors"
+                    >
+                      ➤ Add Group Score
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -390,6 +425,18 @@ export default function TrainingPage() {
             setEditingScore(null);
           }}
           onSubmit={handleAddScore}
+        />
+        <AddGroupScoreModal
+          isOpen={isAddGroupScoreOpen}
+          onClose={() => setIsAddGroupScoreOpen(false)}
+          onSubmit={async (data) => {
+            try {
+              await supabase.from("group_scores").insert(data);
+              setIsAddGroupScoreOpen(false);
+            } catch (error) {
+              console.error("Error adding group score:", error);
+            }
+          }}
         />
 
         <ScoreDetailsModal isOpen={isScoreDetailsOpen} setIsOpen={setIsScoreDetailsOpen} score={selectedScore} />

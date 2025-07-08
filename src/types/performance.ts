@@ -50,12 +50,14 @@ export interface TrainingEffectiveness {
 }
 
 export interface SquadStats {
-  out_name: string;
-  out_performance: number;
-  out_accuracy: number;
-  out_elimination: number;
-  out_coordination: number;
+  first_name: string;
+  last_name: string;
+  role_or_weapon: string;
+  hit_percentage: number;
+  session_count: number;
 }
+
+
 
 export interface OverallAccuracyStats {
   total_scores: number;
