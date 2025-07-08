@@ -42,31 +42,31 @@ export async function getWeaponPerformanceBySquadAndWeapon(teamId: string): Prom
   return data || [];
 }
 
-export async function getUserGroupingSummaryRpc(userId: string): Promise<GroupingSummary> {
-  const { data, error } = await supabase.rpc("get_user_grouping_summary", {
-    user_id: userId,
+export async function getUserGroupingStatsRpc(userId: string, weaponId: string | null = null): Promise<GroupingSummary> {
+  const { data, error } = await supabase.rpc("get_user_grouping_stats", {
+    p_user_id: userId,
+    p_weapon_id: weaponId,
   });
 
   if (error) {
     console.error("SQL function failed:", error.message);
-    throw new Error("Could not complete get_user_grouping_summary");
+    throw new Error("Could not complete get_user_grouping_stats");
   }
 
-  if (data && data.length > 0) {
-    const result = data[0];
-
-    if (typeof result.weapon_breakdown === "string") {
-      result.weapon_breakdown = JSON.parse(result.weapon_breakdown);
-    }
-
-    if (typeof result.last_five_groups === "string") {
-      result.last_five_groups = JSON.parse(result.last_five_groups);
-    }
-
-    return result;
+  if (!data || data.length === 0) {
+    throw new Error("No grouping data returned");
   }
 
-  throw new Error("No grouping summary data returned");
+  const result = data[0];
+
+  return {
+    avg_dispersion: result.avg_dispersion,
+    best_dispersion: result.best_dispersion,
+    avg_time_to_group: result.avg_time_to_group,
+    total_groupings: result.total_groupings,
+    weapon_breakdown: [], // You’ll populate this in a separate call
+    last_five_groups: [], // Same here
+  };
 }
 
 // In your service

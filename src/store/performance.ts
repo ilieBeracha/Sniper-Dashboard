@@ -5,10 +5,10 @@ import { GroupingSummary } from "@/types/groupingScore";
 import {
   getUserHitPercentageRpc,
   getWeaponPerformanceBySquadAndWeapon,
-  getUserGroupingSummaryRpc,
   getTrainingEffectivenessByTeam,
   overallAccuracyStats,
   getSquadRoleHitPercentages,
+  getUserGroupingStatsRpc,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/score";
@@ -136,7 +136,7 @@ getSquadStats: async (_position: PositionScore | null, distance: string | null) 
         return;
       }
 
-      const data = await getUserGroupingSummaryRpc(userId);
+      const data = await getUserGroupingStatsRpc(userId);
       set({ groupingSummary: data });
     } catch (error) {
       console.error("Failed to load grouping summary:", error);

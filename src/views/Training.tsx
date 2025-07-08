@@ -46,6 +46,7 @@ export default function TrainingPage() {
   const [newlyAddedScoreId, setNewlyAddedScoreId] = useState<string | null>(null);
   const [editingScore, setEditingScore] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"scores" | "analytics" | "status">("scores");
+  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const { setIsLoading, isLoading } = useStore(loaderStore);
   const {
     getScoresByTrainingId,
@@ -233,11 +234,11 @@ export default function TrainingPage() {
 
             {/* Add Score Button */}
             <div className="flex gap-2 flex-wrap">
-              <div className="flex gap-2 flex-wrap">
+              <div className="relative">
                 <BaseButton
                   type="button"
                   disabled={training?.status === TrainingStatus.Completed}
-                  onClick={() => toggleIsAddScoreOpen()}
+                  onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
                   style="purple"
                   className={`flex items-center gap-2 font-medium transition-all duration-200 ${
                     isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-sm" : "px-4 py-2.5 rounded-lg text-sm hover:shadow-lg"
@@ -247,18 +248,32 @@ export default function TrainingPage() {
                   <span>Add Score</span>
                 </BaseButton>
 
-                <BaseButton
-                  type="button"
-                  disabled={training?.status === TrainingStatus.Completed}
-                  onClick={() => toggleIsAddGroupScoreOpen()}
-                  style="purple"
-                  className={`flex items-center gap-2 font-medium transition-all duration-200 ${
-                    isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-sm" : "px-4 py-2.5 rounded-lg text-sm hover:shadow-lg"
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  <Plus size={16} />
-                  <span>Add Group Score</span>
-                </BaseButton>
+                {isAddMenuOpen && (
+                  <div
+                    className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg z-50 ${
+                      theme === "dark" ? "bg-zinc-800 border border-zinc-700" : "bg-white border border-gray-200"
+                    }`}
+                  >
+                    <button
+                      onClick={() => {
+                        setIsAddMenuOpen(false);
+                        toggleIsAddScoreOpen();
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-purple-100 dark:hover:bg-zinc-700 transition-colors"
+                    >
+                      ➤ Add Target Score
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsAddMenuOpen(false);
+                        toggleIsAddGroupScoreOpen();
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-purple-100 dark:hover:bg-zinc-700 transition-colors"
+                    >
+                      ➤ Add Group Score
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
