@@ -12,7 +12,6 @@ import { TrainingStore } from "./trainingStore";
 import { supabase } from "@/services/supabaseClient";
 import { DayNight, PositionScore, ScoreParticipant, ScoreTarget } from "@/types/score";
 import { userStore } from "./userStore";
-import { embedScore } from "@/services/embeddingService";
 
 export interface Score {
   id?: string;
@@ -86,7 +85,7 @@ export const scoreStore = create<ScoreStore>((set) => ({
     if (res) {
       await createScoreParticipant(scoreForm.score_participants, res[0].id);
       await createTarget(scoreForm.scoreTargets, res[0].id);
-      embedScore(score as any, res[0].id, training_id || "", scoreForm.scoreTargets, scoreForm.score_participants);
+      // embedScore(score as any, res[0].id, training_id || "", scoreForm.scoreTargets, scoreForm.score_participants);
       return res;
     }
   },

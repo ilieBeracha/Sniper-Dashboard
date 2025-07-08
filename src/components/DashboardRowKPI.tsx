@@ -14,7 +14,7 @@ export default function DashboardRowKPI() {
         </div>
 
         <div className="sm:col-span-1 md:col-span-3 lg:col-span-3">
-          <BaseDashboardCard header="User Hit Percentage" tooltipContent="Your overall hit accuracy and performance metrics">
+          <BaseDashboardCard header="Individual Hit Percentage" tooltipContent="Accuracy from scores where you were the only sniper">
             <UserHitPercentage />
           </BaseDashboardCard>
         </div>

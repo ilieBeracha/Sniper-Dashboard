@@ -4,7 +4,7 @@ import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/score";
 
 export async function getUserHitPercentageRpc(userId: string): Promise<HitPercentageData> {
-  const { data, error } = await supabase.rpc("get_user_hit_percentage_by_single_sniper", {
+  const { data, error } = await supabase.rpc("get_user_hit_percentage_with_assignments", {
     user_id: userId,
   });
   if (error) {
@@ -13,6 +13,21 @@ export async function getUserHitPercentageRpc(userId: string): Promise<HitPercen
   }
   return data[0];
 }
+
+export async function getSquadRoleHitPercentages(squadId: string, distance: string | null = null) {
+  const { data, error } = await supabase.rpc("get_squad_hit_percentages_by_role", {
+    p_squad_id: squadId,
+    p_distance_category: distance,
+  });
+
+  if (error) {
+    console.error("Error fetching squad role hit percentages:", error.message);
+    throw error;
+  }
+
+  return data || [];
+}
+
 
 export async function getWeaponPerformanceBySquadAndWeapon(teamId: string): Promise<SquadWeaponPerformance[]> {
   const { data, error } = await supabase.rpc("get_weapon_performance_by_squad_and_weapon", {
