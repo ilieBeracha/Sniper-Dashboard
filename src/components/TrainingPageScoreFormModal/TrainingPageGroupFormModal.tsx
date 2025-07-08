@@ -82,7 +82,7 @@ export default function TrainingPageGroupFormModal({
   const message = <p className="text-sm italic mt-1 text-gray-500">This field is available only when 4 or more bullets are fired</p>;
 
   const renderForm = () => (
-    <form onSubmit={handleSubmit(onSubmit)} className={`space-y-6 ${isMobile ? "min-w-[300px]" : "min-w-[1000px]"}`}>
+    <form onSubmit={handleSubmit(onSubmit)} className={`space-y-6 ${isMobile ? "min-w-[300px]" : "min-w-[600px]"}`}>
       <input type="hidden" {...register("sniper_user_id")} />
 
       <div className="grid grid-cols-1 gap-4">
@@ -230,7 +230,7 @@ export default function TrainingPageGroupFormModal({
           {renderForm()}
         </BaseMobileDrawer>
       ) : (
-        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={onClose} title="Add Group Score" width="1000px">
+        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={onClose} title="Add Group Score">
           {renderForm()}
         </BaseDesktopDrawer>
       )}
