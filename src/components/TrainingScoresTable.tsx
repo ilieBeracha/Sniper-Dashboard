@@ -199,7 +199,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
 
           {/* Collapsible Filter Controls */}
           {showFilters && (
-            <div className="gap-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 animate-in slide-in-from-top-2 duration-200">
+            <div className="gap-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 ">
               <div className="relative sm:col-span-2 lg:col-span-2">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
@@ -315,7 +315,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
                   className={`transition-colors border-b ${
                     isLastRow ? "border-transparent" : theme === "dark" ? "border-zinc-800/50" : "border-gray-100"
                   } ${
-                    isNew ? "bg-indigo-100/40 dark:bg-indigo-800/20 animate-pulse" : theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-gray-50"
+                    isNew ? "bg-gray-100/60 dark:bg-gray-700/30" : theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-gray-50"
                   }`}
                 >
                   <td className="px-4 sm:px-4 py-3 font-medium truncate max-w-[100px] sm:max-w-[150px]">
