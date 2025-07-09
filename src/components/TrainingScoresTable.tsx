@@ -80,6 +80,22 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
     loadInitialData();
   }, [id]);
 
+  // Watch for changes in scores prop and refresh paginated scores
+  useEffect(() => {
+    if (scores.length > 0 && currentPage === 0) {
+      // Reset to first page when scores change
+      loadScores(0, true);
+    }
+  }, [scores.length]);
+
+  // Watch for newly added score to highlight it
+  useEffect(() => {
+    if (newlyAddedScoreId) {
+      // Refresh scores to include the newly added score
+      loadScores(0, true);
+    }
+  }, [newlyAddedScoreId]);
+
   // Get unique values for filters (use all scores prop for complete filter options)
   const uniquePositions = useMemo(() => {
     const positions = scores.map((score) => score.position).filter(Boolean);

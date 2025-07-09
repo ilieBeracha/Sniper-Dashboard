@@ -42,7 +42,7 @@ export default function TrainingPageGroupFormModal({
   const { user } = useStore(userStore);
   const { weapons } = useStore(weaponsStore);
   const { theme } = useTheme();
-  const isMobile = useIsMobile();
+  const isMobile = useIsMobile(640);
 
   const methods = useForm<GroupScoreFormValues>({
     resolver: zodResolver(groupScoreSchema),

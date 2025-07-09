@@ -1,4 +1,3 @@
-// BaseDesktopDrawer.tsx
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { X } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -19,7 +18,7 @@ export default function BaseDesktopDrawer({
   const { theme } = useTheme();
 
   return (
-    <Dialog open={isOpen} onClose={setIsOpen} className="relative z-50 hidden sm:block w-screen">
+    <Dialog open={isOpen} onClose={setIsOpen} className="relative z-50 hidden sm:block w-screen min-w-[600px">
       <div className="fixed inset-0 bg-black/50 " />
       <div className="fixed inset-0 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">

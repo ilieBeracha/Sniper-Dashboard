@@ -16,6 +16,13 @@ export async function createScore(scoreData: Partial<Score>) {
   if (error) throw error;
   return data;
 }
+
+export async function createGroupScore(groupScoreData: any) {
+  const { data, error } = await supabase.from("group_scores").insert(groupScoreData).select("*");
+  if (error) throw error;
+  return data;
+}
+
 export async function getScoresCountByTrainingId(training_id: string) {
   try {
     const { count, error } = await supabase.from("score").select("*", { count: "exact", head: true }).eq("training_id", training_id);

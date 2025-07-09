@@ -56,6 +56,8 @@ export default function TrainingPage() {
     scoreRanges,
     getScoreTargetsByScoreId,
     handlePatchScore,
+    handleCreateGroupScore: createGroupScoreAction,
+    forceRefreshScores,
   } = useStore(scoreStore);
 
   /* ------------ data loading ------------ */
@@ -110,11 +112,17 @@ export default function TrainingPage() {
     }
     try {
       const newScore = await createScoreAction(data);
+
       if (newScore?.[0]?.id) {
         setNewlyAddedScoreId(newScore[0].id as string);
         setIsAddScoreOpen(false);
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        await forceRefreshScores(id as string);
+      } else {
+        console.error("No score ID returned:", newScore);
       }
-      await getScoresByTrainingId(id as string);
     } catch (error) {
       console.error("Error adding score:", error);
     }
@@ -135,11 +143,23 @@ export default function TrainingPage() {
   const handleUpdateScore = async (data: any) => {
     try {
       await handlePatchScore(data, editingScore.id);
+      await forceRefreshScores(id as string);
       setIsAddScoreOpen(false);
       setEditingScore(null);
-      await getScoresByTrainingId(id as string);
     } catch (error) {
       console.error("Error updating score:", error);
+    }
+  };
+
+  const handleAddGroupScore = async (data: any) => {
+    try {
+      const result = await createGroupScoreAction(data);
+      if (result) {
+        setIsAddGroupScoreOpen(false);
+        await forceRefreshScores(id as string);
+      }
+    } catch (error) {
+      console.error("Error adding group score:", error);
     }
   };
 
@@ -426,18 +446,7 @@ export default function TrainingPage() {
           }}
           onSubmit={handleAddScore}
         />
-        <TrainingPageGroupFormModal
-          isOpen={isAddGroupScoreOpen}
-          onClose={() => setIsAddGroupScoreOpen(false)}
-          onSubmit={async (data) => {
-            try {
-              await supabase.from("group_scores").insert(data);
-              setIsAddGroupScoreOpen(false);
-            } catch (error) {
-              console.error("Error adding group score:", error);
-            }
-          }}
-        />
+        <TrainingPageGroupFormModal isOpen={isAddGroupScoreOpen} onClose={() => setIsAddGroupScoreOpen(false)} onSubmit={handleAddGroupScore} />
 
         <ScoreDetailsModal isOpen={isScoreDetailsOpen} setIsOpen={setIsScoreDetailsOpen} score={selectedScore} />
       </main>
