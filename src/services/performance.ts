@@ -59,14 +59,16 @@ export async function getUserGroupingStatsRpc(userId: string, weaponId: string |
 
   const result = data[0];
 
-  return {
-    avg_dispersion: result.avg_dispersion,
-    best_dispersion: result.best_dispersion,
-    avg_time_to_group: result.avg_time_to_group,
-    total_groupings: result.total_groupings,
-    weapon_breakdown: [], // You’ll populate this in a separate call
-    last_five_groups: [], // Same here
-  };
+return {
+  avg_dispersion: result.avg_dispersion,
+  best_dispersion: result.best_dispersion,
+  avg_time_to_group: result.avg_time_to_group,
+  total_groupings: result.total_groupings,
+  weapon_breakdown: [],
+  last_five_groups: result.last_five_groups ?? [],
+};
+
+
 }
 
 // In your service

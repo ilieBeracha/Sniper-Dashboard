@@ -19,9 +19,13 @@ export interface GroupingSummary {
   best_dispersion: number | null;
   avg_time_to_group: number | null;
   total_groupings: number;
-  weapon_breakdown: WeaponBreakdown[];
-  last_five_groups: RecentGroup[];
+  weapon_breakdown: any[]; // still placeholder
+  last_five_groups: {
+    cm_dispersion: number;
+    created_at: string; // YYYY-MM-DD
+  }[];
 }
+
 
 export interface WeaponBreakdown {
   weapon_type: string;
