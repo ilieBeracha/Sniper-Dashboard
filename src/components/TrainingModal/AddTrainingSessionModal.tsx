@@ -10,7 +10,7 @@ import { useModal } from "@/hooks/useModal";
 import { toastService } from "@/services/toastService";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
-import { isMobile } from "react-device-detect";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useStore as useZustandStore } from "zustand";
 import { weaponsStore } from "@/store/weaponsStore";
@@ -34,6 +34,7 @@ export default function TrainingAddTrainingSessionModal({
   const [assignmentIds, setAssignmentIds] = useState<string[]>([]);
   const [error, setError] = useState("");
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { loadAssignments } = useStore(TrainingStore);
@@ -238,7 +239,7 @@ export default function TrainingAddTrainingSessionModal({
       {Content}
     </BaseMobileDrawer>
   ) : (
-    <BaseDesktopDrawer title="New Training Session" isOpen={isOpen} width="600px" setIsOpen={onClose}>
+    <BaseDesktopDrawer title="New Training Session" isOpen={isOpen} setIsOpen={onClose}>
       {Content}
     </BaseDesktopDrawer>
   );

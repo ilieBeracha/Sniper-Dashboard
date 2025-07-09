@@ -48,15 +48,17 @@ const UserGroupingSummary = () => {
     );
   }
 
-  const recentData = groupingSummary.last_five_groups?.map((item) => {
-    const date = new Date(item.created_at);
-    const month = date.toLocaleString("default", { month: "short" });
-    const day = date.getDate();
-    return {
-      ...item,
-      formattedDate: `${month} ${day}`,
-    };
-  }).reverse();
+  const recentData = groupingSummary.last_five_groups
+    ?.map((item) => {
+      const date = new Date(item.created_at);
+      const month = date.toLocaleString("default", { month: "short" });
+      const day = date.getDate();
+      return {
+        ...item,
+        formattedDate: `${month} ${day}`,
+      };
+    })
+    .reverse();
 
   return (
     <div ref={containerRef} style={{ height: "100%" }} className="flex flex-col">
@@ -101,7 +103,7 @@ const UserGroupingSummary = () => {
                 borderColor: theme === "dark" ? "#444444" : "#d1d5db",
                 border: `1px solid ${theme === "dark" ? "#444444" : "#d1d5db"}`,
                 boxShadow: "none",
-                borderRadius: "4px"
+                borderRadius: "4px",
               }}
               itemStyle={{ color: theme === "dark" ? "#CCCCCC" : "#374151" }}
               labelStyle={{ color: theme === "dark" ? "#AAAAAA" : "#6b7280" }}

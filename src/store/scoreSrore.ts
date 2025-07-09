@@ -6,12 +6,14 @@ import {
   createTarget,
   fetchScoreTargetsByScoreId,
   patchScore,
+  createGroupScore as createGroupScoreService,
 } from "@/services/scoreService";
 import { create } from "zustand";
 import { TrainingStore } from "./trainingStore";
 import { supabase } from "@/services/supabaseClient";
 import { DayNight, PositionScore, ScoreParticipant, ScoreTarget } from "@/types/score";
 import { userStore } from "./userStore";
+import { updateAIKnowledge } from "@/services/AiService";
 
 export interface Score {
   id?: string;
@@ -50,6 +52,7 @@ interface ScoreStore {
   scores: Score[];
   scoreRanges: ScoreRangeRow[];
   handleCreateScore: (score: Score) => Promise<any[] | undefined>;
+  handleCreateGroupScore: (groupScore: any) => Promise<any[] | undefined>;
   handlePatchScore: (scoreForm: any, scoreId: string) => Promise<void>;
   getScoresByTrainingId: (trainingId: string, limit?: number, range?: number) => Promise<Score[]>;
   getScoresCountByTrainingId: (trainingId: string) => Promise<number>;
@@ -57,6 +60,7 @@ interface ScoreStore {
   getScoreTargetsByScoreId: (scoreId: string) => Promise<ScoreTarget[]>;
   scoreTargetsByScoreId: ScoreTarget[];
   scoreParticipantsByScoreId: ScoreParticipant[];
+  forceRefreshScores: (trainingId: string) => Promise<void>;
 }
 
 export const scoreStore = create<ScoreStore>((set) => ({
@@ -80,18 +84,32 @@ export const scoreStore = create<ScoreStore>((set) => ({
       training_id: training_id || "",
     };
 
-    const res = await createScore(score);
+    try {
+      const res = await createScore(score);
 
-    if (res) {
-      await createScoreParticipant(scoreForm.score_participants, res[0].id);
-      await createTarget(scoreForm.scoreTargets, res[0].id);
-      // embedScore(score as any, res[0].id, training_id || "", scoreForm.scoreTargets, scoreForm.score_participants);
-      return res;
+      if (res && res[0]?.id) {
+        const [scoreParticipant, scoreTarget] = await Promise.all([
+          createScoreParticipant(scoreForm.score_participants, res[0].id as string),
+          createTarget(scoreForm.scoreTargets, res[0].id as string),
+        ]);
+
+        try {
+          updateAIKnowledge(userStore.getState().user?.id as string, res[0], scoreParticipant, scoreTarget);
+        } catch (aiError) {
+          console.error("Error updating AI knowledge:", aiError);
+        }
+
+        return res;
+      }
+    } catch (error) {
+      console.error("Error creating score:", error);
+      throw error;
     }
   },
 
   async getScoresByTrainingId(training_id: string, limit: number = 0, range: number = 0) {
     const res = await getScoresByTrainingId(training_id, limit, range);
+
     if (limit > 0) {
       // For pagination, return the scores without setting them in global state
       return res as Score[];
@@ -115,6 +133,12 @@ export const scoreStore = create<ScoreStore>((set) => ({
   getScoreTargetsByScoreId: async (scoreId: string) => {
     const res = await fetchScoreTargetsByScoreId(scoreId);
     set({ scoreTargetsByScoreId: res });
+    return res;
+  },
+
+  handleCreateGroupScore: async (groupScore: any) => {
+    const res = await createGroupScoreService(groupScore);
+    console.log("res", res);
     return res;
   },
 
@@ -155,5 +179,10 @@ export const scoreStore = create<ScoreStore>((set) => ({
       console.error("Error updating score:", error);
       throw error;
     }
+  },
+
+  forceRefreshScores: async (trainingId: string) => {
+    const res = await getScoresByTrainingId(trainingId);
+    set({ scores: res });
   },
 }));

@@ -80,6 +80,22 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
     loadInitialData();
   }, [id]);
 
+  // Watch for changes in scores prop and refresh paginated scores
+  useEffect(() => {
+    if (scores.length > 0 && currentPage === 0) {
+      // Reset to first page when scores change
+      loadScores(0, true);
+    }
+  }, [scores.length]);
+
+  // Watch for newly added score to highlight it
+  useEffect(() => {
+    if (newlyAddedScoreId) {
+      // Refresh scores to include the newly added score
+      loadScores(0, true);
+    }
+  }, [newlyAddedScoreId]);
+
   // Get unique values for filters (use all scores prop for complete filter options)
   const uniquePositions = useMemo(() => {
     const positions = scores.map((score) => score.position).filter(Boolean);
@@ -183,7 +199,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
 
           {/* Collapsible Filter Controls */}
           {showFilters && (
-            <div className="gap-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 animate-in slide-in-from-top-2 duration-200">
+            <div className="gap-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 ">
               <div className="relative sm:col-span-2 lg:col-span-2">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
@@ -276,7 +292,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
             }`}
           >
             <tr>
-              <th className="px-2 sm:px-4 py-3">Assignment</th>
+              <th className="px-4 sm:px-4 py-3">Assignment</th>
               <th className="px-2 sm:px-4 py-3">Participant</th>
               <th className="px-2 sm:px-4 py-3  sm:table-cell">Position</th>
               <th className="px-2 sm:px-4 py-3  lg:table-cell">Day/Night</th>
@@ -299,10 +315,10 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
                   className={`transition-colors border-b ${
                     isLastRow ? "border-transparent" : theme === "dark" ? "border-zinc-800/50" : "border-gray-100"
                   } ${
-                    isNew ? "bg-indigo-100/40 dark:bg-indigo-800/20 animate-pulse" : theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-gray-50"
+                    isNew ? "bg-gray-100/60 dark:bg-gray-700/30" : theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-gray-50"
                   }`}
                 >
-                  <td className="px-2 sm:px-4 py-3 font-medium truncate max-w-[100px] sm:max-w-[150px]">
+                  <td className="px-4 sm:px-4 py-3 font-medium truncate max-w-[100px] sm:max-w-[150px]">
                     {score.assignment_session?.assignment?.assignment_name || "N/A"}
                   </td>
                   <td className="px-2 sm:px-4 py-3 truncate max-w-[80px] sm:max-w-none">
