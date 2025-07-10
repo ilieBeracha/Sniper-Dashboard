@@ -273,7 +273,7 @@ function SpTableFilters({
 
         {/* Filter Controls */}
         {showFilters && (
-          <div className="gap-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
             {/* Search */}
             <div className="relative sm:col-span-2 lg:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -282,7 +282,7 @@ function SpTableFilters({
                 placeholder={searchPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 rounded-lg border transition-colors duration-200 text-sm ${
+                className={`w-full pl-10 pr-4 py-1.5 rounded-lg border transition-colors duration-200 text-sm ${
                   theme === "dark"
                     ? "border-zinc-700 bg-zinc-800 text-white placeholder-gray-400 focus:border-purple-400"
                     : "border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:border-purple-500"
