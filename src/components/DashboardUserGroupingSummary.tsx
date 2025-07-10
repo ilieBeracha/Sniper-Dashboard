@@ -108,6 +108,7 @@ const UserGroupingSummary = () => {
                 border: `1px solid ${theme === "dark" ? "#444444" : "#d1d5db"}`,
                 borderRadius: "6px",
                 boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+
               }}
               itemStyle={{ color: theme === "dark" ? "#CCCCCC" : "#374151" }}
               labelStyle={{ color: theme === "dark" ? "#AAAAAA" : "#6b7280" }}

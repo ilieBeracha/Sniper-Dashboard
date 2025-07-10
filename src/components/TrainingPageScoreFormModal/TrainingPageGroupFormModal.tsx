@@ -7,7 +7,7 @@ import { userStore } from "@/store/userStore";
 import { weaponsStore } from "@/store/weaponsStore";
 import BaseDesktopDrawer from "../BaseDrawer/BaseDesktopDrawer";
 import BaseMobileDrawer from "../BaseDrawer/BaseMobileDrawer";
-import { isMobile } from "react-device-detect";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { useEffect } from "react";
 
 const groupScoreSchema = z.object({
@@ -30,7 +30,7 @@ const groupScoreSchema = z.object({
 
 type GroupScoreFormValues = z.infer<typeof groupScoreSchema>;
 
-export default function AddGroupScoreModal({
+export default function TrainingPageGroupFormModal({
   isOpen,
   onClose,
   onSubmit,
@@ -42,6 +42,7 @@ export default function AddGroupScoreModal({
   const { user } = useStore(userStore);
   const { weapons } = useStore(weaponsStore);
   const { theme } = useTheme();
+  const isMobile = useIsMobile(640);
 
   const methods = useForm<GroupScoreFormValues>({
     resolver: zodResolver(groupScoreSchema),
@@ -78,14 +79,10 @@ export default function AddGroupScoreModal({
     }
   }, [isDisabled, setValue]);
 
-  const message = (
-    <p className="text-sm italic mt-1 text-gray-500">
-      This field is available only when 4 or more bullets are fired
-    </p>
-  );
+  const message = <p className="text-sm italic mt-1 text-gray-500">This field is available only when 4 or more bullets are fired</p>;
 
   const renderForm = () => (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 min-w-[300px]">
+    <form onSubmit={handleSubmit(onSubmit)} className={`space-y-6 ${isMobile ? "min-w-[300px]" : "min-w-[600px]"}`}>
       <input type="hidden" {...register("sniper_user_id")} />
 
       <div className="grid grid-cols-1 gap-4">
@@ -131,9 +128,7 @@ export default function AddGroupScoreModal({
               setValueAs: (v) => (v === "" ? null : Number(v)),
             })}
             className={`w-full rounded-lg px-3 py-2 text-sm border ${
-              theme === "dark"
-                ? "bg-zinc-800/50 text-white border-zinc-700"
-                : "bg-white text-gray-900 border-gray-300"
+              theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
             } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
           />
           {isDisabled && message}
@@ -151,9 +146,7 @@ export default function AddGroupScoreModal({
               setValueAs: (v) => (v === "" ? null : Number(v)),
             })}
             className={`w-full rounded-lg px-3 py-2 text-sm border ${
-              theme === "dark"
-                ? "bg-zinc-800/50 text-white border-zinc-700"
-                : "bg-white text-gray-900 border-gray-300"
+              theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
             } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
           />
           {isDisabled && message}
@@ -167,9 +160,7 @@ export default function AddGroupScoreModal({
             disabled={isDisabled}
             {...register("shooting_position")}
             className={`w-full min-h-10 rounded-lg px-3 py-2 text-sm border ${
-              theme === "dark"
-                ? "bg-zinc-800/50 text-white border-zinc-700"
-                : "bg-white text-gray-900 border-gray-300"
+              theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
             } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <option value="">Select Position</option>
@@ -190,7 +181,9 @@ export default function AddGroupScoreModal({
             id="effort"
             className={`h-4 w-4 border-gray-300 rounded ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
           />
-          <label htmlFor="effort" className="text-sm">Effort Given</label>
+          <label htmlFor="effort" className="text-sm">
+            Effort Given
+          </label>
         </div>
         {isDisabled && message}
 
@@ -201,9 +194,7 @@ export default function AddGroupScoreModal({
             disabled={isDisabled}
             {...register("type")}
             className={`w-full min-h-10 rounded-lg px-3 py-2 text-sm border ${
-              theme === "dark"
-                ? "bg-zinc-800/50 text-white border-zinc-700"
-                : "bg-white text-gray-900 border-gray-300"
+              theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
             } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <option value="normal">Normal</option>
@@ -225,10 +216,7 @@ export default function AddGroupScoreModal({
         >
           Cancel
         </button>
-        <button
-          type="submit"
-          className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-blue-500 to-indigo-700 rounded-md"
-        >
+        <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-blue-500 to-indigo-700 rounded-md">
           Save
         </button>
       </div>

@@ -9,7 +9,7 @@ import { userStore } from "@/store/userStore";
 import { TrainingStore } from "@/store/trainingStore";
 import { scoreStore } from "@/store/scoreSrore";
 import BaseMobileDrawer from "../BaseDrawer/BaseMobileDrawer";
-import { isMobile } from "react-device-detect";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { useModal } from "@/hooks/useModal";
 import TrainingPageScoreFormModalInfo from "./TrainingPageScoreFormModalInfo";
 import TrainingPageScoreFormModalStats from "./TrainingPageScoreFormModalStats";
@@ -97,6 +97,7 @@ export default function ScoreFormModal({
   const { members: teamMembers } = useStore(teamStore);
   const { scoreTargetsByScoreId } = useStore(scoreStore);
   const { theme } = useTheme();
+  const isMobile = useIsMobile(640);
   const [showOptionalFields, setShowOptionalFields] = useState(false);
   const [showParticipantSelect, setShowParticipantSelect] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -402,7 +403,7 @@ export default function ScoreFormModal({
   };
 
   const renderForm = () => (
-    <div className="w-full space-y-6 min-w-[30vw]">
+    <div className={`w-full space-y-6 ${isMobile ? "min-w-[300px]" : "min-w-[600px]"}`}>
       {renderStepIndicator()}
       {renderCurrentStep()}
 

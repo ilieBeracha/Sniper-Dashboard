@@ -1,6 +1,6 @@
 import { Card } from "@heroui/react";
 import BaseDropBox from "./BaseDropBox";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { ResponsiveContainer, BarChart, Bar, XAxis, Legend, CartesianGrid, Tooltip } from "recharts";
 import BaseDashboardCard from "./BaseDashboardCard";
 import { useEffect, useState } from "react";
 import { performanceStore } from "@/store/performance";
@@ -110,7 +110,7 @@ export default function DashboardSquadStats() {
         </div>
       }
       tooltipContent="This data shows how the squad performed while this person was in the given role. It is NOT their individual hit percentage in that role."
-      >
+    >
       <Card
         className={`bg-transparent justify-center rounded-xl w-full h-full flex flex-col items-center gap-4 text-sm transition-colors duration-200 ${
           theme === "dark" ? "text-white" : "text-gray-900"
@@ -188,11 +188,12 @@ export default function DashboardSquadStats() {
 
                   <CartesianGrid strokeDasharray="3 3" stroke="transparent" />
                   <XAxis dataKey="role_or_weapon" stroke={theme === "dark" ? "#9ca3af" : "#4b5563"} style={{ fontSize: "12px" }} />
-                  <YAxis
+
+                  {/* <YAxis
                     stroke={theme === "dark" ? "#9ca3af" : "#4b5563"}
                     domain={[0, 100]}
-                    label={{ value: "Hit %", angle: -90, position: "insideLeft" }}
-                  />
+                    label={{ value: "Hit %", angle: -90, position: "insideLeft", offset: 80 }}
+                  /> */}
                   <Tooltip
                     cursor={{ fill: "transparent" }}
                     content={({ label, payload }) => (
