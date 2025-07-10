@@ -20,7 +20,7 @@ export default function TrainingSessionGroup({ title, color, date, children }: T
 
   return (
     <div>
-      <div className="flex items-center gap-2 my-4">
+      <div className="flex items-center gap-2 mb-4">
         <div className={`w-2 h-2 rounded-full ${colorMap[color]} shadow-[0_0_8px_0px_${colorMap[color]}]`}></div>
         <h4
           className={`text-sm font-medium uppercase tracking-wider transition-colors duration-200 ${

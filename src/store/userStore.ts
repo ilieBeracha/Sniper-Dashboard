@@ -1,25 +1,21 @@
 import { create } from "zustand";
 import { User as SupabaseAuthUser } from "@supabase/supabase-js";
-import { User, UserRole } from "@/types/user";
-import { get_user_score_profile } from "@/services/userService";
+import { User } from "@/types/user";
+import { updateUser } from "@/services/userService";
 
 interface UserStore {
   user: User | null;
-  userRole: UserRole;
-  userScoreProfile: any;
-  getUserScoreProfile: () => Promise<void>;
-  setUser: (user: User) => void;
   clearUser: () => void;
+  setUser: (user: User) => void;
   setUserFromAuth: (authUser: SupabaseAuthUser) => void;
+  updateUser: (user_data: Partial<User>) => Promise<User | null>;
 }
 
-export const userStore = create<UserStore>((set) => ({
+export const userStore = create<UserStore>((set, get) => ({
   user: null,
-  userRole: "" as UserRole,
-  userScoreProfile: null,
 
-  setUser: (user) => {
-    set({ user, userRole: user.user_role });
+  setUser: (user: User) => {
+    set({ user });
   },
 
   clearUser: () => {
@@ -43,22 +39,16 @@ export const userStore = create<UserStore>((set) => ({
       created_at: authUser.created_at ?? "",
     };
 
-    set({ user: mappedUser, userRole: mappedUser.user_role });
+    set({ user: mappedUser });
   },
 
-  getUserScoreProfile: async () => {
-    const { user } = userStore.getState();
-    if (!user) {
-      console.error("User not found");
-      return;
-    }
+  updateUser: async (user_data: Partial<User>) => {
+    const id = get().user?.id;
 
-    try {
-      const userScoreProfile = await get_user_score_profile(user.id);
-      console.log("userScoreProfile", userScoreProfile);
-      set({ userScoreProfile: userScoreProfile });
-    } catch (error) {
-      console.error("Error fetching user score profile:", error);
-    }
+    console.log(id);
+    if (!id) return null;
+    const updatedUser = await updateUser(id, user_data);
+    set({ user: updatedUser as unknown as User });
+    return updatedUser;
   },
 }));

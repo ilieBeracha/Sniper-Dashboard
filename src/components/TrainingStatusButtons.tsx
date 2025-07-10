@@ -5,6 +5,7 @@ import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
 import { Clock, CheckCircle, XCircle, PlayCircle, Shield } from "lucide-react";
 import { isMobile } from "react-device-detect";
+import { UserRole } from "@/types/user";
 
 type TrainingStatusButtonsProps = {
   currentStatus: TrainingStatus;
@@ -14,7 +15,7 @@ type TrainingStatusButtonsProps = {
 export default function TrainingStatusButtons({ currentStatus, onStatusChange }: TrainingStatusButtonsProps) {
   const { theme } = useTheme();
   const mainStatuses = [TrainingStatus.Scheduled, TrainingStatus.InProgress, TrainingStatus.Completed];
-  const { userRole } = useStore(userStore);
+  const { user } = useStore(userStore);
 
   const getStatusConfig = (status: TrainingStatus) => {
     const configs = {
@@ -38,7 +39,7 @@ export default function TrainingStatusButtons({ currentStatus, onStatusChange }:
     return configs[status as keyof typeof configs];
   };
 
-  if (!isCommander(userRole)) return null;
+  if (!isCommander(user?.user_role as UserRole)) return null;
 
   return (
     <div

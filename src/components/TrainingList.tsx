@@ -7,18 +7,15 @@ import TrainingCalendar from "./TrainingCalendar";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
-import { isMobile } from "react-device-detect";
-import { Target } from "lucide-react";
-
+import { useIsMobile } from "@/hooks/useIsMobile";
 interface TrainingListProps {
   trainings: TrainingSession[];
-  totalCount?: number;
 }
 
-export default function TrainingList({ trainings, totalCount }: TrainingListProps) {
+export default function TrainingList({ trainings }: TrainingListProps) {
   const { theme } = useTheme();
   const { getOverallAccuracyStats } = useStore(performanceStore);
-
+  const isMobile = useIsMobile();
   useEffect(() => {
     getOverallAccuracyStats();
   }, []);
@@ -43,24 +40,8 @@ export default function TrainingList({ trainings, totalCount }: TrainingListProp
 
   return (
     <>
-      {/* Mobile Layout */}
       {isMobile ? (
         <div className="space-y-4">
-          {/* Tabs */}
-          <div className={`border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
-            <nav className="flex space-x-8  items-center" aria-label="Tabs">
-              <button
-                className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                  theme === "dark" ? "border-purple-400 text-purple-400" : "border-purple-500 text-purple-600"
-                }`}
-              >
-                <Target className="w-4 h-4" />
-                Active {totalCount ? `(${totalCount})` : ""}
-              </button>
-            </nav>
-          </div>
-
-          {/* Sessions List */}
           <div className="space-y-3">
             {active.length === 0 && <div className="text-center text-gray-500 h-80 flex items-center justify-center">No active trainings</div>}
             {todaySessions.length > 0 && (
@@ -100,19 +81,6 @@ export default function TrainingList({ trainings, totalCount }: TrainingListProp
         </div>
       ) : (
         <>
-          <div className={`border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
-            <nav className="flex space-x-8 items-center" aria-label="Tabs">
-              <button
-                className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                  theme === "dark" ? "border-purple-400 text-purple-400" : "border-purple-500 text-purple-600"
-                }`}
-              >
-                <Target className="w-4 h-4" />
-                Active {totalCount ? `(${totalCount})` : ""}
-              </button>
-            </nav>
-          </div>
-
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
             <div className="lg:col-span-8 space-y-6">
               {!trainings.length && (
