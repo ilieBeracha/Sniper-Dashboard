@@ -26,8 +26,8 @@ import { userStore } from "@/store/userStore";
 import TrainingScoresTable from "@/components/TrainingScoresTable";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
-import AddGroupScoreModal from "@/components/TrainingPageScoreFormModal/TrainingPageGroupFormModal";
 import { useModal as useGroupModal } from "@/hooks/useModal";
+import TrainingPageGroupFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageGroupFormModal";
 
 export default function TrainingPage() {
   const { id } = useParams();
@@ -56,6 +56,8 @@ export default function TrainingPage() {
     scoreRanges,
     getScoreTargetsByScoreId,
     handlePatchScore,
+    handleCreateGroupScore: createGroupScoreAction,
+    forceRefreshScores,
   } = useStore(scoreStore);
 
   /* ------------ data loading ------------ */
@@ -110,11 +112,17 @@ export default function TrainingPage() {
     }
     try {
       const newScore = await createScoreAction(data);
+
       if (newScore?.[0]?.id) {
         setNewlyAddedScoreId(newScore[0].id as string);
         setIsAddScoreOpen(false);
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        await forceRefreshScores(id as string);
+      } else {
+        console.error("No score ID returned:", newScore);
       }
-      await getScoresByTrainingId(id as string);
     } catch (error) {
       console.error("Error adding score:", error);
     }
@@ -135,11 +143,23 @@ export default function TrainingPage() {
   const handleUpdateScore = async (data: any) => {
     try {
       await handlePatchScore(data, editingScore.id);
+      await forceRefreshScores(id as string);
       setIsAddScoreOpen(false);
       setEditingScore(null);
-      await getScoresByTrainingId(id as string);
     } catch (error) {
       console.error("Error updating score:", error);
+    }
+  };
+
+  const handleAddGroupScore = async (data: any) => {
+    try {
+      const result = await createGroupScoreAction(data);
+      if (result) {
+        setIsAddGroupScoreOpen(false);
+        await forceRefreshScores(id as string);
+      }
+    } catch (error) {
+      console.error("Error adding group score:", error);
     }
   };
 
@@ -197,7 +217,7 @@ export default function TrainingPage() {
 
         <div className={`p-4 rounded-2xl transition-all duration-200`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mt-4 sm:mt-0 mb-4 sm:mb-0">
               <div className={`p-3 rounded-xl ${theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"}`}>
                 <BiCurrentLocation className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
               </div>
@@ -234,7 +254,7 @@ export default function TrainingPage() {
 
             {/* Add Score Button */}
             <div className="flex gap-2 flex-wrap">
-              <div className="relative">
+              <div className="relative w-full">
                 <BaseButton
                   type="button"
                   disabled={training?.status === TrainingStatus.Completed}
@@ -426,18 +446,7 @@ export default function TrainingPage() {
           }}
           onSubmit={handleAddScore}
         />
-        <AddGroupScoreModal
-          isOpen={isAddGroupScoreOpen}
-          onClose={() => setIsAddGroupScoreOpen(false)}
-          onSubmit={async (data) => {
-            try {
-              await supabase.from("group_scores").insert(data);
-              setIsAddGroupScoreOpen(false);
-            } catch (error) {
-              console.error("Error adding group score:", error);
-            }
-          }}
-        />
+        <TrainingPageGroupFormModal isOpen={isAddGroupScoreOpen} onClose={() => setIsAddGroupScoreOpen(false)} onSubmit={handleAddGroupScore} />
 
         <ScoreDetailsModal isOpen={isScoreDetailsOpen} setIsOpen={setIsScoreDetailsOpen} score={selectedScore} />
       </main>
