@@ -10,6 +10,7 @@ import { equipmentStore } from "@/store/equipmentStore";
 import { getSquadsWithUsersByTeamId } from "@/services/squadService";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import { Loader2 } from "lucide-react";
+import Settings from './Settings';
 
 // Dynamic imports for better code splitting
 const Dashboard = lazy(() => import("./Dashboard"));
@@ -80,6 +81,14 @@ export default function AppRoutes() {
             element={
               <Suspense fallback={<LoadingFallback />}>
                 <Assets />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <Settings />
               </Suspense>
             }
           />

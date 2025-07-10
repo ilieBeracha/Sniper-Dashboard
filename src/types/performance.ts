@@ -55,6 +55,7 @@ export interface SquadStats {
   role_or_weapon: string;
   hit_percentage: number;
   session_count: number;
+  squad_name: string;
 }
 
 

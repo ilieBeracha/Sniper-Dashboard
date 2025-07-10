@@ -18,7 +18,9 @@ export interface User {
   team_id: string;
   squad_id?: string | null;
   registered?: boolean;
-
+  user_default_duty?: string | null;
+  user_default_weapon?: string | null;
+  user_default_equipment?: string | null;
   teams?: Team;
   squads?: Squad;
 }
