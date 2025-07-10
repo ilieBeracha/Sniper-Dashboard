@@ -33,8 +33,6 @@ const CommanderView = () => {
 
   return (
     <div className="flex flex-col gap-6">
-
-      {/* Squad Role Metrics */}
       <BaseDashboardCard
         header="Squad Role Metrics"
         tooltipContent="This shows average hit percentage and total sessions for each squad and role."
