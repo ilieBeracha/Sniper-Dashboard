@@ -1,73 +1,237 @@
-import { useTheme } from "@/contexts/ThemeContext";
-import { useIsMobile } from "@/hooks/useIsMobile";
-import { Search, X, Filter, ChevronLeft, ChevronRight } from "lucide-react";
-import { ReactNode, useState, useEffect } from "react";
+import { useState, useEffect, useMemo, ReactNode } from "react";
+import { ChevronLeft, ChevronRight, Filter, Search, X } from "lucide-react";
 
-interface SpTableColumn {
+import { useIsMobile } from "@/hooks/useIsMobile";
+import { useTheme } from "@/contexts/ThemeContext";
+
+export type FilterConfig<T> = {
+  key: keyof T;
+  label: string;
+  type: "select" | "text";
+  formatOption?: (value: any) => string;
+};
+
+export interface UseTableLogicProps<T> {
+  loadData: (limit: number, offset: number) => Promise<T[]>;
+  getTotalCount: () => Promise<number>;
+  limit?: number;
+  dependencies?: any[];
+  filterConfigs?: FilterConfig<T>[];
+}
+
+export function useTableLogic<T extends { id: string | number }>({
+  loadData,
+  getTotalCount,
+  limit = 20,
+  dependencies = [],
+  filterConfigs = [],
+}: UseTableLogicProps<T>) {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [data, setData] = useState<T[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+  const [editingItem, setEditingItem] = useState<T | null>(null);
+  const [editForm, setEditForm] = useState<Partial<T>>({});
+
+  const loadPage = async (page = 0, reset = false) => {
+    setIsLoading(true);
+    try {
+      const offset = page * limit;
+      const result = await loadData(limit, offset);
+      setData(reset ? result : [...(reset ? [] : data), ...result]);
+      setHasMore(result.length === limit);
+      setCurrentPage(page);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadInitialData = async () => {
+    await loadPage(0, true);
+    const count = await getTotalCount();
+    setTotalCount(count);
+  };
+
+  useEffect(() => {
+    loadInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, dependencies);
+
+  const nextPage = () => {
+    if (hasMore && !isLoading) loadPage(currentPage + 1);
+  };
+
+  const prevPage = () => {
+    if (currentPage > 0 && !isLoading) loadPage(currentPage - 1, true);
+  };
+
+  const refreshData = () => loadPage(0, true);
+
+  const pagination = {
+    currentPage,
+    totalPages: Math.ceil(totalCount / limit),
+    pageSize: limit,
+    totalItems: totalCount,
+    onPageChange: (page: number) => loadPage(page, true),
+    onNextPage: nextPage,
+    onPrevPage: prevPage,
+    hasMore,
+  };
+
+  const handleEditItem = (item: T) => {
+    setEditingItem(item);
+    setEditForm(item);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItem(null);
+    setEditForm({});
+  };
+
+  const handleFormChange = (field: keyof T, value: any) => {
+    setEditForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const isEditing = (item: T) => editingItem?.id === item.id;
+
+  const filters = useMemo(() => {
+    return filterConfigs.map((config) => {
+      const values = Array.from(
+        new Set(
+          data
+            .map((item) => item[config.key])
+            .filter((v) => v !== null && v !== undefined)
+            .map((v) => String(v)),
+        ),
+      );
+      return {
+        key: String(config.key),
+        label: config.label,
+        type: config.type,
+        options: values.map((v) => ({
+          value: v,
+          label: config.formatOption ? config.formatOption(v) : v,
+        })),
+      };
+    });
+  }, [data, filterConfigs]);
+
+  return {
+    data,
+    setData,
+    isLoading,
+    pagination,
+    refreshData,
+    totalCount,
+    editingItem,
+    editForm,
+    handleEditItem,
+    handleCancelEdit,
+    handleFormChange,
+    isEditing,
+    setEditingItem,
+    setEditForm,
+    filters,
+  };
+}
+
+export type SpTableFilter = {
   key: string;
   label: string;
-  render?: (value: any, row: any) => ReactNode;
-  sortable?: boolean;
-  width?: string;
+  type: "select" | "text";
+  placeholder?: string;
+  options?: { value: string; label: string }[];
+  className?: string;
+};
+
+export type SpTableColumn<T> = {
+  key: keyof T & string;
+  label: string;
+  width?: number | string;
   className?: string;
   hideOnMobile?: boolean;
+  render?: (value: any, row: T) => ReactNode;
+};
+
+export interface SpTablePaginationProps {
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalItems: number;
+  onPageChange: (page: number) => void;
+  onNextPage: () => void;
+  onPrevPage: () => void;
+  hasMore: boolean;
 }
 
-interface SpTableFilter {
-  key: string;
-  label: string;
-  type: "text" | "select";
-  options?: { value: string; label: string }[];
-  placeholder?: string;
-  className?: string;
-}
-
-interface SpTableProps {
-  data: any[];
-  columns: SpTableColumn[];
+export interface SpTableProps<T extends { id: string | number }> {
+  data?: T[];
+  pagination?: SpTablePaginationProps;
+  loading?: boolean;
+  loadData?: (limit: number, offset: number) => Promise<T[]>;
+  getTotalCount?: () => Promise<number>;
+  limit?: number;
+  dependencies?: any[];
+  filterConfigs?: FilterConfig<T>[];
+  columns: SpTableColumn<T>[];
   filters?: SpTableFilter[];
   searchPlaceholder?: string;
-  searchFields?: string[];
-  onRowClick?: (row: any) => void;
-  onEdit?: (row: any) => void;
-  onView?: (row: any) => void;
-  onDelete?: (row: any) => void;
-  actions?: (row: any) => ReactNode;
+  searchFields?: (keyof T & string)[];
+  onRowClick?: (row: T) => void;
+  onEdit?: (row: T) => void;
+  onView?: (row: T) => void;
+  onDelete?: (row: T) => void;
+  actions?: (row: T) => ReactNode;
   emptyState?: ReactNode;
-  loading?: boolean;
-  pagination?: {
-    currentPage: number;
-    totalPages: number;
-    pageSize: number;
-    totalItems: number;
-    onPageChange: (page: number) => void;
-    onNextPage: () => void;
-    onPrevPage: () => void;
-    hasMore: boolean;
-  };
   className?: string;
-  highlightRow?: (row: any) => boolean;
+  highlightRow?: (row: T) => boolean;
 }
 
-export function SpTable({
-  data,
-  columns,
-  filters = [],
-  searchPlaceholder = "Search...",
-  searchFields = [],
-  onRowClick,
-  onEdit,
-  onView,
-  onDelete,
-  actions,
-  emptyState,
-  loading = false,
-  pagination,
-  className = "",
-  highlightRow,
-}: SpTableProps) {
+export function SpTable<T extends { id: string | number }>(props: SpTableProps<T>) {
+  const {
+    data: externalData = [],
+    pagination: externalPagination,
+    loading: externalLoading = false,
+    loadData,
+    getTotalCount,
+    limit = 20,
+    dependencies = [],
+    filterConfigs = [],
+    columns,
+    filters: staticFilters = [],
+    searchPlaceholder = "Search...",
+    searchFields = [],
+    onRowClick,
+    onEdit,
+    onView,
+    onDelete,
+    actions,
+    emptyState,
+    className = "",
+    highlightRow,
+  } = props;
+
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+
+  const hasInternalLogic = loadData && getTotalCount;
+  const internalLogic = hasInternalLogic
+    ? useTableLogic<T>({
+        loadData: loadData as (l: number, o: number) => Promise<T[]>,
+        getTotalCount: getTotalCount as () => Promise<number>,
+        limit,
+        dependencies,
+        filterConfigs,
+      })
+    : null;
+
+  const data = internalLogic ? internalLogic.data : externalData;
+  const loading = internalLogic ? internalLogic.isLoading : externalLoading;
+  const pagination = internalLogic ? internalLogic.pagination : externalPagination;
+  const autoFilters = internalLogic ? internalLogic.filters : [];
+  const filters = autoFilters.length ? autoFilters : staticFilters;
+
   const [searchTerm, setSearchTerm] = useState("");
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
   const [showFilters, setShowFilters] = useState(!isMobile);
@@ -85,24 +249,25 @@ export function SpTable({
     setFilterValues({});
   };
 
-  const hasActiveFilters = searchTerm || Object.values(filterValues).some(Boolean);
+  const hasActiveFilters = searchTerm.trim() !== "" || Object.values(filterValues).some(Boolean);
 
   const filteredData = data.filter((row) => {
-    // Search filter
     const matchesSearch =
-      !searchTerm ||
-      searchFields.some((field) =>
-        String(row[field] || "")
+      searchTerm.trim() === "" ||
+      (searchFields.length === 0
+        ? JSON.stringify(row).toLowerCase().includes(searchTerm.toLowerCase())
+        : searchFields.some((field) =>
+            String(row[field] ?? "")
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()),
+          ));
+    const matchesFilters = Object.entries(filterValues).every(
+      ([key, value]) =>
+        value.trim() === "" ||
+        String((row as any)[key] ?? "")
           .toLowerCase()
-          .includes(searchTerm.toLowerCase()),
-      );
-
-    // Custom filters
-    const matchesFilters = Object.entries(filterValues).every(([key, value]) => {
-      if (!value) return true;
-      return String(row[key] || "").toLowerCase() === value.toLowerCase();
-    });
-
+          .trim() === value.toLowerCase().trim(),
+    );
     return matchesSearch && matchesFilters;
   });
 
@@ -113,7 +278,6 @@ export function SpTable({
           theme === "dark" ? "border-zinc-800 bg-zinc-900/50" : "border-gray-200 bg-white shadow-sm"
         }`}
       >
-        {/* Filters Section */}
         {(filters.length > 0 || searchFields.length > 0) && (
           <SpTableFilters
             searchTerm={searchTerm}
@@ -124,14 +288,12 @@ export function SpTable({
             searchPlaceholder={searchPlaceholder}
             showFilters={showFilters}
             setShowFilters={setShowFilters}
-            hasActiveFilters={hasActiveFilters as boolean}
+            hasActiveFilters={hasActiveFilters}
             clearFilters={clearFilters}
             isMobile={isMobile}
             theme={theme}
           />
         )}
-
-        {/* Table */}
         <div className="overflow-x-auto">
           <table className={`min-w-full text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
             <thead
@@ -140,34 +302,33 @@ export function SpTable({
               }`}
             >
               <tr>
-                {columns.map((column) => (
+                {columns.map((col) => (
                   <th
-                    key={column.key}
-                    className={`px-4 py-3 ${column.className || ""} ${column.hideOnMobile ? "hidden sm:table-cell" : ""}`}
-                    style={column.width ? { width: column.width } : undefined}
+                    key={col.key}
+                    className={`px-4 py-3 ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}
+                    style={col.width ? { width: col.width } : undefined}
                   >
-                    {column.label}
+                    {col.label}
                   </th>
                 ))}
                 {(actions || onView || onEdit || onDelete) && <th className="px-4 py-3 text-right">Actions</th>}
               </tr>
             </thead>
             <tbody>
-              {filteredData.map((row, index) => {
-                const isLastRow = index === filteredData.length - 1;
-                const isHighlighted = highlightRow?.(row);
-
+              {filteredData.map((row, idx) => {
+                const isLast = idx === filteredData.length - 1;
+                const highlighted = highlightRow?.(row);
                 return (
                   <tr
-                    key={row.id || index}
+                    key={row.id}
                     onClick={() => onRowClick?.(row)}
                     className={`transition-colors border-b cursor-pointer ${
-                      isLastRow ? "border-transparent" : theme === "dark" ? "border-zinc-800/50" : "border-gray-100"
-                    } ${isHighlighted ? "bg-gray-100/60 dark:bg-gray-700/30" : theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-gray-50"}`}
+                      isLast ? "border-transparent" : theme === "dark" ? "border-zinc-800/50" : "border-gray-100"
+                    } ${highlighted ? "bg-gray-100/60 dark:bg-gray-700/30" : theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-gray-50"}`}
                   >
-                    {columns.map((column) => (
-                      <td key={column.key} className={`px-4 py-3 ${column.className || ""} ${column.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
-                        {column.render ? column.render(row[column.key], row) : row[column.key] || "N/A"}
+                    {columns.map((col) => (
+                      <td key={col.key} className={`px-4 py-3 ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
+                        {col.render ? col.render(row[col.key], row) : ((row as any)[col.key] ?? "N/A")}
                       </td>
                     ))}
                     {(actions || onView || onEdit || onDelete) && (
@@ -181,25 +342,18 @@ export function SpTable({
             </tbody>
           </table>
         </div>
-
-        {/* Empty State */}
         {filteredData.length === 0 && data.length > 0 && (
           <div className={`text-center py-8 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
             <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">No items match your current filters</p>
           </div>
         )}
-
         {filteredData.length === 0 && data.length === 0 && emptyState && <div className="py-8">{emptyState}</div>}
-
-        {/* Pagination */}
         {pagination && <SpTablePagination pagination={pagination} loading={loading} theme={theme} />}
-
-        {/* Loading State */}
         {loading && (
           <div className={`text-center py-4 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
             <div className="flex items-center justify-center gap-2">
-              <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin border-current"></div>
+              <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin border-current" />
               <span className="text-sm">Loading...</span>
             </div>
           </div>
@@ -224,13 +378,13 @@ function SpTableFilters({
   theme,
 }: {
   searchTerm: string;
-  setSearchTerm: (value: string) => void;
+  setSearchTerm: (v: string) => void;
   filterValues: Record<string, string>;
-  onFilterChange: (key: string, value: string) => void;
+  onFilterChange: (k: string, v: string) => void;
   filters: SpTableFilter[];
   searchPlaceholder: string;
   showFilters: boolean;
-  setShowFilters: (value: boolean) => void;
+  setShowFilters: (v: boolean) => void;
   hasActiveFilters: boolean;
   clearFilters: () => void;
   isMobile: boolean;
@@ -238,11 +392,10 @@ function SpTableFilters({
 }) {
   return (
     <div className={`p-4 border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
-      <div className="space-y-4">
-        {/* Filter Toggle */}
+      <div className={`${isMobile ? "" : "space-y-4"}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {isMobile && (
+            {isMobile ? (
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
@@ -252,8 +405,7 @@ function SpTableFilters({
                 <Filter className="w-4 h-4" />
                 {showFilters ? "Hide" : "Show"} Filters
               </button>
-            )}
-            {!isMobile && (
+            ) : (
               <>
                 <Filter className="w-4 h-4" />
                 <span>Filters</span>
@@ -270,11 +422,8 @@ function SpTableFilters({
             )}
           </div>
         </div>
-
-        {/* Filter Controls */}
         {showFilters && (
           <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
-            {/* Search */}
             <div className="relative sm:col-span-2 lg:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -289,33 +438,31 @@ function SpTableFilters({
                 } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
               />
             </div>
-
-            {/* Custom Filters */}
-            {filters.map((filter) => (
-              <div key={filter.key} className={filter.className}>
-                {filter.type === "select" ? (
+            {filters.map((f) => (
+              <div key={f.key} className={f.className}>
+                {f.type === "select" ? (
                   <select
-                    value={filterValues[filter.key] || ""}
-                    onChange={(e) => onFilterChange(filter.key, e.target.value)}
+                    value={filterValues[f.key] || ""}
+                    onChange={(e) => onFilterChange(f.key, e.target.value)}
                     className={`w-full px-3 py-2 rounded-lg border text-sm transition-colors duration-200 ${
                       theme === "dark"
                         ? "border-zinc-700 bg-zinc-800 text-white focus:border-purple-400"
                         : "border-gray-300 bg-white text-gray-900 focus:border-purple-500"
                     } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                   >
-                    <option value="">{filter.label}</option>
-                    {filter.options?.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
+                    <option value="">{f.label}</option>
+                    {f.options?.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
                       </option>
                     ))}
                   </select>
                 ) : (
                   <input
                     type="text"
-                    placeholder={filter.placeholder || filter.label}
-                    value={filterValues[filter.key] || ""}
-                    onChange={(e) => onFilterChange(filter.key, e.target.value)}
+                    placeholder={f.placeholder || f.label}
+                    value={filterValues[f.key] || ""}
+                    onChange={(e) => onFilterChange(f.key, e.target.value)}
                     className={`w-full px-3 py-2 rounded-lg border text-sm transition-colors duration-200 ${
                       theme === "dark"
                         ? "border-zinc-700 bg-zinc-800 text-white placeholder-gray-400 focus:border-purple-400"
@@ -325,8 +472,6 @@ function SpTableFilters({
                 )}
               </div>
             ))}
-
-            {/* Clear Filters */}
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
@@ -340,11 +485,7 @@ function SpTableFilters({
             )}
           </div>
         )}
-
-        {/* Results Count */}
-        <div className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-          {hasActiveFilters ? `Showing filtered results` : `Showing all items`}
-        </div>
+        <div className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>{hasActiveFilters ? "Showing filtered results" : ""}</div>
       </div>
     </div>
   );
@@ -359,10 +500,10 @@ function SpTableActions({
   theme,
 }: {
   row: any;
-  onView?: (row: any) => void;
-  onEdit?: (row: any) => void;
-  onDelete?: (row: any) => void;
-  actions?: (row: any) => ReactNode;
+  onView?: (r: any) => void;
+  onEdit?: (r: any) => void;
+  onDelete?: (r: any) => void;
+  actions?: (r: any) => ReactNode;
   theme: string;
 }) {
   return (
@@ -413,9 +554,8 @@ function SpTableActions({
   );
 }
 
-function SpTablePagination({ pagination, loading, theme }: { pagination: SpTableProps["pagination"]; loading: boolean; theme: string }) {
+function SpTablePagination({ pagination, loading, theme }: { pagination: SpTablePaginationProps; loading: boolean; theme: string }) {
   if (!pagination) return null;
-
   return (
     <div
       className={`flex items-center justify-between p-4 border-t transition-colors duration-200 ${
@@ -430,7 +570,6 @@ function SpTablePagination({ pagination, loading, theme }: { pagination: SpTable
         {pagination.pageSize} per page
         {pagination.totalItems > 0 && <span className="hidden md:inline"> • {pagination.totalItems} total items</span>}
       </div>
-
       <div className="flex items-center gap-2">
         <button
           onClick={pagination.onPrevPage}
@@ -446,7 +585,6 @@ function SpTablePagination({ pagination, loading, theme }: { pagination: SpTable
           <ChevronLeft className="w-4 h-4" />
           <span className="hidden sm:inline">Previous</span>
         </button>
-
         <button
           onClick={pagination.onNextPage}
           disabled={!pagination.hasMore || loading}

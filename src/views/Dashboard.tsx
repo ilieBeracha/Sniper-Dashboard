@@ -1,84 +1,28 @@
-import { useEffect, useState } from "react";
-import { useStore } from "zustand";
-import { userStore } from "@/store/userStore";
-import { squadStore } from "@/store/squadStore";
-import { performanceStore } from "@/store/performance";
-import { TrainingStore } from "@/store/trainingStore";
-import { getUserGroupingStatsRpc } from "@/services/performance";
-
-import BaseButton from "@/components/BaseButton";
-import DashboardRowOne from "@/components/DashboardRowOne";
-import DashboardRowKPI from "@/components/DashboardRowKPI";
-import DashboardRowThree from "@/components/DashboardRowThree";
-import DashboardRowFour from "@/components/DashboardRowFour";
-import DashboardAI from "@/components/DashboardAI";
-import InviteModal from "@/components/InviteModal";
-import CommanderView from "@/components/CommanderView";
-
-import { Activity, Brain, SplinePointerIcon } from "lucide-react";
+import { useDashboardPageLogic } from "@/hooks/useDashboardPageLogic";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
+import InviteModal from "@/components/InviteModal";
+import BaseButton from "@/components/BaseButton";
 import Header from "@/Headers/Header";
+import { SplinePointerIcon } from "lucide-react";
 
 export default function Dashboard() {
-  const useUserStore = useStore(userStore);
-  const { getUserHitPercentage, getSquadStats } = useStore(performanceStore);
-  const { getSquadMetricsByRole } = useStore(squadStore);
-  const { loadNextAndLastTraining } = useStore(TrainingStore);
-
-  const user = useUserStore.user;
-  const userRole = useUserStore.user?.user_role ?? null;
-  const [loading, setLoading] = useState(true);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-
-  const tabs = [
-    { label: "Overview", icon: <Activity /> },
-    { label: "AI Insights", icon: <Brain /> },
-    { label: "Commander View", icon: <SplinePointerIcon /> },
-  ];
-  const [activeTab, setActiveTab] = useState<string>(tabs[0].label);
-
-  useEffect(() => {
-    const load = async () => {
-      if (user?.team_id) {
-        await getUserGroupingStatsRpc(user.id);
-        await getUserHitPercentage(user?.id);
-        await loadNextAndLastTraining(user?.team_id);
-        await getSquadMetricsByRole(user?.id);
-        await getSquadStats(null, null);
-      }
-      setLoading(false);
-    };
-
-    load();
-  }, []);
+  const { user, userRole, isInviteModalOpen, setIsInviteModalOpen, tabs, activeTab, setActiveTab, RenderComponent } = useDashboardPageLogic();
 
   return (
     <SpPage>
-      <Header title={"Dashboard"}>
-        <BaseButton onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}>Invite</BaseButton>
-      </Header>
+      <Header title={"Dashboard"}></Header>
+
       <SpPageHeader
-        title="Dashboard"
+        title={activeTab}
         subtitle={activeTab === "Overview" ? "Team, Squad, and more" : "By Date, Squad, and more"}
         icon={<SplinePointerIcon />}
         breadcrumbs={[{ label: "Dashboard", link: "/" }]}
+        button={[<BaseButton onClick={() => setIsInviteModalOpen(true)}>Invite</BaseButton>]}
       />
-      <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={(tab) => setActiveTab(tab)} />
 
-      <SpPageBody>
-        {activeTab === "Overview" && (
-          <>
-            <DashboardRowOne user={user} />
-            <DashboardRowKPI />
-            <DashboardRowThree loading={loading} />
-            <DashboardRowFour />
-          </>
-        )}
+      <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-        {activeTab === "AI Insights" && <DashboardAI />}
-
-        {activeTab === "Commander View" && <CommanderView />}
-      </SpPageBody>
+      <SpPageBody>{RenderComponent()}</SpPageBody>
 
       {userRole !== "soldier" && user?.id && <InviteModal isOpen={isInviteModalOpen} setIsOpen={setIsInviteModalOpen} userId={user.id} />}
     </SpPage>

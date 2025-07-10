@@ -114,9 +114,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
       key: "assignment",
       label: "Assignment",
       render: (_value: any, row: any) => (
-        <span className="font-medium truncate max-w-[100px] sm:max-w-[150px]">
-          {row.assignment_session?.assignment?.assignment_name || "N/A"}
-        </span>
+        <span className="font-medium truncate max-w-[100px] sm:max-w-[150px]">{row.assignment_session?.assignment?.assignment_name || "N/A"}</span>
       ),
       className: "px-4 sm:px-4 py-3",
     },
@@ -126,9 +124,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
       render: (_value: any, row: any) => {
         const participant = row.score_participants?.[0]?.user;
         return (
-          <span className="truncate max-w-[80px] sm:max-w-none">
-            {participant ? `${participant.first_name} ${participant.last_name}` : "N/A"}
-          </span>
+          <span className="truncate max-w-[80px] sm:max-w-none">{participant ? `${participant.first_name} ${participant.last_name}` : "N/A"}</span>
         );
       },
       className: "px-2 sm:px-4 py-3",
@@ -197,9 +193,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
           e.stopPropagation();
           onScoreClick(score);
         }}
-        className={`p-1.5 sm:p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${
-          theme === "dark" ? "text-indigo-400" : "text-indigo-600"
-        }`}
+        className={`p-1.5 sm:p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
         title="View"
       >
         <Eye size={14} className="sm:w-4 sm:h-4" />
@@ -209,9 +203,7 @@ export default function TrainingScoresTable({ scores, onScoreClick, onEditClick,
           e.stopPropagation();
           onEditClick(score);
         }}
-        className={`p-1.5 sm:p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${
-          theme === "dark" ? "text-amber-400" : "text-amber-600"
-        }`}
+        className={`p-1.5 sm:p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
         title="Edit"
       >
         <Edit size={14} className="sm:w-4 sm:h-4" />

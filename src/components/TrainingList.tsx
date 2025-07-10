@@ -1,82 +1,44 @@
+import { useEffect } from "react";
 import { TrainingSession } from "@/types/training";
-import { parseISO, isToday, isPast, isFuture } from "date-fns";
 import { TrainingSessionCard } from "./TrainingSessionCard";
 import TrainingSessionGroup from "./TrainingSessionGroup";
-import { useEffect } from "react";
 import TrainingCalendar from "./TrainingCalendar";
+import TrainingSection from "./TrainingSection";
+import TrainingListEmpty from "./TrainingListEmpty";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import { filterTrainingsByDate } from "@/utils/trainingFilters";
+
 interface TrainingListProps {
   trainings: TrainingSession[];
 }
 
 export default function TrainingList({ trainings }: TrainingListProps) {
-  const { theme } = useTheme();
   const { getOverallAccuracyStats } = useStore(performanceStore);
+  const { theme } = useTheme();
   const isMobile = useIsMobile();
+
   useEffect(() => {
     getOverallAccuracyStats();
   }, []);
 
-  // Use provided trainings directly
-  const active = trainings;
-
+  const { todaySessions, upcoming, past } = filterTrainingsByDate(trainings);
   const today = new Date();
-  const todaySessions = active.filter((s) => isToday(parseISO(s.date)));
-  const upcoming = active.filter((s) => {
-    const sessionDate = parseISO(s.date);
-    return isFuture(sessionDate) && !isToday(sessionDate);
-  });
-  const past = active
-    .filter((s) => {
-      const sessionDate = parseISO(s.date);
-      const sessionDateEnd = new Date(sessionDate);
-      sessionDateEnd.setHours(23, 59, 59, 999);
-      return isPast(sessionDateEnd) && !isToday(sessionDate);
-    })
-    .reverse();
 
   return (
     <>
       {isMobile ? (
         <div className="space-y-4">
           <div className="space-y-3">
-            {active.length === 0 && <div className="text-center text-gray-500 h-80 flex items-center justify-center">No active trainings</div>}
-            {todaySessions.length > 0 && (
-              <div className="space-y-3">
-                <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                  <div className="h-3 w-3 bg-green-400 rounded-full"></div> Today
-                </h3>
+            {trainings.length === 0 && <TrainingListEmpty />}
 
-                {todaySessions.map((s) => (
-                  <TrainingSessionCard key={s.id} session={s} highlight showDate={false} />
-                ))}
-              </div>
-            )}
+            <TrainingSection title="Today" trainings={todaySessions} color="green" highlight={true} showDate={false} />
 
-            {upcoming.length > 0 && (
-              <div className="space-y-3 mt-6">
-                <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                  <div className="h-3 w-3 bg-blue-600 rounded-full"></div> Upcoming <span className="text-xs">{upcoming.length}</span>
-                </h3>
-                {upcoming.map((s) => (
-                  <TrainingSessionCard key={s.id} session={s} />
-                ))}
-              </div>
-            )}
+            <TrainingSection title="Upcoming" trainings={upcoming} color="blue" showCount={true} />
 
-            {past.length > 0 && (
-              <div className="space-y-3 mt-6">
-                <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                  <div className="h-3 w-3 bg-gray-600 rounded-full"></div> Past Sessions
-                </h3>
-                {past.map((s) => (
-                  <TrainingSessionCard key={s.id} session={s} isPast />
-                ))}
-              </div>
-            )}
+            <TrainingSection title="Past Sessions" trainings={past} color="gray" isPast={true} />
           </div>
         </div>
       ) : (

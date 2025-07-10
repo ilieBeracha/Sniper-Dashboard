@@ -1,13 +1,15 @@
 import { useState, useMemo } from "react";
 import { Weapon } from "@/types/weapon";
-import { Eye, Edit, Save, X } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Eye, Edit, Search, X, Save } from "lucide-react";
 import { format } from "date-fns";
 import { useStore } from "zustand";
 import { weaponsStore } from "@/store/weaponsStore";
-import { SpTable } from "@/layouts/SpTable";
-import { useTheme } from "@/contexts/ThemeContext";
+import { SpTable, SpTableColumn } from "@/layouts/SpTable";
 
 export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
+  // Filter out weapons without IDs for SpTable compatibility
+  const weaponsWithIds = weapons.filter((weapon): weapon is Weapon & { id: string } => Boolean(weapon.id));
   const { theme } = useTheme();
   const { updateWeapon } = useStore(weaponsStore);
   const [editingWeapon, setEditingWeapon] = useState<Weapon | null>(null);
@@ -15,9 +17,9 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
 
   // Get unique weapon types for filter
   const uniqueWeaponTypes = useMemo(() => {
-    const types = weapons.map((weapon) => weapon.weapon_type).filter(Boolean);
+    const types = weaponsWithIds.map((weapon) => weapon.weapon_type).filter(Boolean);
     return [...new Set(types)];
-  }, [weapons]);
+  }, [weaponsWithIds]);
 
   const handleEditWeapon = (weapon: Weapon) => {
     setEditingWeapon(weapon);
@@ -45,7 +47,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
     console.log("Viewing weapon:", weapon);
   };
 
-  const columns = [
+  const columns: SpTableColumn<Weapon>[] = [
     {
       key: "weapon_type",
       label: "Weapon Type",
@@ -70,6 +72,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
           <span className="font-medium">{value || "N/A"}</span>
         );
       },
+      className: "px-4 py-3",
     },
     {
       key: "serial_number",
@@ -86,9 +89,10 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
             }`}
           />
         ) : (
-          value || "N/A"
+          <span>{value || "N/A"}</span>
         );
       },
+      className: "px-4 py-3",
     },
     {
       key: "mv",
@@ -105,19 +109,18 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
             }`}
           />
         ) : (
-          value || "N/A"
+          <span>{value || "N/A"}</span>
         );
       },
+      className: "px-4 py-3",
     },
-    ...(weapons.some((weapon) => weapon.created_at)
-      ? [
-          {
-            key: "created_at",
-            label: "Created",
-            render: (value: string) => (value ? format(new Date(value), "yyyy-MM-dd HH:mm") : "N/A"),
-          },
-        ]
-      : []),
+    {
+      key: "created_at",
+      label: "Created",
+      render: (value: string) => (value ? format(new Date(value), "yyyy-MM-dd HH:mm") : "N/A"),
+      className: "px-4 py-3",
+      hideOnMobile: true,
+    },
   ];
 
   const filters = [
@@ -131,20 +134,25 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
 
   const actions = (weapon: Weapon) => {
     const isEditing = editingWeapon?.id === weapon.id;
-
     return (
       <div className="inline-flex gap-2">
         {isEditing ? (
           <>
             <button
-              onClick={handleSaveWeapon}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSaveWeapon();
+              }}
               className={`p-2 rounded hover:bg-green-100 dark:hover:bg-green-800/40 ${theme === "dark" ? "text-green-400" : "text-green-600"}`}
               title="Save"
             >
               <Save size={16} />
             </button>
             <button
-              onClick={handleCancelEdit}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCancelEdit();
+              }}
               className={`p-2 rounded hover:bg-red-100 dark:hover:bg-red-800/40 ${theme === "dark" ? "text-red-400" : "text-red-600"}`}
               title="Cancel"
             >
@@ -154,14 +162,20 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
         ) : (
           <>
             <button
-              onClick={() => handleViewWeapon(weapon)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleViewWeapon(weapon);
+              }}
               className={`p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
               title="View"
             >
               <Eye size={16} />
             </button>
             <button
-              onClick={() => handleEditWeapon(weapon)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEditWeapon(weapon);
+              }}
               className={`p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
               title="Edit"
             >
@@ -173,9 +187,19 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
     );
   };
 
+  if (weaponsWithIds.length === 0) {
+    return (
+      <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+        <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
+        <h3 className="text-lg font-medium mb-2">No weapons yet</h3>
+        <p className="text-sm">Add your first weapon to get started</p>
+      </div>
+    );
+  }
+
   return (
     <SpTable
-      data={weapons}
+      data={weaponsWithIds}
       columns={columns}
       filters={filters}
       searchPlaceholder="Search by serial number, type, or MV..."
@@ -183,9 +207,9 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
       actions={actions}
       emptyState={
         <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
-          <div className="w-12 h-12 mx-auto mb-4 opacity-50">⚔️</div>
-          <h3 className="text-lg font-medium mb-2">No weapons yet</h3>
-          <p className="text-sm">Add your first weapon to get started</p>
+          <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <h3 className="text-lg font-medium mb-2">No weapons match your filters</h3>
+          <p className="text-sm">Try adjusting your search criteria</p>
         </div>
       }
     />

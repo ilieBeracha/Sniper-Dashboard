@@ -9,8 +9,8 @@ export default function AssetsPage() {
   const [activeTab, setActiveTab] = useState<"weapons" | "equipments">("weapons");
 
   const tabs = [
-    { label: "weapons", icon: <FileQuestion /> },
-    { label: "equipments", icon: <Package /> },
+    { label: "weapons", icon: FileQuestion },
+    { label: "equipments", icon: Package },
   ];
   return (
     <SpPage>

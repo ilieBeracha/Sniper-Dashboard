@@ -1,11 +1,9 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Link } from "react-router-dom";
-import { ReactNode } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator, BreadcrumbLink } from "@/components/ui/breadcrumb";
+import React, { ReactNode } from "react";
 import { MoreVertical } from "lucide-react";
-
+import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
 export function SpPage({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
   return (
@@ -60,18 +58,18 @@ export function SpPageHeader({
             {button &&
               button.length > 0 &&
               (isMobile ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <MoreVertical className="w-6 h-6 cursor-pointer" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="flex flex-col gap-2 border-none bg-zinc-700">
-                    <DropdownMenuItem className="cursor-pointer flex flex-col gap-2">
+                <Menubar className="bg-transparent border-none shadow-none">
+                  <MenubarMenu>
+                    <MenubarTrigger>
+                      <MoreVertical className="w-6 h-6 cursor-pointer" />
+                    </MenubarTrigger>
+                    <MenubarContent className="bg-zinc-900 border-zinc-800 shadow-2xl">
                       {button.map((item, index) => (
-                        <div key={index}>{item}</div>
+                        <MenubarItem key={index}>{item}</MenubarItem>
                       ))}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    </MenubarContent>
+                  </MenubarMenu>
+                </Menubar>
               ) : (
                 <div className="flex items-center gap-2">
                   {button.map((item, index) => (
@@ -91,7 +89,7 @@ export function SpPageTabs({
   activeTab,
   onChange,
 }: {
-  tabs: { label: string; icon: ReactNode }[];
+  tabs: { label: string; icon: React.ComponentType<any> }[];
   activeTab: string;
   onChange: (id: string) => void;
 }) {
@@ -118,7 +116,7 @@ export function SpPageTabs({
               }`}
               title={tab.label}
             >
-              {tab.icon}
+              <tab.icon className="w-4 h-4" />
               <span className={isMobile ? "text-xs" : "text-sm"}>{tab.label}</span>
             </button>
           );
@@ -129,7 +127,7 @@ export function SpPageTabs({
 }
 
 export function SpPageBody({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-4 md:px-6 py-4 2xl:px-6 px-4 pb-10 space-y-6">{children}</div>;
+  return <div className="flex flex-col gap-4 md:px-6 2xl:px-6 px-4 pb-10 space-y-6">{children}</div>;
 }
 
 export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: string; link: string }[] }) {
@@ -138,12 +136,14 @@ export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: strin
     <Breadcrumb>
       <BreadcrumbList>
         {breadcrumbs.map((breadcrumb, index) => (
-          <BreadcrumbItem key={breadcrumb.label}>
-            <BreadcrumbLink asChild className={`${theme === "dark" ? "text-gray-400" : "text-gray-600"} text-md`}>
-              <Link to={breadcrumb.link}>{breadcrumb.label}</Link>
-            </BreadcrumbLink>
+          <React.Fragment key={breadcrumb.label}>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild className={`${theme === "dark" ? "text-gray-400" : "text-gray-600"} text-md`}>
+                <span>{breadcrumb.label}</span>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
             {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-          </BreadcrumbItem>
+          </React.Fragment>
         ))}
       </BreadcrumbList>
     </Breadcrumb>
