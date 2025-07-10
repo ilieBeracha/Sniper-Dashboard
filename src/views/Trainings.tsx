@@ -126,7 +126,7 @@ export default function Trainings() {
           { label: "Trainings", link: "/trainings" },
         ]}
         button={[
-          <BaseButton isMenu style="purple" onClick={() => setIsAddTrainingOpen(true)}>
+          <BaseButton style="purple" onClick={() => setIsAddTrainingOpen(true)}>
             Add Training
           </BaseButton>,
         ]}

@@ -34,14 +34,14 @@ export function SpPageHeader({
   const isMobile = useIsMobile();
 
   return (
-    <div>
+    <div className="m-0 p-0">
       {breadcrumbs && (
         <div className="md:px-6 2xl:px-6 px-4">
           <SpPageBreadcrumbs breadcrumbs={breadcrumbs} />
         </div>
       )}
 
-      <div className="px-8 py-14 rounded-2xl transition-all duration-200 min-h-28">
+      <div className={` ${isMobile ? "px-6 mt-10 mb-0" : "px-8 py-14"} transition-all duration-200 min-h-28`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 justify-between w-full">
             <div className="flex items-center gap-3">

@@ -48,7 +48,7 @@ export default function BaseButton({
         onClick={onClick}
         disabled={disabled}
         className={`${isMenu ? "w-full" : ""} text-xs rounded-2xl px-4 py-1 cursor-pointer transition-colors duration-200 ${
-          theme === "dark" ? " text-white hover:bg-gray-600" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          isMobile && isMenu ? getStyleClasses() : ""
         }`}
       >
         {children}
