@@ -88,13 +88,13 @@ export const scoreStore = create<ScoreStore>((set) => ({
       const res = await createScore(score);
 
       if (res && res[0]?.id) {
-        const [scoreParticipant, scoreTarget] = await Promise.all([
+        const [scoreTarget] = await Promise.all([
           createScoreParticipant(scoreForm.score_participants, res[0].id as string),
           createTarget(scoreForm.scoreTargets, res[0].id as string),
         ]);
 
         try {
-          updateAIKnowledge(userStore.getState().user?.id as string, res[0], scoreParticipant, scoreTarget);
+          updateAIKnowledge(userStore.getState().user?.id as string, res[0], scoreForm.score_participants, scoreTarget);
         } catch (aiError) {
           console.error("Error updating AI knowledge:", aiError);
         }

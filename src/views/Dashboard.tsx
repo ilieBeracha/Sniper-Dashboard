@@ -92,11 +92,7 @@ export default function Dashboard() {
               <div className="flex items-center gap-4 mt-1">
                 <div className={`flex items-center gap-1.5 text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
                   <Calendar className="w-4 h-4" />
-                  {activeTab === "Overview" ? (
-                    <span>Team, Squad, and more</span>
-                  ) : (
-                    <span>By Date, Squad, and more</span>
-                  )}
+                  {activeTab === "Overview" ? <span>Team, Squad, and more</span> : <span>By Date, Squad, and more</span>}
                 </div>
               </div>
             </div>
@@ -120,8 +116,8 @@ export default function Dashboard() {
                       ? "border-purple-400 text-purple-400"
                       : "border-purple-600 text-purple-600"
                     : theme === "dark"
-                    ? "border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                      ? "border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
                 title={tab.description}
               >
@@ -171,9 +167,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {userRole !== "soldier" && user?.id && (
-        <InviteModal isOpen={isInviteModalOpen} setIsOpen={setIsInviteModalOpen} userId={user.id} />
-      )}
+      {userRole !== "soldier" && user?.id && <InviteModal isOpen={isInviteModalOpen} setIsOpen={setIsInviteModalOpen} userId={user.id} />}
     </div>
   );
 }
