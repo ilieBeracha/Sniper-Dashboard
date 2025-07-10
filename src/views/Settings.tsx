@@ -14,7 +14,7 @@ import { BASE_EQUIPMENTS } from "@/utils/BaseData/BaseEquipments";
 
 const Settings = () => {
   const { theme } = useTheme();
-const { user, setUser } = useStore(userStore);
+  const { user, setUser } = useStore(userStore);
   const { weapons } = useStore(weaponsStore);
   const { equipments } = useStore(equipmentStore);
 
@@ -22,7 +22,7 @@ const { user, setUser } = useStore(userStore);
     first_name: "",
     last_name: "",
     email: "",
-    defaultRole: "sniper" as "sniper" | "spotter",
+    defaultDuty: "sniper" as "sniper" | "spotter",
     defaultWeapon: "",
     defaultEquipment: "",
   });
@@ -36,7 +36,7 @@ const { user, setUser } = useStore(userStore);
         first_name: user.first_name || "",
         last_name: user.last_name || "",
         email: user.email || "",
-        defaultRole: "sniper",
+        defaultDuty: "sniper",
         defaultWeapon: "",
         defaultEquipment: "",
       });
@@ -48,31 +48,33 @@ const { user, setUser } = useStore(userStore);
     setSaved(false);
   };
 
-const handleSave = async () => {
+  const handleSave = async () => {
     setLoading(true);
     try {
-        if (!user || !user.id || !user.user_role) {
-            console.error("User is missing required properties");
-            return;
-        }
+      if (!user || !user.id || !user.user_role) {
+        console.error("User is missing required properties");
+        return;
+      }
 
-        setUser({
-            ...user,
-            id: user.id, // ensure it's passed explicitly and is a string
-            user_role: user.user_role, // required too
-            first_name: formData.first_name,
-            last_name: formData.last_name,
-            email: formData.email,
-        });
+      setUser({
+        ...user,
+        id: user.id, // ensure it's passed explicitly and is a string
+        user_role: user.user_role, // required too
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        user_default_weapon: formData.defaultDuty === "sniper" ? formData.defaultWeapon : null,
+        user_default_equipment: formData.defaultDuty === "spotter" ? formData.defaultEquipment : null,
+      });
 
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-        console.error('Error saving settings:', error);
+      console.error("Error saving settings:", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
   const availableWeapons = [...BASE_WEAPONS, ...weapons];
   const availableEquipment = [...BASE_EQUIPMENTS, ...equipments];
@@ -168,7 +170,7 @@ const handleSave = async () => {
                   <button
                     onClick={() => handleInputChange("defaultRole", "sniper")}
                     className={`flex-1 p-3 rounded-lg border-2 transition-all duration-200 ${
-                      formData.defaultRole === "sniper"
+                      formData.defaultDuty === "sniper"
                         ? "border-purple-500 bg-purple-500/10"
                         : theme === "dark"
                           ? "border-gray-700 hover:border-gray-600"
@@ -181,7 +183,7 @@ const handleSave = async () => {
                   <button
                     onClick={() => handleInputChange("defaultRole", "spotter")}
                     className={`flex-1 p-3 rounded-lg border-2 transition-all duration-200 ${
-                      formData.defaultRole === "spotter"
+                      formData.defaultDuty === "spotter"
                         ? "border-purple-500 bg-purple-500/10"
                         : theme === "dark"
                           ? "border-gray-700 hover:border-gray-600"
@@ -203,12 +205,12 @@ const handleSave = async () => {
                 <Target className="w-4 h-4 text-orange-400" />
               </div>
               <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>
-                {formData.defaultRole === "sniper" ? "Default Weapon" : "Default Equipment"}
+                {formData.defaultDuty === "sniper" ? "Default Weapon" : "Default Equipment"}
               </h3>
             </div>
 
             <div className="space-y-4">
-              {formData.defaultRole === "sniper" ? (
+              {formData.defaultDuty === "sniper" ? (
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                     Select Default Weapon

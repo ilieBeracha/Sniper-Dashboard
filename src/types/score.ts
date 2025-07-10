@@ -67,12 +67,12 @@ export interface ScoreParticipant {
   user_id: string;
   user?: { first_name: string; last_name: string; email: string };
   user_duty: UserDuty;
-
   weapon_id?: string;
   weapon?: { weapon_type: string; serial_number: string };
-
   equipment_id?: string;
   equipment?: { equipment_type: string; serial_number: string };
+  shots_fired?: number;
+  target_hits?: number;
 }
 
 /*──────────────────────────── misc enums ───────────────────────────*/
