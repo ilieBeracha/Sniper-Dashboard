@@ -17,7 +17,6 @@ import {
   Award,
   Bell,
 } from "lucide-react";
-import { SuggestionData } from "@/store/AiStore";
 import BaseDashboardCard from "./BaseDashboardCard";
 
 export default function AiSuggestionGenerator({
@@ -40,7 +39,7 @@ export default function AiSuggestionGenerator({
 
   const handleGenerateSuggestions = async () => {
     const tasks = await generateSuggestions();
-    setSuggestions(tasks as unknown as SuggestionData[]);
+    setSuggestions(tasks as any[]);
     if (tasks && tasks.length > previousCount) {
       setIsNewSuggestions(true);
       setTimeout(() => setIsNewSuggestions(false), 5000);

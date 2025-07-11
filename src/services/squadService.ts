@@ -8,7 +8,7 @@ export async function getSquadsWithUsersByTeamId(team_id: string) {
       id,
       squad_name,
       created_at,
-      users!fk_squad (
+      users!fk_users_squad_id (
         id,
         first_name,
         last_name,
@@ -35,7 +35,7 @@ export async function getSquadUsersBySquadId(squad_id: string) {
       id,
       squad_name,
       created_at,
-      users!fk_squad (
+      users!fk_users_squad_id (
         id,
         first_name,
         last_name,
