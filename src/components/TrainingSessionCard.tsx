@@ -27,7 +27,6 @@ export function TrainingSessionCard({
     navigate(`/training/${session.id}`);
   };
 
-  // Mobile-first design like the event cards in the image
   if (isMobile) {
     return (
       <div
