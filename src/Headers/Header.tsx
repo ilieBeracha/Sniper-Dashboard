@@ -5,7 +5,7 @@ import { isMobile } from "react-device-detect";
 import { useTheme } from "@/contexts/ThemeContext";
 import ThemeToggle from "@/components/ThemeToggle";
 
-export default function Header({ children, title }: { children?: React.ReactNode; title?: string }) {
+export default function Header({ children, title }: { children: React.ReactNode; title?: string }) {
   const { toggleDrawer } = useStore(useSidebarStore);
   const { theme } = useTheme();
 

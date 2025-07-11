@@ -13,6 +13,7 @@ import { TrainingStore } from "./trainingStore";
 import { supabase } from "@/services/supabaseClient";
 import { DayNight, PositionScore, ScoreParticipant, ScoreTarget } from "@/types/score";
 import { userStore } from "./userStore";
+import { updateAIKnowledge } from "@/services/AiService";
 
 export interface Score {
   id?: string;
@@ -87,10 +88,16 @@ export const scoreStore = create<ScoreStore>((set) => ({
       const res = await createScore(score);
 
       if (res && res[0]?.id) {
-        await Promise.all([
+        const [scoreParticipant, scoreTarget] = await Promise.all([
           createScoreParticipant(scoreForm.score_participants, res[0].id as string),
           createTarget(scoreForm.scoreTargets, res[0].id as string),
         ]);
+
+        try {
+          updateAIKnowledge(userStore.getState().user?.id as string, res[0], scoreParticipant, scoreTarget);
+        } catch (aiError) {
+          console.error("Error updating AI knowledge:", aiError);
+        }
 
         return res;
       }

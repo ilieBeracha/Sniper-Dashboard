@@ -44,15 +44,15 @@ export async function getTrainingByTeamId(teamId: string, limit: number = 0, ran
       session_name,
       location,
       status,
-      creator:users!fk_training_session_creator_id (
+      creator_id:creator_id(
         id,
         first_name,
         last_name,
         email
       ),
-      assignment_session:assignment_session (
+        assignment_session:assignment_session(
         id,
-        assignment:assignment_id (
+        assignment:assignment_id(
           id,
           assignment_name,
           created_at
@@ -64,7 +64,9 @@ export async function getTrainingByTeamId(teamId: string, limit: number = 0, ran
     .neq("status", "canceled")
     .order("date", { ascending: false });
 
+  // Apply pagination if limit is specified and greater than 0
   if (limit > 0) {
+    // Always use range for consistent pagination (from offset to offset + limit - 1)
     const rangeEnd = range + limit - 1;
     query = query.range(range, rangeEnd);
   }
@@ -77,7 +79,8 @@ export async function getTrainingByTeamId(teamId: string, limit: number = 0, ran
   }
 
   const processedTrainings = (trainings || []).map((training) => {
-    const assignments = training.assignment_session?.map((item) => item.assignment).filter(Boolean);
+    const assignments = training.assignment_session.map((item) => item.assignment).filter(Boolean);
+
     return {
       ...training,
       assignments,

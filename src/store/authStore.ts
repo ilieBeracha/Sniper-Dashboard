@@ -65,7 +65,7 @@ export const authStore = create<props>((set, get) => ({
       const res = await authService.registerCommander(user);
       set({ token: res.access_token });
       get().supabaseLogin(res);
-      userStore.getState().setUser(res.user as unknown as User);
+      userStore.getState().setUser(res.user);
 
       return res;
     } catch (error: any) {
@@ -78,7 +78,7 @@ export const authStore = create<props>((set, get) => ({
       const res = await authService.registerSquadCommander(user);
       set({ token: res.access_token });
 
-      userStore.getState().setUser(res.user as unknown as User);
+      userStore.getState().setUser(res.user);
       get().supabaseLogin(res);
 
       return res;
@@ -94,7 +94,7 @@ export const authStore = create<props>((set, get) => ({
       set({ token: res.access_token });
       get().supabaseLogin(res);
 
-      userStore.getState().setUser(res.user as unknown as User);
+      userStore.getState().setUser(res.user);
 
       return res;
     } catch (error: any) {
@@ -108,7 +108,7 @@ export const authStore = create<props>((set, get) => ({
       authStore.getState().resetError();
       const res = await authService.login(user);
       get().supabaseLogin(res);
-      userStore.getState().setUser(res.user as User);
+      userStore.getState().setUser(res.user);
 
       set({ token: res.access_token });
 

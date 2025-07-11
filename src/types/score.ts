@@ -79,8 +79,8 @@ export interface ScoreParticipant {
 export type DayNight = "day" | "night";
 
 export enum UserDuty {
-  SNIPER = "Sniper",
-  SPOTTER = "Spotter",
+  SNIPER = "sniper",
+  SPOTTER = "spotter",
 }
 
 export enum PositionScore {

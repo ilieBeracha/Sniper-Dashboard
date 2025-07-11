@@ -7,7 +7,7 @@ export async function getTeamMembers(teamId: string): Promise<User[]> {
     .select(
       `
       *,
-      squads:fk_users_squad_id (
+      squads:fk_squad (
         id,
         squad_name
       )
@@ -20,5 +20,12 @@ export async function getTeamMembers(teamId: string): Promise<User[]> {
     throw new Error("Failed to fetch team members");
   }
 
-  return data ?? [];
+  if (!data) return [];
+
+  // ✅ Filter logic based on role
+  // if (["squad_commander", "soldier"].includes(currentUser.user_role)) {
+  //   return data.filter((user) => user.squad_id === currentUser.squad_id);
+  // }
+
+  return data; // commander sees all
 }

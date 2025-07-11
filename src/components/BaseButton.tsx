@@ -9,7 +9,6 @@ export default function BaseButton({
   padding = "px-4 py-1.5",
   style = "default",
   type = "button",
-  isMenu = false,
 }: {
   children: React.ReactNode;
   onClick: () => void;
@@ -18,7 +17,6 @@ export default function BaseButton({
   padding?: string;
   type?: "button" | "submit" | "reset";
   style?: "default" | "purple" | "white" | "gradient";
-  isMenu?: boolean;
 }) {
   const isMobile = useIsMobile();
   const { theme } = useTheme();
@@ -41,29 +39,15 @@ export default function BaseButton({
         return `${baseClasses} ${theme === "dark" ? "bg-white/5 hover:bg-white/10 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-900"}`;
     }
   };
-  if (isMobile || isMenu) {
+  if (isMobile) {
     return (
-      <button
-        type="button"
-        onClick={onClick}
-        disabled={disabled}
-        className={`${isMenu ? "w-full" : ""} text-xs rounded-2xl px-4 py-1 cursor-pointer transition-colors duration-200 ${
-          isMobile && isMenu ? getStyleClasses() : ""
-        }`}
-      >
+      <button onClick={onClick} disabled={disabled} className={`${getStyleClasses()} ${padding} ${className}`}>
         {children}
       </button>
     );
   }
   return (
-    <button
-      disabled={disabled}
-      type={type}
-      onClick={onClick}
-      className={`${getStyleClasses()} ${padding} ${className} ${
-        theme === "dark" ? "bg-gray-700 text-white hover:bg-gray-600" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-      }`}
-    >
+    <button disabled={disabled} type={type} onClick={onClick} className={`${getStyleClasses()} ${padding} ${className}`}>
       {children}
     </button>
   );

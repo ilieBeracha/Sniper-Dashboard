@@ -10,7 +10,6 @@ import { FaCrosshairs } from "react-icons/fa";
 import { useSidebarStore } from "@/store/sidebarStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
-
 const navSections = [
   {
     title: "OVERVIEW",

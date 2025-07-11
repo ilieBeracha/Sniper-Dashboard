@@ -1,48 +1,118 @@
-import { useEffect } from "react";
 import { TrainingSession } from "@/types/training";
+import { parseISO, isToday, isPast, isFuture } from "date-fns";
 import { TrainingSessionCard } from "./TrainingSessionCard";
 import TrainingSessionGroup from "./TrainingSessionGroup";
+import { useEffect } from "react";
 import TrainingCalendar from "./TrainingCalendar";
-import TrainingSection from "./TrainingSection";
-import TrainingListEmpty from "./TrainingListEmpty";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useIsMobile } from "@/hooks/useIsMobile";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
-import { filterTrainingsByDate } from "@/utils/trainingFilters";
+import { isMobile } from "react-device-detect";
+import { Target } from "lucide-react";
 
 interface TrainingListProps {
   trainings: TrainingSession[];
+  totalCount?: number;
 }
 
-export default function TrainingList({ trainings }: TrainingListProps) {
-  const { getOverallAccuracyStats } = useStore(performanceStore);
+export default function TrainingList({ trainings, totalCount }: TrainingListProps) {
   const { theme } = useTheme();
-  const isMobile = useIsMobile();
+  const { getOverallAccuracyStats } = useStore(performanceStore);
 
   useEffect(() => {
     getOverallAccuracyStats();
   }, []);
 
-  const { todaySessions, upcoming, past } = filterTrainingsByDate(trainings);
+  // Use provided trainings directly
+  const active = trainings;
+
   const today = new Date();
+  const todaySessions = active.filter((s) => isToday(parseISO(s.date)));
+  const upcoming = active.filter((s) => {
+    const sessionDate = parseISO(s.date);
+    return isFuture(sessionDate) && !isToday(sessionDate);
+  });
+  const past = active
+    .filter((s) => {
+      const sessionDate = parseISO(s.date);
+      const sessionDateEnd = new Date(sessionDate);
+      sessionDateEnd.setHours(23, 59, 59, 999);
+      return isPast(sessionDateEnd) && !isToday(sessionDate);
+    })
+    .reverse();
 
   return (
     <>
+      {/* Mobile Layout */}
       {isMobile ? (
         <div className="space-y-4">
+          {/* Tabs */}
+          <div className={`border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+            <nav className="flex space-x-8  items-center" aria-label="Tabs">
+              <button
+                className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                  theme === "dark" ? "border-purple-400 text-purple-400" : "border-purple-500 text-purple-600"
+                }`}
+              >
+                <Target className="w-4 h-4" />
+                Active {totalCount ? `(${totalCount})` : ""}
+              </button>
+            </nav>
+          </div>
+
+          {/* Sessions List */}
           <div className="space-y-3">
-            {trainings.length === 0 && <TrainingListEmpty />}
+            {active.length === 0 && <div className="text-center text-gray-500 h-80 flex items-center justify-center">No active trainings</div>}
+            {todaySessions.length > 0 && (
+              <div className="space-y-3">
+                <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                  <div className="h-3 w-3 bg-green-400 rounded-full"></div> Today
+                </h3>
 
-            <TrainingSection title="Today" trainings={todaySessions} color="green" highlight={true} showDate={false} />
+                {todaySessions.map((s) => (
+                  <TrainingSessionCard key={s.id} session={s} highlight showDate={false} />
+                ))}
+              </div>
+            )}
 
-            <TrainingSection title="Upcoming" trainings={upcoming} color="blue" showCount={true} />
+            {upcoming.length > 0 && (
+              <div className="space-y-3 mt-6">
+                <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                  <div className="h-3 w-3 bg-blue-600 rounded-full"></div> Upcoming <span className="text-xs">{upcoming.length}</span>
+                </h3>
+                {upcoming.map((s) => (
+                  <TrainingSessionCard key={s.id} session={s} />
+                ))}
+              </div>
+            )}
 
-            <TrainingSection title="Past Sessions" trainings={past} color="gray" isPast={true} />
+            {past.length > 0 && (
+              <div className="space-y-3 mt-6">
+                <h3 className={`text-sm flex items-center gap-2 font-medium px-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                  <div className="h-3 w-3 bg-gray-600 rounded-full"></div> Past Sessions
+                </h3>
+                {past.map((s) => (
+                  <TrainingSessionCard key={s.id} session={s} isPast />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       ) : (
         <>
+          <div className={`border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+            <nav className="flex space-x-8 items-center" aria-label="Tabs">
+              <button
+                className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                  theme === "dark" ? "border-purple-400 text-purple-400" : "border-purple-500 text-purple-600"
+                }`}
+              >
+                <Target className="w-4 h-4" />
+                Active {totalCount ? `(${totalCount})` : ""}
+              </button>
+            </nav>
+          </div>
+
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
             <div className="lg:col-span-8 space-y-6">
               {!trainings.length && (
