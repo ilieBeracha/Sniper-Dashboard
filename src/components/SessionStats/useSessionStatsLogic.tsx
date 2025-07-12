@@ -8,15 +8,16 @@ import { teamStore } from "@/store/teamStore";
 import { toast } from "react-toastify";
 import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
+import { sessionStore } from "@/store/sessionStore";
+import type { SessionStatsSaveData } from "@/store/sessionStore";
 
 interface Participant {
   userId: string;
   name: string;
-  userDuty: "sniper" | "spotter";
+  userDuty: "Sniper" | "Spotter";
   weaponId: string;
   equipmentId: string;
-  position: "lying" | "standing" | "kneeling" | "sitting";
-  shotsFired?: number; // Total shots fired by sniper
+  position: "Lying" | "Standing" | "Sitting" | "Operational";
 }
 
 interface Target {
@@ -24,7 +25,6 @@ interface Target {
   distance: number;
   windStrength?: number;
   windDirection?: number;
-  totalHits?: number;
   mistakeCode?: string;
   engagements: TargetEngagement[];
 }
@@ -36,53 +36,55 @@ interface TargetEngagement {
 }
 
 const sessionDataSchema = z.object({
-  squadId: z.string().nullable(),
-  teamId: z.string().nullable(),
+  squad_id: z.string().nullable(),
+  team_id: z.string().nullable(),
   dayPeriod: z.string().nullable(),
   timeToFirstShot: z.number().nullable(),
   note: z.string().nullable(),
-  assignmentId: z.string().nullable(),
-  trainingId: z.string().nullable(),
+  assignment_id: z.string().nullable(),
+  training_session_id: z.string().nullable(),
 });
 
 export type SessionData = z.infer<typeof sessionDataSchema>;
 
 export function useSessionStatsLogic(isOpen: boolean) {
   const { user } = useStore(userStore);
-  const { training } = useStore(TrainingStore);
+  const defaultUserParticipant = {
+    userId: user?.id || "",
+    name: `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || user?.email || "",
+    userDuty: user?.user_default_duty === UserDuty.SPOTTER ? "Spotter" : "Sniper",
+    weaponId: user?.user_default_weapon || "",
+    equipmentId: user?.user_default_equipment || "",
+    position: "Lying",
+  };
+
+  const trainingStore = useStore(TrainingStore);
+  const training = trainingStore?.training;
   const { members } = useStore(teamStore);
   const { weapons } = useStore(weaponsStore);
   const { equipments } = useStore(equipmentStore);
   const trainingId = training?.id;
   const assignments = training?.assignment_sessions || [];
+  const [participants, setParticipants] = useState<Participant[]>([defaultUserParticipant as Participant]);
+  const [targets, setTargets] = useState<Target[]>([] as Target[]);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const uniqueWeapons = [...new Set(weapons.map((weapon) => weapon.weapon_type))];
-  const uniqueEquipments = [...new Set(equipments.map((equipment) => equipment.equipment_type))];
+  const uniqueWeapons = [...new Set(weapons.map((weapon) => ({ name: weapon.weapon_type, id: weapon.id })))] as { name: string; id: string }[];
+  const uniqueEquipments = [...new Set(equipments.map((equipment) => ({ name: equipment.equipment_type, id: equipment.id })))] as {
+    name: string;
+    id: string;
+  }[];
 
   // Initialize session data with defaults
   const [sessionData, setSessionData] = useState<SessionData>({
-    trainingId: trainingId || null,
-    teamId: user?.team_id || null,
-    squadId: user?.squad_id || null,
-    assignmentId: null,
+    training_session_id: trainingId || null,
+    team_id: user?.team_id || null,
+    squad_id: user?.squad_id || null,
+    assignment_id: null,
     dayPeriod: "day" as DayNight,
     timeToFirstShot: null,
     note: "",
   });
-
-  const defaultUserParticipant = {
-    userId: user?.id || "",
-    name: `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || user?.email || "",
-    userDuty: user?.user_default_duty === UserDuty.SPOTTER ? "spotter" : "sniper",
-    weaponId: user?.user_default_weapon || "",
-    equipmentId: user?.user_default_equipment || "",
-    position: "lying",
-    shotsFired: 0,
-  };
-
-  const [participants, setParticipants] = useState<Participant[]>([defaultUserParticipant as Participant]);
-  const [targets, setTargets] = useState<Target[]>([]);
-  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // Add participant from member
   const addParticipant = (memberId?: string) => {
@@ -93,11 +95,10 @@ export function useSessionStatsLogic(isOpen: boolean) {
         const newParticipant: Participant = {
           userId: memberId,
           name: `${member.first_name || ""} ${member.last_name || ""}`.trim() || member.email || "",
-          userDuty: member.user_default_duty === UserDuty.SPOTTER ? "spotter" : "sniper",
+          userDuty: member.user_default_duty === UserDuty.SPOTTER ? "Spotter" : "Sniper",
           weaponId: member.user_default_weapon || "",
           equipmentId: member.user_default_equipment || "",
-          position: "lying",
-          shotsFired: 0,
+          position: "Lying",
         };
         setParticipants([...participants, newParticipant]);
 
@@ -120,14 +121,12 @@ export function useSessionStatsLogic(isOpen: boolean) {
       const newParticipant: Participant = {
         userId: `user-${Date.now()}`,
         name: "",
-        userDuty: "sniper",
+        userDuty: "Sniper",
         weaponId: "",
         equipmentId: "",
-        position: "lying",
-        shotsFired: 0,
+        position: "Lying",
       };
       setParticipants([...participants, newParticipant]);
-
       // Automatically add this participant to all existing targets
       const newTargets = targets.map((target) => ({
         ...target,
@@ -168,7 +167,7 @@ export function useSessionStatsLogic(isOpen: boolean) {
   // Update participant
   const updateParticipant = (index: number, field: keyof Participant | Partial<Participant>, value?: any) => {
     const newParticipants = [...participants];
-    if (typeof field === 'string') {
+    if (typeof field === "string") {
       // Single field update
       newParticipants[index] = { ...newParticipants[index], [field]: value };
     } else {
@@ -192,9 +191,8 @@ export function useSessionStatsLogic(isOpen: boolean) {
       distance: 100,
       windStrength: undefined,
       windDirection: undefined,
-      totalHits: undefined,
       mistakeCode: "",
-      engagements: newEngagements,
+      engagements: newEngagements as TargetEngagement[],
     };
 
     setTargets([...targets, newTarget]);
@@ -221,34 +219,15 @@ export function useSessionStatsLogic(isOpen: boolean) {
     setTargets(newTargets);
   };
 
-  // Calculate estimated hits
-  const calculateEstimatedHits = (targetIndex: number) => {
-    const target = targets[targetIndex];
-    if (!target.totalHits) return;
-
-    const totalShotsFired = target.engagements.reduce((sum, eng) => sum + eng.shotsFired, 0);
-    if (totalShotsFired === 0) return;
-
-    const newTargets = [...targets];
-    newTargets[targetIndex].engagements = target.engagements.map((eng) => {
-      if (eng.targetHits === undefined || eng.targetHits === null) {
-        const estimatedHits = Math.round((eng.shotsFired / totalShotsFired) * target.totalHits!);
-        return { ...eng, targetHits: estimatedHits };
-      }
-      return eng;
-    });
-    setTargets(newTargets);
-  };
-
   // Form validation
   const validateForm = (): boolean => {
     const errors: string[] = [];
 
     // Validate Session Information
-    if (!sessionData.squadId) errors.push("Squad is required");
-    if (!sessionData.teamId) errors.push("Team is required");
+    if (!sessionData.squad_id) errors.push("Squad is required");
+    if (!sessionData.team_id) errors.push("Team is required");
     if (!sessionData.timeToFirstShot) errors.push("Time to First Shot is required");
-    if (!sessionData.assignmentId) errors.push("Assignment is required");
+    if (!sessionData.assignment_id) errors.push("Assignment is required");
 
     // Validate Participants
     if (participants.length === 0) {
@@ -256,9 +235,8 @@ export function useSessionStatsLogic(isOpen: boolean) {
     } else {
       participants.forEach((p, index) => {
         if (!p.name) errors.push(`Participant ${index + 1}: Name is required`);
-        if (p.userDuty === "sniper") {
+        if (p.userDuty === "Sniper") {
           if (!p.weaponId) errors.push(`Participant ${index + 1}: Weapon is required for snipers`);
-          if (p.shotsFired === undefined || p.shotsFired < 0) errors.push(`Participant ${index + 1}: Shots fired is required for snipers`);
         } else {
           if (!p.equipmentId) errors.push(`Participant ${index + 1}: Equipment is required for spotters`);
         }
@@ -271,48 +249,88 @@ export function useSessionStatsLogic(isOpen: boolean) {
     } else {
       targets.forEach((t, index) => {
         if (!t.distance || t.distance <= 0) errors.push(`Target ${index + 1}: Distance must be greater than 0`);
-        if (t.totalHits === undefined || t.totalHits < 0) errors.push(`Target ${index + 1}: Total hits is required and must be 0 or greater`);
-
-        // Validate engagements
-        let totalPersonalHits = 0;
-        t.engagements.forEach((eng) => {
-          const participant = participants.find((p) => p.userId === eng.userId);
-          if (participant?.userDuty === "sniper" && eng.targetHits !== undefined) {
-            totalPersonalHits += eng.targetHits;
-          }
-        });
-        
-        // Check if total personal hits exceed target total hits
-        if (t.totalHits !== undefined && totalPersonalHits > t.totalHits) {
-          errors.push(`Target ${index + 1}: Total personal hits (${totalPersonalHits}) exceed target total hits (${t.totalHits})`);
-        }
       });
     }
+
+    // Validate that all engagements have shots fired for snipers
+    targets.forEach((target, tIndex) => {
+      target.engagements.forEach((eng) => {
+        const participant = participants.find((p) => p.userId === eng.userId);
+        if (participant?.userDuty === "Sniper") {
+          if (eng.shotsFired === undefined || eng.shotsFired < 0) {
+            errors.push(`Target ${tIndex + 1}: Shots fired is required for ${participant.name}`);
+          }
+          // Check that hits don't exceed shots
+          if (eng.targetHits !== undefined && eng.shotsFired !== undefined && eng.targetHits > eng.shotsFired) {
+            errors.push(`Target ${tIndex + 1}: Hits (${eng.targetHits}) exceed shots (${eng.shotsFired}) for ${participant.name}`);
+          }
+        }
+      });
+    });
 
     setValidationErrors(errors);
     return errors.length === 0;
   };
 
-  // Handle save
-  const handleSave = (onClose: () => void) => {
-    if (validateForm()) {
-      // TODO: Save the data to database
-      console.log("Form is valid, saving...");
-      console.log({ sessionData, participants, targets });
+  // Handle save using sessionStore
+  const { saveSessionStats } = useStore(sessionStore);
+
+  const handleSave = async (onClose: () => void) => {
+    try {
+      // Prepare data for sessionStore
+      const wizardData: SessionStatsSaveData = {
+        sessionData: {
+          training_session_id: trainingId || null,
+          assignment_id: sessionData.assignment_id,
+          squad_id: sessionData.squad_id,
+          team_id: sessionData.team_id,
+          dayPeriod: sessionData.dayPeriod,
+          timeToFirstShot: sessionData.timeToFirstShot,
+          note: sessionData.note || null,
+        },
+        participants: participants.map((p) => ({
+          user_id: p.userId,
+          user_duty: p.userDuty,
+          weapon_id: p.weaponId || null,
+          equipment_id: p.equipmentId || null,
+          position: p.position,
+        })),
+        targets: targets.map((t) => ({
+          distance: t.distance,
+          windStrength: t.windStrength,
+          windDirection: t.windDirection,
+          mistakeCode: t.mistakeCode,
+          engagements: t.engagements.map((eng) => ({
+            user_id: eng.userId,
+            shots_fired: eng.shotsFired,
+            target_hits: eng.targetHits,
+          })),
+        })),
+
+        currentUser: user ? { id: user.id } : null,
+      };
+
+      // Use sessionStore to save
+      await saveSessionStats(wizardData);
+
+      toast.success("Session statistics saved successfully!");
 
       // Clear form and close
       resetForm();
       onClose();
+    } catch (error) {
+      console.error("Unexpected error saving session:", error);
+      toast.error("An unexpected error occurred while saving");
     }
   };
 
   // Reset form
   const resetForm = () => {
     setSessionData({
-      trainingId: trainingId || null,
-      teamId: user?.team_id || null,
-      squadId: user?.squad_id || null,
-      assignmentId: null,
+      training_session_id: trainingId || null,
+      team_id: user?.team_id || null,
+      squad_id: user?.squad_id || null,
+      assignment_id: null,
       dayPeriod: "day" as DayNight,
       timeToFirstShot: null,
       note: "",
@@ -351,7 +369,6 @@ export function useSessionStatsLogic(isOpen: boolean) {
     removeTarget,
     updateTarget,
     updateEngagement,
-    calculateEstimatedHits,
 
     // Form methods
     validateForm,
