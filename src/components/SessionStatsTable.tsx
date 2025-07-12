@@ -72,11 +72,11 @@ export default function SessionStatsTable({ sessionStats, onSessionClick, onEdit
 
   // Watch for changes in sessionStats prop and refresh paginated session stats
   useEffect(() => {
-    if (sessionStats.length > 0 && currentPage === 0) {
+    if (sessionStats?.length > 0 && currentPage === 0) {
       // Reset to first page when session stats change
       loadSessionStats(0, true);
     }
-  }, [sessionStats.length]);
+  }, [sessionStats?.length]);
 
   // Watch for newly added session to highlight it
   useEffect(() => {
@@ -88,12 +88,12 @@ export default function SessionStatsTable({ sessionStats, onSessionClick, onEdit
 
   // Get unique values for filters
   const uniqueDayPeriods = useMemo(() => {
-    const periods = sessionStats.map((stat) => stat.day_period).filter(Boolean);
+    const periods = sessionStats?.map((stat) => stat.day_period).filter(Boolean);
     return [...new Set(periods)];
   }, [sessionStats]);
 
   const uniqueSquads = useMemo(() => {
-    const squads = sessionStats.map((stat) => stat.squads?.squad_name).filter(Boolean);
+    const squads = sessionStats?.map((stat) => stat.squads?.squad_name).filter(Boolean);
     return [...new Set(squads)];
   }, [sessionStats]);
 
@@ -115,9 +115,7 @@ export default function SessionStatsTable({ sessionStats, onSessionClick, onEdit
       key: "assignment",
       label: "Assignment",
       render: (_value: any, row: any) => (
-        <span className="font-medium truncate max-w-[100px] sm:max-w-[150px]">
-          {row.assignment_sessions?.assignment?.assignment_name || "N/A"}
-        </span>
+        <span className="font-medium truncate max-w-[100px] sm:max-w-[150px]">{row.assignment_session?.assignment?.assignment_name || "N/A"}</span>
       ),
       className: "px-4 sm:px-4 py-3",
     },
@@ -133,20 +131,6 @@ export default function SessionStatsTable({ sessionStats, onSessionClick, onEdit
         );
       },
       className: "px-2 sm:px-4 py-3",
-    },
-    {
-      key: "squad",
-      label: "Squad",
-      render: (_value: any, row: any) => <span className="capitalize">{row.squads?.squad_name || "N/A"}</span>,
-      className: "px-2 sm:px-4 py-3 hidden sm:table-cell",
-      hideOnMobile: true,
-    },
-    {
-      key: "team",
-      label: "Team",
-      render: (_value: any, row: any) => <span className="capitalize">{row.teams?.team_name || "N/A"}</span>,
-      className: "px-2 sm:px-4 py-3 hidden lg:table-cell",
-      hideOnMobile: true,
     },
     {
       key: "day_period",
@@ -224,7 +208,7 @@ export default function SessionStatsTable({ sessionStats, onSessionClick, onEdit
     hasMore,
   };
 
-  if (sessionStats.length === 0) {
+  if (sessionStats?.length === 0) {
     return (
       <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
         <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />

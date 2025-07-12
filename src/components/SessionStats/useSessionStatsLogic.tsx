@@ -143,6 +143,48 @@ export function useSessionStatsLogic(isOpen: boolean) {
     }
   };
 
+  // Add multiple participants at once
+  const addMultipleParticipants = (memberIds: string[]) => {
+    const newParticipants: Participant[] = [];
+    const newEngagements: { [targetId: string]: TargetEngagement[] } = {};
+    
+    // Create participant objects for all valid members
+    memberIds.forEach((memberId) => {
+      const member = members?.find((m) => m.id === memberId);
+      if (member && !participants.find((p) => p.userId === memberId)) {
+        newParticipants.push({
+          userId: memberId,
+          name: `${member.first_name || ""} ${member.last_name || ""}`.trim() || member.email || "",
+          userDuty: member.user_default_duty === UserDuty.SPOTTER ? "Spotter" : "Sniper",
+          weaponId: member.user_default_weapon || "",
+          equipmentId: member.user_default_equipment || "",
+          position: "Lying",
+        });
+      }
+    });
+
+    if (newParticipants.length === 0) return;
+
+    // Update participants in one batch
+    setParticipants([...participants, ...newParticipants]);
+
+    // Update all targets with new participant engagements in one batch
+    const updatedTargets = targets.map((target) => {
+      const newTargetEngagements = newParticipants.map((participant) => ({
+        userId: participant.userId,
+        shotsFired: 0,
+        targetHits: undefined,
+      }));
+
+      return {
+        ...target,
+        engagements: [...target.engagements, ...newTargetEngagements],
+      };
+    });
+
+    setTargets(updatedTargets);
+  };
+
   // Remove participant
   const removeParticipant = (index: number, userId: string) => {
     if (userId === user?.id) {
@@ -361,6 +403,7 @@ export function useSessionStatsLogic(isOpen: boolean) {
     uniqueEquipments,
     // Participant methods
     addParticipant,
+    addMultipleParticipants,
     removeParticipant,
     updateParticipant,
 

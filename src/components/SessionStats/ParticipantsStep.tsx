@@ -1,8 +1,12 @@
+import { userStore } from "@/store/userStore";
+import { useStore } from "zustand";
+
 interface ParticipantsStepProps {
   participants: any[];
   members: any[];
   user: any;
   addParticipant: (memberId?: string) => void;
+  addMultipleParticipants: (memberIds: string[]) => void;
   removeParticipant: (index: number, userId: string) => void;
   updateParticipant: (index: number, field: any, value?: any) => void;
   uniqueWeapons: { name: string; id: string }[];
@@ -14,11 +18,29 @@ export default function ParticipantsStep({
   members,
   user,
   addParticipant,
+  addMultipleParticipants,
   removeParticipant,
   updateParticipant,
   uniqueWeapons,
   uniqueEquipments,
 }: ParticipantsStepProps) {
+  const user_squad_id = user?.squad_id;
+
+  const handleAddSquad = () => {
+    // Filter members who have a squad_id and are not already added
+    console.log(members);
+    const squadMembers = members?.filter(
+      (member: any) => member.squad_id === user_squad_id && !participants.find((p: any) => p.userId === member.id),
+    );
+
+    // Get array of member IDs to add
+    const memberIds = squadMembers?.map((member: any) => member.id) || [];
+
+    // Add all squad members at once
+    if (memberIds.length > 0) {
+      addMultipleParticipants(memberIds);
+    }
+  };
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
@@ -32,7 +54,13 @@ export default function ParticipantsStep({
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={handleAddSquad}
+          className="px-3 py-1 text-sm bg-blue-500 text-white border border-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700"
+        >
+          Add All Squad Members
+        </button>
         <select
           onChange={(e) => {
             if (e.target.value) {

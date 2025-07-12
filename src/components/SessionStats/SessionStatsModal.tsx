@@ -45,6 +45,7 @@ export default function SessionStatsModal({ isOpen, onClose, onSuccess }: Sessio
     uniqueEquipments,
 
     addParticipant,
+    addMultipleParticipants,
     removeParticipant,
     updateParticipant,
 
@@ -169,6 +170,7 @@ export default function SessionStatsModal({ isOpen, onClose, onSuccess }: Sessio
             members={members}
             user={user}
             addParticipant={addParticipant}
+            addMultipleParticipants={addMultipleParticipants}
             removeParticipant={removeParticipant}
             updateParticipant={updateParticipant}
             uniqueWeapons={uniqueWeapons}

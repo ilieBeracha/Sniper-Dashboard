@@ -10,9 +10,11 @@ interface EngagementsStepProps {
 export default function EngagementsStep({ targets, participants, updateEngagement }: EngagementsStepProps) {
   // Track which targets have separated hits per participant
   const [separatedTargets, setSeparatedTargets] = useState<Set<number>>(new Set());
+  // Track combined total hits for each target
+  const [combinedTotalHits, setCombinedTotalHits] = useState<{ [targetIndex: number]: number }>({});
 
   // Only show snipers
-  const snipers = participants.filter(p => p.userDuty === "Sniper");
+  const snipers = participants.filter((p) => p.userDuty === "Sniper");
 
   // Toggle whether a target shows separated hits
   const toggleSeparatedHits = (targetIndex: number) => {
@@ -24,6 +26,10 @@ export default function EngagementsStep({ targets, participants, updateEngagemen
       target.engagements.forEach((eng: any, engIndex: number) => {
         updateEngagement(targetIndex, engIndex, "targetHits", undefined);
       });
+      // Clear the combined total hits for this target
+      const newCombinedHits = { ...combinedTotalHits };
+      delete newCombinedHits[targetIndex];
+      setCombinedTotalHits(newCombinedHits);
     } else {
       newSet.add(targetIndex);
     }
@@ -44,7 +50,7 @@ export default function EngagementsStep({ targets, participants, updateEngagemen
   const autoDistributeHits = (targetIndex: number, totalHits: number) => {
     const target = targets[targetIndex];
     const totalShots = getTotalShots(target);
-    
+
     if (totalShots === 0) return;
 
     target.engagements.forEach((eng: any, engIndex: number) => {
@@ -79,7 +85,7 @@ export default function EngagementsStep({ targets, participants, updateEngagemen
             const isSeparated = separatedTargets.has(targetIndex);
             const totalShots = getTotalShots(target);
             const totalHits = getTotalHits(target);
-            
+
             return (
               <div key={target.id} className="border-2 border-gray-200 dark:border-neutral-600 rounded-lg overflow-hidden">
                 {/* Target Header */}
@@ -106,17 +112,17 @@ export default function EngagementsStep({ targets, participants, updateEngagemen
                   {participants.map((participant: any) => {
                     const engIndex = target.engagements.findIndex((e: any) => e.userId === participant.userId);
                     if (engIndex === -1) return null;
-                    
+
                     const engagement = target.engagements[engIndex];
                     const isSniper = participant.userDuty === "Sniper";
-                    
+
                     return (
                       <div key={participant.userId} className="flex items-center gap-4 p-3 bg-gray-50 dark:bg-neutral-700/30 rounded-lg">
                         <div className="flex-1">
                           <span className="text-sm font-medium">{participant.name}</span>
                           <span className="ml-2 text-xs text-gray-500 dark:text-neutral-400">({participant.userDuty})</span>
                         </div>
-                        
+
                         {isSniper ? (
                           <>
                             <div className="flex items-center gap-2">
@@ -129,14 +135,16 @@ export default function EngagementsStep({ targets, participants, updateEngagemen
                                 min="0"
                               />
                             </div>
-                            
+
                             {isSeparated && (
                               <div className="flex items-center gap-2">
                                 <label className="text-sm text-gray-600 dark:text-neutral-400">Hits:</label>
                                 <input
                                   type="number"
                                   value={engagement.targetHits || 0}
-                                  onChange={(e) => updateEngagement(targetIndex, engIndex, "targetHits", e.target.value ? parseInt(e.target.value) : 0)}
+                                  onChange={(e) =>
+                                    updateEngagement(targetIndex, engIndex, "targetHits", e.target.value ? parseInt(e.target.value) : 0)
+                                  }
                                   className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
                                   min="0"
                                   max={engagement.shotsFired || 0}
@@ -155,33 +163,28 @@ export default function EngagementsStep({ targets, participants, updateEngagemen
                       </div>
                     );
                   })}
-                  
+
                   {/* Combined hits input */}
                   {!isSeparated && snipers.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-600">
                       <div className="flex items-center gap-4">
-                        <label className="text-sm font-medium text-gray-700 dark:text-neutral-300">
-                          Total Hits on Target:
-                        </label>
+                        <label className="text-sm font-medium text-gray-700 dark:text-neutral-300">Total Hits on Target:</label>
                         <input
                           type="number"
-                          value={totalHits || ""}
+                          value={combinedTotalHits[targetIndex] ?? ""}
                           onChange={(e) => {
                             const newTotalHits = e.target.value ? parseInt(e.target.value) : 0;
+                            setCombinedTotalHits({ ...combinedTotalHits, [targetIndex]: newTotalHits });
                             autoDistributeHits(targetIndex, newTotalHits);
                           }}
                           className="w-24 px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
                           min="0"
                           max={totalShots}
                         />
-                        <span className="text-sm text-gray-500 dark:text-neutral-400">
-                          (max: {totalShots} shots)
-                        </span>
+                        <span className="text-sm text-gray-500 dark:text-neutral-400">(max: {totalShots} shots)</span>
                       </div>
-                      {totalHits > totalShots && (
-                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-                          ⚠️ Hits cannot exceed total shots fired
-                        </p>
+                      {(combinedTotalHits[targetIndex] ?? 0) > totalShots && (
+                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">⚠️ Hits cannot exceed total shots fired</p>
                       )}
                     </div>
                   )}
