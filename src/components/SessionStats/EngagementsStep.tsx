@@ -89,26 +89,28 @@ export default function EngagementsStep({ targets, participants, updateEngagemen
             return (
               <div key={target.id} className="border-2 border-gray-200 dark:border-neutral-600 rounded-lg overflow-hidden">
                 {/* Target Header */}
-                <div className="bg-gray-50 dark:bg-neutral-700 px-4 py-3 flex items-center justify-between">
-                  <div>
-                    <h6 className="font-medium text-gray-800 dark:text-neutral-200">
-                      Target {targetIndex + 1} - {target.distance}m
-                    </h6>
-                    <div className="flex gap-4 text-sm text-gray-600 dark:text-neutral-400 mt-1">
-                      <span>Total shots: {totalShots}</span>
-                      {isSeparated && <span>Total hits: {totalHits}</span>}
+                <div className="bg-gray-50 dark:bg-neutral-700 px-3 sm:px-4 py-2 sm:py-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div>
+                      <h6 className="font-medium text-gray-800 dark:text-neutral-200 text-sm sm:text-base">
+                        Target {targetIndex + 1} - {target.distance}m
+                      </h6>
+                      <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 dark:text-neutral-400 mt-1">
+                        <span>Total shots: {totalShots}</span>
+                        {isSeparated && <span>Total hits: {totalHits}</span>}
+                      </div>
                     </div>
+                    <button
+                      onClick={() => toggleSeparatedHits(targetIndex)}
+                      className="self-start sm:self-auto px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-full transition-colors bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/70"
+                    >
+                      {isSeparated ? "Combined" : "Separate"} Hits
+                    </button>
                   </div>
-                  <button
-                    onClick={() => toggleSeparatedHits(targetIndex)}
-                    className="px-3 py-1 text-sm font-medium rounded-full transition-colors bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/70"
-                  >
-                    {isSeparated ? "Combined Hits" : "Separate Hits"}
-                  </button>
                 </div>
 
                 {/* Participants */}
-                <div className="p-4 space-y-3">
+                <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
                   {participants.map((participant: any) => {
                     const engIndex = target.engagements.findIndex((e: any) => e.userId === participant.userId);
                     if (engIndex === -1) return null;
@@ -117,37 +119,49 @@ export default function EngagementsStep({ targets, participants, updateEngagemen
                     const isSniper = participant.userDuty === "Sniper";
 
                     return (
-                      <div key={participant.userId} className="flex items-center gap-4 p-3 bg-gray-50 dark:bg-neutral-700/30 rounded-lg">
+                      <div
+                        key={participant.userId}
+                        className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-2 sm:p-3 bg-gray-50 dark:bg-neutral-700/30 rounded-lg"
+                      >
                         <div className="flex-1">
                           <span className="text-sm font-medium">{participant.name}</span>
                           <span className="ml-2 text-xs text-gray-500 dark:text-neutral-400">({participant.userDuty})</span>
                         </div>
 
                         {isSniper ? (
-                          <>
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                             <div className="flex items-center gap-2">
-                              <label className="text-sm text-gray-600 dark:text-neutral-400">Shots:</label>
+                              <label className="text-xs sm:text-sm text-gray-600 dark:text-neutral-400">Shots:</label>
                               <input
                                 type="number"
-                                value={engagement.shotsFired || 0}
-                                onChange={(e) => updateEngagement(targetIndex, engIndex, "shotsFired", e.target.value ? parseInt(e.target.value) : 0)}
-                                className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
+                                value={engagement.shotsFired ?? ""}
+                                onChange={(e) =>
+                                  updateEngagement(targetIndex, engIndex, "shotsFired", e.target.value === "" ? 0 : parseInt(e.target.value))
+                                }
+                                className="w-16 sm:w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
                                 min="0"
+                                placeholder="0"
                               />
                             </div>
 
                             {isSeparated && (
                               <div className="flex items-center gap-2">
-                                <label className="text-sm text-gray-600 dark:text-neutral-400">Hits:</label>
+                                <label className="text-xs sm:text-sm text-gray-600 dark:text-neutral-400">Hits:</label>
                                 <input
                                   type="number"
-                                  value={engagement.targetHits || 0}
+                                  value={engagement.targetHits ?? ""}
                                   onChange={(e) =>
-                                    updateEngagement(targetIndex, engIndex, "targetHits", e.target.value ? parseInt(e.target.value) : 0)
+                                    updateEngagement(
+                                      targetIndex,
+                                      engIndex,
+                                      "targetHits",
+                                      e.target.value === "" ? undefined : parseInt(e.target.value),
+                                    )
                                   }
-                                  className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
+                                  className="w-16 sm:w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
                                   min="0"
                                   max={engagement.shotsFired || 0}
+                                  placeholder="0"
                                 />
                                 <span className="text-xs text-gray-500 dark:text-neutral-400">
                                   {engagement.shotsFired > 0 && engagement.targetHits !== undefined
@@ -156,9 +170,9 @@ export default function EngagementsStep({ targets, participants, updateEngagemen
                                 </span>
                               </div>
                             )}
-                          </>
+                          </div>
                         ) : (
-                          <span className="text-sm text-gray-500 dark:text-neutral-400">Observer</span>
+                          <span className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400">Observer</span>
                         )}
                       </div>
                     );
@@ -166,25 +180,28 @@ export default function EngagementsStep({ targets, participants, updateEngagemen
 
                   {/* Combined hits input */}
                   {!isSeparated && snipers.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-600">
-                      <div className="flex items-center gap-4">
-                        <label className="text-sm font-medium text-gray-700 dark:text-neutral-300">Total Hits on Target:</label>
-                        <input
-                          type="number"
-                          value={combinedTotalHits[targetIndex] ?? ""}
-                          onChange={(e) => {
-                            const newTotalHits = e.target.value ? parseInt(e.target.value) : 0;
-                            setCombinedTotalHits({ ...combinedTotalHits, [targetIndex]: newTotalHits });
-                            autoDistributeHits(targetIndex, newTotalHits);
-                          }}
-                          className="w-24 px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
-                          min="0"
-                          max={totalShots}
-                        />
-                        <span className="text-sm text-gray-500 dark:text-neutral-400">(max: {totalShots} shots)</span>
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200 dark:border-neutral-600">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 justify-between">
+                        <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-neutral-300">Total Hits on Target:</label>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400">(max: {totalShots})</span>
+
+                          <input
+                            type="number"
+                            value={combinedTotalHits[targetIndex] ?? ""}
+                            onChange={(e) => {
+                              const newTotalHits = e.target.value ? parseInt(e.target.value) : 0;
+                              setCombinedTotalHits({ ...combinedTotalHits, [targetIndex]: newTotalHits });
+                              autoDistributeHits(targetIndex, newTotalHits);
+                            }}
+                            className="w-20 sm:w-24 px-2 sm:px-3 py-1 sm:py-1.5 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
+                            min="0"
+                            max={totalShots}
+                          />
+                        </div>
                       </div>
                       {(combinedTotalHits[targetIndex] ?? 0) > totalShots && (
-                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">⚠️ Hits cannot exceed total shots fired</p>
+                        <p className="mt-2 text-xs sm:text-sm text-red-600 dark:text-red-400">⚠️ Hits cannot exceed total shots fired</p>
                       )}
                     </div>
                   )}

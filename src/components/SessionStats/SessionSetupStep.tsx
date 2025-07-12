@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check, Timer } from "lucide-react";
 
 interface SessionSetupStepProps {
   sessionData: any;
@@ -109,19 +109,48 @@ export default function SessionSetupStep({ sessionData, setSessionData, assignme
           </div>
         </div>
 
-        {/* Time to First Shot */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
-            Time to First Shot (seconds) <span className="text-red-500">*</span>
-            <span className="block text-xs text-gray-500 dark:text-neutral-400 mt-1">Time from target appearance to first shot</span>
+        {/* Time to First Shot - Enhanced Timer Style */}
+        <div className="md:col-span-2 lg:col-span-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+            Time to First Shot <span className="text-red-500">*</span>
           </label>
-          <input
-            type="number"
-            value={sessionData.timeToFirstShot || ""}
-            onChange={(e) => setSessionData({ ...sessionData, timeToFirstShot: Number(e.target.value) })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
-            placeholder="Enter time in seconds"
-          />
+          <div className="relative">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-2">
+                <Timer className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 animate-pulse" />
+                <div className="flex items-baseline gap-1">
+                  <input
+                    type="number"
+                    value={sessionData.timeToFirstShot ?? ""}
+                    onChange={(e) => {
+                      const value = e.target.value === "" ? null : parseInt(e.target.value);
+                      setSessionData({ ...sessionData, timeToFirstShot: value });
+                    }}
+                    className="w-16 sm:w-20 text-2xl sm:text-3xl font-bold text-center bg-transparent border-b-2 border-blue-300 dark:border-blue-600 focus:outline-none focus:border-blue-500 dark:text-blue-100"
+                    placeholder="0"
+                    min="0"
+                    max="999"
+                  />
+                  <span className="text-lg sm:text-xl font-semibold text-blue-700 dark:text-blue-300">sec</span>
+                </div>
+              </div>
+              <div className="sm:ml-auto flex flex-col items-center sm:items-end">
+                <span className="text-xs text-gray-600 dark:text-gray-400 mb-1">Quick presets:</span>
+                <div className="flex gap-1">
+                  {[3, 5, 10].map((seconds) => (
+                    <button
+                      key={seconds}
+                      type="button"
+                      onClick={() => setSessionData({ ...sessionData, timeToFirstShot: seconds })}
+                      className="px-2 py-1 text-xs font-medium rounded bg-blue-100 hover:bg-blue-200 dark:bg-blue-800/50 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-300 transition-colors"
+                    >
+                      {seconds}s
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Note */}

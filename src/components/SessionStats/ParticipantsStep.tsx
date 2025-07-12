@@ -51,10 +51,10 @@ export default function ParticipantsStep({
         </div>
       </div>
 
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-col sm:flex-row justify-end gap-2">
         <button
           onClick={handleAddSquad}
-          className="px-3 py-1 text-sm bg-blue-500 text-white border border-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700"
+          className="w-full sm:w-auto px-3 py-2 sm:py-1 text-sm bg-blue-500 text-white border border-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700"
         >
           Add All Squad Members
         </button>
@@ -65,7 +65,7 @@ export default function ParticipantsStep({
               e.target.value = "";
             }
           }}
-          className="px-3 py-1 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
+          className="w-full sm:w-auto px-3 py-2 sm:py-1 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
         >
           <option value="">Add Member</option>
           {members
@@ -84,11 +84,11 @@ export default function ParticipantsStep({
           const gridCols = "md:grid-cols-4";
 
           return (
-            <div key={participant.userId} className={`grid grid-cols-1 ${gridCols} gap-4 p-4 bg-gray-50 dark:bg-neutral-700/50 rounded-lg relative`}>
+            <div key={participant.userId} className={`grid grid-cols-1 sm:grid-cols-2 ${gridCols} gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-neutral-700/50 rounded-lg relative`}>
               {participant.userId !== user?.id && (
                 <button
                   onClick={() => removeParticipant(index, participant.userId)}
-                  className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm"
+                  className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs sm:text-sm p-1"
                   aria-label="Remove participant"
                 >
                   Remove
