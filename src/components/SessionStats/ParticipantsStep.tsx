@@ -1,6 +1,3 @@
-import { userStore } from "@/store/userStore";
-import { useStore } from "zustand";
-
 interface ParticipantsStepProps {
   participants: any[];
   members: any[];

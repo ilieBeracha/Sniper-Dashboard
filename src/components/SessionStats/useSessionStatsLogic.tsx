@@ -146,8 +146,7 @@ export function useSessionStatsLogic(isOpen: boolean) {
   // Add multiple participants at once
   const addMultipleParticipants = (memberIds: string[]) => {
     const newParticipants: Participant[] = [];
-    const newEngagements: { [targetId: string]: TargetEngagement[] } = {};
-    
+
     // Create participant objects for all valid members
     memberIds.forEach((memberId) => {
       const member = members?.find((m) => m.id === memberId);

@@ -23,7 +23,7 @@ export default function EngagementsStep({ targets, participants, updateEngagemen
       newSet.delete(targetIndex);
       // Reset individual hits when going back to combined
       const target = targets[targetIndex];
-      target.engagements.forEach((eng: any, engIndex: number) => {
+      target.engagements.forEach((engIndex: number) => {
         updateEngagement(targetIndex, engIndex, "targetHits", undefined);
       });
       // Clear the combined total hits for this target

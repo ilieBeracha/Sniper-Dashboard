@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useStore } from "zustand";
 import { TrainingSession, TrainingStatus } from "@/types/training";
 import { supabase } from "@/services/supabaseClient";
-import { scoreStore } from "@/store/scoreSrore";
 import { loaderStore } from "@/store/loaderStore";
 import { Calendar, Activity, Target } from "lucide-react";
 import { useModal } from "@/hooks/useModal";
@@ -12,32 +11,19 @@ import SessionStatsModal from "@/components/SessionStats/SessionStatsModal";
 import SessionStatsTable from "@/components/SessionStatsTable";
 import TrainingAnalyticsTab from "@/components/TrainingAnalyticsTab";
 import TrainingStatusTab from "@/components/TrainingStatusTab";
-import { ScoreTarget } from "@/types/score";
 import { sessionStore } from "@/store/sessionStore";
 
 export function useTrainingPageLogic() {
   const tabs = [
-    { label: "Session Stats", icon: Target },
-    { label: "Analytics", icon: Activity },
-    { label: "Status", icon: Calendar },
+    { id: "session-stats", label: "Session Stats", icon: Target },
+    { id: "analytics", label: "Analytics", icon: Activity },
+    { id: "status", label: "Status", icon: Calendar },
   ];
 
   const { id } = useParams();
   const { loadTrainingById, loadAssignments, createAssignment } = useStore(TrainingStore);
   const { setIsLoading } = useStore(loaderStore);
   const { training } = useStore(TrainingStore);
-
-  const {
-    getScoresByTrainingId,
-    scores,
-    handleCreateScore: createScoreAction,
-    getScoreRangesByTrainingId,
-    scoreRanges,
-    getScoreTargetsByScoreId,
-    handlePatchScore,
-    handleCreateGroupScore: createGroupScoreAction,
-    forceRefreshScores,
-  } = useStore(scoreStore);
 
   const { sessionStats, getSessionStatsByTrainingId } = useStore(sessionStore);
 
@@ -46,9 +32,9 @@ export function useTrainingPageLogic() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [isSessionStatsOpen, setIsSessionStatsOpen] = useState(false);
-  const [newlyAddedSessionId, setNewlyAddedSessionId] = useState<string | null>(null);
+  const [newlyAddedSessionStatsId, setNewlyAddedSessionStatsId] = useState<string | null>(null);
   const [selectedSession, setSelectedSession] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<string>(tabs[0].label);
+  const [activeTab, setActiveTab] = useState<string>(tabs[0].id);
 
   useEffect(() => {
     setIsLoading(true);
@@ -57,8 +43,6 @@ export function useTrainingPageLogic() {
       await loadAssignments();
       await loadTrainingById(id);
       await getSessionStatsByTrainingId(id);
-      await getScoresByTrainingId(id);
-      await getScoreRangesByTrainingId(id);
       setIsLoading(false);
     };
     load();
@@ -94,58 +78,49 @@ export function useTrainingPageLogic() {
     }
   };
 
-
   const handleSessionClick = (session: any) => {
     setSelectedSession(session);
     // TODO: Implement session details modal
   };
 
-  const handleEditSession = (session: any) => {
-    // TODO: Implement session edit functionality
-    console.log("Edit session:", session);
-  };
-
   const renderComponent = () => {
-    if (activeTab.toLowerCase() === "session stats") {
+    if (activeTab.toLowerCase() === "session-stats") {
       return (
         <>
           <SessionStatsModal
             isOpen={isSessionStatsOpen}
             onClose={() => setIsSessionStatsOpen(false)}
             onSuccess={async (sessionId) => {
-              setNewlyAddedSessionId(sessionId);
+              setNewlyAddedSessionStatsId(sessionId);
               await getSessionStatsByTrainingId(id as string);
             }}
           />
           <SessionStatsTable
             sessionStats={sessionStats}
-            onSessionClick={handleSessionClick}
-            onEditClick={handleEditSession}
-            newlyAddedSessionId={newlyAddedSessionId}
+            onSessionStatsClick={handleSessionClick}
+            onSessionStatsEditClick={() => {}}
+            newlyAddedSessionId={newlyAddedSessionStatsId}
           />
         </>
       );
     }
 
     if (activeTab.toLowerCase() === "analytics") {
-      return <TrainingAnalyticsTab scoreRanges={scoreRanges as unknown as ScoreTarget[]} />;
+      return <TrainingAnalyticsTab sessionStats={sessionStats} />;
     }
 
     if (activeTab.toLowerCase() === "status") {
-      return <TrainingStatusTab training={training as TrainingSession} scores={scores as any} handleStatusChange={handleStatusChange} />;
+      return <TrainingStatusTab training={training as TrainingSession} sessionStats={sessionStats} handleStatusChange={handleStatusChange} />;
     }
   };
 
   return {
-    // Data
     id,
     training,
-    scores,
-    scoreRanges,
     tabs,
     activeTab,
     setActiveTab,
-    newlyAddedSessionId,
+    newlyAddedSessionStatsId,
     selectedSession,
     pendingStatus,
 

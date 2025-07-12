@@ -1,7 +1,7 @@
 import { Eye, Edit, FileText } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { format } from "date-fns";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useStore } from "zustand";
 import { sessionStore } from "@/store/sessionStore";
 import { useParams } from "react-router-dom";
@@ -9,12 +9,17 @@ import { SpTable } from "@/layouts/SpTable";
 
 interface SessionStatsTableProps {
   sessionStats: any[];
-  onSessionClick: (session: any) => void;
-  onEditClick: (session: any) => void;
+  onSessionStatsClick: (session: any) => void;
+  onSessionStatsEditClick: (session: any) => void;
   newlyAddedSessionId?: string | null;
 }
 
-export default function SessionStatsTable({ sessionStats, onSessionClick, onEditClick, newlyAddedSessionId }: SessionStatsTableProps) {
+export default function SessionStatsTable({
+  sessionStats,
+  onSessionStatsClick,
+  onSessionStatsEditClick,
+  newlyAddedSessionId,
+}: SessionStatsTableProps) {
   const { theme } = useTheme();
   const { id } = useParams();
   const { getSessionStatsByTrainingId, getSessionStatsCountByTrainingId } = useStore(sessionStore);
@@ -70,32 +75,28 @@ export default function SessionStatsTable({ sessionStats, onSessionClick, onEdit
     loadInitialData();
   }, [id]);
 
-  // Watch for changes in sessionStats prop and refresh paginated session stats
   useEffect(() => {
     if (sessionStats?.length > 0 && currentPage === 0) {
-      // Reset to first page when session stats change
       loadSessionStats(0, true);
     }
   }, [sessionStats?.length]);
 
-  // Watch for newly added session to highlight it
   useEffect(() => {
     if (newlyAddedSessionId) {
-      // Refresh session stats to include the newly added session
       loadSessionStats(0, true);
     }
   }, [newlyAddedSessionId]);
 
   // Get unique values for filters
-  const uniqueDayPeriods = useMemo(() => {
-    const periods = sessionStats?.map((stat) => stat.day_period).filter(Boolean);
-    return [...new Set(periods)];
-  }, [sessionStats]);
+  // const uniqueDayPeriods = useMemo(() => {
+  //   const periods = sessionStats?.map((stat) => stat.day_period).filter(Boolean);
+  //   return [...new Set(periods)];
+  // }, [sessionStats]);
 
-  const uniqueSquads = useMemo(() => {
-    const squads = sessionStats?.map((stat) => stat.squads?.squad_name).filter(Boolean);
-    return [...new Set(squads)];
-  }, [sessionStats]);
+  // const uniqueSquads = useMemo(() => {
+  //   const squads = sessionStats?.map((stat) => stat.squads?.squad_name).filter(Boolean);
+  //   return [...new Set(squads)];
+  // }, [sessionStats]);
 
   // Pagination handlers
   const nextPage = () => {
@@ -157,27 +158,27 @@ export default function SessionStatsTable({ sessionStats, onSessionClick, onEdit
     },
   ];
 
-  const filters = [
-    {
-      key: "day_period",
-      label: "All Times",
-      type: "select" as const,
-      options: uniqueDayPeriods.map((period) => ({ value: period, label: period })),
-    },
-    {
-      key: "squads.squad_name",
-      label: "All Squads",
-      type: "select" as const,
-      options: uniqueSquads.map((squad) => ({ value: squad, label: squad })),
-    },
-  ];
+  // const filters = [
+  //   {
+  //     key: "day_period",
+  //     label: "All Times",
+  //     type: "select" as const,
+  //     options: uniqueDayPeriods.map((period) => ({ value: period, label: period })),
+  //   },
+  //   {
+  //     key: "squads.squad_name",
+  //     label: "All Squads",
+  //     type: "select" as const,
+  //     options: uniqueSquads.map((squad) => ({ value: squad, label: squad })),
+  //   },
+  // ];
 
   const actions = (session: any) => (
     <div className="inline-flex gap-1 sm:gap-2">
       <button
         onClick={(e) => {
           e.stopPropagation();
-          onSessionClick(session);
+          onSessionStatsClick(session);
         }}
         className={`p-1.5 sm:p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
         title="View"
@@ -187,7 +188,7 @@ export default function SessionStatsTable({ sessionStats, onSessionClick, onEdit
       <button
         onClick={(e) => {
           e.stopPropagation();
-          onEditClick(session);
+          onSessionStatsEditClick(session);
         }}
         className={`p-1.5 sm:p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
         title="Edit"
@@ -222,10 +223,9 @@ export default function SessionStatsTable({ sessionStats, onSessionClick, onEdit
     <SpTable
       data={paginatedSessionStats}
       columns={columns}
-      filters={filters}
+      filters={[]}
       searchPlaceholder="Search..."
-      searchFields={["note", "squads.squad_name", "teams.team_name"]}
-      onRowClick={onSessionClick}
+      onRowClick={onSessionStatsClick}
       actions={actions}
       loading={isLoading}
       pagination={pagination}
