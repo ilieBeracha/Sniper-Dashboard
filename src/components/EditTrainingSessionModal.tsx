@@ -1,11 +1,11 @@
-import BaseModal from "./BaseModal";
+import BaseModal from "./base/BaseModal";
 import { useState, useEffect } from "react";
 import { supabase } from "@/services/supabaseClient";
 import { User } from "@/types/user";
 import { Assignment, TrainingSession } from "@/types/training";
 import BasicInfoSection from "./TrainingModal/AddTrainingSessionModalBasicInfo";
 import AssignmentsSection from "./TrainingModal/AddTrainingSessionModalAssignments";
-import BaseButton from "./BaseButton";
+import BaseButton from "./base/BaseButton";
 
 type EditTrainingSessionModalProps = {
   isOpen: boolean;

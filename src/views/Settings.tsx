@@ -1,6 +1,6 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import BaseInput from "@/components/BaseInput";
-import BaseButton from "@/components/BaseButton";
+import BaseInput from "@/components/base/BaseInput";
+import BaseButton from "@/components/base/BaseButton";
 import { User as UserIcon, Settings as SettingsIcon, Shield, Target, Crosshair } from "lucide-react";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import Header from "@/Headers/Header";

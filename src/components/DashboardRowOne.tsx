@@ -1,5 +1,5 @@
 import { User } from "@/types/user";
-import BaseDashboardCard from "./BaseDashboardCard";
+import BaseDashboardCard from "./base/BaseDashboardCard";
 import DashboardCalendar from "./DashboardCalendar";
 import DashboardWelcome from "./DashboardWelcome";
 

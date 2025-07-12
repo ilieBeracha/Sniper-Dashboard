@@ -4,6 +4,7 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator, Breadc
 import React, { ReactNode } from "react";
 import { MoreVertical } from "lucide-react";
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
+
 export function SpPage({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
   return (
@@ -89,7 +90,7 @@ export function SpPageTabs({
   activeTab,
   onChange,
 }: {
-  tabs: { label: string; icon: React.ComponentType<any> }[];
+  tabs: { id: string; label: string; icon: React.ComponentType<any> }[];
   activeTab: string;
   onChange: (id: string) => void;
 }) {
@@ -100,11 +101,11 @@ export function SpPageTabs({
     <div className={`border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
       <nav className={`flex ${isMobile ? "justify-center space-x-4" : "justify-start space-x-8"} items-center px-4`} aria-label="Tabs">
         {tabs.map((tab) => {
-          const isActive = activeTab === tab.label;
+          const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.label}
-              onClick={() => onChange(tab.label)}
+              onClick={() => onChange(tab.id)}
               className={`group relative flex items-center gap-2 py-3 px-2 border-b-2 font-medium text-sm transition-all duration-200 ${
                 isActive
                   ? theme === "dark"

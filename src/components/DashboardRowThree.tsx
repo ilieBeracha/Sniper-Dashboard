@@ -1,5 +1,5 @@
 import DashboardTeamTable from "./DashboardTeamTable";
-import BaseDashboardCard from "./BaseDashboardCard";
+import BaseDashboardCard from "./base/BaseDashboardCard";
 import { useTheme } from "@/contexts/ThemeContext";
 
 type DashboardRowThreeProps = {
@@ -16,7 +16,9 @@ export default function DashboardRowThree({ loading }: DashboardRowThreeProps) {
             {loading ? (
               <div className="text-center py-16">
                 <div className="inline-block w-12 h-12 border-4 border-[#7F5AF0] border-t-transparent rounded-full animate-spin"></div>
-                <p className={`mt-4 transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Loading operational units data...</p>
+                <p className={`mt-4 transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                  Loading operational units data...
+                </p>
               </div>
             ) : (
               <DashboardTeamTable />

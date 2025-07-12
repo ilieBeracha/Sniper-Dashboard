@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Package, FileQuestion } from "lucide-react";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import Header from "@/Headers/Header";
-import WeaponsTab from "@/components/WeaponsTab";
-import EquipmentTab from "@/components/EquipmentTab";
+import WeaponsTab from "@/components/AssetsWeaponsTab";
+import EquipmentTab from "@/components/AssetsEquipmentTab";
 
 export default function AssetsPage() {
   const [activeTab, setActiveTab] = useState<"weapons" | "equipments">("weapons");

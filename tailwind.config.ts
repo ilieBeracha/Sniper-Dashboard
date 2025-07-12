@@ -3,7 +3,7 @@ import withMT from "@material-tailwind/react/utils/withMT";
 
 /** @type {import('tailwindcss').Config} */
 const config = {
-  content: ["./src/**/*.{js,ts,jsx,tsx}", "./node_modules/@heroui/react/dist/**/*.{js,ts,jsx,tsx}"],
+  content: ["./src/**/*.{js,ts,jsx,tsx}", "./node_modules/@heroui/react/dist/**/*.{js,ts,jsx,tsx}", "./node_modules/preline/dist/*.js"],
   theme: {
     extend: {
       colors: {
@@ -14,7 +14,7 @@ const config = {
       },
     },
   },
-  plugins: [heroui()],
+  plugins: [heroui(), require("preline/plugin")],
 };
 
 module.exports = withMT(config);

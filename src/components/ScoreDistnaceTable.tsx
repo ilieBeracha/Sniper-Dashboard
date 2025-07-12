@@ -1,5 +1,5 @@
 import { ScoreTarget } from "@/types/score";
-import BaseDashboardCard from "./BaseDashboardCard";
+import BaseDashboardCard from "./base/BaseDashboardCard";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function ScoreDistanceTable({ rows }: { rows: ScoreTarget[] }) {

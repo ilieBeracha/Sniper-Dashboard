@@ -17,7 +17,7 @@ import {
   Award,
   Bell,
 } from "lucide-react";
-import BaseDashboardCard from "./BaseDashboardCard";
+import BaseDashboardCard from "./base/BaseDashboardCard";
 
 export default function AiSuggestionGenerator({
   suggestions,

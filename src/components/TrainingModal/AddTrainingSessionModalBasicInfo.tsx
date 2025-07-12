@@ -1,4 +1,4 @@
-import BaseInput from "@/components/BaseInput";
+import BaseInput from "@/components/base/BaseInput";
 import { useTheme } from "@/contexts/ThemeContext";
 
 type BasicInfoSectionProps = {

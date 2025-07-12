@@ -4,7 +4,7 @@ import { useStore } from "zustand";
 import BaseMobileDrawer from "./BaseDrawer/BaseMobileDrawer";
 import BaseDesktopDrawer from "./BaseDrawer/BaseDesktopDrawer";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import BaseInput from "./BaseInput";
+import BaseInput from "./base/BaseInput";
 import { FileQuestion } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { validateAssignmentForm } from "@/lib/formValidation";

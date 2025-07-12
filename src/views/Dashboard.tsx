@@ -1,7 +1,7 @@
 import { useDashboardPageLogic } from "@/hooks/useDashboardPageLogic";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import InviteModal from "@/components/InviteModal";
-import BaseButton from "@/components/BaseButton";
+import BaseButton from "@/components/base/BaseButton";
 import Header from "@/Headers/Header";
 import { SplinePointerIcon } from "lucide-react";
 
@@ -10,8 +10,7 @@ export default function Dashboard() {
 
   return (
     <SpPage>
-      <Header title={"Dashboard"}></Header>
-
+      <Header />
       <SpPageHeader
         title={activeTab}
         subtitle={activeTab === "Overview" ? "Team, Squad, and more" : "By Date, Squad, and more"}
