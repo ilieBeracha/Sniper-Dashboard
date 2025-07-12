@@ -1,14 +1,20 @@
 // src/store/performanceStore.ts
 import { create } from "zustand";
-import { HitPercentageData, SquadStats, SquadWeaponPerformance, TrainingEffectiveness, OverallAccuracyStats } from "@/types/performance";
+import {
+  SquadStats,
+  SquadWeaponPerformance,
+  TrainingEffectiveness,
+  OverallAccuracyStats,
+  UserHitsData,
+} from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
-  getUserHitPercentageRpc,
   getWeaponPerformanceBySquadAndWeapon,
   getTrainingEffectivenessByTeam,
   overallAccuracyStats,
   getSquadRoleHitPercentages,
   getUserGroupingStatsRpc,
+  getUserHitStatsFull,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/score";
@@ -19,9 +25,12 @@ interface PerformanceStore {
   getSquadWeaponPerformance: (teamId: string) => Promise<void>;
   squadStats: SquadStats[];
   getSquadStats: (position: PositionScore | null, distance: string | null) => Promise<void>;
-  userHitPercentage: HitPercentageData | null;
-  getUserHitPercentage: (userId: string) => Promise<HitPercentageData>;
 
+  // UserHitsData is a new type that includes detailed hit statistics for a user
+  userHitsStats: UserHitsData | null;
+  getUserHitStatsFull: (userId: string) => Promise<UserHitsData>;
+
+  //
   groupingSummary: GroupingSummary | null;
   groupingSummaryLoading: boolean;
   getGroupingSummary: () => Promise<void>;
@@ -41,7 +50,9 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   squadStats: [],
   trainingEffectiveness: [],
   overallAccuracyStats: null,
+  userHitsStats: null,
   overallAccuracyStatsLoading: false,
+
   getOverallAccuracyStats: async () => {
     try {
       set({ overallAccuracyStatsLoading: true });
@@ -54,37 +65,20 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       set({ overallAccuracyStatsLoading: false });
     }
   },
-  // getSquadStats: async (teamId: string, position: PositionScore | null, distance: string | null) => {
-  //   try {
-  //     set({ isLoading: true });
-  //     const data = await getSquadStatByTeamId(teamId, position, distance);
 
-  //     set({ squadStats: data as any });
-  //   } catch (error) {
-  //     console.error("Failed to load squad stats:", error);
-  //     set({ squadStats: [] });
-  //   } finally {
-  //     set({ isLoading: false });
-  //   }
-  // },
-
-
-getSquadStats: async (_position: PositionScore | null, distance: string | null) => {
-  const squadId = userStore.getState().user?.squad_id;
-  try {
-    set({ isLoading: true });
-    const data = await getSquadRoleHitPercentages(squadId!, distance);
-    set({ squadStats: data });
-  } catch (error) {
-    console.error("Failed to load squad stats:", error);
-    set({ squadStats: [] });
-  } finally {
-    set({ isLoading: false });
-  }
-},
-
-
-  
+  getSquadStats: async (_position: PositionScore | null, distance: string | null) => {
+    const squadId = userStore.getState().user?.squad_id;
+    try {
+      set({ isLoading: true });
+      const data = await getSquadRoleHitPercentages(squadId!, distance);
+      set({ squadStats: data });
+    } catch (error) {
+      console.error("Failed to load squad stats:", error);
+      set({ squadStats: [] });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 
   getTrainingEffectiveness: async (teamId: string) => {
     try {
@@ -112,15 +106,17 @@ getSquadStats: async (_position: PositionScore | null, distance: string | null) 
     }
   },
 
-  userHitPercentage: null,
-  getUserHitPercentage: async (userId: string) => {
-    try {
-      const data = await getUserHitPercentageRpc(userId);
 
-      set({ userHitPercentage: data });
+
+
+
+  getUserHitStatsFull: async (userId: string) => {
+    try {
+      const data = await getUserHitStatsFull(userId);
+      set({ userHitsStats: data });
       return data;
     } catch (error) {
-      console.error("Failed to load user hit percentage:", error);
+      console.error("Failed to load user hit stats full:", error);
       throw error;
     }
   },

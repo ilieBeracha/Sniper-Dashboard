@@ -1,18 +1,19 @@
 import { supabase } from "./supabaseClient";
-import { HitPercentageData, SquadWeaponPerformance } from "@/types/performance";
+import { SquadWeaponPerformance, UserHitsData } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/score";
 
-export async function getUserHitPercentageRpc(userId: string): Promise<HitPercentageData> {
-  const { data, error } = await supabase.rpc("get_user_hit_percentage_with_assignments", {
-    user_id: userId,
+export async function getUserHitStatsFull(userId: string): Promise<UserHitsData> {
+  const { data, error } = await supabase.rpc("get_user_hit_stats_full", {
+    p_user_id: userId,
   });
   if (error) {
     console.error("SQL function failed:", error.message);
-    throw new Error("Could not complete get_user_hit_percentage");
+    throw new Error("Could not complete get_user_hit_stats_full");
   }
   return data[0];
 }
+
 
 export async function getSquadRoleHitPercentages(squadId: string, distance: string | null = null) {
   const { data, error } = await supabase.rpc("get_squad_hit_percentages_by_role", {
@@ -27,6 +28,23 @@ export async function getSquadRoleHitPercentages(squadId: string, distance: stri
 
   return data || [];
 }
+// This function is a duplicate of the one above, so we can remove it to avoid redundancy.
+export async function getSquadRoleHitPercentagesRpc(squadId: string, distance: string | null = null) {
+  const { data, error } = await supabase.rpc("get_avg_hit_percentage_by_role_for_squad", {
+    p_squad_id: squadId,
+    p_distance_category: distance,
+  });
+
+  if (error) {
+    console.error("Error fetching squad role hit percentages:", error.message);
+    throw error;
+  }
+
+  return data || [];
+}
+
+
+
 
 
 export async function getWeaponPerformanceBySquadAndWeapon(teamId: string): Promise<SquadWeaponPerformance[]> {
@@ -59,16 +77,14 @@ export async function getUserGroupingStatsRpc(userId: string, weaponId: string |
 
   const result = data[0];
 
-return {
-  avg_dispersion: result.avg_dispersion,
-  best_dispersion: result.best_dispersion,
-  avg_time_to_group: result.avg_time_to_group,
-  total_groupings: result.total_groupings,
-  weapon_breakdown: [],
-  last_five_groups: result.last_five_groups ?? [],
-};
-
-
+  return {
+    avg_dispersion: result.avg_dispersion,
+    best_dispersion: result.best_dispersion,
+    avg_time_to_group: result.avg_time_to_group,
+    total_groupings: result.total_groupings,
+    weapon_breakdown: [],
+    last_five_groups: result.last_five_groups ?? [],
+  };
 }
 
 // In your service

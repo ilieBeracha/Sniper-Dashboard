@@ -12,6 +12,16 @@ export interface HitPercentageData {
   total_hits: number;
   assignments_count: number;
 }
+export interface UserHitsData {
+  hit_percentage: number | null;
+  shots_fired: number;
+  target_hits: number;
+  session_count: number;
+  confirmed_hit_percentage: number | null;
+  confirmed_hits: number;
+  eliminated_targets: number;
+}
+
 
 export enum UserPosition {
   SNIPER = "Sniper",
