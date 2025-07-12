@@ -14,11 +14,12 @@ import SubmitStep from "./SubmitStep";
 interface SessionStatsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: (sessionId: string) => void;
   sessionId?: string;
   trainingId?: string;
 }
 
-export default function SessionStatsModal({ isOpen, onClose }: SessionStatsModalProps) {
+export default function SessionStatsModal({ isOpen, onClose, onSuccess }: SessionStatsModalProps) {
   const { theme } = useTheme();
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -148,7 +149,12 @@ export default function SessionStatsModal({ isOpen, onClose }: SessionStatsModal
 
   const handleSubmit = () => {
     if (validateForm()) {
-      handleSave(onClose);
+      handleSave((sessionId?: string) => {
+        if (sessionId && onSuccess) {
+          onSuccess(sessionId);
+        }
+        onClose();
+      });
     }
   };
 

@@ -275,7 +275,7 @@ export function useSessionStatsLogic(isOpen: boolean) {
   // Handle save using sessionStore
   const { saveSessionStats } = useStore(sessionStore);
 
-  const handleSave = async (onClose: () => void) => {
+  const handleSave = async (onClose: (sessionId?: string) => void) => {
     try {
       // Prepare data for sessionStore
       const wizardData: SessionStatsSaveData = {
@@ -311,13 +311,13 @@ export function useSessionStatsLogic(isOpen: boolean) {
       };
 
       // Use sessionStore to save
-      await saveSessionStats(wizardData);
+      const savedSession = await saveSessionStats(wizardData);
 
       toast.success("Session statistics saved successfully!");
 
       // Clear form and close
       resetForm();
-      onClose();
+      onClose(savedSession?.id);
     } catch (error) {
       console.error("Unexpected error saving session:", error);
       toast.error("An unexpected error occurred while saving");

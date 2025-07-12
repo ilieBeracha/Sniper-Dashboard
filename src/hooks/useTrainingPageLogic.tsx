@@ -7,17 +7,17 @@ import { scoreStore } from "@/store/scoreSrore";
 import { loaderStore } from "@/store/loaderStore";
 import { Calendar, Activity, Target } from "lucide-react";
 import { useModal } from "@/hooks/useModal";
-import { useModal as useGroupModal } from "@/hooks/useModal";
 import { TrainingStore } from "@/store/trainingStore";
 import SessionStatsModal from "@/components/SessionStats/SessionStatsModal";
-import TrainingScoresTable from "@/components/TrainingScoresTable";
+import SessionStatsTable from "@/components/SessionStatsTable";
 import TrainingAnalyticsTab from "@/components/TrainingAnalyticsTab";
 import TrainingStatusTab from "@/components/TrainingStatusTab";
 import { ScoreTarget } from "@/types/score";
+import { sessionStore } from "@/store/sessionStore";
 
 export function useTrainingPageLogic() {
   const tabs = [
-    { label: "Scores", icon: Target },
+    { label: "Session Stats", icon: Target },
     { label: "Analytics", icon: Activity },
     { label: "Status", icon: Calendar },
   ];
@@ -39,17 +39,15 @@ export function useTrainingPageLogic() {
     forceRefreshScores,
   } = useStore(scoreStore);
 
+  const { sessionStats, getSessionStatsByTrainingId } = useStore(sessionStore);
+
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
-  const { isOpen: isAddScoreOpen, setIsOpen: setIsAddScoreOpen } = useModal();
-  const { isOpen: isAddGroupScoreOpen, setIsOpen: setIsAddGroupScoreOpen } = useGroupModal();
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
-  const [selectedScore, setSelectedScore] = useState<any>(null);
   const [isSessionStatsOpen, setIsSessionStatsOpen] = useState(false);
-  const [isScoreDetailsOpen, setIsScoreDetailsOpen] = useState(false);
-  const [newlyAddedScoreId, setNewlyAddedScoreId] = useState<string | null>(null);
-  const [editingScore, setEditingScore] = useState<any>(null);
+  const [newlyAddedSessionId, setNewlyAddedSessionId] = useState<string | null>(null);
+  const [selectedSession, setSelectedSession] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>(tabs[0].label);
 
   useEffect(() => {
@@ -58,6 +56,7 @@ export function useTrainingPageLogic() {
       if (!id) return;
       await loadAssignments();
       await loadTrainingById(id);
+      await getSessionStatsByTrainingId(id);
       await getScoresByTrainingId(id);
       await getScoreRangesByTrainingId(id);
       setIsLoading(false);
@@ -95,71 +94,35 @@ export function useTrainingPageLogic() {
     }
   };
 
-  const handleAddScore = async (data: any) => {
-    if (editingScore?.id) {
-      handleUpdateScore(data);
-      return;
-    }
-    try {
-      const newScore = await createScoreAction(data);
-      console.log(newScore);
 
-      if (newScore?.[0]?.id) {
-        setNewlyAddedScoreId(newScore[0].id as string);
-        setIsAddScoreOpen(false);
-
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
-        await forceRefreshScores(id as string);
-      } else {
-        console.error("No score ID returned:", newScore);
-      }
-    } catch (error) {
-      console.error("Error adding score:", error);
-    }
+  const handleSessionClick = (session: any) => {
+    setSelectedSession(session);
+    // TODO: Implement session details modal
   };
 
-  const handleScoreClick = (score: any) => {
-    setSelectedScore(score);
-    getScoreTargetsByScoreId(score.id);
-    setIsScoreDetailsOpen(true);
-  };
-
-  const handleEditScore = (score: any) => {
-    setEditingScore(score);
-    getScoreTargetsByScoreId(score.id);
-    setIsAddScoreOpen(true);
-  };
-
-  const handleUpdateScore = async (data: any) => {
-    try {
-      await handlePatchScore(data, editingScore.id);
-      await forceRefreshScores(id as string);
-      setIsAddScoreOpen(false);
-      setEditingScore(null);
-    } catch (error) {
-      console.error("Error updating score:", error);
-    }
-  };
-
-  const handleAddGroupScore = async (data: any) => {
-    try {
-      const result = await createGroupScoreAction(data);
-      if (result) {
-        setIsAddGroupScoreOpen(false);
-        await forceRefreshScores(id as string);
-      }
-    } catch (error) {
-      console.error("Error adding group score:", error);
-    }
+  const handleEditSession = (session: any) => {
+    // TODO: Implement session edit functionality
+    console.log("Edit session:", session);
   };
 
   const renderComponent = () => {
-    if (activeTab.toLowerCase() === "scores") {
+    if (activeTab.toLowerCase() === "session stats") {
       return (
         <>
-          <SessionStatsModal isOpen={isSessionStatsOpen} onClose={() => setIsSessionStatsOpen(false)} />
-          <TrainingScoresTable scores={scores} onScoreClick={handleScoreClick} onEditClick={handleEditScore} newlyAddedScoreId={newlyAddedScoreId} />
+          <SessionStatsModal
+            isOpen={isSessionStatsOpen}
+            onClose={() => setIsSessionStatsOpen(false)}
+            onSuccess={async (sessionId) => {
+              setNewlyAddedSessionId(sessionId);
+              await getSessionStatsByTrainingId(id as string);
+            }}
+          />
+          <SessionStatsTable
+            sessionStats={sessionStats}
+            onSessionClick={handleSessionClick}
+            onEditClick={handleEditSession}
+            newlyAddedSessionId={newlyAddedSessionId}
+          />
         </>
       );
     }
@@ -182,33 +145,21 @@ export function useTrainingPageLogic() {
     tabs,
     activeTab,
     setActiveTab,
-    selectedScore,
-    editingScore,
-    newlyAddedScoreId,
+    newlyAddedSessionId,
+    selectedSession,
     pendingStatus,
 
     // Modal states
     isAddAssignmentOpen,
     setIsAddAssignmentOpen,
-    isAddScoreOpen,
-    setIsAddScoreOpen,
-    isAddGroupScoreOpen,
-    setIsAddGroupScoreOpen,
     isConfirmModalOpen,
     setIsConfirmModalOpen,
-    isScoreDetailsOpen,
-    setIsScoreDetailsOpen,
     isSessionStatsOpen,
     setIsSessionStatsOpen,
     // Handlers
     handleStatusChange,
     handleConfirmStatusChange,
     handleAddAssignment,
-    handleAddScore,
-    handleScoreClick,
-    handleEditScore,
-    handleUpdateScore,
-    handleAddGroupScore,
     renderComponent,
   };
 }

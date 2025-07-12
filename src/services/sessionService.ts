@@ -39,20 +39,23 @@ export interface CreateTargetEngagementData {
   estimated_method?: string | null;
 }
 
-export const getSessionStatsByTrainingId = async (trainingId: string, limit: number = 0, offset: number = 0) => {
+export const getSessionStatsByTrainingId = async (trainingId: string, limit: number = 20, offset: number = 0) => {
   const { data, error } = await supabase
     .from("session_stats")
-    .select("*")
+    .select(
+      ` *, assignment_session ( assignment ( assignment_name ) ), users!session_stats_creator_id_fkey ( first_name, last_name, email ), squads ( squad_name ), teams ( team_name )  `,
+    )
     .eq("training_session_id", trainingId)
+    .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
   if (error) throw error;
   return data;
 };
 
 export const getSessionStatsCountByTrainingId = async (trainingId: string) => {
-  const { data, error } = await supabase.from("session_stats").select("*", { count: "exact" }).eq("training_session_id", trainingId);
+  const { count, error } = await supabase.from("session_stats").select("*", { count: "exact", head: true }).eq("training_session_id", trainingId);
   if (error) throw error;
-  return data[0].count;
+  return count || 0;
 };
 
 export const createSessionStats = async (sessionData: CreateSessionStatsData) => {
