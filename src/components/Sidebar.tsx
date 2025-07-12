@@ -38,7 +38,7 @@ export default function Sidebar() {
   const SidebarContent = () => (
     <div
       className={`transition-all duration-300 ease-in-out flex flex-col border-r h-full relative z-[100] ${
-        theme === "dark" ? "bg-[#121212] border-[#1D1D1F]" : "bg-white border-gray-200"
+        theme === "dark" ? "bg-[#121212] border-[#1D1D1F]" : " border-gray-200"
       } ${collapsed ? "w-20" : "w-72"}`}
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -55,7 +55,7 @@ export default function Sidebar() {
       </div>
       <div
         className={`flex items-center justify-between h-16 px-4 border-b transition-colors duration-200 ${
-          theme === "dark" ? "border-[#1D1D1F] bg-[#121212]" : "border-gray-200 bg-white"
+          theme === "dark" ? "border-[#1D1D1F] bg-[#121212]" : "border-gray-200 "
         }`}
       >
         {!collapsed && (
@@ -122,9 +122,7 @@ export default function Sidebar() {
         ))}
       </div>
 
-      <div
-        className={`p-4 border-t transition-colors duration-200 ${theme === "dark" ? "border-[#1D1D1F] bg-[#121212]" : "border-gray-200 bg-white"}`}
-      >
+      <div className={`p-4 border-t transition-colors duration-200 ${theme === "dark" ? "border-[#1D1D1F] bg-[#121212]" : "border-gray-200 "}`}>
         <button
           onClick={logout}
           className={`flex items-center w-full px-4 py-2 text-sm text-red-400 hover:text-white rounded-lg hover:bg-red-600/20 transition-colors duration-200 ${
@@ -148,7 +146,7 @@ export default function Sidebar() {
           />
           <div
             className={`fixed inset-y-0 left-0 max-w-xs shadow-xl transform transition-transform duration-300 ease-in-out ${
-              theme === "dark" ? "bg-[#121212]" : "bg-white"
+              theme === "dark" ? "bg-[#121212]" : ""
             }`}
           >
             {SidebarContent()}

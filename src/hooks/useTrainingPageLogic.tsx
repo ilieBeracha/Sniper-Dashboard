@@ -1,14 +1,19 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { TrainingStore } from "@/store/trainingStore";
 import { useStore } from "zustand";
-import { TrainingStatus } from "@/types/training";
+import { TrainingSession, TrainingStatus } from "@/types/training";
 import { supabase } from "@/services/supabaseClient";
 import { scoreStore } from "@/store/scoreSrore";
 import { loaderStore } from "@/store/loaderStore";
 import { Calendar, Activity, Target } from "lucide-react";
 import { useModal } from "@/hooks/useModal";
 import { useModal as useGroupModal } from "@/hooks/useModal";
+import { TrainingStore } from "@/store/trainingStore";
+import SessionStatsModal from "@/components/SessionStats/SessionStatsModal";
+import TrainingScoresTable from "@/components/TrainingScoresTable";
+import TrainingAnalyticsTab from "@/components/TrainingAnalyticsTab";
+import TrainingStatusTab from "@/components/TrainingStatusTab";
+import { ScoreTarget } from "@/types/score";
 
 export function useTrainingPageLogic() {
   const tabs = [
@@ -18,8 +23,9 @@ export function useTrainingPageLogic() {
   ];
 
   const { id } = useParams();
-  const { training, loadTrainingById, loadAssignments, createAssignment } = useStore(TrainingStore);
+  const { loadTrainingById, loadAssignments, createAssignment } = useStore(TrainingStore);
   const { setIsLoading } = useStore(loaderStore);
+  const { training } = useStore(TrainingStore);
 
   const {
     getScoresByTrainingId,
@@ -40,6 +46,7 @@ export function useTrainingPageLogic() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [selectedScore, setSelectedScore] = useState<any>(null);
+  const [isSessionStatsOpen, setIsSessionStatsOpen] = useState(false);
   const [isScoreDetailsOpen, setIsScoreDetailsOpen] = useState(false);
   const [newlyAddedScoreId, setNewlyAddedScoreId] = useState<string | null>(null);
   const [editingScore, setEditingScore] = useState<any>(null);
@@ -147,6 +154,25 @@ export function useTrainingPageLogic() {
     }
   };
 
+  const renderComponent = () => {
+    if (activeTab.toLowerCase() === "scores") {
+      return (
+        <>
+          <SessionStatsModal isOpen={isSessionStatsOpen} onClose={() => setIsSessionStatsOpen(false)} />
+          <TrainingScoresTable scores={scores} onScoreClick={handleScoreClick} onEditClick={handleEditScore} newlyAddedScoreId={newlyAddedScoreId} />
+        </>
+      );
+    }
+
+    if (activeTab.toLowerCase() === "analytics") {
+      return <TrainingAnalyticsTab scoreRanges={scoreRanges as unknown as ScoreTarget[]} />;
+    }
+
+    if (activeTab.toLowerCase() === "status") {
+      return <TrainingStatusTab training={training as TrainingSession} scores={scores as any} handleStatusChange={handleStatusChange} />;
+    }
+  };
+
   return {
     // Data
     id,
@@ -172,7 +198,8 @@ export function useTrainingPageLogic() {
     setIsConfirmModalOpen,
     isScoreDetailsOpen,
     setIsScoreDetailsOpen,
-
+    isSessionStatsOpen,
+    setIsSessionStatsOpen,
     // Handlers
     handleStatusChange,
     handleConfirmStatusChange,
@@ -182,5 +209,6 @@ export function useTrainingPageLogic() {
     handleEditScore,
     handleUpdateScore,
     handleAddGroupScore,
+    renderComponent,
   };
 }

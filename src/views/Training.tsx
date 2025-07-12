@@ -1,13 +1,7 @@
-import { TrainingSession } from "@/types/training";
-import { ScoreTarget } from "@/types/score";
-import { Score } from "@/types/score";
 import { BiCurrentLocation } from "react-icons/bi";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import Header from "@/Headers/Header";
-import BaseButton from "@/components/BaseButton";
-import TrainingScoresTable from "@/components/TrainingScoresTable";
-import TrainingAnalyticsTab from "@/components/TrainingAnalyticsTab";
-import TrainingStatusTab from "@/components/TrainingStatusTab";
+import BaseButton from "@/components/base/BaseButton";
 import ConfirmStatusChangeModal from "@/components/ConfirmStatusChangeModal";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
 import TrainingPageScoreFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModal";
@@ -18,15 +12,11 @@ import { useTrainingPageLogic } from "@/hooks/useTrainingPageLogic";
 export default function TrainingPage() {
   const {
     id,
-    training,
-    scores,
-    scoreRanges,
     tabs,
     activeTab,
     setActiveTab,
     selectedScore,
     editingScore,
-    newlyAddedScoreId,
     pendingStatus,
     isAddAssignmentOpen,
     setIsAddAssignmentOpen,
@@ -38,13 +28,12 @@ export default function TrainingPage() {
     setIsConfirmModalOpen,
     isScoreDetailsOpen,
     setIsScoreDetailsOpen,
-    handleStatusChange,
     handleConfirmStatusChange,
     handleAddAssignment,
     handleAddScore,
-    handleScoreClick,
-    handleEditScore,
     handleAddGroupScore,
+    setIsSessionStatsOpen,
+    renderComponent,
   } = useTrainingPageLogic();
 
   return (
@@ -54,36 +43,25 @@ export default function TrainingPage() {
         breadcrumbs={[
           { label: "Dashboard", link: "/" },
           { label: "Trainings", link: "/trainings" },
-          { label: training?.session_name || "Training Session", link: `/trainings/${id}` },
+          { label: "Training Session", link: `/trainings/${id}` },
         ]}
-        subtitle={training?.session_name || "Training Session"}
-        title={training?.session_name || "Training Session"}
+        subtitle={"Training Session"}
+        title={"Training Session"}
         icon={<BiCurrentLocation />}
         button={[
-          <BaseButton style="purple" onClick={() => setIsAddScoreOpen(true)}>
-            Add Score
+          <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsSessionStatsOpen(true)}>
+            Add Session Stats
           </BaseButton>,
-          <BaseButton style="purple" onClick={() => setIsAddGroupScoreOpen(true)}>
-            Add Group Score
-          </BaseButton>,
+
+          <BaseButton onClick={() => setIsAddGroupScoreOpen(true)}>Add Group Score</BaseButton>,
         ]}
       />
       <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={(tab) => setActiveTab(tab as string)} />
 
-      <SpPageBody>
-        {activeTab.toLowerCase() === "scores" && (
-          <TrainingScoresTable scores={scores} onScoreClick={handleScoreClick} onEditClick={handleEditScore} newlyAddedScoreId={newlyAddedScoreId} />
-        )}
-
-        {activeTab.toLowerCase() === "analytics" && <TrainingAnalyticsTab scoreRanges={scoreRanges as unknown as ScoreTarget[]} />}
-
-        {activeTab.toLowerCase() === "status" && (
-          <TrainingStatusTab training={training as TrainingSession} scores={scores as unknown as Score[]} handleStatusChange={handleStatusChange} />
-        )}
-      </SpPageBody>
+      <SpPageBody>{renderComponent()}</SpPageBody>
       <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
       <TrainingPageScoreFormModal
-        trainingId={training?.id as string}
+        trainingId={id as string}
         editingScore={editingScore}
         isOpen={isAddScoreOpen}
         onClose={() => {

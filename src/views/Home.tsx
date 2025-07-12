@@ -10,8 +10,8 @@ import { equipmentStore } from "@/store/equipmentStore";
 import { getSquadsWithUsersByTeamId } from "@/services/squadService";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import { Loader2 } from "lucide-react";
-import Settings from './Settings';
-
+import Settings from "./Settings";
+// import SessionStats from "./SessionStats";
 // Dynamic imports for better code splitting
 const Dashboard = lazy(() => import("./Dashboard"));
 const Training = lazy(() => import("./Trainings"));
@@ -100,6 +100,7 @@ export default function AppRoutes() {
               </Suspense>
             }
           />
+
           <Route
             path="*"
             element={

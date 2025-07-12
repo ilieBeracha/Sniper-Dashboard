@@ -2,9 +2,9 @@ import { useStore } from "zustand";
 import { equipmentStore } from "@/store/equipmentStore";
 import { userStore } from "@/store/userStore";
 import AssetsEquipmentTable from "@/components/AssetsEquipmentTable";
-import BaseButton from "@/components/BaseButton";
+import BaseButton from "@/components/base/BaseButton";
 import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
-import BaseInput from "@/components/BaseInput";
+import BaseInput from "@/components/base/BaseInput";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import { FileQuestion } from "lucide-react";
 import { useState } from "react";
@@ -134,9 +134,7 @@ export default function EquipmentTab() {
           </h2>
           <div
             className={`px-3 py-1 text-sm rounded border ${
-              theme === "dark"
-                ? "bg-emerald-500/20 text-emerald-200 border-emerald-500/30"
-                : "bg-emerald-100 text-emerald-700 border-emerald-300"
+              theme === "dark" ? "bg-emerald-500/20 text-emerald-200 border-emerald-500/30" : "bg-emerald-100 text-emerald-700 border-emerald-300"
             }`}
           >
             {equipments.length} items
@@ -149,7 +147,7 @@ export default function EquipmentTab() {
         )}
       </div>
       <AssetsEquipmentTable equipments={equipments} />
-      
+
       {!isMobile && (
         <BaseDesktopDrawer isOpen={isOpen} setIsOpen={() => setIsOpen(false)} title="new equipments">
           {EquipmentContent}

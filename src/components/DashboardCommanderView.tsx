@@ -4,18 +4,13 @@ import { squadStore } from "@/store/squadStore";
 import { userStore } from "@/store/userStore";
 import { performanceStore } from "@/store/performance";
 import { Card } from "@heroui/react";
-import BaseDashboardCard from "./BaseDashboardCard";
+import BaseDashboardCard from "./base/BaseDashboardCard";
 import { useTheme } from "@/contexts/ThemeContext";
 
 const CommanderView = () => {
   const { theme } = useTheme();
   const { user } = useStore(userStore);
-  const {
-    metrics,
-    squadsWithMembers,
-    getSquadMetricsByRole,
-    getSquadsWithUsersByTeamId,
-  } = useStore(squadStore);
+  const { metrics, squadsWithMembers, getSquadMetricsByRole, getSquadsWithUsersByTeamId } = useStore(squadStore);
   const { squadStats, getSquadStats } = useStore(performanceStore);
 
   const [loading, setLoading] = useState(true);
@@ -33,10 +28,7 @@ const CommanderView = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <BaseDashboardCard
-        header="Squad Role Metrics"
-        tooltipContent="This shows average hit percentage and total sessions for each squad and role."
-      >
+      <BaseDashboardCard header="Squad Role Metrics" tooltipContent="This shows average hit percentage and total sessions for each squad and role.">
         {loading ? (
           <div className="py-10 text-center text-sm text-gray-500">Loading squad data...</div>
         ) : !metrics || metrics.length === 0 ? (
@@ -46,9 +38,7 @@ const CommanderView = () => {
             {metrics.map((m, i) => (
               <Card
                 key={i}
-                className={`rounded-xl p-4 transition-colors duration-200 ${
-                  theme === "dark" ? "bg-zinc-900 text-white" : "bg-white text-gray-900"
-                }`}
+                className={`rounded-xl p-4 transition-colors duration-200 ${theme === "dark" ? "bg-zinc-900 text-white" : "bg-white text-gray-900"}`}
               >
                 <h3 className="text-md font-semibold mb-1 capitalize">{m.role}</h3>
                 <p className="text-xs text-gray-500 mb-1">Avg Hit %</p>
@@ -72,24 +62,22 @@ const CommanderView = () => {
         ) : (
           <div className="grid grid-cols-1 gap-4 text-sm">
             {Object.entries(
-              squadStats.reduce((acc, item) => {
-                const squad = item.squad_name || "Unknown Squad";
-                if (!acc[squad]) acc[squad] = [];
-                acc[squad].push(item);
-                return acc;
-              }, {} as Record<string, typeof squadStats>)
+              squadStats.reduce(
+                (acc, item) => {
+                  const squad = item.squad_name || "Unknown Squad";
+                  if (!acc[squad]) acc[squad] = [];
+                  acc[squad].push(item);
+                  return acc;
+                },
+                {} as Record<string, typeof squadStats>,
+              ),
             ).map(([squadName, stats], idx) => {
               const sorted = [...stats].sort((a, b) => b.hit_percentage - a.hit_percentage);
               const best = sorted[0];
               const worst = sorted[sorted.length - 1];
 
               return (
-                <div
-                  key={idx}
-                  className={`rounded-xl p-4 border ${
-                    theme === "dark" ? "border-zinc-800 bg-zinc-900" : "border-gray-200 bg-white"
-                  }`}
-                >
+                <div key={idx} className={`rounded-xl p-4 border ${theme === "dark" ? "border-zinc-800 bg-zinc-900" : "border-gray-200 bg-white"}`}>
                   <h4 className="font-semibold text-md mb-2">{squadName}</h4>
                   <div className="flex flex-col sm:flex-row justify-between gap-4">
                     <div>
@@ -126,10 +114,7 @@ const CommanderView = () => {
       </BaseDashboardCard>
 
       {/* Squads & Members */}
-      <BaseDashboardCard
-        header="Squads & Members"
-        tooltipContent="List of all squads and their users."
-      >
+      <BaseDashboardCard header="Squads & Members" tooltipContent="List of all squads and their users.">
         {loading ? (
           <div className="py-10 text-center text-sm text-gray-500">Loading squad members...</div>
         ) : !squadsWithMembers || squadsWithMembers.length === 0 ? (
@@ -137,12 +122,7 @@ const CommanderView = () => {
         ) : (
           <div className="grid grid-cols-1 gap-4">
             {squadsWithMembers.map((squad, i) => (
-              <div
-                key={i}
-                className={`rounded-xl p-4 border ${
-                  theme === "dark" ? "border-zinc-800 bg-zinc-900" : "border-gray-200 bg-white"
-                }`}
-              >
+              <div key={i} className={`rounded-xl p-4 border ${theme === "dark" ? "border-zinc-800 bg-zinc-900" : "border-gray-200 bg-white"}`}>
                 <h4 className="font-semibold text-lg mb-2">{squad.squad_name}</h4>
                 <ul className="text-sm text-gray-500 flex flex-wrap gap-2">
                   {squad.users?.map((user: any) => (

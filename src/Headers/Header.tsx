@@ -17,7 +17,7 @@ export default function Header({ children, title }: { children?: React.ReactNode
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
-          className={`absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl ${
+          className={` absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl ${
             theme === "dark" ? "bg-gradient-to-br from-purple-500/10 to-blue-500/10" : "bg-gradient-to-br from-purple-200/20 to-blue-200/20"
           }`}
         />
@@ -30,7 +30,9 @@ export default function Header({ children, title }: { children?: React.ReactNode
       <div className="flex items-center">
         {isMobile && <List className={`w-5 h-5 mr-3 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} onClick={toggleDrawer} />}
         <span
-          className={`${isMobile ? "text-lg" : "text-xl"} font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+          className={`${isMobile ? "text-lg" : "text-xl"} font-bold transition-colors duration-200 ${
+            theme === "dark" ? "text-white" : "text-gray-900"
+          }`}
         >
           {title}
         </span>

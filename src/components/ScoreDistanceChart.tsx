@@ -1,6 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from "recharts";
 import { ScoreTarget } from "@/types/score";
-import BaseDashboardCard from "./BaseDashboardCard";
+import BaseDashboardCard from "./base/BaseDashboardCard";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function ScoreDistanceChart({ rows }: { rows: ScoreTarget[] | undefined }) {

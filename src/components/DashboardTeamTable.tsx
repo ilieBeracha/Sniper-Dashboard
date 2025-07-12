@@ -6,7 +6,7 @@ import { teamStore } from "@/store/teamStore";
 import { User } from "@/types/user";
 import { isCommander } from "@/utils/permissions";
 import { userStore } from "@/store/userStore";
-import BaseButton from "./BaseButton";
+import BaseButton from "./base/BaseButton";
 import { useTheme } from "@/contexts/ThemeContext";
 import { UserRole } from "@/types/user";
 

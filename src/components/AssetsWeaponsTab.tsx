@@ -2,9 +2,9 @@ import { useStore } from "zustand";
 import { weaponsStore } from "@/store/weaponsStore";
 import { userStore } from "@/store/userStore";
 import AssetsWeaponsTable from "@/components/AssetsWeaponsTable";
-import BaseButton from "@/components/BaseButton";
+import BaseButton from "@/components/base/BaseButton";
 import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
-import BaseInput from "@/components/BaseInput";
+import BaseInput from "@/components/base/BaseInput";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import { FileQuestion } from "lucide-react";
 import { useState } from "react";
@@ -141,7 +141,7 @@ export default function WeaponsTab() {
         )}
       </div>
       <AssetsWeaponsTable weapons={weapons} />
-      
+
       {!isMobile && (
         <BaseDesktopDrawer isOpen={isOpen} setIsOpen={() => setIsOpen(false)} title="new weapons">
           {WeaponsContent}
