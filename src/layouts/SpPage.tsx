@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 
 export function SpPage({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
+
   return (
     <div className={`min-h-screen w-full transition-colors duration-200 ${theme === "dark" ? " text-gray-100" : "bg-gray-50 text-gray-900"}`}>
       <main className="pb-10 space-y-6 ">{children}</main>
@@ -39,7 +40,7 @@ export function SpPageHeader({
         </div>
       )}
 
-      <div className={` ${isMobile ? "px-6 mt-10 mb-0" : "px-8 py-14"} transition-all duration-200 min-h-28`}>
+      <div className={` ${isMobile ? "px-6 mt-10 mb-0" : "px-6 pt-8 pb-8"} transition-all duration-200 `}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 justify-between w-full">
             <div className="flex items-center gap-3">

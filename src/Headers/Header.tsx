@@ -11,7 +11,7 @@ export default function Header({ children, title }: { children?: React.ReactNode
 
   return (
     <div
-      className={`flex  items-center justify-between px-8 py-4 h-16 border-b relative z-[50] transition-colors duration-200 ${
+      className={`flex  items-center justify-between px-8 py-4 h-12 border-b relative z-[50] transition-colors duration-200 ${
         theme === "dark" ? "border-white/5" : "border-gray-200"
       }`}
     >

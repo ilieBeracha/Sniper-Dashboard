@@ -54,7 +54,7 @@ export default function Sidebar() {
         />
       </div> */}
       <div
-        className={`flex items-center justify-between h-16 px-4 border-b transition-colors duration-200 ${
+        className={`flex items-center justify-between h-12 px-4 border-b transition-colors duration-200 ${
           theme === "dark" ? "border-[#1D1D1F] " : "border-gray-200 "
         }`}
       >
