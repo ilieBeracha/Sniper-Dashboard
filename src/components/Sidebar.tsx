@@ -127,13 +127,9 @@ export default function Sidebar() {
   if (isMobile) {
     return (
       <>
-        <Dialog open={isDrawerOpen} onClose={() => toggleDrawer()} className="relative z-50">
+        <Dialog open={isDrawerOpen} onClose={() => toggleDrawer()} className="relative z-50 bg-black/30">
           <div className={`fixed inset-0 transition-opacity duration-300`} aria-hidden="true" />
-          <div
-            className={`fixed inset-y-0 left-0 max-w-xs shadow-xl transform transition-transform duration-300 ease-in-out ${
-              theme === "dark" ? "" : ""
-            }`}
-          >
+          <div className={`bg-black fixed inset-y-0 left-0 max-w-xs shadow-xl transform transition-transform duration-300 ease-in-out`}>
             {SidebarContent()}
           </div>
         </Dialog>

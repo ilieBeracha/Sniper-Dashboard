@@ -1,9 +1,9 @@
-import { TrainingSession, TrainingStatus } from "@/types/training";
+import { TrainingSession } from "@/types/training";
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
-import { ChevronRight, Clock, MapPin, Bookmark, UserCheck, User } from "lucide-react";
-import { isMobile } from "react-device-detect";
+import { ChevronRight, Clock, MapPin, Bookmark, UserCheck } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export function TrainingSessionCard({
   session,
@@ -20,101 +20,12 @@ export function TrainingSessionCard({
   const navigate = useNavigate();
   const { theme } = useTheme();
   const sessionDate = parseISO(session.date);
-
+  const isMobile = useIsMobile();
   const participants = session.participants || [];
 
   const handleSessionClick = () => {
     navigate(`/training/${session.id}`);
   };
-
-  if (isMobile) {
-    return (
-      <div
-        onClick={handleSessionClick}
-        className={`
-          relative
-          p-4
-          rounded-2xl
-          transition-all duration-  200
-          cursor-pointer
-          ${theme === "dark" ? "bg-zinc-900 border border-zinc-800" : "bg-white border border-gray-100 shadow-sm"}
-        `}
-      >
-        <div className="flex items-start justify-between mb-3">
-          {/* Date/Time info */}
-          <div className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-            {format(sessionDate, "d MMM, hh:mm")} to {format(sessionDate, "hh:mmaaa")}
-          </div>
-
-          {/* Status badge */}
-          {(isPast || highlight) && (
-            <span
-              className={`text-xs px-2 py-1 rounded-full font-medium ${
-                isPast
-                  ? theme === "dark"
-                    ? "bg-gray-800 text-gray-400"
-                    : "bg-gray-100 text-gray-600"
-                  : theme === "dark"
-                    ? "bg-red-500/20 text-red-400"
-                    : "bg-red-50 text-red-600"
-              }`}
-            >
-              {isPast && session.status !== TrainingStatus.Completed
-                ? "Finished"
-                : isPast && session.status === TrainingStatus.Completed
-                  ? "Completed"
-                  : "Today"}
-            </span>
-          )}
-        </div>
-
-        {/* Title */}
-        <h3 className={`text-lg font-semibold mb-3 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-          {session.session_name}
-        </h3>
-
-        {/* Participants and Price */}
-        <div className="flex items-center gap-2 justify-between">
-          {/* Participant avatars */}
-          <div className="flex items-center">
-            <div className="flex -space-x-2">
-              {participants.slice(0, 3).map((participant, idx) => (
-                <div
-                  key={idx}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border-2 ${
-                    theme === "dark" ? "bg-zinc-700 border-zinc-900 text-zinc-300" : "bg-gray-200 border-white text-gray-700"
-                  }`}
-                >
-                  {participant.user?.first_name?.charAt(0).toUpperCase() || "U"}
-                </div>
-              ))}
-              {participants.length > 3 && (
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border-2 ${
-                    theme === "dark" ? "bg-zinc-800 border-zinc-900 text-zinc-400" : "bg-gray-100 border-white text-gray-600"
-                  }`}
-                >
-                  +{participants.length - 3}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Assignment count as "price" */}
-          <div
-            className={`text-lg flex items-center gap-2  justify-between w-full font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-          >
-            <div className="flex justify-center items-center gap-2">
-              <User className="w-4 h-4 mr-1.5" />
-              <span className="text-sm">{session.creator_id?.first_name}</span>
-            </div>
-            {session.assignments && session.assignments.length > 0 && session.assignments.length}{" "}
-            {session.assignments && session.assignments.length === 1 ? "task" : "tasks"}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // Desktop design (existing)
   return (
@@ -131,7 +42,7 @@ export function TrainingSessionCard({
         items-center
         ${
           theme === "dark"
-            ? "border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] hover:from-white/10 hover:to-white/[0.05]"
+            ? "border-white/10 bg-gradient-to-br from-black/5 to-white/[0.02] hover:from-white/10 hover:to-white/[0.05]"
             : "border-gray-200 bg-white hover:bg-gray-50"
         }
       `}
@@ -176,7 +87,12 @@ export function TrainingSessionCard({
               theme === "dark" ? "text-gray-400" : "text-gray-600"
             }`}
           >
-            {showDate && !isMobile && (
+            {!isMobile ? (
+              <div className="flex items-center">
+                <Clock className="w-3 h-3 mr-1.5" />
+                {format(sessionDate, "h:mm a MMM d")}
+              </div>
+            ) : (
               <div className="flex items-center">
                 <Clock className="w-3 h-3 mr-1.5" />
                 {format(sessionDate, "h:mm a")}
@@ -209,3 +125,92 @@ export function TrainingSessionCard({
     </div>
   );
 }
+
+// if (isMobile) {
+//   return (
+//     <div
+//       onClick={handleSessionClick}
+//       className={`
+//         relative
+//         px-4 py-2
+//         rounded-2xl
+//         transition-all duration-  200
+//         cursor-pointer
+//         ${theme === "dark" ? "bg-gradient-to-br from-transparent to-black/10 border border-zinc-800" : "bg-white border border-gray-100 shadow-sm"}
+//       `}
+//     >
+//       <div className="flex items-start justify-between mb-3">
+//         {/* Date/Time info */}
+//         <div className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+//           {format(sessionDate, "d MMM, hh:mm")} to {format(sessionDate, "hh:mmaaa")}
+//         </div>
+
+//         {/* Status badge */}
+//         {(isPast || highlight) && (
+//           <span
+//             className={`text-xs px-2 py-1 rounded-full font-medium ${
+//               isPast
+//                 ? theme === "dark"
+//                   ? "bg-gray-800 text-gray-400"
+//                   : "bg-gray-100 text-gray-600"
+//                 : theme === "dark"
+//                   ? "bg-red-500/20 text-red-400"
+//                   : "bg-red-50 text-red-600"
+//             }`}
+//           >
+//             {isPast && session.status !== TrainingStatus.Completed
+//               ? "Finished"
+//               : isPast && session.status === TrainingStatus.Completed
+//                 ? "Completed"
+//                 : "Today"}
+//           </span>
+//         )}
+//       </div>
+
+//       {/* Title */}
+//       <h3 className={`text-lg font-semibold mb-3 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+//         {session.session_name}
+//       </h3>
+
+//       {/* Participants and Price */}
+//       <div className="flex items-center gap-2 justify-between">
+//         {/* Participant avatars */}
+//         <div className="flex items-center">
+//           <div className="flex -space-x-2">
+//             {participants.slice(0, 3).map((participant, idx) => (
+//               <div
+//                 key={idx}
+//                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border-2 ${
+//                   theme === "dark" ? "bg-zinc-700 border-zinc-900 text-zinc-300" : "bg-gray-200 border-white text-gray-700"
+//                 }`}
+//               >
+//                 {participant.user?.first_name?.charAt(0).toUpperCase() || "U"}
+//               </div>
+//             ))}
+//             {participants.length > 3 && (
+//               <div
+//                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border-2 ${
+//                   theme === "dark" ? "bg-zinc-800 border-zinc-900 text-zinc-400" : "bg-gray-100 border-white text-gray-600"
+//                 }`}
+//               >
+//                 +{participants.length - 3}
+//               </div>
+//             )}
+//           </div>
+//         </div>
+
+//         {/* Assignment count as "price" */}
+//         <div
+//           className={`text-lg flex items-center gap-2  justify-between w-full font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+//         >
+//           <div className="flex justify-center items-center gap-2">
+//             <User className="w-4 h-4 mr-1.5" />
+//             <span className="text-sm">{session.creator_id?.first_name}</span>
+//           </div>
+//           {session.assignments && session.assignments.length > 0 && session.assignments.length}{" "}
+//           {session.assignments && session.assignments.length === 1 ? "task" : "tasks"}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }

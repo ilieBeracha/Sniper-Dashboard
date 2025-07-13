@@ -1,13 +1,14 @@
 import { useStore } from "zustand";
 import { useSidebarStore } from "@/store/sidebarStore";
 import { List } from "lucide-react";
-import { isMobile } from "react-device-detect";
 import { useTheme } from "@/contexts/ThemeContext";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function Header({ children }: { children?: React.ReactNode }) {
   const { toggleDrawer } = useStore(useSidebarStore);
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
 
   return (
     <div
