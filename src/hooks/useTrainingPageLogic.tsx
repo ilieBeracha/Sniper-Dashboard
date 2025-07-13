@@ -13,7 +13,6 @@ import SessionStatsModal from "@/components/SessionStats/SessionStatsModal";
 import TrainingScoresTable from "@/components/TrainingScoresTable";
 import TrainingAnalyticsTab from "@/components/TrainingAnalyticsTab";
 import TrainingStatusTab from "@/components/TrainingStatusTab";
-import { ScoreTarget } from "@/types/score";
 
 export function useTrainingPageLogic() {
   const tabs = [
@@ -165,7 +164,9 @@ export function useTrainingPageLogic() {
     }
 
     if (activeTab.toLowerCase() === "analytics") {
-      return <TrainingAnalyticsTab scoreRanges={scoreRanges as unknown as ScoreTarget[]} />;
+      return<TrainingAnalyticsTab
+      trainingSessionId={id!}
+    />;
     }
 
     if (activeTab.toLowerCase() === "status") {

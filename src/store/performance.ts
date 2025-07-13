@@ -6,15 +6,18 @@ import {
   TrainingEffectiveness,
   OverallAccuracyStats,
   UserHitsData,
+  TrainingTeamAnalytics,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
   getWeaponPerformanceBySquadAndWeapon,
   getTrainingEffectivenessByTeam,
   overallAccuracyStats,
-  getSquadRoleHitPercentages,
+  // getSquadRoleHitPercentages,
   getUserGroupingStatsRpc,
   getUserHitStatsFull,
+  getSquadHitPercentageByRole,
+  getTrainingTeamAnalytics,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/score";
@@ -24,12 +27,16 @@ interface PerformanceStore {
   isLoading: boolean;
   getSquadWeaponPerformance: (teamId: string) => Promise<void>;
   squadStats: SquadStats[];
-  getSquadStats: (position: PositionScore | null, distance: string | null) => Promise<void>;
+  // getSquadStats: (position: PositionScore | null, distance: string | null) => Promise<void>;
+  getSquadStatsByRole: (position: PositionScore | null, distance: string | null) => Promise<void>;
 
   // UserHitsData is a new type that includes detailed hit statistics for a user
   userHitsStats: UserHitsData | null;
   getUserHitStatsFull: (userId: string) => Promise<UserHitsData>;
 
+  //
+  trainingTeamAnalytics: TrainingTeamAnalytics | null;
+  getTrainingTeamAnalytics: (trainingSessionId: string) => Promise<void>;
   //
   groupingSummary: GroupingSummary | null;
   groupingSummaryLoading: boolean;
@@ -52,6 +59,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   overallAccuracyStats: null,
   userHitsStats: null,
   overallAccuracyStatsLoading: false,
+  trainingTeamAnalytics: null,
 
   getOverallAccuracyStats: async () => {
     try {
@@ -66,14 +74,28 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     }
   },
 
-  getSquadStats: async (_position: PositionScore | null, distance: string | null) => {
+  // getSquadStats: async (_position: PositionScore | null, distance: string | null) => {
+  //   const squadId = userStore.getState().user?.squad_id;
+  //   try {
+  //     set({ isLoading: true });
+  //     const data = await getSquadRoleHitPercentages(squadId!, distance);
+  //     set({ squadStats: data });
+  //   } catch (error) {
+  //     console.error("Failed to load squad stats:", error);
+  //     set({ squadStats: [] });
+  //   } finally {
+  //     set({ isLoading: false });
+  //   }
+  // },
+
+  getSquadStatsByRole: async (_position: PositionScore | null, distance: string | null) => {
     const squadId = userStore.getState().user?.squad_id;
     try {
       set({ isLoading: true });
-      const data = await getSquadRoleHitPercentages(squadId!, distance);
+      const data = await getSquadHitPercentageByRole(squadId!, distance);
       set({ squadStats: data });
     } catch (error) {
-      console.error("Failed to load squad stats:", error);
+      console.error("Failed to load squad stats (session-based):", error);
       set({ squadStats: [] });
     } finally {
       set({ isLoading: false });
@@ -106,10 +128,6 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     }
   },
 
-
-
-
-
   getUserHitStatsFull: async (userId: string) => {
     try {
       const data = await getUserHitStatsFull(userId);
@@ -118,6 +136,18 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     } catch (error) {
       console.error("Failed to load user hit stats full:", error);
       throw error;
+    }
+  },
+  getTrainingTeamAnalytics: async (trainingSessionId: string) => {
+    try {
+      set({ isLoading: true });
+      const analytics = await getTrainingTeamAnalytics(trainingSessionId);
+      set({ trainingTeamAnalytics: analytics });
+    } catch (error) {
+      console.error("Failed to load training team analytics:", error);
+      set({ trainingTeamAnalytics: null });
+    } finally {
+      set({ isLoading: false });
     }
   },
 

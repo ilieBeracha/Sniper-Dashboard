@@ -68,6 +68,24 @@ export interface SquadStats {
   squad_name: string;
 }
 
+export type TrainingTeamAnalytics = {
+  total_participants: number;
+  total_shots_fired: number;
+  overall_hit_percentage: number;
+  total_targets_eliminated: number;
+  avg_time_to_first_shot: number;
+  short_shots: number;
+  short_hit_percentage: number;
+  medium_shots: number;
+  medium_hit_percentage: number;
+  long_shots: number;
+  long_hit_percentage: number | null;
+  avg_cm_dispersion: number;
+  best_cm_dispersion: number;
+  best_user_first_name: string;
+  best_user_last_name: string;
+  times_grouped: number;
+};
 
 
 export interface OverallAccuracyStats {

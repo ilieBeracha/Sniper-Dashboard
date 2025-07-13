@@ -1,16 +1,15 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import ScoreDistanceChart from "./ScoreDistanceChart";
-import { ScoreTarget } from "@/types/score";
 import { Activity } from "lucide-react";
+import TrainingSessionStatsCard from "./TrainingSessionStatsCard";
 
-export default function TrainingAnalyticsTab({ scoreRanges }: { scoreRanges: ScoreTarget[] }) {
+export default function TrainingAnalyticsTab({trainingSessionId }: { trainingSessionId: string }) {
   const { theme } = useTheme();
 
   return (
     <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
       {/* Chart */}
       <div className="lg:col-span-2">
-        <ScoreDistanceChart rows={scoreRanges as unknown as ScoreTarget[]} />
+      <TrainingSessionStatsCard trainingSessionId={trainingSessionId} />
       </div>
 
       {/* Analytics placeholder */}
