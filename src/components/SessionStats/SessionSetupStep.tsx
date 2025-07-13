@@ -115,7 +115,7 @@ export default function SessionSetupStep({ sessionData, setSessionData, assignme
             Time to First Shot <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border-1 border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2">
                 <Timer className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 animate-pulse" />
                 <div className="flex items-baseline gap-1">

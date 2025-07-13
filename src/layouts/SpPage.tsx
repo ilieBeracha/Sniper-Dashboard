@@ -4,14 +4,13 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator, Breadc
 import React, { ReactNode } from "react";
 import { MoreVertical } from "lucide-react";
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
+import { Link } from "react-router-dom";
 
 export function SpPage({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
   return (
-    <div
-      className={`min-h-screen w-full transition-colors duration-200 ${theme === "dark" ? "bg-[#121212] text-gray-100" : "bg-gray-50 text-gray-900"}`}
-    >
-      <main className="pb-10 space-y-6">{children}</main>
+    <div className={`min-h-screen w-full transition-colors duration-200 ${theme === "dark" ? " text-gray-100" : "bg-gray-50 text-gray-900"}`}>
+      <main className="pb-10 space-y-6 ">{children}</main>
     </div>
   );
 }
@@ -133,15 +132,26 @@ export function SpPageBody({ children }: { children: ReactNode }) {
 
 export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: string; link: string }[] }) {
   const { theme } = useTheme();
+  const isLastItem = (index: number) => index === breadcrumbs.length - 1;
+
   return (
     <Breadcrumb>
       <BreadcrumbList>
         {breadcrumbs.map((breadcrumb, index) => (
           <React.Fragment key={breadcrumb.label}>
             <BreadcrumbItem>
-              <BreadcrumbLink asChild className={`${theme === "dark" ? "text-gray-400" : "text-gray-600"} text-md`}>
-                <span>{breadcrumb.label}</span>
-              </BreadcrumbLink>
+              {isLastItem(index) ? (
+                <BreadcrumbLink asChild className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} text-md font-medium cursor-default`}>
+                  <span>{breadcrumb.label}</span>
+                </BreadcrumbLink>
+              ) : (
+                <BreadcrumbLink
+                  asChild
+                  className={`${theme === "dark" ? "text-gray-400 hover:text-gray-200" : "text-gray-600 hover:text-gray-900"} text-md transition-colors`}
+                >
+                  <Link to={breadcrumb.link}>{breadcrumb.label}</Link>
+                </BreadcrumbLink>
+              )}
             </BreadcrumbItem>
             {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
           </React.Fragment>

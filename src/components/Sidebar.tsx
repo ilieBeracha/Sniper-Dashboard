@@ -38,10 +38,10 @@ export default function Sidebar() {
   const SidebarContent = () => (
     <div
       className={`transition-all duration-300 ease-in-out flex flex-col border-r h-full relative z-[100] ${
-        theme === "dark" ? "bg-[#121212] border-[#1D1D1F]" : " border-gray-200"
+        theme === "dark" ? " border-[#1D1D1F]" : " border-gray-200"
       } ${collapsed ? "w-20" : "w-72"}`}
     >
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
           className={`absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl ${
             theme === "dark" ? "bg-gradient-to-br from-purple-500/10 to-blue-500/10" : "bg-gradient-to-br from-purple-200/20 to-blue-200/20"
@@ -52,10 +52,10 @@ export default function Sidebar() {
             theme === "dark" ? "bg-gradient-to-tl from-blue-500/10" : "bg-gradient-to-tl from-blue-200/20"
           }`}
         />
-      </div>
+      </div> */}
       <div
         className={`flex items-center justify-between h-16 px-4 border-b transition-colors duration-200 ${
-          theme === "dark" ? "border-[#1D1D1F] bg-[#121212]" : "border-gray-200 "
+          theme === "dark" ? "border-[#1D1D1F] " : "border-gray-200 "
         }`}
       >
         {!collapsed && (
@@ -122,7 +122,7 @@ export default function Sidebar() {
         ))}
       </div>
 
-      <div className={`p-4 border-t transition-colors duration-200 ${theme === "dark" ? "border-[#1D1D1F] bg-[#121212]" : "border-gray-200 "}`}>
+      <div className={`p-4 border-t transition-colors duration-200 ${theme === "dark" ? "border-[#1D1D1F] " : "border-gray-200 "}`}>
         <button
           onClick={logout}
           className={`flex items-center w-full px-4 py-2 text-sm text-red-400 hover:text-white rounded-lg hover:bg-red-600/20 transition-colors duration-200 ${
@@ -146,7 +146,7 @@ export default function Sidebar() {
           />
           <div
             className={`fixed inset-y-0 left-0 max-w-xs shadow-xl transform transition-transform duration-300 ease-in-out ${
-              theme === "dark" ? "bg-[#121212]" : ""
+              theme === "dark" ? "" : ""
             }`}
           >
             {SidebarContent()}

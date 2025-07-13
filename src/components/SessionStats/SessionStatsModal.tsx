@@ -108,7 +108,7 @@ export default function SessionStatsModal({ isOpen, onClose, onSuccess }: Sessio
 
   const validateStep = () => {
     const errors: string[] = [];
-    
+
     switch (currentStep) {
       case 1:
         if (!sessionData.assignment_id) errors.push("Please select an assignment");
@@ -141,7 +141,7 @@ export default function SessionStatsModal({ isOpen, onClose, onSuccess }: Sessio
         }
         break;
     }
-    
+
     setStepErrors(errors);
     return errors.length === 0;
   };
@@ -276,31 +276,23 @@ export default function SessionStatsModal({ isOpen, onClose, onSuccess }: Sessio
                           }
                         `}
                         >
-                          {isCompleted ? (
-                            <Check className="w-4 h-4 sm:w-5 sm:h-5" />
-                          ) : (
-                            <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                          )}
+                          {isCompleted ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : <Icon className="w-4 h-4 sm:w-5 sm:h-5" />}
                         </div>
                         <span
                           className={`
                           hidden sm:block sm:ml-2 text-xs lg:text-sm font-medium
-                          ${
-                            isActive 
-                              ? "text-gray-900 dark:text-white" 
-                              : "text-gray-500 dark:text-neutral-400"
-                          }
+                          ${isActive ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-neutral-400"}
                         `}
                         >
                           {step.name}
                         </span>
                       </div>
                       {index < steps.length - 1 && (
-                        <div 
+                        <div
                           className={`
                             flex-1 h-0.5 mx-1 sm:mx-2 lg:mx-3
                             ${currentStep > step.id ? "bg-green-600" : "bg-gray-200 dark:bg-neutral-700"}
-                          `} 
+                          `}
                         />
                       )}
                     </div>
@@ -354,7 +346,11 @@ export default function SessionStatsModal({ isOpen, onClose, onSuccess }: Sessio
                 <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
               </BaseButton>
             ) : (
-              <BaseButton onClick={handleSubmit} className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm" style="purple">
+              <BaseButton
+                onClick={handleSubmit}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm"
+                style="purple"
+              >
                 <Send className="w-3 h-3 sm:w-4 sm:h-4" />
                 Submit
               </BaseButton>

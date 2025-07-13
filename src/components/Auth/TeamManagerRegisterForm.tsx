@@ -242,7 +242,7 @@ export default function SessionStats({ isOpen, onClose, training }: { isOpen: bo
 
                     {/* Time to First Shot */}
                     <div>
-                      <label className={`block text-xs font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                      <label className={`block text-xs  font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                         Time to First Shot (seconds)
                       </label>
                       <input

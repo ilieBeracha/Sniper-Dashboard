@@ -11,11 +11,11 @@ export default function Header({ children, title }: { children?: React.ReactNode
 
   return (
     <div
-      className={`flex items-center justify-between px-8 py-4 h-16 border-b relative z-[50] transition-colors duration-200 ${
+      className={`flex  items-center justify-between px-8 py-4 h-16 border-b relative z-[50] transition-colors duration-200 ${
         theme === "dark" ? "border-white/5" : "border-gray-200"
       }`}
     >
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
           className={` absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl ${
             theme === "dark" ? "bg-gradient-to-br from-purple-500/10 to-blue-500/10" : "bg-gradient-to-br from-purple-200/20 to-blue-200/20"
@@ -26,7 +26,7 @@ export default function Header({ children, title }: { children?: React.ReactNode
             theme === "dark" ? "bg-gradient-to-tl from-blue-500/10" : "bg-gradient-to-tl from-blue-200/20"
           }`}
         />
-      </div>
+      </div> */}
       <div className="flex items-center">
         {isMobile && <List className={`w-5 h-5 mr-3 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} onClick={toggleDrawer} />}
         <span
