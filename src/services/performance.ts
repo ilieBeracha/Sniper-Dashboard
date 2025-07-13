@@ -161,13 +161,31 @@ export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsage
 
   console.log("Service - RPC response data:", data);
   console.log("Service - RPC response error:", error);
+  console.log("Service - RPC response data type:", typeof data);
+  console.log("Service - RPC response data length:", data?.length);
+  
+  if (data && data.length > 0) {
+    console.log("Service - First data item:", data[0]);
+    console.log("Service - Data item keys:", Object.keys(data[0]));
+    console.log("Service - total_shots_fired value:", data[0].total_shots_fired, "type:", typeof data[0].total_shots_fired);
+    console.log("Service - total_hits value:", data[0].total_hits, "type:", typeof data[0].total_hits);
+  }
 
   if (error) {
     console.error("Error fetching weapon usage stats:", error.message);
     throw error;
   }
 
-  const result = data?.[0] ?? {
+  // Handle case where data exists but might have different field names or null values
+  const rawResult = data?.[0];
+  const result = rawResult ? {
+    weapon_id: rawResult.weapon_id || weaponId,
+    total_shots_fired: rawResult.total_shots_fired ?? rawResult.total_shots ?? rawResult.shots_fired ?? 0,
+    total_hits: rawResult.total_hits ?? rawResult.hits ?? 0,
+    hit_percentage: rawResult.hit_percentage ?? 0,
+    avg_cm_dispersion: rawResult.avg_cm_dispersion ?? null,
+    best_cm_dispersion: rawResult.best_cm_dispersion ?? null,
+  } : {
     weapon_id: weaponId,
     total_shots_fired: 0,
     total_hits: 0,

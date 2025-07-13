@@ -54,6 +54,8 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
 
   const handleViewUsage = async (weapon: Weapon) => {
     if (!weapon.id) return;
+    console.log("AssetsWeaponsTable - handleViewUsage called with weapon:", weapon);
+    console.log("AssetsWeaponsTable - weapon.id:", weapon.id);
     setSelectedWeaponForUsage(weapon);
     setUsageModalOpen(true);
     await getWeaponUsageStats(weapon.id);

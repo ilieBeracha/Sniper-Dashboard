@@ -15,11 +15,7 @@ export default function WeaponUsageModal({ isOpen, onClose, weapon }: WeaponUsag
   const { theme } = useTheme();
   const { weaponUsageStats, isLoading } = useStore(performanceStore);
 
-  // Debug log to see what data we're getting
-  console.log("WeaponUsageModal - weaponUsageStats:", weaponUsageStats);
-  console.log("WeaponUsageModal - isLoading:", isLoading);
-  console.log("WeaponUsageModal - weapon:", weapon);
-
+  
   if (!isOpen || !weapon) return null;
 
   const modalBg = theme === "dark" 
