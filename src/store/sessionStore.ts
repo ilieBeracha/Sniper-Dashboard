@@ -3,6 +3,7 @@ import { getSessionStatsCountByTrainingId, saveCompleteSession } from "@/service
 import type { CreateSessionStatsData, CreateParticipantData, CreateTargetStatsData, CreateTargetEngagementData } from "@/services/sessionService";
 import { TrainingStore } from "./trainingStore";
 import { getSessionStatsByTrainingId } from "@/services/sessionService";
+import { formatForSupabaseInsert, processTrainingSessionToEmbeddings } from "@/services/embedSniperSession";
 
 interface SessionStatsState {
   sessionStats: any[];
@@ -102,38 +103,51 @@ export const sessionStore = create<SessionStatsState>((set) => ({
       }));
 
       // Transform targets and engagements data
-      const targetsData = wizardData.targets.map((target) => {
-        // Calculate total hits from engagements
-        const totalHits = target.engagements.reduce((sum: number, eng: any) => {
-          return sum + (eng.target_hits || 0);
-        }, 0);
+      const targetsData = await Promise.all(
+        wizardData.targets.map(async (target) => {
+          // Calculate total hits from engagements
+          const totalHits = target.engagements.reduce((sum: number, eng: any) => {
+            return sum + (eng.target_hits || 0);
+          }, 0);
 
-        // Target stats (without session_id - service will add it)
-        const targetStats: Omit<CreateTargetStatsData, "session_stats_id"> = {
-          distance_m: target.distance,
-          wind_strength: target.windStrength || null,
-          wind_direction_deg: target.windDirection || null,
-          total_hits: totalHits,
-          target_eliminated: totalHits >= 2,
-          mistake_code: target.mistakeCode || null,
-        };
-
-        // Target engagements (without target_id - service will add it)
-        const engagements: Omit<CreateTargetEngagementData, "target_stats_id">[] = target.engagements.map((eng) => {
-          return {
-            user_id: eng.user_id,
-            shots_fired: eng.shots_fired || 0,
-            target_hits: eng.target_hits || 0,
-            is_estimated: eng.target_hits === undefined || eng.target_hits === null,
-            estimated_method: eng.target_hits === undefined || eng.target_hits === null ? "shots_ratio" : null,
+          // Target stats (without session_id - service will add it)
+          const targetStats: Omit<CreateTargetStatsData, "session_stats_id"> = {
+            distance_m: target.distance,
+            wind_strength: target.windStrength || null,
+            wind_direction_deg: target.windDirection || null,
+            total_hits: totalHits,
+            target_eliminated: totalHits >= 2,
+            mistake_code: target.mistakeCode || null,
           };
-        });
 
-        return {
-          targetStats,
-          engagements,
-        };
-      });
+          // Target engagements (without target_id - service will add it)
+          const engagements: Omit<CreateTargetEngagementData, "target_stats_id">[] = target.engagements.map((eng) => {
+            return {
+              user_id: eng.user_id,
+              shots_fired: eng.shots_fired || 0,
+              target_hits: eng.target_hits || 0,
+              is_estimated: eng.target_hits === undefined || eng.target_hits === null,
+              estimated_method: eng.target_hits === undefined || eng.target_hits === null ? "shots_ratio" : null,
+            };
+          });
+
+          const processedData = await processTrainingSessionToEmbeddings({
+            sessionData: wizardData.sessionData,
+            participants: wizardData.participants,
+            targets: wizardData.targets,
+          });
+
+          const supabaseRecords = formatForSupabaseInsert(processedData);
+          console.log("supabaseRecords", supabaseRecords);
+
+          return {
+            targetStats,
+            engagements,
+          };
+        }),
+      );
+
+      console.log("wizardData", wizardData);
 
       // Call service to save everything
       const savedSession = await saveCompleteSession({
@@ -144,8 +158,6 @@ export const sessionStore = create<SessionStatsState>((set) => ({
           engagements: CreateTargetEngagementData[];
         }>, // service will add session_id and target_id
       });
-
-      console.log(savedSession);
 
       set({
         sessionStats: savedSession,

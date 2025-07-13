@@ -40,21 +40,21 @@ export default function ParticipantsStep({
   };
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 sm:p-4">
         <div className="flex justify-between items-start">
           <div>
-            <h4 className="text-base font-semibold text-blue-800 dark:text-blue-200 mb-2">👥 Participants</h4>
-            <p className="text-sm text-blue-700 dark:text-blue-300">
+            <h4 className="text-sm sm:text-base font-semibold text-blue-800 dark:text-blue-200 mb-1 sm:mb-2">👥 Participants</h4>
+            <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300">
               Add squad members who participated in this session. You are automatically added as the first participant.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-end gap-2">
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
         <button
           onClick={handleAddSquad}
-          className="w-full sm:w-auto px-3 py-2 sm:py-1 text-sm bg-blue-500 text-white border border-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700"
+          className="w-full sm:w-auto px-3 py-2 text-xs sm:text-sm bg-blue-500 text-white border border-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700"
         >
           Add All Squad Members
         </button>
@@ -65,7 +65,7 @@ export default function ParticipantsStep({
               e.target.value = "";
             }
           }}
-          className="w-full sm:w-auto px-3 py-2 sm:py-1 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
+          className="w-full sm:w-auto px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
         >
           <option value="">Add Member</option>
           {members
@@ -81,33 +81,33 @@ export default function ParticipantsStep({
       <div className="space-y-4">
         {participants.map((participant: any, index: number) => {
           const isSniper = participant.userDuty === "Sniper";
-          const gridCols = "md:grid-cols-4";
+          const gridCols = "lg:grid-cols-4";
 
           return (
-            <div key={participant.userId} className={`grid grid-cols-1 sm:grid-cols-2 ${gridCols} gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-neutral-700/50 rounded-lg relative`}>
+            <div key={participant.userId} className={`grid grid-cols-1 sm:grid-cols-2 ${gridCols} gap-2 sm:gap-3 p-2 sm:p-4 bg-gray-50 dark:bg-neutral-700/50 rounded-lg relative`}>
               {participant.userId !== user?.id && (
                 <button
                   onClick={() => removeParticipant(index, participant.userId)}
-                  className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs sm:text-sm p-1"
+                  className="absolute top-1 right-1 sm:top-2 sm:right-2 text-red-500 hover:text-red-700 text-[10px] sm:text-xs p-1"
                   aria-label="Remove participant"
                 >
                   Remove
                 </button>
               )}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-neutral-300 mb-0.5 sm:mb-1">
                   Name <span className="text-red-500">*</span>
                 </label>
-                <div className="px-3 py-2 bg-gray-100 dark:bg-neutral-700 rounded-md text-gray-700 dark:text-neutral-300">{participant.name}</div>
+                <div className="px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-100 dark:bg-neutral-700 rounded-md text-xs sm:text-sm text-gray-700 dark:text-neutral-300">{participant.name}</div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-neutral-300 mb-0.5 sm:mb-1">
                   Position <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={participant.position}
                   onChange={(e) => updateParticipant(index, "position", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
                 >
                   <option value="Lying">Lying</option>
                   <option value="Standing">Standing</option>
@@ -116,7 +116,7 @@ export default function ParticipantsStep({
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-neutral-300 mb-0.5 sm:mb-1">
                   Duty <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -137,7 +137,7 @@ export default function ParticipantsStep({
                       });
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
                 >
                   <option value="Sniper">Sniper</option>
                   <option value="Spotter">Spotter</option>
@@ -148,13 +148,13 @@ export default function ParticipantsStep({
               {isSniper ? (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-neutral-300 mb-0.5 sm:mb-1">
                       Weapon <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={participant.weaponId}
                       onChange={(e) => updateParticipant(index, "weaponId", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
+                      className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
                     >
                       <option value="">Select Weapon</option>
                       {uniqueWeapons.map((weapon: { name: string; id: string }) => (
@@ -167,13 +167,13 @@ export default function ParticipantsStep({
                 </>
               ) : (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-neutral-300 mb-0.5 sm:mb-1">
                     Equipment <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={participant.equipmentId}
                     onChange={(e) => updateParticipant(index, "equipmentId", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
+                    className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-neutral-200"
                   >
                     <option value="">Select Equipment</option>
                     {uniqueEquipments.map((equipment: { name: string; id: string }) => (

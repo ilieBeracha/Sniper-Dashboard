@@ -12,7 +12,6 @@ import DashboardRowKPI from "@/components/DashboardRowKPI";
 import DashboardRowThree from "@/components/DashboardRowThree";
 import DashboardRowFour from "@/components/DashboardRowFour";
 import CommanderView from "@/components/DashboardCommanderView";
-import QuickActions from "@/components/QuickActions";
 
 export function useDashboardPageLogic() {
   const useUserStore = useStore(userStore);
@@ -52,7 +51,6 @@ export function useDashboardPageLogic() {
       return (
         <div className="flex flex-col gap-4">
           <DashboardRowOne user={user} />
-          <QuickActions />
           <DashboardRowKPI />
           <DashboardRowThree loading={loading} />
           <DashboardRowFour />

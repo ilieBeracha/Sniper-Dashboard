@@ -30,7 +30,7 @@ export default function BaseDashboardCard({
 
   return (
     <div
-      className={`flex flex-col bg-white border border-gray-200 h-full shadow-xs rounded-xl overflow-hidden ${theme === "dark" ? "dark:bg-neutral-900 dark:border-neutral-700" : ""}`}
+      className={`flex flex-col bg-white border border-gray-200 h-full shadow-xs rounded-xl overflow-hidden ${theme === "dark" ? "dark:bg-neutral-900/50 dark:border-neutral-700/70" : ""}`}
     >
       <div className={`${padding} border-b mb-2 transition-colors duration-200 ${theme === "dark" ? "border-white/10" : "border-gray-200"}`}>
         <div className="flex justify-between relative h-full items-center">

@@ -11,7 +11,7 @@ export function SpPage({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className={`min-h-screen w-full bg-black/30 transition-colors duration-200 ${theme === "dark" ? " text-gray-100" : "bg-gray-50 text-gray-900"}`}
+      className={` min-h-screen w-full bg-black/30 transition-colors duration-200 ${theme === "dark" ? " text-gray-100" : "bg-gray-50 text-gray-900"}`}
     >
       <main className=" space-y-6 ">{children}</main>
     </div>
@@ -42,7 +42,7 @@ export function SpPageHeader({
         </div>
       )}
 
-      <div className={` ${isMobile ? "pl-6 pr-4 mb-8 mt-10" : "px-6 pt-8 pb-8"} transition-all duration-200 `}>
+      <div className={` ${isMobile ? "pl-6 pr-4 mb-8 mt-10" : "px-6 pt-8 pb-8"} transition-all duration-200 relative`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 justify-between w-full">
             <div className="flex items-center gap-3">

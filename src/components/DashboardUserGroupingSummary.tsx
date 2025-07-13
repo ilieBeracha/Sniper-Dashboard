@@ -7,7 +7,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 const UserGroupingSummary = () => {
   const { groupingSummary, getGroupingSummary, groupingSummaryLoading } = useStore(performanceStore);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [chartHeight, setChartHeight] = useState(260);
+  const [chartHeight, setChartHeight] = useState(150);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -91,8 +91,8 @@ const UserGroupingSummary = () => {
       </h3>
 
       {/* Chart */}
-      <div className="flex-1 w-full">
-        <ResponsiveContainer width="100%" height={chartHeight}>
+      <div className="flex-1 w-full flex justify-center items-center">
+        <ResponsiveContainer width="90%" height={chartHeight}>
           <LineChart data={recentData} margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#333" : "#e5e7eb"} />
             <XAxis dataKey="label" stroke={theme === "dark" ? "#9ca3af" : "#4b5563"} />
@@ -108,7 +108,6 @@ const UserGroupingSummary = () => {
                 border: `1px solid ${theme === "dark" ? "#444444" : "#d1d5db"}`,
                 borderRadius: "6px",
                 boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-
               }}
               itemStyle={{ color: theme === "dark" ? "#CCCCCC" : "#374151" }}
               labelStyle={{ color: theme === "dark" ? "#AAAAAA" : "#6b7280" }}

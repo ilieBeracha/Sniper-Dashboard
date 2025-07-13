@@ -215,13 +215,13 @@ export default function SessionStatsModal({ isOpen, onClose, onSuccess }: Sessio
   };
 
   const modalContent = (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-2 sm:p-4">
+    <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center">
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal Content */}
       <div
-        className={`relative w-full max-w-5xl max-h-[95vh] sm:max-h-[90vh] bg-white dark:bg-neutral-800 rounded-xl shadow-xl flex flex-col overflow-hidden ${theme === "dark" ? "dark:bg-neutral-800" : "bg-white"}`}
+        className={`relative w-full sm:max-w-5xl h-[100vh] sm:h-auto sm:max-h-[90vh] bg-white dark:bg-neutral-800 rounded-t-2xl sm:rounded-xl shadow-xl flex flex-col overflow-hidden ${theme === "dark" ? "dark:bg-neutral-800" : "bg-white"}`}
       >
         {/* Header with Steps Progress */}
         <div className="border-b border-gray-200 dark:border-neutral-700">
@@ -253,44 +253,44 @@ export default function SessionStatsModal({ isOpen, onClose, onSuccess }: Sessio
           </div>
 
           {/* Step Indicators */}
-          <div className="px-3 sm:px-4 pb-3 sm:pb-4">
-            <div className="overflow-x-auto -mx-3 sm:-mx-4 px-3 sm:px-4">
-              <div className="flex items-center justify-between min-w-max sm:min-w-0">
+          <div className="px-3 sm:px-4 pb-2 sm:pb-4">
+            <div className="overflow-x-auto -mx-3 sm:-mx-4 px-3 sm:px-4 pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="flex items-center justify-between min-w-fit">
                 {steps.map((step, index) => {
                   const Icon = step.icon;
                   const isActive = currentStep === step.id;
                   const isCompleted = currentStep > step.id;
 
                   return (
-                    <div key={step.id} className="flex items-center flex-1 last:flex-none">
-                      <div className="flex flex-col sm:flex-row items-center">
+                    <div key={step.id} className="flex items-center">
+                      <div className="flex flex-col items-center">
                         <div
                           className={`
-                          relative shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-200
+                          relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200
                           ${
                             isActive
-                              ? "bg-blue-600 text-white ring-4 ring-blue-100 dark:ring-blue-900/50"
+                              ? "bg-blue-600 text-white ring-2 sm:ring-4 ring-blue-100 dark:ring-blue-900/50"
                               : isCompleted
                                 ? "bg-green-600 text-white"
                                 : "bg-gray-200 dark:bg-neutral-700 text-gray-400 dark:text-neutral-500"
                           }
                         `}
                         >
-                          {isCompleted ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : <Icon className="w-4 h-4 sm:w-5 sm:h-5" />}
+                          {isCompleted ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                         </div>
                         <span
                           className={`
-                          hidden sm:block sm:ml-2 text-xs lg:text-sm font-medium
+                          mt-1 text-[10px] sm:text-xs font-medium text-center
                           ${isActive ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-neutral-400"}
                         `}
                         >
-                          {step.name}
+                          {step.name.split(' ')[0]}
                         </span>
                       </div>
                       {index < steps.length - 1 && (
                         <div
                           className={`
-                            flex-1 h-0.5 mx-1 sm:mx-2 lg:mx-3
+                            w-8 sm:w-12 lg:w-16 h-0.5 mx-1
                             ${currentStep > step.id ? "bg-green-600" : "bg-gray-200 dark:bg-neutral-700"}
                           `}
                         />
@@ -325,36 +325,38 @@ export default function SessionStatsModal({ isOpen, onClose, onSuccess }: Sessio
         </div>
 
         {/* Footer with Navigation */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 py-3 px-3 sm:px-4 border-t border-gray-200 dark:border-neutral-700">
-          <div className="flex gap-2 order-2 sm:order-1">
-            {currentStep > 1 && (
-              <BaseButton onClick={handlePrevious} className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm" style="white">
-                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-                Previous
-              </BaseButton>
-            )}
-          </div>
+        <div className="border-t border-gray-200 dark:border-neutral-700 p-3 sm:p-4 bg-gray-50 dark:bg-neutral-900/50">
+          <div className="flex justify-between items-center gap-3">
+            <div className="flex gap-2">
+              {currentStep > 1 ? (
+                <BaseButton onClick={handlePrevious} className="flex items-center gap-1 text-xs sm:text-sm px-3 py-2" style="white">
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="hidden sm:inline">Previous</span>
+                </BaseButton>
+              ) : (
+                <BaseButton onClick={onClose} style="white" className="text-xs sm:text-sm px-3 py-2">
+                  Cancel
+                </BaseButton>
+              )}
+            </div>
 
-          <div className="flex gap-2 order-1 sm:order-2 w-full sm:w-auto">
-            <BaseButton onClick={onClose} style="white" className="flex-1 sm:flex-none text-xs sm:text-sm">
-              Cancel
-            </BaseButton>
-
-            {currentStep < 6 ? (
-              <BaseButton onClick={handleNext} className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                Next
-                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
-              </BaseButton>
-            ) : (
-              <BaseButton
-                onClick={handleSubmit}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm"
-                style="purple"
-              >
-                <Send className="w-3 h-3 sm:w-4 sm:h-4" />
-                Submit
-              </BaseButton>
-            )}
+            <div className="flex gap-2">
+              {currentStep < 6 ? (
+                <BaseButton onClick={handleNext} className="flex items-center justify-center gap-1 text-xs sm:text-sm px-4 py-2">
+                  Next
+                  <ArrowRight className="w-4 h-4" />
+                </BaseButton>
+              ) : (
+                <BaseButton
+                  onClick={handleSubmit}
+                  className="flex items-center justify-center gap-1 text-xs sm:text-sm px-4 py-2"
+                  style="purple"
+                >
+                  <Send className="w-4 h-4" />
+                  Submit
+                </BaseButton>
+              )}
+            </div>
           </div>
         </div>
       </div>

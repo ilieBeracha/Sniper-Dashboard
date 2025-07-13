@@ -99,9 +99,9 @@ export default function DashboardSquadStats() {
   return (
     <BaseDashboardCard
       header={
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 w-full text-sm">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 text-sm">
           <h2
-            className={`font-semibold text-sm flex items-center gap-2 flex-shrink-0 transition-colors duration-200 ${
+            className={` font-semibold text-sm flex items-center gap-2 flex-shrink-0 transition-colors duration-200 ${
               theme === "dark" ? "text-white" : "text-gray-900"
             }`}
           >
@@ -112,7 +112,7 @@ export default function DashboardSquadStats() {
       tooltipContent="This data shows how the squad performed while this person was in the given role. It is NOT their individual hit percentage in that role."
     >
       <Card
-        className={`bg-transparent justify-center rounded-xl w-full h-full flex flex-col items-center gap-4 text-sm transition-colors duration-200 ${
+        className={` justify-center rounded-xl w-full flex flex-col items-center gap-4 text-sm transition-colors duration-200 ${
           theme === "dark" ? "text-white" : "text-gray-900"
         }`}
       >
@@ -142,7 +142,7 @@ export default function DashboardSquadStats() {
             </div>
 
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center h-[300px] w-full">
+              <div className="flex flex-col items-center justify-center h-[300px] w-full text-sm">
                 <div className="relative w-12 h-12 text-sm">
                   <div
                     className={`absolute top-0 left-0 w-full h-full border-4 rounded-full transition-colors duration-200 ${

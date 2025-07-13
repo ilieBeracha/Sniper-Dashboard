@@ -1,12 +1,8 @@
-import { useTheme } from "@/contexts/ThemeContext";
+import BaseDashboardCard from "@/components/base/BaseDashboardCard";
 
-export default function SessionStatsFormPage() {
-  const { theme } = useTheme();
-
+export default function LogTable() {
   return (
-    <div
-      className={`flex flex-col bg-white border border-gray-200 shadow-xs rounded-xl overflow-hidden ${theme === "dark" ? "dark:bg-neutral-900 dark:border-neutral-700" : ""}`}
-    >
+    <BaseDashboardCard header="Feeds" tooltipContent="View and manage your feeds">
       {/* Header */}
       <div className="py-3 px-5 flex flex-wrap justify-between items-center gap-2 border-b border-gray-200 dark:border-neutral-700">
         <div className="flex flex-wrap items-center gap-2">
@@ -885,6 +881,6 @@ export default function SessionStatsFormPage() {
         {/* End Footer */}
       </div>
       {/* End Footer */}
-    </div>
+    </BaseDashboardCard>
   );
 }

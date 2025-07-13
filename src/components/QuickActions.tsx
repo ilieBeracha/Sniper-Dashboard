@@ -1,12 +1,8 @@
-import { useTheme } from "@/contexts/ThemeContext";
+import BaseDashboardCard from "./base/BaseDashboardCard";
 
 export default function QuickActions() {
-  const { theme } = useTheme();
-
   return (
-    <div
-      className={`flex flex-col bg-white border border-gray-200 shadow-xs rounded-xl overflow-hidden ${theme === "dark" ? "dark:bg-neutral-900 dark:border-neutral-700" : ""}`}
-    >
+    <BaseDashboardCard header="Quick Actions" tooltipContent="View and manage your quick actions">
       <div className="p-3 ps-0 flex flex-col sm:flex-row sm:items-center gap-y-2 sm:gap-y-0 sm:gap-x-3">
         <div className="sm:order-2 sm:ms-auto ps-3 sm:ps-0">
           <button
@@ -172,6 +168,6 @@ export default function QuickActions() {
           </div>
         </div>
       </div>
-    </div>
+    </BaseDashboardCard>
   );
 }
