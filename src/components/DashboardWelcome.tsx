@@ -38,9 +38,9 @@ export default function DashboardWelcome({ user }: { user: User }) {
         {/* Left Side */}
         <div className="space-y-3 flex-1">
           <div className="space-y-1">
-            <h2 className={`text-xl font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            <span className={`text-lg font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
               {user.first_name.charAt(0).toUpperCase() + user.first_name.slice(1)} {user.last_name.charAt(0).toUpperCase() + user.last_name.slice(1)}
-            </h2>
+            </span>
             <div className={`flex items-center gap-2 text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
               <Mail className="w-4 h-4" />
               <span>{user.email}</span>

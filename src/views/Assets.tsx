@@ -14,7 +14,7 @@ export default function AssetsPage() {
   ];
   return (
     <SpPage>
-      <Header title="Assets"> </Header>
+      <Header> </Header>
       <SpPageHeader
         title="Assets"
         subtitle={`Manage ${activeTab === "weapons" ? "weapons" : "equipment"} inventory`}

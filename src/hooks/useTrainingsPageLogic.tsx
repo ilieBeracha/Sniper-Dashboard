@@ -21,7 +21,7 @@ export function useTrainingsPageLogic() {
   const [isPageChanging, setIsPageChanging] = useState(false);
   const [isAddTrainingOpen, setIsAddTrainingOpen] = useState(false);
 
-  const tabs = [{ label: "Active", icon: CalendarIcon }];
+  const tabs = [{ id: "active", label: "Active", icon: CalendarIcon }];
   const [activeTab, setActiveTab] = useState<string>(tabs[0].label);
 
   useEffect(() => {

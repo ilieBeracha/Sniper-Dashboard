@@ -25,7 +25,7 @@ const Settings = () => {
 
   return (
     <SpPage>
-      <Header title="Settings"> </Header>
+      <Header />
       <SpPageHeader
         breadcrumbs={[
           { label: "Dashboard", link: "/" },

@@ -12,8 +12,8 @@ export default function ThemeToggle() {
         p-2 rounded-lg transition-all duration-200 ${isMobile ? "w-full justify-center rounded-xl px-4 py-3 text-base" : "px-6 py-2.5 rounded-lg text-sm hover:shadow-lg"}
         ${
           theme === "dark"
-            ? "bg-white/5 hover:bg-white/10 text-gray-200 hover:text-white"
-            : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+            ? "bg-transparent hover:bg-white/10 text-gray-100 hover:text-white"
+            : "bg-transparent hover:bg-gray-200 text-gray-900 hover:text-gray-900"
         }
       `}
       aria-label="Toggle theme"
