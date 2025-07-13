@@ -27,7 +27,7 @@ export default function Trainings() {
 
   return (
     <SpPage>
-      <Header title="Trainings" />
+      <Header />
       <SpPageHeader
         title="Trainings"
         icon={<BiCurrentLocation />}

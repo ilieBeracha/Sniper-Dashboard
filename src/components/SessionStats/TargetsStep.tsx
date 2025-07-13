@@ -1,4 +1,4 @@
-import { Target, Crosshair, Wind, Compass, AlertCircle, Plus, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Target, Crosshair, Wind, Compass, AlertCircle, X, ChevronDown, ChevronUp } from "lucide-react";
 import BaseButton from "@/components/base/BaseButton";
 import { useState } from "react";
 
@@ -21,14 +21,13 @@ export default function TargetsStep({ targets, addTarget, removeTarget, updateTa
     }
     setExpandedTargets(newSet);
   };
-  
+
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
         <h4 className="text-base font-semibold text-blue-800 dark:text-blue-200 mb-2">🎯 Target Information</h4>
         <p className="text-sm text-blue-700 dark:text-blue-300">Add targets engaged during this session. Distance is required.</p>
       </div>
-
 
       <div className="flex justify-center sm:justify-end">
         <BaseButton onClick={addTarget} className="w-full sm:w-auto flex items-center justify-center gap-2">
@@ -41,7 +40,10 @@ export default function TargetsStep({ targets, addTarget, removeTarget, updateTa
         {targets.map((target: any, targetIndex: number) => {
           const isExpanded = expandedTargets.has(target.id);
           return (
-            <div key={target.id} className="bg-gradient-to-r from-gray-50 to-white dark:from-neutral-800 dark:to-neutral-900 border-2 border-gray-200 dark:border-neutral-700 rounded-xl shadow-sm hover:shadow-md transition-all">
+            <div
+              key={target.id}
+              className="bg-gradient-to-r from-gray-50 to-white dark:from-neutral-800 dark:to-neutral-900 border-2 border-gray-200 dark:border-neutral-700 rounded-xl shadow-sm hover:shadow-md transition-all"
+            >
               {/* Target Header */}
               <div className="p-3 sm:p-4">
                 <div className="flex items-start sm:items-center justify-between gap-2">
@@ -85,9 +87,7 @@ export default function TargetsStep({ targets, addTarget, removeTarget, updateTa
                       <Target className="w-4 h-4 text-gray-500" />
                       Distance
                     </label>
-                    <span className="text-lg font-semibold text-gray-800 dark:text-neutral-200">
-                      {target.distance || 100}m
-                    </span>
+                    <span className="text-lg font-semibold text-gray-800 dark:text-neutral-200">{target.distance || 100}m</span>
                   </div>
                   <div className="relative">
                     <input
