@@ -41,18 +41,6 @@ export default function Sidebar() {
         theme === "dark" ? " border-[#1D1D1F]" : " border-gray-200"
       } ${collapsed ? "w-20" : "w-72"}`}
     >
-      {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className={`absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl ${
-            theme === "dark" ? "bg-gradient-to-br from-purple-500/10 to-blue-500/10" : "bg-gradient-to-br from-purple-200/20 to-blue-200/20"
-          }`}
-        />
-        <div
-          className={`absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full blur-3xl ${
-            theme === "dark" ? "bg-gradient-to-tl from-blue-500/10" : "bg-gradient-to-tl from-blue-200/20"
-          }`}
-        />
-      </div> */}
       <div
         className={`flex items-center justify-between h-12 px-4 border-b transition-colors duration-200 ${
           theme === "dark" ? "border-[#1D1D1F] " : "border-gray-200 "
@@ -140,10 +128,7 @@ export default function Sidebar() {
     return (
       <>
         <Dialog open={isDrawerOpen} onClose={() => toggleDrawer()} className="relative z-50">
-          <div
-            className={`fixed inset-0 transition-opacity duration-300 ${theme === "dark" ? "bg-black/30" : "bg-gray-900/30"}`}
-            aria-hidden="true"
-          />
+          <div className={`fixed inset-0 transition-opacity duration-300`} aria-hidden="true" />
           <div
             className={`fixed inset-y-0 left-0 max-w-xs shadow-xl transform transition-transform duration-300 ease-in-out ${
               theme === "dark" ? "" : ""
@@ -156,5 +141,5 @@ export default function Sidebar() {
     );
   }
 
-  return <div className="h-screen sticky top-0">{SidebarContent()}</div>;
+  return <div className={`h-screen sticky top-0 ${theme === "dark" ? "bg-black/30" : ""}`}>{SidebarContent()}</div>;
 }

@@ -25,7 +25,7 @@ export default function TrainingPage() {
 
   return (
     <SpPage>
-      <Header title="Training Session"> </Header>
+      <Header />
       <SpPageHeader
         breadcrumbs={[
           { label: "Dashboard", link: "/" },
