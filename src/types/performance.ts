@@ -22,7 +22,6 @@ export interface UserHitsData {
   eliminated_targets: number;
 }
 
-
 export enum UserPosition {
   SNIPER = "Sniper",
   SPOTTER = "Spotter",
@@ -68,6 +67,15 @@ export interface SquadStats {
   squad_name: string;
 }
 
+export interface WeaponUsageStats {
+  weapon_id: string;
+  total_shots_fired: number;
+  total_hits: number;
+  hit_percentage: number;
+  avg_cm_dispersion: number | null;
+  best_cm_dispersion: number | null;
+}
+
 export type TrainingTeamAnalytics = {
   total_participants: number;
   total_shots_fired: number;
@@ -86,7 +94,6 @@ export type TrainingTeamAnalytics = {
   best_user_last_name: string;
   times_grouped: number;
 };
-
 
 export interface OverallAccuracyStats {
   total_scores: number;

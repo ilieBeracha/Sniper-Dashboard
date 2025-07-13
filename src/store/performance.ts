@@ -7,6 +7,7 @@ import {
   OverallAccuracyStats,
   UserHitsData,
   TrainingTeamAnalytics,
+  WeaponUsageStats,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
@@ -18,6 +19,7 @@ import {
   getUserHitStatsFull,
   getSquadHitPercentageByRole,
   getTrainingTeamAnalytics,
+  getWeaponUsageStats,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/score";
@@ -49,6 +51,10 @@ interface PerformanceStore {
   getOverallAccuracyStats: () => Promise<void>;
 
   overallAccuracyStatsLoading: boolean;
+
+  weaponUsageStats: WeaponUsageStats | null;
+  weaponUsageStatsMap: Record<string, WeaponUsageStats>;
+  getWeaponUsageStats: (weaponId: string) => Promise<void>;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
@@ -60,6 +66,30 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   userHitsStats: null,
   overallAccuracyStatsLoading: false,
   trainingTeamAnalytics: null,
+  weaponUsageStats: null,
+  weaponUsageStatsMap: {},
+
+  getWeaponUsageStats: async (weaponId: string) => {
+    try {
+      set({ isLoading: true });
+      console.log("Store - fetching weapon usage for weaponId:", weaponId);
+      const stats = await getWeaponUsageStats(weaponId);
+      console.log("Store - received stats:", stats);
+      set((state) => ({ 
+        weaponUsageStats: stats,
+        weaponUsageStatsMap: {
+          ...state.weaponUsageStatsMap,
+          [weaponId]: stats
+        }
+      }));
+    } catch (error) {
+      console.error("Failed to load weapon usage stats:", error);
+      set({ weaponUsageStats: null });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
 
   getOverallAccuracyStats: async () => {
     try {

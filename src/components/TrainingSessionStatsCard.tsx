@@ -9,7 +9,6 @@ import {
   Crosshair, 
   Timer, 
   Users2, 
-  Zap, 
   Trophy,
   BarChart3,
   Activity

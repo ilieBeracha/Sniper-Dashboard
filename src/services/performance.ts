@@ -1,5 +1,5 @@
 import { supabase } from "./supabaseClient";
-import { SquadWeaponPerformance, UserHitsData,TrainingTeamAnalytics } from "@/types/performance";
+import { SquadWeaponPerformance, UserHitsData,TrainingTeamAnalytics,WeaponUsageStats } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/score";
 
@@ -149,4 +149,33 @@ export async function overallAccuracyStats() {
   }
 
   return data[0];
+}
+
+
+export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsageStats> {
+  console.log("Service - getWeaponUsageStats called with weaponId:", weaponId);
+  
+  const { data, error } = await supabase.rpc("get_weapon_usage_stats", {
+    p_weapon_id: weaponId,
+  });
+
+  console.log("Service - RPC response data:", data);
+  console.log("Service - RPC response error:", error);
+
+  if (error) {
+    console.error("Error fetching weapon usage stats:", error.message);
+    throw error;
+  }
+
+  const result = data?.[0] ?? {
+    weapon_id: weaponId,
+    total_shots_fired: 0,
+    total_hits: 0,
+    hit_percentage: 0,
+    avg_cm_dispersion: 0,
+    best_cm_dispersion: 0,
+  };
+
+  console.log("Service - returning result:", result);
+  return result;
 }
