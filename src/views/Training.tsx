@@ -5,8 +5,11 @@ import BaseButton from "@/components/base/BaseButton";
 import ConfirmStatusChangeModal from "@/components/ConfirmStatusChangeModal";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
 import { useTrainingPageLogic } from "@/hooks/useTrainingPageLogic";
+import { useNavigate } from "react-router-dom";
+import { FileText } from "lucide-react";
 
 export default function TrainingPage() {
+  const navigate = useNavigate();
   const {
     id,
     tabs,
@@ -37,7 +40,15 @@ export default function TrainingPage() {
         icon={<BiCurrentLocation />}
         button={[
           <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsSessionStatsOpen(true)}>
-            Add Session Stats
+            Add Session Stats (Modal)
+          </BaseButton>,
+          <BaseButton 
+            className="flex items-center gap-2" 
+            style="white" 
+            onClick={() => navigate(`/training/${id}/session-stats-full`)}
+          >
+            <FileText className="w-4 h-4" />
+            Full Page Form
           </BaseButton>,
         ]}
       />
