@@ -114,16 +114,15 @@ export type SquadUserPerformance = {
   sessions: number;
 };
 
-export type SquadCommanderPerformance = {
+export type CommanderUserRoleBreakdown = {
   squad_name: string;
-  users: SquadUserPerformance[];
-  squad_hit_percentage: number;
-  squad_total_shots: number;
-  squad_total_hits: number;
-  squad_total_sessions: number;
-  squad_avg_time_to_first_shot: number;
-  squad_elimination_rate: number;
-  // squad_first_shot_accuracy: number;
+  first_name: string;
+  last_name: string;
+  role_or_weapon: string; // "spotter", "sniper", "semi_auto"
+  hit_percentage: number;
+  shots: number;
+  hits: number;
+  sessions: number;
 };
 
 

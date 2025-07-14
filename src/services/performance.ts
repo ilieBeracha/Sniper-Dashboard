@@ -4,8 +4,8 @@ import {
   UserHitsData,
   TrainingTeamAnalytics,
   WeaponUsageStats,
-  SquadCommanderPerformance,
   SquadMajorityPerformance,
+  CommanderUserRoleBreakdown,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/score";
@@ -155,19 +155,21 @@ export async function overallAccuracyStats() {
 }
 
 // commander view
-export const getCommanderPerformance = async (teamId: string, distanceCategory?: string): Promise<SquadCommanderPerformance[]> => {
-  const { data, error } = await supabase.rpc("get_commander_squad_overview", {
+export const getCommanderUserRoleBreakdown = async (
+  teamId: string
+): Promise<CommanderUserRoleBreakdown[]> => {
+  const { data, error } = await supabase.rpc("get_commander_user_role_breakdown", {
     p_team_id: teamId,
-    p_distance_category: distanceCategory || null,
   });
 
   if (error) {
-    console.error("RPC Error: get_commander_squad_overview", error);
+    console.error("Error fetching user role breakdown:", error);
     throw error;
   }
 
-  return data;
+  return data ?? [];
 };
+
 
 
 // new
@@ -178,7 +180,7 @@ export const getSquadMajoritySessionsPerformance = async (
     "get_squad_majority_sessions_performance",
     { p_team_id: teamId }
   );
-
+console.log(data, "Data from getSquadMajoritySessionsPerformance");
   if (error) {
     console.error("Error fetching squad majority performance:", error);
     throw error;

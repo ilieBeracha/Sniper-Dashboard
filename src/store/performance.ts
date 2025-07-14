@@ -8,8 +8,8 @@ import {
   UserHitsData,
   TrainingTeamAnalytics,
   WeaponUsageStats,
-  SquadCommanderPerformance,
   SquadMajorityPerformance,
+  CommanderUserRoleBreakdown,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
@@ -22,7 +22,7 @@ import {
   getSquadHitPercentageByRole,
   getTrainingTeamAnalytics,
   getWeaponUsageStats,
-  getCommanderPerformance,
+  getCommanderUserRoleBreakdown,
   getSquadMajoritySessionsPerformance,
 } from "@/services/performance";
 import { userStore } from "./userStore";
@@ -61,8 +61,9 @@ interface PerformanceStore {
   getWeaponUsageStats: (weaponId: string) => Promise<void>;
 
   // commnder view
-  commanderPerformance: SquadCommanderPerformance[] | null;
-  fetchCommanderPerformance: (teamId: string, distanceCategory?: string) => Promise<void>;
+  commanderUserRoleBreakdown: CommanderUserRoleBreakdown[] | null;
+  fetchCommanderUserRoleBreakdown: (teamId: string) => Promise<void>;
+
   // new
   squadMajorityPerformance: SquadMajorityPerformance[] | null;
   fetchSquadMajorityPerformance: (teamId: string) => Promise<void>;
@@ -79,7 +80,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   trainingTeamAnalytics: null,
   weaponUsageStats: null,
   weaponUsageStatsMap: {},
-  commanderPerformance: null,
+  commanderUserRoleBreakdown: null,
   squadMajorityPerformance: null,
 
   getWeaponUsageStats: async (weaponId: string) => {
@@ -214,20 +215,15 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     }
   },
   // commander view
-  fetchCommanderPerformance: async (teamId: string, distanceCategory?: string) => {
+  fetchCommanderUserRoleBreakdown: async (teamId: string) => {
     try {
-      set({ isLoading: true });
-      const data = await getCommanderPerformance(teamId, distanceCategory);
-      set({ commanderPerformance: data });
+      const data = await getCommanderUserRoleBreakdown(teamId);
+      set({ commanderUserRoleBreakdown: data });
     } catch (error) {
-      console.error("Failed to load commander performance:", error);
-      set({ commanderPerformance: [] });
-    } finally {
-      set({ isLoading: false });
+      console.error("Failed to fetch commander user role breakdown:", error);
     }
   },
 
-  // new
   fetchSquadMajorityPerformance: async (teamId: string) => {
     try {
       set({ isLoading: true });

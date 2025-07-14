@@ -7,13 +7,16 @@ import BaseDashboardCard from "./base/BaseDashboardCard";
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import NoDataDisplay from "./base/BaseNoData";
 import { useTheme } from "@/contexts/ThemeContext";
+import UserRoleAccuracyTable from "./UserRoleAccuracyTable";
 
 const CommanderView = () => {
   const { theme } = useTheme();
   const { user } = useStore(userStore);
   const {
     squadMajorityPerformance,
-    fetchSquadMajorityPerformance
+    fetchSquadMajorityPerformance,
+    commanderUserRoleBreakdown,
+    fetchCommanderUserRoleBreakdown,
   } = useStore(performanceStore);
 
   const [loading, setLoading] = useState(true);
@@ -22,6 +25,7 @@ const CommanderView = () => {
     const load = async () => {
       if (!user?.team_id) return;
       await fetchSquadMajorityPerformance(user.team_id);
+      await fetchCommanderUserRoleBreakdown(user.team_id);
       setLoading(false);
     };
     load();
@@ -57,7 +61,9 @@ const CommanderView = () => {
               return (
                 <Card
                   key={idx}
-                  className={`rounded-xl p-4 transition-colors duration-200 ${theme === "dark" ? "bg-zinc-900 text-white" : "bg-white text-gray-900"}`}
+                  className={`rounded-xl p-4 transition-colors duration-200 ${
+                    theme === "dark" ? "bg-zinc-900 text-white" : "bg-white text-gray-900"
+                  }`}
                 >
                   <h3 className="text-lg font-semibold mb-3 text-center">{squad.squad_name}</h3>
                   <div className="flex flex-col items-center">
@@ -110,6 +116,13 @@ const CommanderView = () => {
           </div>
         )}
       </BaseDashboardCard>
+
+      {/* User Accuracy by Role */}
+      <UserRoleAccuracyTable 
+        loading={loading}
+        commanderUserRoleBreakdown={commanderUserRoleBreakdown}
+        theme={theme}
+      />
     </div>
   );
 };
