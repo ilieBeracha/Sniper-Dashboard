@@ -808,7 +808,7 @@ export default function ImprovedSessionStats() {
         </div>
 
         {/* Summary */}
-        <div id="summary" className="snap-start scroll-mt-4 min-h-[70vh] space-y-4">
+        <div id="summary" className="snap-start scroll-mt-4 min-h-[85vh] space-y-4">
           <SectionHeader section={sections[4]} />
           <Card className="border-0 shadow-sm dark:shadow-black/20 bg-white dark:bg-[#1A1A1A]">
             <CardContent className="px-2 py-4 lg:py-6">
