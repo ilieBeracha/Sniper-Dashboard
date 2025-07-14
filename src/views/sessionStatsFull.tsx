@@ -6,11 +6,14 @@ import { TrainingStore } from "@/store/trainingStore";
 import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
 import { teamStore } from "@/store/teamStore";
+import { sessionStore } from "@/store/sessionStore";
 import Header from "@/Headers/Header";
 import { userStore } from "@/store/userStore";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import type { SessionData, Participant, Target, Section } from "./SessionStatsFull/types";
+import type { SessionStatsSaveData } from "@/store/sessionStore";
 
 import {
   SessionConfigSection,
@@ -32,6 +35,8 @@ export default function ImprovedSessionStats() {
   const { members } = useStore(teamStore);
 
   const [activeSection, setActiveSection] = useState(0);
+
+  const { saveSessionStats } = useStore(sessionStore);
 
   useEffect(() => {
     (async () => {
@@ -88,7 +93,7 @@ export default function ImprovedSessionStats() {
       mistakeCode: "",
       engagements: [
         {
-          userId: "1",
+          userId: user?.id || "",
           shotsFired: 10,
           targetHits: 8,
         },
@@ -245,16 +250,77 @@ export default function ImprovedSessionStats() {
     );
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const errors: string[] = [];
     if (!sessionData.assignment_id) errors.push("Training Assignment is required");
     if (!sessionData.dayPeriod) errors.push("Time Period is required");
-    if (!sessionData.timeToFirstShot) errors.push("Time to First Shot is required");
+    if (sessionData.timeToFirstShot === null || sessionData.timeToFirstShot === undefined) {
+      errors.push("Time to First Shot is required");
+    }
+
+    // Validate participants
+    if (participants.length === 0) {
+      errors.push("At least one participant is required");
+    } else {
+      participants.forEach((p, index) => {
+        if (p.userDuty === "Sniper" && !p.weaponId) {
+          errors.push(`Participant ${index + 1} (${p.name}): Weapon is required for snipers`);
+        }
+        if (p.userDuty === "Spotter" && !p.equipmentId) {
+          errors.push(`Participant ${index + 1} (${p.name}): Equipment is required for spotters`);
+        }
+      });
+    }
+
+    // Validate targets
+    if (targets.length === 0) {
+      errors.push("At least one target is required");
+    }
 
     setValidationErrors(errors);
 
     if (errors.length === 0) {
-      console.log("Submitting session data:", { sessionData, participants, targets });
+      const saveData: SessionStatsSaveData = {
+        sessionData: {
+          training_session_id: training?.id || null,
+          assignment_id: sessionData.assignment_id || null,
+          squad_id: user?.squad_id || null,
+          team_id: user?.team_id || null,
+          dayPeriod: sessionData.dayPeriod || null,
+          timeToFirstShot: sessionData.timeToFirstShot,
+          note: sessionData.note || null,
+        },
+        participants: participants.map((p) => ({
+          user_id: p.userId,
+          user_duty: p.userDuty as "Sniper" | "Spotter",
+          weapon_id: p.weaponId || null,
+          equipment_id: p.equipmentId || null,
+          position: p.position,
+        })),
+        targets: targets.map((t) => ({
+          distance: t.distance,
+          windStrength: t.windStrength || undefined,
+          windDirection: t.windDirection || undefined,
+          totalHits: t.engagements.reduce((sum, eng) => sum + (eng.targetHits || 0), 0),
+          mistakeCode: t.mistakeCode || undefined,
+          engagements: t.engagements.map((eng) => ({
+            user_id: eng.userId,
+            shots_fired: eng.shotsFired,
+            target_hits: eng.targetHits || undefined,
+          })),
+        })),
+        currentUser: user ? { id: user.id } : null,
+      };
+
+      console.log("Submitting session data:", saveData);
+
+      try {
+        await saveSessionStats(saveData);
+        toast.success("Session statistics saved successfully!");
+      } catch (error) {
+        console.error("Error saving session:", error);
+        toast.error("Failed to save session statistics");
+      }
     }
   };
 
