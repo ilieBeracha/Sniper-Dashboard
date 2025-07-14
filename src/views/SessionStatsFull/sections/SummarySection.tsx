@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Send } from "lucide-react";
-import BaseButton from "@/components/base/BaseButton";
 import { Target, Participant } from "../types";
 import { SectionHeader } from "./SectionHeader";
 
@@ -20,8 +19,8 @@ export const SummarySection = ({ section, participants, targets, validationError
   return (
     <div id="summary" className="snap-start scroll-mt-4 min-h-[85vh] space-y-4">
       <SectionHeader section={section} />
-      <Card className="border-0 shadow-sm dark:shadow-black/20 bg-white dark:bg-[#1A1A1A]">
-        <CardContent className="px-2 py-4 lg:py-6">
+      <Card className="border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-zinc-900/30 rounded-lg ">
+        <CardContent className="px-2 ">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
             <div className="border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-zinc-900/30 rounded-lg p-4 lg:p-6 text-center hover:shadow-md transition-shadow">
               <div className="text-3xl font-light text-gray-900 dark:text-white mb-1">{participants.length}</div>
@@ -45,10 +44,10 @@ export const SummarySection = ({ section, participants, targets, validationError
           </div>
 
           <div className="text-center">
-            <BaseButton onClick={handleSubmit} style="purple" padding="px-8 lg:px-12 py-3" className="shadow-lg hover:shadow-xl transition-all">
+            <div onClick={handleSubmit} className="shadow-lg hover:shadow-xl transition-all w-full flex justify-center">
               <Send className="w-6 h-6 mr-2" />
               Submit Training Session
-            </BaseButton>
+            </div>
             <p className="text-base text-gray-500 dark:text-zinc-400 mt-4">
               Once submitted, this data will be permanently saved to your training records.
             </p>

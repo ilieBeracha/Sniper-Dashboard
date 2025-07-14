@@ -1,9 +1,7 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Target as TargetIcon, Trash2, Plus } from "lucide-react";
-import BaseButton from "@/components/base/BaseButton";
+import { Target as TargetIcon, Trash2 } from "lucide-react";
 import { Target } from "../types";
 import { SectionHeader } from "./SectionHeader";
 
@@ -28,107 +26,101 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
           <span>Add Target</span>
         </button>
       </div>
-      <Card className="border-0 shadow-sm dark:shadow-black/20 bg-white dark:bg-[#1A1A1A] py-2">
-        <CardContent className="px-2">
-          <div className="space-y-4 lg:space-y-6">
-            {targets.map((target, index) => (
-              <div key={target.id} className="border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-zinc-900/30 rounded-lg p-4 lg:p-6">
-                <div className="flex sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-zinc-700 dark:to-zinc-800 rounded-lg flex items-center justify-center text-base font-medium text-gray-700 dark:text-gray-300 flex-shrink-0 shadow-sm">
-                      {index + 1}
-                    </div>
-                    <span className="font-medium text-gray-900 dark:text-white text-lg">Target #{index + 1}</span>
+      <div className="border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-zinc-900/30 rounded-lg ">
+        <div className="space-y-4 lg:space-y-6">
+          {targets.map((target, index) => (
+            <div key={target.id} className="p-4 lg:p-6">
+              <div className="flex sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-zinc-700 dark:to-zinc-800 rounded-lg flex items-center justify-center text-base font-medium text-gray-700 dark:text-gray-300 flex-shrink-0 shadow-sm">
+                    {index + 1}
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeTarget(target.id)}
-                    className="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors self-start sm:self-center"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <span className="font-medium text-gray-900 dark:text-white text-lg">Target #{index + 1}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeTarget(target.id)}
+                  className="text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors self-start sm:self-center"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                <div className="space-y-3 lg:col-span-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-medium text-gray-700 dark:text-gray-300">Distance (meters)</Label>
+                    <span className="text-xl font-semibold text-indigo-600 dark:text-indigo-400">{target.distance}m</span>
+                  </div>
+                  <div className="space-y-2">
+                    <input
+                      type="range"
+                      value={target.distance}
+                      onChange={(e) => updateTarget(target.id, "distance", parseInt(e.target.value))}
+                      className="w-full h-2 bg-gray-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-indigo-600 dark:accent-indigo-400"
+                      min="100"
+                      max="900"
+                      step="25"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                      <span>100m</span>
+                      <span>300m</span>
+                      <span>500m</span>
+                      <span>700m</span>
+                      <span>900m</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-                  <div className="space-y-3 lg:col-span-2">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-base font-medium text-gray-700 dark:text-gray-300">Distance (meters)</Label>
-                      <span className="text-xl font-semibold text-indigo-600 dark:text-indigo-400">{target.distance}m</span>
-                    </div>
-                    <div className="space-y-2">
-                      <input
-                        type="range"
-                        value={target.distance}
-                        onChange={(e) => updateTarget(target.id, "distance", parseInt(e.target.value))}
-                        className="w-full h-2 bg-gray-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-indigo-600 dark:accent-indigo-400"
-                        min="100"
-                        max="900"
-                        step="25"
-                      />
-                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                        <span>100m</span>
-                        <span>300m</span>
-                        <span>500m</span>
-                        <span>700m</span>
-                        <span>900m</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6">
-                    <div className="space-y-2">
-                      <Label className="text-sm sm:text-xs lg:text-base font-medium text-gray-700 dark:text-gray-300">Wind Speed (m/s)</Label>
-                      <Input
-                        type="number"
-                        placeholder="Optional"
-                        value={target.windStrength || ""}
-                        onChange={(e) => updateTarget(target.id, "windStrength", e.target.value ? parseInt(e.target.value) : null)}
-                        className="w-full h-10 border-gray-300 dark:border-white/10 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:bg-zinc-800 dark:text-white transition-all"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-sm sm:text-xs lg:text-base font-medium text-gray-700 dark:text-gray-300">Wind Direction (°)</Label>
-                      <Input
-                        type="number"
-                        placeholder="0-360°"
-                        min="0"
-                        max="360"
-                        value={target.windDirection || ""}
-                        onChange={(e) => updateTarget(target.id, "windDirection", e.target.value ? parseInt(e.target.value) : null)}
-                        className="w-full h-10 border-gray-300 dark:border-white/10 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:bg-zinc-800 dark:text-white transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 lg:col-span-2">
-                    <Label className="text-base sm:text-xs lg:text-base font-medium text-gray-700 dark:text-gray-300">Mistake Code</Label>
+                <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-sm sm:text-xs lg:text-base font-medium text-gray-700 dark:text-gray-300">Wind Speed (m/s)</Label>
                     <Input
+                      type="number"
                       placeholder="Optional"
-                      value={target.mistakeCode}
-                      onChange={(e) => updateTarget(target.id, "mistakeCode", e.target.value)}
+                      value={target.windStrength || ""}
+                      onChange={(e) => updateTarget(target.id, "windStrength", e.target.value ? parseInt(e.target.value) : null)}
+                      className="w-full h-10 border-gray-300 dark:border-white/10 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:bg-zinc-800 dark:text-white transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm sm:text-xs lg:text-base font-medium text-gray-700 dark:text-gray-300">Wind Direction (°)</Label>
+                    <Input
+                      type="number"
+                      placeholder="0-360°"
+                      min="0"
+                      max="360"
+                      value={target.windDirection || ""}
+                      onChange={(e) => updateTarget(target.id, "windDirection", e.target.value ? parseInt(e.target.value) : null)}
                       className="w-full h-10 border-gray-300 dark:border-white/10 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:bg-zinc-800 dark:text-white transition-all"
                     />
                   </div>
                 </div>
-              </div>
-            ))}
 
-            {targets.length === 0 && (
-              <div className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-white/10 rounded-lg">
-                <TargetIcon className="w-14 h-14 mx-auto text-gray-400 dark:text-zinc-600 mb-4" />
-                <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">No targets configured</h3>
-                <p className="text-gray-600 dark:text-zinc-400 mb-6">Add targets to define your shooting range setup</p>
-                <BaseButton onClick={addTarget} style="default">
-                  <Plus className="w-5 h-5 mr-2" />
-                  Add First Target
-                </BaseButton>
+                <div className="space-y-2 lg:col-span-2">
+                  <Label className="text-base sm:text-xs lg:text-base font-medium text-gray-700 dark:text-gray-300">Mistake Code</Label>
+                  <Input
+                    placeholder="Optional"
+                    value={target.mistakeCode}
+                    onChange={(e) => updateTarget(target.id, "mistakeCode", e.target.value)}
+                    className="w-full h-10 border-gray-300 dark:border-white/10 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:bg-zinc-800 dark:text-white transition-all"
+                  />
+                </div>
               </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+          ))}
+
+          {targets.length === 0 && (
+            <div className="text-center py-12 border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-zinc-900/30 rounded-lg p-4">
+              <TargetIcon className="w-14 h-14 mx-auto text-gray-400 dark:text-zinc-600 mb-4" />
+              <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">No targets configured</h3>
+              <p className="text-gray-600 dark:text-zinc-400 mb-6">Add targets to define your shooting range setup</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

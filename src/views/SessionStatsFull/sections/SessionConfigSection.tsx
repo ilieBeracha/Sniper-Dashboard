@@ -2,9 +2,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { SessionData } from "../types";
 import { SectionHeader } from "./SectionHeader";
+import { Check } from "lucide-react";
+import BaseButton from "@/components/base/BaseButton";
 
 interface SessionConfigSectionProps {
   section: any;
@@ -17,8 +18,8 @@ export const SessionConfigSection = ({ section, sessionData, updateSessionData, 
   return (
     <div id="session-config" className="snap-start scroll-mt-4 min-h-[85vh] space-y-4">
       <SectionHeader section={section} />
-      <Card className="border-0 shadow-sm dark:shadow-black/20 bg-white dark:bg-[#1A1A1A]">
-        <CardContent className="px-4">
+      <Card className="border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-zinc-900/30 rounded-lg p-4 ">
+        <CardContent className="p-0">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
             <div className="space-y-3">
               <Label htmlFor="assignment" className="text-base font-medium text-gray-700 dark:text-gray-300">
@@ -27,7 +28,7 @@ export const SessionConfigSection = ({ section, sessionData, updateSessionData, 
               <select
                 value={sessionData.assignment_id}
                 onChange={(e) => updateSessionData("assignment_id", e.target.value)}
-                className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-800 dark:border-zinc-600 dark:text-white transition-all"
+                className="w-full h-9 px-3 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-800 dark:border-zinc-600 dark:text-white transition-all"
               >
                 <option value="">Select assignment type</option>
                 {trainingAssignments.map((assignment) => (
@@ -38,23 +39,81 @@ export const SessionConfigSection = ({ section, sessionData, updateSessionData, 
               </select>
             </div>
 
-            <div className="space-y-3">
-              <Label htmlFor="dayPeriod" className="text-base font-medium text-gray-700 dark:text-gray-300">
-                Time Period <span className="text-red-500">*</span>
+            <div className="space-y-2">
+              <Label htmlFor="dayPeriod" className="block text-sm font-medium text-gray-700 dark:text-neutral-300  sm:mb-2">
+                Day Period <span className="text-red-500">*</span>
               </Label>
-              <select
-                value={sessionData.dayPeriod}
-                onChange={(e) => updateSessionData("dayPeriod", e.target.value)}
-                className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-800 dark:border-zinc-600 dark:text-white transition-all"
-              >
-                <option value="">Select time period</option>
-                <option value="day">Day Training</option>
-                <option value="night">Night Training</option>
-              </select>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                <button
+                  type="button"
+                  onClick={() => updateSessionData("dayPeriod", "day")}
+                  className={`relative flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg border-2 transition-all ${
+                    sessionData.dayPeriod === "day"
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                      : "border-gray-300 bg-white hover:border-gray-400 dark:border-neutral-600 dark:bg-neutral-800 dark:hover:border-neutral-500"
+                  }`}
+                >
+                  <svg
+                    className={`w-6 h-6 sm:w-8 sm:h-8 mb-1 sm:mb-2 ${sessionData.dayPeriod === "day" ? "text-yellow-500" : "text-gray-400 dark:text-neutral-500"}`}
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
+                  </svg>
+                  <span
+                    className={`text-xs sm:text-sm font-medium ${
+                      sessionData.dayPeriod === "day" ? "text-blue-700 dark:text-blue-300" : "text-gray-700 dark:text-neutral-300"
+                    }`}
+                  >
+                    Day
+                  </span>
+                  {sessionData.dayPeriod === "day" && (
+                    <div className="absolute top-2 right-2">
+                      <Check className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => updateSessionData("dayPeriod", "night")}
+                  className={`relative flex flex-col items-center justify-center p-2 sm:p-2 rounded-lg border-2 transition-all ${
+                    sessionData.dayPeriod === "night"
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                      : "border-gray-300 bg-white hover:border-gray-400 dark:border-neutral-600 dark:bg-neutral-800 dark:hover:border-neutral-500"
+                  }`}
+                >
+                  <svg
+                    className={`w-6 h-6 sm:w-8 sm:h-8 mb-1 sm:mb-2 ${
+                      sessionData.dayPeriod === "night" ? "text-blue-400 dark:text-blue-300" : "text-gray-400 dark:text-neutral-500"
+                    }`}
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span
+                    className={`text-xs sm:text-sm font-medium ${
+                      sessionData.dayPeriod === "night" ? "text-blue-700 dark:text-blue-300" : "text-gray-700 dark:text-neutral-300"
+                    }`}
+                  >
+                    Night
+                  </span>
+                  {sessionData.dayPeriod === "night" && (
+                    <div className="absolute top-2 right-2">
+                      <Check className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                  )}
+                </button>
+              </div>
             </div>
 
-            <div className="space-y-3">
-              <Label htmlFor="timeToFirstShot" className="text-base font-medium text-gray-700 dark:text-gray-300">
+            <div className="space-y-2">
+              <Label htmlFor="timeToFirstShot" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
                 Time to First Shot (seconds) <span className="text-red-500">*</span>
               </Label>
               <div className="space-y-3">
@@ -64,28 +123,27 @@ export const SessionConfigSection = ({ section, sessionData, updateSessionData, 
                   placeholder="Enter response time"
                   value={sessionData.timeToFirstShot || ""}
                   onChange={(e) => updateSessionData("timeToFirstShot", e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full h-10 border-gray-300 dark:border-white/10 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:bg-zinc-800 dark:text-white transition-all"
+                  className="w-full h-9 border-gray-300 dark:border-white/10 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:bg-zinc-800 dark:text-white transition-all"
                 />
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 justify-between items-center">
                   <span className="text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">Quick presets:</span>
-                  {[3, 5, 10].map((seconds) => (
-                    <Button
+                  {[3, 5, 10, 15].map((seconds) => (
+                    <BaseButton
                       key={seconds}
                       type="button"
-                      variant="outline"
-                      size="sm"
                       onClick={() => updateSessionData("timeToFirstShot", seconds)}
-                      className="h-8 px-4 text-sm border-gray-300 dark:border-white/10 hover:bg-indigo-50 dark:hover:bg-indigo-500/20 hover:border-indigo-500 dark:hover:border-indigo-400 transition-all"
+                      style="purple"
+                      padding="px-4 py-2 w-full"
                     >
                       {seconds}s
-                    </Button>
+                    </BaseButton>
                   ))}
                 </div>
               </div>
             </div>
 
             <div className="space-y-3 lg:col-span-2">
-              <Label htmlFor="notes" className="text-base font-medium text-gray-700 dark:text-gray-300">
+              <Label htmlFor="notes" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Session Notes
               </Label>
               <Textarea

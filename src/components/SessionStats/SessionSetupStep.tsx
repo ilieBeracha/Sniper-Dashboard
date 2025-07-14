@@ -11,7 +11,9 @@ export default function SessionSetupStep({ sessionData, setSessionData, assignme
     <div className="space-y-6">
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 sm:p-4">
         <h4 className="text-sm sm:text-base font-semibold text-blue-800 dark:text-blue-200 mb-1 sm:mb-2">📋 Session Information</h4>
-        <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300">Set up the basic information about your training session. All fields are required.</p>
+        <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300">
+          Set up the basic information about your training session. All fields are required.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
@@ -35,7 +37,6 @@ export default function SessionSetupStep({ sessionData, setSessionData, assignme
           </select>
         </div>
 
-        {/* Day Period */}
         <div>
           <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1 sm:mb-2">
             Day Period <span className="text-red-500">*</span>
@@ -109,7 +110,6 @@ export default function SessionSetupStep({ sessionData, setSessionData, assignme
           </div>
         </div>
 
-        {/* Time to First Shot - Enhanced Timer Style */}
         <div>
           <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1 sm:mb-2">
             Time to First Shot <span className="text-red-500">*</span>
@@ -134,7 +134,7 @@ export default function SessionSetupStep({ sessionData, setSessionData, assignme
                   <span className="text-lg font-semibold text-blue-700 dark:text-blue-300">sec</span>
                 </div>
               </div>
-              <div className="flex flex-col items-center">
+              <div className="flex-col items-center justify-center gap-1 w-full flex justify">
                 <span className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mb-1">Quick presets:</span>
                 <div className="flex gap-1">
                   {[3, 5, 10].map((seconds) => (

@@ -1,7 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Target as TargetIcon, Crosshair } from "lucide-react";
 import { Target, Participant } from "../types";
 import { SectionHeader } from "./SectionHeader";
@@ -17,7 +15,7 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
   return (
     <div id="engagements" className="snap-start scroll-mt-4 min-h-[85vh] space-y-4 ">
       <SectionHeader section={section} />
-      <Card className="border-0 py-2 shadow-sm dark:shadow-black/20 bg-white dark:bg-[#1A1A1A]">
+      <Card className="border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-zinc-900/30 rounded-lg p-4 ">
         <CardContent className="p-0">
           <div className="space-y-6 lg:space-y-8">
             {targets.map((target, targetIndex) => (
