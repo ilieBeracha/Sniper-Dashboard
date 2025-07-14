@@ -8,6 +8,8 @@ import {
   UserHitsData,
   TrainingTeamAnalytics,
   WeaponUsageStats,
+  SquadCommanderPerformance,
+  SquadMajorityPerformance,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
@@ -20,6 +22,8 @@ import {
   getSquadHitPercentageByRole,
   getTrainingTeamAnalytics,
   getWeaponUsageStats,
+  getCommanderPerformance,
+  getSquadMajoritySessionsPerformance,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/score";
@@ -55,6 +59,13 @@ interface PerformanceStore {
   weaponUsageStats: WeaponUsageStats | null;
   weaponUsageStatsMap: Record<string, WeaponUsageStats>;
   getWeaponUsageStats: (weaponId: string) => Promise<void>;
+
+  // commnder view
+  commanderPerformance: SquadCommanderPerformance[] | null;
+  fetchCommanderPerformance: (teamId: string, distanceCategory?: string) => Promise<void>;
+  // new
+  squadMajorityPerformance: SquadMajorityPerformance[] | null;
+  fetchSquadMajorityPerformance: (teamId: string) => Promise<void>;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
@@ -68,6 +79,8 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   trainingTeamAnalytics: null,
   weaponUsageStats: null,
   weaponUsageStatsMap: {},
+  commanderPerformance: null,
+  squadMajorityPerformance: null,
 
   getWeaponUsageStats: async (weaponId: string) => {
     try {
@@ -75,12 +88,12 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       console.log("Store - fetching weapon usage for weaponId:", weaponId);
       const stats = await getWeaponUsageStats(weaponId);
       console.log("Store - received stats:", stats);
-      set((state) => ({ 
+      set((state) => ({
         weaponUsageStats: stats,
         weaponUsageStatsMap: {
           ...state.weaponUsageStatsMap,
-          [weaponId]: stats
-        }
+          [weaponId]: stats,
+        },
       }));
     } catch (error) {
       console.error("Failed to load weapon usage stats:", error);
@@ -89,7 +102,6 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       set({ isLoading: false });
     }
   },
-
 
   getOverallAccuracyStats: async () => {
     try {
@@ -199,6 +211,33 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       set({ groupingSummary: null });
     } finally {
       set({ groupingSummaryLoading: false });
+    }
+  },
+  // commander view
+  fetchCommanderPerformance: async (teamId: string, distanceCategory?: string) => {
+    try {
+      set({ isLoading: true });
+      const data = await getCommanderPerformance(teamId, distanceCategory);
+      set({ commanderPerformance: data });
+    } catch (error) {
+      console.error("Failed to load commander performance:", error);
+      set({ commanderPerformance: [] });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  // new
+  fetchSquadMajorityPerformance: async (teamId: string) => {
+    try {
+      set({ isLoading: true });
+      const data = await getSquadMajoritySessionsPerformance(teamId);
+      set({ squadMajorityPerformance: data });
+    } catch (error) {
+      console.error("Failed to load squad majority session performance:", error);
+      set({ squadMajorityPerformance: null });
+    } finally {
+      set({ isLoading: false });
     }
   },
 }));

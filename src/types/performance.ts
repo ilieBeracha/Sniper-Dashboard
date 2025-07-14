@@ -101,3 +101,39 @@ export interface OverallAccuracyStats {
   total_target_hits: number;
   accuracy_percent: number;
 }
+
+
+// commander view
+export type SquadUserPerformance = {
+  first_name: string;
+  last_name: string;
+  role_or_weapon: string; // e.g. "spotter", "sniper", "semi_auto"
+  hit_percentage: number;
+  shots: number;
+  hits: number;
+  sessions: number;
+};
+
+export type SquadCommanderPerformance = {
+  squad_name: string;
+  users: SquadUserPerformance[];
+  squad_hit_percentage: number;
+  squad_total_shots: number;
+  squad_total_hits: number;
+  squad_total_sessions: number;
+  squad_avg_time_to_first_shot: number;
+  squad_elimination_rate: number;
+  // squad_first_shot_accuracy: number;
+};
+
+
+// new
+export type SquadMajorityPerformance = {
+  squad_name: string;
+  total_shots: number;
+  total_hits: number;
+  total_sessions: number;
+  hit_percentage: number;
+  avg_time_to_first_shot: number;
+  elimination_rate: number;
+};

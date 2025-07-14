@@ -1,8 +1,14 @@
 import { supabase } from "./supabaseClient";
-import { SquadWeaponPerformance, UserHitsData,TrainingTeamAnalytics,WeaponUsageStats } from "@/types/performance";
+import {
+  SquadWeaponPerformance,
+  UserHitsData,
+  TrainingTeamAnalytics,
+  WeaponUsageStats,
+  SquadCommanderPerformance,
+  SquadMajorityPerformance,
+} from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/score";
-
 
 export async function getUserHitStatsFull(userId: string): Promise<UserHitsData> {
   const { data, error } = await supabase.rpc("get_user_hit_stats_full", {
@@ -14,7 +20,6 @@ export async function getUserHitStatsFull(userId: string): Promise<UserHitsData>
   }
   return data[0];
 }
-
 
 export async function getSquadRoleHitPercentages(squadId: string, distance: string | null = null) {
   const { data, error } = await supabase.rpc("get_squad_hit_percentages_by_role", {
@@ -45,19 +50,17 @@ export async function getSquadHitPercentageByRole(squadId: string, distance: str
 }
 
 export async function getTrainingTeamAnalytics(trainingSessionId: string): Promise<TrainingTeamAnalytics | null> {
-  const { data, error } = await supabase.rpc('get_training_team_analytics', {
+  const { data, error } = await supabase.rpc("get_training_team_analytics", {
     p_training_session_id: trainingSessionId,
   });
 
   if (error) {
-    console.error('Error fetching training analytics:', error.message);
+    console.error("Error fetching training analytics:", error.message);
     return null;
   }
 
   return data?.[0] ?? null;
 }
-
-
 
 export async function getWeaponPerformanceBySquadAndWeapon(teamId: string): Promise<SquadWeaponPerformance[]> {
   const { data, error } = await supabase.rpc("get_weapon_performance_by_squad_and_weapon", {
@@ -151,19 +154,46 @@ export async function overallAccuracyStats() {
   return data[0];
 }
 
+// commander view
+export const getCommanderPerformance = async (teamId: string, distanceCategory?: string): Promise<SquadCommanderPerformance[]> => {
+  const { data, error } = await supabase.rpc("get_commander_squad_overview", {
+    p_team_id: teamId,
+    p_distance_category: distanceCategory || null,
+  });
+
+  if (error) {
+    console.error("RPC Error: get_commander_squad_overview", error);
+    throw error;
+  }
+
+  return data;
+};
+
+
+// new
+export const getSquadMajoritySessionsPerformance = async (
+  teamId: string
+): Promise<SquadMajorityPerformance[]> => {
+  const { data, error } = await supabase.rpc(
+    "get_squad_majority_sessions_performance",
+    { p_team_id: teamId }
+  );
+
+  if (error) {
+    console.error("Error fetching squad majority performance:", error);
+    throw error;
+  }
+
+  return data;
+};
 
 export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsageStats> {
   console.log("Service - getWeaponUsageStats called with weaponId:", weaponId);
-  
+
   const { data, error } = await supabase.rpc("get_weapon_usage_stats", {
     p_weapon_id: weaponId,
   });
 
-  console.log("Service - RPC response data:", data);
-  console.log("Service - RPC response error:", error);
-  console.log("Service - RPC response data type:", typeof data);
-  console.log("Service - RPC response data length:", data?.length);
-  
   if (data && data.length > 0) {
     console.log("Service - First data item:", data[0]);
     console.log("Service - Data item keys:", Object.keys(data[0]));
@@ -178,22 +208,23 @@ export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsage
 
   // Handle case where data exists but might have different field names or null values
   const rawResult = data?.[0];
-  const result = rawResult ? {
-    weapon_id: rawResult.weapon_id || weaponId,
-    total_shots_fired: rawResult.total_shots_fired ?? rawResult.total_shots ?? rawResult.shots_fired ?? 0,
-    total_hits: rawResult.total_hits ?? rawResult.hits ?? 0,
-    hit_percentage: rawResult.hit_percentage ?? 0,
-    avg_cm_dispersion: rawResult.avg_cm_dispersion ?? null,
-    best_cm_dispersion: rawResult.best_cm_dispersion ?? null,
-  } : {
-    weapon_id: weaponId,
-    total_shots_fired: 0,
-    total_hits: 0,
-    hit_percentage: 0,
-    avg_cm_dispersion: 0,
-    best_cm_dispersion: 0,
-  };
+  const result = rawResult
+    ? {
+        weapon_id: rawResult.weapon_id || weaponId,
+        total_shots_fired: rawResult.total_shots_fired ?? rawResult.total_shots ?? rawResult.shots_fired ?? 0,
+        total_hits: rawResult.total_hits ?? rawResult.hits ?? 0,
+        hit_percentage: rawResult.hit_percentage ?? 0,
+        avg_cm_dispersion: rawResult.avg_cm_dispersion ?? null,
+        best_cm_dispersion: rawResult.best_cm_dispersion ?? null,
+      }
+    : {
+        weapon_id: weaponId,
+        total_shots_fired: 0,
+        total_hits: 0,
+        hit_percentage: 0,
+        avg_cm_dispersion: 0,
+        best_cm_dispersion: 0,
+      };
 
-  console.log("Service - returning result:", result);
   return result;
 }
