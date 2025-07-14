@@ -150,7 +150,6 @@ export default function Auth() {
                     >
                       ← Back to Sign In
                     </p>
-                    {authType === "team_manager_register" && <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />}
                     {authType === "squad_manager_register" && <SquadCommanderRegisterForm AuthSubmit={AuthSubmit} />}
                     {authType === "soldier_register" && <SoldierRegisterForm AuthSubmit={AuthSubmit} />}
                   </div>
