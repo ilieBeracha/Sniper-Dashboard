@@ -1,15 +1,22 @@
 import { supabase } from "./supabaseClient";
-import { HitPercentageData, SquadWeaponPerformance } from "@/types/performance";
+import {
+  SquadWeaponPerformance,
+  UserHitsData,
+  TrainingTeamAnalytics,
+  WeaponUsageStats,
+  SquadMajorityPerformance,
+  CommanderUserRoleBreakdown,
+} from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/score";
 
-export async function getUserHitPercentageRpc(userId: string): Promise<HitPercentageData> {
-  const { data, error } = await supabase.rpc("get_user_hit_percentage_with_assignments", {
-    user_id: userId,
+export async function getUserHitStatsFull(userId: string): Promise<UserHitsData> {
+  const { data, error } = await supabase.rpc("get_user_hit_stats_full", {
+    p_user_id: userId,
   });
   if (error) {
     console.error("SQL function failed:", error.message);
-    throw new Error("Could not complete get_user_hit_percentage");
+    throw new Error("Could not complete get_user_hit_stats_full");
   }
   return data[0];
 }
@@ -27,7 +34,33 @@ export async function getSquadRoleHitPercentages(squadId: string, distance: stri
 
   return data || [];
 }
+// This function is a duplicate of the one above, so we can remove it to avoid redundancy.
+export async function getSquadHitPercentageByRole(squadId: string, distance: string | null = null) {
+  const { data, error } = await supabase.rpc("get_squad_hit_percentages_by_role_v3", {
+    p_squad_id: squadId,
+    p_distance_category: distance,
+  });
 
+  if (error) {
+    console.error("Error fetching session-based role stats:", error.message);
+    throw error;
+  }
+
+  return data || [];
+}
+
+export async function getTrainingTeamAnalytics(trainingSessionId: string): Promise<TrainingTeamAnalytics | null> {
+  const { data, error } = await supabase.rpc("get_training_team_analytics", {
+    p_training_session_id: trainingSessionId,
+  });
+
+  if (error) {
+    console.error("Error fetching training analytics:", error.message);
+    return null;
+  }
+
+  return data?.[0] ?? null;
+}
 
 export async function getWeaponPerformanceBySquadAndWeapon(teamId: string): Promise<SquadWeaponPerformance[]> {
   const { data, error } = await supabase.rpc("get_weapon_performance_by_squad_and_weapon", {
@@ -59,16 +92,14 @@ export async function getUserGroupingStatsRpc(userId: string, weaponId: string |
 
   const result = data[0];
 
-return {
-  avg_dispersion: result.avg_dispersion,
-  best_dispersion: result.best_dispersion,
-  avg_time_to_group: result.avg_time_to_group,
-  total_groupings: result.total_groupings,
-  weapon_breakdown: [],
-  last_five_groups: result.last_five_groups ?? [],
-};
-
-
+  return {
+    avg_dispersion: result.avg_dispersion,
+    best_dispersion: result.best_dispersion,
+    avg_time_to_group: result.avg_time_to_group,
+    total_groupings: result.total_groupings,
+    weapon_breakdown: [],
+    last_five_groups: result.last_five_groups ?? [],
+  };
 }
 
 // In your service
@@ -121,4 +152,81 @@ export async function overallAccuracyStats() {
   }
 
   return data[0];
+}
+
+// commander view
+export const getCommanderUserRoleBreakdown = async (
+  teamId: string
+): Promise<CommanderUserRoleBreakdown[]> => {
+  const { data, error } = await supabase.rpc("get_commander_user_role_breakdown", {
+    p_team_id: teamId,
+  });
+
+  if (error) {
+    console.error("Error fetching user role breakdown:", error);
+    throw error;
+  }
+
+  return data ?? [];
+};
+
+
+
+// new
+export const getSquadMajoritySessionsPerformance = async (
+  teamId: string
+): Promise<SquadMajorityPerformance[]> => {
+  const { data, error } = await supabase.rpc(
+    "get_squad_majority_sessions_performance",
+    { p_team_id: teamId }
+  );
+console.log(data, "Data from getSquadMajoritySessionsPerformance");
+  if (error) {
+    console.error("Error fetching squad majority performance:", error);
+    throw error;
+  }
+
+  return data;
+};
+
+export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsageStats> {
+  console.log("Service - getWeaponUsageStats called with weaponId:", weaponId);
+
+  const { data, error } = await supabase.rpc("get_weapon_usage_stats", {
+    p_weapon_id: weaponId,
+  });
+
+  if (data && data.length > 0) {
+    console.log("Service - First data item:", data[0]);
+    console.log("Service - Data item keys:", Object.keys(data[0]));
+    console.log("Service - total_shots_fired value:", data[0].total_shots_fired, "type:", typeof data[0].total_shots_fired);
+    console.log("Service - total_hits value:", data[0].total_hits, "type:", typeof data[0].total_hits);
+  }
+
+  if (error) {
+    console.error("Error fetching weapon usage stats:", error.message);
+    throw error;
+  }
+
+  // Handle case where data exists but might have different field names or null values
+  const rawResult = data?.[0];
+  const result = rawResult
+    ? {
+        weapon_id: rawResult.weapon_id || weaponId,
+        total_shots_fired: rawResult.total_shots_fired ?? rawResult.total_shots ?? rawResult.shots_fired ?? 0,
+        total_hits: rawResult.total_hits ?? rawResult.hits ?? 0,
+        hit_percentage: rawResult.hit_percentage ?? 0,
+        avg_cm_dispersion: rawResult.avg_cm_dispersion ?? null,
+        best_cm_dispersion: rawResult.best_cm_dispersion ?? null,
+      }
+    : {
+        weapon_id: weaponId,
+        total_shots_fired: 0,
+        total_hits: 0,
+        hit_percentage: 0,
+        avg_cm_dispersion: 0,
+        best_cm_dispersion: 0,
+      };
+
+  return result;
 }

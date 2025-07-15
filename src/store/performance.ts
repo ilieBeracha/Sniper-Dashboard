@@ -1,14 +1,29 @@
 // src/store/performanceStore.ts
 import { create } from "zustand";
-import { HitPercentageData, SquadStats, SquadWeaponPerformance, TrainingEffectiveness, OverallAccuracyStats } from "@/types/performance";
+import {
+  SquadStats,
+  SquadWeaponPerformance,
+  TrainingEffectiveness,
+  OverallAccuracyStats,
+  UserHitsData,
+  TrainingTeamAnalytics,
+  WeaponUsageStats,
+  SquadMajorityPerformance,
+  CommanderUserRoleBreakdown,
+} from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
-  getUserHitPercentageRpc,
   getWeaponPerformanceBySquadAndWeapon,
   getTrainingEffectivenessByTeam,
   overallAccuracyStats,
-  getSquadRoleHitPercentages,
+  // getSquadRoleHitPercentages,
   getUserGroupingStatsRpc,
+  getUserHitStatsFull,
+  getSquadHitPercentageByRole,
+  getTrainingTeamAnalytics,
+  getWeaponUsageStats,
+  getCommanderUserRoleBreakdown,
+  getSquadMajoritySessionsPerformance,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/score";
@@ -18,10 +33,17 @@ interface PerformanceStore {
   isLoading: boolean;
   getSquadWeaponPerformance: (teamId: string) => Promise<void>;
   squadStats: SquadStats[];
-  getSquadStats: (position: PositionScore | null, distance: string | null) => Promise<void>;
-  userHitPercentage: HitPercentageData | null;
-  getUserHitPercentage: (userId: string) => Promise<HitPercentageData>;
+  // getSquadStats: (position: PositionScore | null, distance: string | null) => Promise<void>;
+  getSquadStatsByRole: (position: PositionScore | null, distance: string | null) => Promise<void>;
 
+  // UserHitsData is a new type that includes detailed hit statistics for a user
+  userHitsStats: UserHitsData | null;
+  getUserHitStatsFull: (userId: string) => Promise<UserHitsData>;
+
+  //
+  trainingTeamAnalytics: TrainingTeamAnalytics | null;
+  getTrainingTeamAnalytics: (trainingSessionId: string) => Promise<void>;
+  //
   groupingSummary: GroupingSummary | null;
   groupingSummaryLoading: boolean;
   getGroupingSummary: () => Promise<void>;
@@ -33,6 +55,18 @@ interface PerformanceStore {
   getOverallAccuracyStats: () => Promise<void>;
 
   overallAccuracyStatsLoading: boolean;
+
+  weaponUsageStats: WeaponUsageStats | null;
+  weaponUsageStatsMap: Record<string, WeaponUsageStats>;
+  getWeaponUsageStats: (weaponId: string) => Promise<void>;
+
+  // commnder view
+  commanderUserRoleBreakdown: CommanderUserRoleBreakdown[] | null;
+  fetchCommanderUserRoleBreakdown: (teamId: string) => Promise<void>;
+
+  // new
+  squadMajorityPerformance: SquadMajorityPerformance[] | null;
+  fetchSquadMajorityPerformance: (teamId: string) => Promise<void>;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
@@ -41,7 +75,35 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   squadStats: [],
   trainingEffectiveness: [],
   overallAccuracyStats: null,
+  userHitsStats: null,
   overallAccuracyStatsLoading: false,
+  trainingTeamAnalytics: null,
+  weaponUsageStats: null,
+  weaponUsageStatsMap: {},
+  commanderUserRoleBreakdown: null,
+  squadMajorityPerformance: null,
+
+  getWeaponUsageStats: async (weaponId: string) => {
+    try {
+      set({ isLoading: true });
+      console.log("Store - fetching weapon usage for weaponId:", weaponId);
+      const stats = await getWeaponUsageStats(weaponId);
+      console.log("Store - received stats:", stats);
+      set((state) => ({
+        weaponUsageStats: stats,
+        weaponUsageStatsMap: {
+          ...state.weaponUsageStatsMap,
+          [weaponId]: stats,
+        },
+      }));
+    } catch (error) {
+      console.error("Failed to load weapon usage stats:", error);
+      set({ weaponUsageStats: null });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
   getOverallAccuracyStats: async () => {
     try {
       set({ overallAccuracyStatsLoading: true });
@@ -54,12 +116,13 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       set({ overallAccuracyStatsLoading: false });
     }
   },
-  // getSquadStats: async (teamId: string, position: PositionScore | null, distance: string | null) => {
+
+  // getSquadStats: async (_position: PositionScore | null, distance: string | null) => {
+  //   const squadId = userStore.getState().user?.squad_id;
   //   try {
   //     set({ isLoading: true });
-  //     const data = await getSquadStatByTeamId(teamId, position, distance);
-
-  //     set({ squadStats: data as any });
+  //     const data = await getSquadRoleHitPercentages(squadId!, distance);
+  //     set({ squadStats: data });
   //   } catch (error) {
   //     console.error("Failed to load squad stats:", error);
   //     set({ squadStats: [] });
@@ -68,23 +131,19 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   //   }
   // },
 
-
-getSquadStats: async (_position: PositionScore | null, distance: string | null) => {
-  const squadId = userStore.getState().user?.squad_id;
-  try {
-    set({ isLoading: true });
-    const data = await getSquadRoleHitPercentages(squadId!, distance);
-    set({ squadStats: data });
-  } catch (error) {
-    console.error("Failed to load squad stats:", error);
-    set({ squadStats: [] });
-  } finally {
-    set({ isLoading: false });
-  }
-},
-
-
-  
+  getSquadStatsByRole: async (_position: PositionScore | null, distance: string | null) => {
+    const squadId = userStore.getState().user?.squad_id;
+    try {
+      set({ isLoading: true });
+      const data = await getSquadHitPercentageByRole(squadId!, distance);
+      set({ squadStats: data });
+    } catch (error) {
+      console.error("Failed to load squad stats (session-based):", error);
+      set({ squadStats: [] });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 
   getTrainingEffectiveness: async (teamId: string) => {
     try {
@@ -112,16 +171,26 @@ getSquadStats: async (_position: PositionScore | null, distance: string | null) 
     }
   },
 
-  userHitPercentage: null,
-  getUserHitPercentage: async (userId: string) => {
+  getUserHitStatsFull: async (userId: string) => {
     try {
-      const data = await getUserHitPercentageRpc(userId);
-
-      set({ userHitPercentage: data });
+      const data = await getUserHitStatsFull(userId);
+      set({ userHitsStats: data });
       return data;
     } catch (error) {
-      console.error("Failed to load user hit percentage:", error);
+      console.error("Failed to load user hit stats full:", error);
       throw error;
+    }
+  },
+  getTrainingTeamAnalytics: async (trainingSessionId: string) => {
+    try {
+      set({ isLoading: true });
+      const analytics = await getTrainingTeamAnalytics(trainingSessionId);
+      set({ trainingTeamAnalytics: analytics });
+    } catch (error) {
+      console.error("Failed to load training team analytics:", error);
+      set({ trainingTeamAnalytics: null });
+    } finally {
+      set({ isLoading: false });
     }
   },
 
@@ -143,6 +212,28 @@ getSquadStats: async (_position: PositionScore | null, distance: string | null) 
       set({ groupingSummary: null });
     } finally {
       set({ groupingSummaryLoading: false });
+    }
+  },
+  // commander view
+  fetchCommanderUserRoleBreakdown: async (teamId: string) => {
+    try {
+      const data = await getCommanderUserRoleBreakdown(teamId);
+      set({ commanderUserRoleBreakdown: data });
+    } catch (error) {
+      console.error("Failed to fetch commander user role breakdown:", error);
+    }
+  },
+
+  fetchSquadMajorityPerformance: async (teamId: string) => {
+    try {
+      set({ isLoading: true });
+      const data = await getSquadMajoritySessionsPerformance(teamId);
+      set({ squadMajorityPerformance: data });
+    } catch (error) {
+      console.error("Failed to load squad majority session performance:", error);
+      set({ squadMajorityPerformance: null });
+    } finally {
+      set({ isLoading: false });
     }
   },
 }));

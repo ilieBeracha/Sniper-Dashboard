@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getSquadMetricsByRoleRpc, getSquadsWithUsersByTeamId, getSquadUsersBySquadId } from "@/services/squadService";
+import { getSquadsHitsByTeamId, getSquadMetricsByRoleRpc, getSquadsWithUsersByTeamId, getSquadUsersBySquadId } from "@/services/squadService";
 import { Squad } from "@/types/squad";
 
 interface SquadMetric {
@@ -8,20 +8,31 @@ interface SquadMetric {
   avg_hit_ratio: number;
 }
 
+interface SquadsHits {
+  squad_id: string;
+  squad_name: string;
+  avg_hit_percentage: number;
+  total_shots: number;
+  total_hits: number;
+}
+
 interface SquadStore {
   metrics: SquadMetric[] | null;
   squadsWithMembers: Squad[] | null;
   squadUsers: any[] | null;
+  squadsHits: SquadsHits[] | null;
 
   getSquadMetricsByRole: (team_id: string) => Promise<void>;
   getSquadsWithUsersByTeamId: (team_id: string) => Promise<void>;
   getSquadUsersBySquadId: (squad_id: string) => Promise<void>;
+  getSquadsHitsByTeamId: (team_id: string) => Promise<void>;
 }
 
 export const squadStore = create<SquadStore>((set) => ({
   metrics: null,
   squadsWithMembers: null,
   squadUsers: null,
+  squadsHits: null,
 
   getSquadMetricsByRole: async (team_id) => {
     const data = await getSquadMetricsByRoleRpc(team_id);
@@ -34,5 +45,9 @@ export const squadStore = create<SquadStore>((set) => ({
   getSquadUsersBySquadId: async (squad_id) => {
     const data = await getSquadUsersBySquadId(squad_id);
     set({ squadUsers: data as unknown as any[] });
+  },
+  getSquadsHitsByTeamId: async (team_id) => {
+    const data = await getSquadsHitsByTeamId(team_id);
+    set({ squadsHits: data as unknown as any[] });
   },
 }));

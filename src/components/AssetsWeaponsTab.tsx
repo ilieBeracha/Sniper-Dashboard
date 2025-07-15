@@ -37,9 +37,12 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
     setIsOpen(false);
   }
 
+
   const WeaponsContent = (
     <div
-      className={` ${isMobile ? "w-full" : "w-[600px]"} p-4 space-y-6 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+      className={` ${isMobile ? "w-full" : "w-[600px]"} p-4 space-y-6 transition-colors duration-200 ${
+        theme === "dark" ? "text-white" : "text-gray-900"
+      }`}
     >
       <div>
         <h2 className="text-xl font-semibold">New Weapon</h2>
@@ -61,14 +64,13 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
             {weapon.weapon_type}
           </option>
         ))}
-        {Array.from(weaponsTypes)?.map((weaponType, index) => {
-          return (
-            <option key={index} value={weaponType}>
-              {weaponType}
-            </option>
-          );
-        })}
+        {Array.from(weaponsTypes)?.map((weaponType, index) => (
+          <option key={index} value={weaponType}>
+            {weaponType}
+          </option>
+        ))}
       </select>
+
       <BaseInput
         label="Serial Number"
         type="text"
@@ -101,7 +103,7 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
         </button>
         <button
           type="button"
-          onClick={() => handleCreateWeapon()}
+          onClick={handleCreateWeapon}
           className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
         >
           Create
@@ -127,6 +129,7 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
           </div>
         </div>
       </div>
+
       <AssetsWeaponsTable weapons={weapons} />
 
       {!isMobile && (

@@ -66,3 +66,17 @@ export async function getSquadMetricsByRoleRpc(team_id: string) {
 
   return data;
 }
+
+export async function getSquadsHitsByTeamId(team_id: string) {
+  const { data, error } = await supabase
+    .rpc("get_squads_avg_hit_prc_by_team_id ", {
+      team_id_param: team_id,
+    })
+    
+  if (error) {
+    console.error("Failed to fetch squad average hit percentage:", error.message);
+    throw new Error("Could not fetch squad average hit percentage");
+  }
+
+  return data;
+}

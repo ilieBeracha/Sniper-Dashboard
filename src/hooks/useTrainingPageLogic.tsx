@@ -91,7 +91,9 @@ export function useTrainingPageLogic() {
     }
 
     if (activeTab.toLowerCase() === "analytics") {
-      return <TrainingAnalyticsTab sessionStats={sessionStats} />;
+      return<TrainingAnalyticsTab
+      trainingSessionId={id!}
+    />;
     }
 
     if (activeTab.toLowerCase() === "status") {
