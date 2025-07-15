@@ -20,7 +20,7 @@ const navSections = [
     ],
   },
   {
-    title: "STORAGE",
+    title: "TEAM",
     items: [
       { name: "Assets", href: "/assets", icon: <FaCrosshairs className="w-5 h-5" /> },
       { name: "File Vault", href: "/file-vault", icon: <FaFolderOpen className="w-5 h-5" /> },

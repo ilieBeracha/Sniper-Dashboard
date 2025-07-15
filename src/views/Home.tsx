@@ -19,7 +19,7 @@ const TrainingPage = lazy(() => import("./Training"));
 const Assets = lazy(() => import("./Assets"));
 const ErrorPage = lazy(() => import("./404"));
 const SessionStatsFull = lazy(() => import("./sessionStatsFull"));
-const FileVault = lazy(() => import("./FileVault"));
+const FileVault = lazy(() => import("./fileVault"));
 
 export default function AppRoutes() {
   const { token } = useStore(authStore);

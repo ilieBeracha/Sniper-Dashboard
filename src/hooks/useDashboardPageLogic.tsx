@@ -27,8 +27,8 @@ export function useDashboardPageLogic() {
 
   const tabs = [
     { id: "overview", label: "Overview", icon: Activity },
-    { id: "ai-insights", label: "AI Insights", icon: Brain },
-    { id: "commander-view", label: "Commander View", icon: SplinePointerIcon },
+    { id: "ai-insights", label: "Insights", icon: Brain },
+    { id: "commander-view", label: "Commander", icon: SplinePointerIcon },
   ];
   const [activeTab, setActiveTab] = useState<string>(tabs[0].id);
 

@@ -19,7 +19,7 @@ function AppContent() {
   if (isLoadingAuth) {
     return (
       <div className={`absolute inset-0 flex items-center justify-center z-10`}>
-        <div className={`rounded-lg p-4 flex items-center space-x-3 border`}>
+        <div className={`rounded-lg p-4 flex items-center space-x-3 border-none`}>
           <Loader2 className={`h-6 w-6 animate-spin ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
         </div>
       </div>

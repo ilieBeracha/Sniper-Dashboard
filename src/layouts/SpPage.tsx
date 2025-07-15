@@ -8,12 +8,12 @@ import { Link } from "react-router-dom";
 
 export function SpPage({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
-
+  const isMobile = useIsMobile();
   return (
     <div
       className={` min-h-screen w-full bg-black/30 transition-colors duration-200 ${theme === "dark" ? " text-gray-100" : "bg-gray-50 text-gray-900"}`}
     >
-      <main className=" space-y-6 ">{children}</main>
+      <main className={`${isMobile ? "space-y-2" : "space-y-4"}`}>{children}</main>
     </div>
   );
 }
@@ -37,12 +37,12 @@ export function SpPageHeader({
   return (
     <div className="m-0 p-0">
       {breadcrumbs && (
-        <div className="md:px-6 2xl:px-6 px-4">
+        <div className={`${isMobile ? "px-2" : "md:px-4 2xl:px-6"}`}>
           <SpPageBreadcrumbs breadcrumbs={breadcrumbs} />
         </div>
       )}
 
-      <div className={` ${isMobile ? "pl-6 pr-4 mb-8 mt-10" : "px-6 pt-8 pb-8"} transition-all duration-200 relative`}>
+      <div className={` ${isMobile ? "pl-6 pr-4 mb-8 mt-6" : "px-6 pt-8 pb-8"} transition-all duration-200 relative`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 justify-between w-full">
             <div className="flex items-center gap-3">
@@ -144,13 +144,13 @@ export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: strin
           <React.Fragment key={breadcrumb.label}>
             <BreadcrumbItem>
               {isLastItem(index) ? (
-                <BreadcrumbLink asChild className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} text-md font-medium cursor-default`}>
+                <BreadcrumbLink asChild className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} text-sm font-medium cursor-default`}>
                   <span>{breadcrumb.label}</span>
                 </BreadcrumbLink>
               ) : (
                 <BreadcrumbLink
                   asChild
-                  className={`${theme === "dark" ? "text-gray-400 hover:text-gray-200" : "text-gray-600 hover:text-gray-900"} text-md transition-colors`}
+                  className={`${theme === "dark" ? "text-gray-400 hover:text-gray-200" : "text-gray-600 hover:text-gray-900"} text-sm transition-colors`}
                 >
                   <Link to={breadcrumb.link}>{breadcrumb.label}</Link>
                 </BreadcrumbLink>
