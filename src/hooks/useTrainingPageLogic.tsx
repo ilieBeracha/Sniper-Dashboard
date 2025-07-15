@@ -31,7 +31,7 @@ export function useTrainingPageLogic() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [isSessionStatsOpen, setIsSessionStatsOpen] = useState(false);
-  const [newlyAddedSessionStatsId, setNewlyAddedSessionStatsId] = useState<string | null>(null);
+  const [newlyAddedSessionStatsId] = useState<string | null>(null);
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>(tabs[0].id);
 
@@ -90,7 +90,7 @@ export function useTrainingPageLogic() {
             sessionStats={sessionStats}
             onSessionStatsClick={handleSessionClick}
             onSessionStatsEditClick={() => {}}
-            newlyAddedSessionId={newlyAddedSessionStatsId || 0}
+            newlyAddedSessionId={newlyAddedSessionStatsId || null}
           />
         </>
       );
