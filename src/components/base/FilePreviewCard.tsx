@@ -110,26 +110,31 @@ export default function FilePreviewCard({ file, previewUrl, onDownload, onDelete
           </div>
 
           {/* Right half - File info */}
-          <div className="w-3/5 p-5 flex flex-col justify-between overflow-hidden">
-            <div className="overflow-hidden space-y-2">
-              <h4 className={`font-semibold text-base leading-tight truncate ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`} title={file.name}>
-                {file.name}
-              </h4>
-              <div className="space-y-1">
-                <p className={`text-sm flex items-center gap-2 ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-600"
-                }`}>
-                  <span className="font-medium">{formatSize(file.metadata?.size)}</span>
-                </p>
-                <p className={`text-sm ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-500"
-                }`}>
-                  {formatDate(file.created_at || file.metadata?.lastModified)}
-                </p>
-              </div>
-            </div>
+        <div className="w-3/5 py-5 pr-5 flex flex-col justify-between overflow-hidden">
+  <div className="flex flex-col overflow-hidden gap-2">
+    <h4
+      className={`font-semibold text-base truncate text-left ${
+        theme === "dark" ? "text-white" : "text-gray-900"
+      }`}
+      title={file.name}
+    >
+      {file.name}
+    </h4>
+    <p
+      className={`text-sm text-left font-medium ${
+        theme === "dark" ? "text-gray-300" : "text-gray-600"
+      }`}
+    >
+      {formatSize(file.metadata?.size)}
+    </p>
+    <p
+      className={`text-sm text-left ${
+        theme === "dark" ? "text-gray-400" : "text-gray-500"
+      }`}
+    >
+      {formatDate(file.created_at || file.metadata?.lastModified)}
+    </p>
+  </div>
 
             <div className="flex items-center justify-between gap-3 mt-3">
               <div className={`text-xs px-2 py-1 rounded-full ${
