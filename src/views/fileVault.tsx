@@ -35,10 +35,26 @@ export default function FileVault() {
       <SpPageDivider />
 
       <SpPageBody>
-        <div className="flex flex-col gap-6 h-full w-full">
+        <div className="flex flex-col gap-4 sm:gap-6 h-full w-full px-2 sm:px-0">
           <FileUploadShad isOpen={isOpen} setIsOpen={setIsOpen} />
-          <FileRecents recentFiles={recentFiles} />
-          <FileExplorerTable />
+          
+          {/* Recent Files Section */}
+          <section className="w-full">
+            <FileRecents recentFiles={recentFiles} />
+          </section>
+          
+          {/* File Explorer Section */}
+          <section className="w-full">
+            <div className="mb-3 sm:mb-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+                File Explorer
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Browse and manage all your files and folders
+              </p>
+            </div>
+            <FileExplorerTable />
+          </section>
         </div>
       </SpPageBody>
     </SpPage>

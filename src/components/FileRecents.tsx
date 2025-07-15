@@ -128,8 +128,8 @@ export default function FileRecents({ recentFiles }: { recentFiles: FileItem[] }
   }
 
   return (
-    <div className="space-y-4 w-full">
-      <h2 className="text-lg font-semibold">Recent Files</h2>
+    <div className="space-y-3 sm:space-y-4 w-full">
+      <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Recent Files</h2>
 
       {isMobile ? (
         // Mobile carousel view

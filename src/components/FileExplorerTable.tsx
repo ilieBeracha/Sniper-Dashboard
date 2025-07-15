@@ -5,6 +5,7 @@ import { fileStore } from "@/store/fileStore";
 import { userStore } from "@/store/userStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { ensureNativeBlob } from "@/utils/fileRecentBlob";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface FileItem {
   id: string;
@@ -21,6 +22,7 @@ interface FileItem {
 
 export default function FileExplorerTable() {
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
   const { getBucketFiles, getFile, deleteFile } = fileStore();
   const user = userStore((s) => s.user);
   const team = user?.last_name || "";
@@ -107,25 +109,34 @@ export default function FileExplorerTable() {
 
   const getFileIcon = (name: string) => {
     const ext = name.split(".").pop()?.toLowerCase();
+    const iconClass = "w-4 h-4 sm:w-5 sm:h-5";
 
-    if (["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(ext || "")) return <FileImage className="w-5 h-5 text-blue-500" />;
-    if (["mp4", "avi", "mov", "wmv"].includes(ext || "")) return <FileVideo className="w-5 h-5 text-purple-500" />;
-    if (["zip", "rar", "7z", "tar", "gz"].includes(ext || "")) return <FileArchive className="w-5 h-5 text-yellow-500" />;
-    if (["pdf", "doc", "docx", "txt"].includes(ext || "")) return <FileText className="w-5 h-5 text-red-500" />;
+    if (["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(ext || "")) return <FileImage className={`${iconClass} text-blue-500`} />;
+    if (["mp4", "avi", "mov", "wmv"].includes(ext || "")) return <FileVideo className={`${iconClass} text-purple-500`} />;
+    if (["zip", "rar", "7z", "tar", "gz"].includes(ext || "")) return <FileArchive className={`${iconClass} text-yellow-500`} />;
+    if (["pdf", "doc", "docx", "txt"].includes(ext || "")) return <FileText className={`${iconClass} text-red-500`} />;
 
-    return <File className="w-5 h-5 text-gray-500" />;
+    return <File className={`${iconClass} text-gray-500`} />;
   };
 
   const formatSize = (bytes?: number) => {
     if (!bytes) return "—";
     const units = ["B", "KB", "MB", "GB"];
     const index = Math.floor(Math.log(bytes) / Math.log(1024));
-    return `${Math.round((bytes / Math.pow(1024, index)) * 100) / 100} ${units[index]}`;
+    const value = Math.round((bytes / Math.pow(1024, index)) * 10) / 10;
+    return `${value} ${units[index]}`;
   };
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "—";
-    return new Date(dateStr).toLocaleDateString("en-US", {
+    const date = new Date(dateStr);
+    if (isMobile) {
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+    }
+    return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -171,9 +182,9 @@ export default function FileExplorerTable() {
       key: "name",
       label: "Name",
       render: (value) => (
-        <div className="flex items-center gap-3">
-          <FolderOpen className="w-5 h-5 text-yellow-500" />
-          <span className="font-medium">{value}</span>
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <FolderOpen className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 flex-shrink-0" />
+          <span className="font-medium truncate block" title={value}>{value}</span>
         </div>
       ),
     },
@@ -181,6 +192,7 @@ export default function FileExplorerTable() {
       key: "created_at",
       label: "Created",
       width: "200px",
+      hideOnMobile: true,
       render: (value) => formatDate(value),
     },
   ];
@@ -190,9 +202,11 @@ export default function FileExplorerTable() {
       key: "name",
       label: "Name",
       render: (value) => (
-        <div className="flex items-center gap-3">
-          {getFileIcon(value)}
-          <span>{value}</span>
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="flex-shrink-0">
+            {getFileIcon(value)}
+          </div>
+          <span className="truncate block" title={value}>{value}</span>
         </div>
       ),
     },
@@ -200,6 +214,7 @@ export default function FileExplorerTable() {
       key: "name",
       label: "Type",
       width: "120px",
+      hideOnMobile: true,
       render: (value) => (
         <span className={`px-2 py-1 rounded-full text-xs ${theme === "dark" ? "bg-zinc-800 text-gray-300" : "bg-gray-100 text-gray-700"}`}>
           {getFileType(value)}
@@ -209,13 +224,14 @@ export default function FileExplorerTable() {
     {
       key: "metadata",
       label: "Size",
-      width: "120px",
-      render: (value) => formatSize(value?.size),
+      width: "100px",
+      render: (value) => <span className="text-xs sm:text-sm">{formatSize(value?.size)}</span>,
     },
     {
       key: "created_at",
       label: "Modified",
       width: "200px",
+      hideOnMobile: true,
       render: (value, row) => formatDate(row.updated_at || value),
     },
   ];
@@ -223,40 +239,55 @@ export default function FileExplorerTable() {
   const breadcrumbs = currentPath.split("/").filter(Boolean);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Breadcrumb navigation */}
-      <div className="flex items-center gap-2 text-sm">
+      {(currentPath || breadcrumbs.length > 0) && (
+        <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm overflow-x-auto pb-2 px-3 sm:px-4 py-2 bg-gray-50 dark:bg-zinc-800/50 rounded-lg">
+        <button
+          onClick={() => setCurrentPath("")}
+          className={`hover:underline flex-shrink-0 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+        >
+          <FolderOpen className="w-4 h-4 inline mr-1" />
+          Root
+        </button>
         {breadcrumbs.map((crumb, index) => (
-          <div key={index} className="flex items-center gap-2">
+          <div key={index} className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             <span className={theme === "dark" ? "text-gray-500" : "text-gray-400"}>/</span>
             <button
               onClick={() => setCurrentPath(breadcrumbs.slice(0, index + 1).join("/"))}
-              className={`hover:underline ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+              className={`hover:underline truncate max-w-[100px] sm:max-w-none ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
             >
               {crumb}
             </button>
           </div>
         ))}
-      </div>
+        </div>
+      )}
 
       {/* Folders Table */}
       {folders.length > 0 && (
         <div>
-          <h3 className={`text-lg font-semibold mb-3 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Folders</h3>
+          <h3 className={`text-base sm:text-lg font-semibold mb-2 sm:mb-3 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            <FolderOpen className="w-4 h-4 sm:w-5 sm:h-5 inline mr-2" />
+            Folders
+          </h3>
           <SpTable
             data={folders}
             columns={folderColumns}
             loading={loading}
             onRowClick={handleFolderClick}
             emptyState={<div className="text-center py-8 text-gray-500">No folders found</div>}
-            className="mb-6"
+            className="mb-4 sm:mb-6"
           />
         </div>
       )}
 
       {/* Files Table */}
       <div>
-        <h3 className={`text-lg font-semibold mb-3 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Files</h3>
+        <h3 className={`text-base sm:text-lg font-semibold mb-2 sm:mb-3 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+          <File className="w-4 h-4 sm:w-5 sm:h-5 inline mr-2" />
+          Files
+        </h3>
         <SpTable
           data={fileItems}
           columns={fileColumns}
@@ -278,36 +309,42 @@ export default function FileExplorerTable() {
             },
           ]}
           actions={(row) => (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleDownloadFile(row);
                 }}
-                className={`p-2 rounded-lg transition-colors ${
+                className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
                   theme === "dark" ? "hover:bg-zinc-700 text-gray-300" : "hover:bg-gray-100 text-gray-700"
                 }`}
                 title="Download"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleDeleteFile(row);
                 }}
-                className="p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
+                className="p-1.5 sm:p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors"
                 title="Delete"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             </div>
           )}
           emptyState={
-            <div className="text-center py-8">
-              <File className={`w-12 h-12 mx-auto mb-3 ${theme === "dark" ? "text-gray-600" : "text-gray-400"}`} />
-              <p className={theme === "dark" ? "text-gray-400" : "text-gray-500"}>{currentPath ? "No files in this folder" : "No files found"}</p>
-              <p className={`text-sm mt-1 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>Upload files to see them here</p>
+            <div className="text-center py-12">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-zinc-800 mb-4">
+                <File className={`w-8 h-8 ${theme === "dark" ? "text-gray-600" : "text-gray-400"}`} />
+              </div>
+              <p className={`text-base font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                {currentPath ? "No files in this folder" : "No files found"}
+              </p>
+              <p className={`text-sm mt-1 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
+                Upload files to see them here
+              </p>
             </div>
           }
         />
