@@ -2,39 +2,32 @@ import { useStore } from "zustand";
 import { equipmentStore } from "@/store/equipmentStore";
 import { userStore } from "@/store/userStore";
 import AssetsEquipmentTable from "@/components/AssetsEquipmentTable";
-import BaseButton from "@/components/BaseButton";
 import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
-import BaseInput from "@/components/BaseInput";
+import BaseInput from "@/components/base/BaseInput";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import { FileQuestion } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { isMobile } from "react-device-detect";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { toast } from "react-toastify";
 import { BASE_EQUIPMENTS } from "@/utils/BaseData/BaseEquipments";
-import { isCommanderOrSquadCommander } from "@/utils/permissions";
-import { UserRole } from "@/types/user";
 
-export default function EquipmentTab() {
+export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) {
   const { equipments, createEquipment } = useStore(equipmentStore);
   const { user } = useStore(userStore);
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
 
   const equipmentsTypes = new Set(equipments.map((equipment) => equipment.equipment_type));
   const baseEquipments = BASE_EQUIPMENTS.map((equipment) => ({ ...equipment, team_id: user?.team_id }));
   const teamId = user?.team_id;
 
-  const [isOpen, setIsOpen] = useState(false);
   const [equipmentForm, setEquipmentForm] = useState({
     equipment_type: "",
     serial_number: "",
     day_night: "",
     team_id: teamId,
   });
-
-  function handleIsOpen() {
-    setIsOpen(!isOpen);
-  }
 
   async function handleCreateEquipment() {
     if (equipmentForm.equipment_type === "" || equipmentForm.serial_number === "" || equipmentForm.day_night === "") {
@@ -134,29 +127,22 @@ export default function EquipmentTab() {
           </h2>
           <div
             className={`px-3 py-1 text-sm rounded border ${
-              theme === "dark"
-                ? "bg-emerald-500/20 text-emerald-200 border-emerald-500/30"
-                : "bg-emerald-100 text-emerald-700 border-emerald-300"
+              theme === "dark" ? "bg-emerald-500/20 text-emerald-200 border-emerald-500/30" : "bg-emerald-100 text-emerald-700 border-emerald-300"
             }`}
           >
             {equipments.length} items
           </div>
         </div>
-        {isCommanderOrSquadCommander(user?.user_role as UserRole) && (
-          <BaseButton style="purple" onClick={handleIsOpen}>
-            Add Equipment
-          </BaseButton>
-        )}
       </div>
       <AssetsEquipmentTable equipments={equipments} />
-      
+
       {!isMobile && (
-        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={() => setIsOpen(false)} title="new equipments">
+        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={setIsOpen} title="new equipments">
           {EquipmentContent}
         </BaseDesktopDrawer>
       )}
       {isMobile && (
-        <BaseMobileDrawer isOpen={isOpen} setIsOpen={() => setIsOpen(false)} title="new equipments">
+        <BaseMobileDrawer isOpen={isOpen} setIsOpen={setIsOpen} title="new equipments">
           {EquipmentContent}
         </BaseMobileDrawer>
       )}

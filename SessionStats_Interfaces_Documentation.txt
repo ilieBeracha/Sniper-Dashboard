@@ -1,0 +1,193 @@
+# SessionStats Component Interfaces Documentation
+
+## Overview
+The SessionStats component is a multi-step wizard for recording training session statistics. It follows a modular architecture with clear data flow from user input through validation to persistence.
+
+## Core Interfaces
+
+### 1. SessionStatsModalProps
+**Location:** SessionStatsModal.tsx:14-20
+**Purpose:** Controls the modal's visibility and provides callbacks for success events
+```typescript
+interface SessionStatsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: (sessionId: string) => void;
+  sessionId?: string;      // Reserved for future edit functionality
+  trainingId?: string;     // Reserved for future training association
+}
+```
+
+### 2. Participant
+**Location:** useSessionStatsLogic.tsx:14-21
+**Purpose:** Represents a team member participating in the training session
+```typescript
+interface Participant {
+  userId: string;          // Unique identifier for the participant
+  name: string;           // Display name (full name or email)
+  userDuty: "Sniper" | "Spotter";  // Role during this session
+  weaponId: string;       // Required for snipers
+  equipmentId: string;    // Required for spotters
+  position: "Lying" | "Standing" | "Sitting" | "Operational";  // Shooting position
+}
+```
+
+### 3. Target
+**Location:** useSessionStatsLogic.tsx:23-30
+**Purpose:** Represents a target engaged during the session with environmental conditions
+```typescript
+interface Target {
+  id: string;             // Unique identifier (generated client-side)
+  distance: number;       // Distance to target in meters
+  windStrength?: number;  // Wind speed in m/s (optional)
+  windDirection?: number; // Wind direction in degrees (0-360, optional)
+  mistakeCode?: string;   // Error classification code (optional)
+  engagements: TargetEngagement[];  // Shots/hits per participant
+}
+```
+
+### 4. TargetEngagement
+**Location:** useSessionStatsLogic.tsx:32-36
+**Purpose:** Records individual participant performance against a specific target
+```typescript
+interface TargetEngagement {
+  userId: string;         // Links to participant
+  shotsFired: number;     // Number of shots taken
+  targetHits?: number;    // Number of hits (optional, can be tracked collectively)
+}
+```
+
+### 5. SessionData
+**Location:** useSessionStatsLogic.tsx:48 (via zod schema)
+**Purpose:** Core session metadata including assignment, timing, and environmental conditions
+```typescript
+interface SessionData {
+  squad_id: string | null;
+  team_id: string | null;
+  dayPeriod: string | null;        // "day" or "night"
+  timeToFirstShot: number | null;  // Response time in seconds
+  note: string | null;             // Session notes
+  assignment_id: string | null;    // Training exercise ID
+  training_session_id: string | null;  // Parent training session
+}
+```
+
+### 6. SessionStatsSaveData
+**Location:** sessionStore.ts:21
+**Purpose:** Complete data structure for persisting session statistics to the database
+```typescript
+interface SessionStatsSaveData {
+  sessionData: {
+    training_session_id: string | null;
+    assignment_id: string | null;
+    squad_id: string | null;
+    team_id: string | null;
+    dayPeriod: string | null;
+    timeToFirstShot: number | null;
+    note: string | null;
+  };
+  participants: Array<{
+    user_id: string;
+    user_duty: string;
+    weapon_id: string | null;
+    equipment_id: string | null;
+    position: string;
+  }>;
+  targets: Array<{
+    distance: number;
+    windStrength?: number;
+    windDirection?: number;
+    mistakeCode?: string;
+    engagements: Array<{
+      user_id: string;
+      shots_fired: number;
+      target_hits?: number;
+    }>;
+  }>;
+  currentUser: { id: string } | null;
+}
+```
+
+## Imported Types
+
+### DayNight
+**Source:** @/types/score
+**Purpose:** Type-safe day/night period selection
+```typescript
+type DayNight = "day" | "night";
+```
+
+### UserDuty
+**Source:** @/types/score
+**Purpose:** Enumeration of user roles (SNIPER, SPOTTER)
+```typescript
+enum UserDuty {
+  SNIPER = "Sniper",
+  SPOTTER = "Spotter"
+}
+```
+
+### PositionScore
+**Source:** @/types/score (referenced but not directly used)
+**Purpose:** Scoring positions enum for future integration
+
+## Data Flow Architecture
+
+### 1. Input Collection (Steps 1-4)
+- **SessionSetupStep**: Collects assignment, time period, and response time
+- **ParticipantsStep**: Manages team member selection and role assignment
+- **TargetsStep**: Defines target parameters and environmental conditions
+- **EngagementsStep**: Records shots fired and hits per participant/target
+
+### 2. Validation (Step 5)
+- **ReviewStep**: Displays summary and validation errors
+- Validates required fields at each step
+- Ensures data consistency (e.g., hits ≤ shots fired)
+
+### 3. Persistence (Step 6)
+- **SubmitStep**: Final confirmation before saving
+- Data transformed to SessionStatsSaveData format
+- Saved via sessionStore to backend
+
+## Key Design Decisions
+
+### 1. Participant Flexibility
+- Supports both pre-registered team members and ad-hoc participants
+- Auto-inherits default weapon/equipment from user profiles
+- Allows role switching per session (sniper ↔ spotter)
+
+### 2. Target Engagement Tracking
+- Flexible hit tracking: combined total or individual attribution
+- Auto-distribution algorithm for combined hits based on shot ratios
+- Environmental factors (wind) are optional for adaptability
+
+### 3. Validation Strategy
+- Step-by-step validation prevents navigation with incomplete data
+- Context-aware validation (e.g., snipers need weapons, spotters need equipment)
+- Clear error messaging with specific field references
+
+### 4. State Management
+- Centralized in useSessionStatsLogic hook
+- Automatic cleanup on modal close
+- Preserves user as default first participant
+
+## Usage Notes
+
+1. **Required Fields**:
+   - Assignment selection
+   - Time to first shot
+   - At least one participant with name and appropriate equipment
+   - At least one target with distance
+   - Shots fired for all snipers
+
+2. **Optional Enhancements**:
+   - Wind conditions for advanced ballistics
+   - Mistake codes for training analysis
+   - Session notes for context
+   - Individual hit tracking for detailed performance metrics
+
+3. **Future Extensibility**:
+   - sessionId prop reserved for editing existing sessions
+   - trainingId prop for direct training association
+   - Position-based scoring integration ready
+   - Multi-language support structure in place

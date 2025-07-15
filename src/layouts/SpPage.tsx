@@ -4,13 +4,16 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator, Breadc
 import React, { ReactNode } from "react";
 import { MoreVertical } from "lucide-react";
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
+import { Link } from "react-router-dom";
+
 export function SpPage({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
   return (
     <div
-      className={`min-h-screen w-full transition-colors duration-200 ${theme === "dark" ? "bg-[#121212] text-gray-100" : "bg-gray-50 text-gray-900"}`}
+      className={` min-h-screen w-full bg-black/30 transition-colors duration-200 ${theme === "dark" ? " text-gray-100" : "bg-gray-50 text-gray-900"}`}
     >
-      <main className="pb-10 space-y-6">{children}</main>
+      <main className={`${isMobile ? "space-y-2" : "space-y-4"}`}>{children}</main>
     </div>
   );
 }
@@ -34,12 +37,12 @@ export function SpPageHeader({
   return (
     <div className="m-0 p-0">
       {breadcrumbs && (
-        <div className="md:px-6 2xl:px-6 px-4">
+        <div className={`${isMobile ? "px-2" : "md:px-4 2xl:px-6"}`}>
           <SpPageBreadcrumbs breadcrumbs={breadcrumbs} />
         </div>
       )}
 
-      <div className={` ${isMobile ? "px-6 mt-10 mb-0" : "px-8 py-14"} transition-all duration-200 min-h-28`}>
+      <div className={` ${isMobile ? "pl-6 pr-4 mb-8 mt-6" : "px-6 pt-8 pb-8"} transition-all duration-200 relative`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 justify-between w-full">
             <div className="flex items-center gap-3">
@@ -89,7 +92,7 @@ export function SpPageTabs({
   activeTab,
   onChange,
 }: {
-  tabs: { label: string; icon: React.ComponentType<any> }[];
+  tabs: { id: string; label: string; icon: React.ComponentType<any> }[];
   activeTab: string;
   onChange: (id: string) => void;
 }) {
@@ -100,11 +103,11 @@ export function SpPageTabs({
     <div className={`border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
       <nav className={`flex ${isMobile ? "justify-center space-x-4" : "justify-start space-x-8"} items-center px-4`} aria-label="Tabs">
         {tabs.map((tab) => {
-          const isActive = activeTab === tab.label;
+          const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.label}
-              onClick={() => onChange(tab.label)}
+              onClick={() => onChange(tab.id)}
               className={`group relative flex items-center gap-2 py-3 px-2 border-b-2 font-medium text-sm transition-all duration-200 ${
                 isActive
                   ? theme === "dark"
@@ -132,15 +135,26 @@ export function SpPageBody({ children }: { children: ReactNode }) {
 
 export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: string; link: string }[] }) {
   const { theme } = useTheme();
+  const isLastItem = (index: number) => index === breadcrumbs.length - 1;
+
   return (
     <Breadcrumb>
       <BreadcrumbList>
         {breadcrumbs.map((breadcrumb, index) => (
           <React.Fragment key={breadcrumb.label}>
             <BreadcrumbItem>
-              <BreadcrumbLink asChild className={`${theme === "dark" ? "text-gray-400" : "text-gray-600"} text-md`}>
-                <span>{breadcrumb.label}</span>
-              </BreadcrumbLink>
+              {isLastItem(index) ? (
+                <BreadcrumbLink asChild className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} text-sm font-medium cursor-default`}>
+                  <span>{breadcrumb.label}</span>
+                </BreadcrumbLink>
+              ) : (
+                <BreadcrumbLink
+                  asChild
+                  className={`${theme === "dark" ? "text-gray-400 hover:text-gray-200" : "text-gray-600 hover:text-gray-900"} text-sm transition-colors`}
+                >
+                  <Link to={breadcrumb.link}>{breadcrumb.label}</Link>
+                </BreadcrumbLink>
+              )}
             </BreadcrumbItem>
             {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
           </React.Fragment>

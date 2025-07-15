@@ -24,9 +24,7 @@ export const weaponsStore = createStore<{
     const updatedWeapon = await updateWeapon(id, weapon);
     if (updatedWeapon) {
       set({
-        weapons: weaponsStore.getState().weapons.map(w => 
-          w.id === id ? { ...w, ...updatedWeapon } : w
-        )
+        weapons: weaponsStore.getState().weapons.map((w) => (w.id === id ? { ...w, ...updatedWeapon } : w)),
       });
     }
   },

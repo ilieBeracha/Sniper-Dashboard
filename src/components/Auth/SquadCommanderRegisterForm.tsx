@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import BaseInput from "@/components/BaseInput";
+import BaseInput from "@/components/base/BaseInput";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function SquadCommanderRegisterForm({

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, Search } from "lucide-react";
-import BaseInput from "./BaseInput";
-import BaseButton from "./BaseButton";
+import BaseInput from "./base/BaseInput";
+import BaseButton from "./base/BaseButton";
 
 type ListItem = {
   id: string;

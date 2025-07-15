@@ -45,7 +45,6 @@ export const userStore = create<UserStore>((set, get) => ({
   updateUser: async (user_data: Partial<User>) => {
     const id = get().user?.id;
 
-    console.log(id);
     if (!id) return null;
     const updatedUser = await updateUser(id, user_data);
     set({ user: updatedUser as unknown as User });
