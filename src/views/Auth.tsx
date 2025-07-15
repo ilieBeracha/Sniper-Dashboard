@@ -28,7 +28,7 @@ export default function Auth() {
       } else if (authType === "team_manager_register") {
         await registerCommander(user as RegisterUserData);
       } else if (authType === "squad_manager_register") {
-        await registerSquadCommander(user);
+        await registerSquadCommander(user as RegisterUserData);
       } else if (authType === "soldier_register") {
         await registerSoldier(user);
       }

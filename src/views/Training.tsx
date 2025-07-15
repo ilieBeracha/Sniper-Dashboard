@@ -42,11 +42,7 @@ export default function TrainingPage() {
           <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsSessionStatsOpen(true)}>
             Add Session Stats (Modal)
           </BaseButton>,
-          <BaseButton 
-            className="flex items-center gap-2" 
-            style="white" 
-            onClick={() => navigate(`/training/${id}/session-stats-full`)}
-          >
+          <BaseButton className="flex items-center gap-2" style="white" onClick={() => navigate(`/training/${id}/session-stats-full`)}>
             <FileText className="w-4 h-4" />
             Full Page Form
           </BaseButton>,

@@ -6,7 +6,7 @@ import { BsBarChartFill } from "react-icons/bs";
 import { authStore } from "@/store/authStore";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
-import { FaCrosshairs } from "react-icons/fa";
+import { FaCrosshairs, FaFolderOpen } from "react-icons/fa";
 import { useSidebarStore } from "@/store/sidebarStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -17,8 +17,13 @@ const navSections = [
     items: [
       { name: "Dashboard", href: "/", icon: <BiSolidDashboard className="w-5 h-5" /> },
       { name: "Training", href: "/trainings", icon: <BsBarChartFill className="w-5 h-5" /> },
+    ],
+  },
+  {
+    title: "STORAGE",
+    items: [
       { name: "Assets", href: "/assets", icon: <FaCrosshairs className="w-5 h-5" /> },
-      { name: "Quick Stats", href: "/session-stats-simple", icon: <FaCrosshairs className="w-5 h-5" /> },
+      { name: "File Vault", href: "/file-vault", icon: <FaFolderOpen className="w-5 h-5" /> },
     ],
   },
   {
@@ -130,7 +135,11 @@ export default function Sidebar() {
       <>
         <Dialog open={isDrawerOpen} onClose={() => toggleDrawer()} className="relative z-50 bg-black/30">
           <div className={`fixed inset-0 transition-opacity duration-300`} aria-hidden="true" />
-          <div className={`bg-black fixed inset-y-0 left-0 max-w-xs shadow-xl transform transition-transform duration-300 ease-in-out`}>
+          <div
+            className={`bg-black fixed inset-y-0 left-0 max-w-xs shadow-xl transform transition-transform duration-300 ease-in-out ${
+              theme === "dark" ? "bg-[#161616]" : "bg-white"
+            }`}
+          >
             {SidebarContent()}
           </div>
         </Dialog>

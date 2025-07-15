@@ -7,7 +7,6 @@ import { loaderStore } from "@/store/loaderStore";
 import { Calendar, Activity, Target } from "lucide-react";
 import { useModal } from "@/hooks/useModal";
 import { TrainingStore } from "@/store/trainingStore";
-import SessionStatsModal from "@/components/SessionStats/SessionStatsModal";
 import SessionStatsTable from "@/components/SessionStatsTable";
 import TrainingAnalyticsTab from "@/components/TrainingAnalyticsTab";
 import TrainingStatusTab from "@/components/TrainingStatusTab";
@@ -32,7 +31,6 @@ export function useTrainingPageLogic() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [isSessionStatsOpen, setIsSessionStatsOpen] = useState(false);
-  const [newlyAddedSessionStatsId, setNewlyAddedSessionStatsId] = useState<string | null>(null);
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>(tabs[0].id);
 
@@ -80,27 +78,13 @@ export function useTrainingPageLogic() {
 
   const handleSessionClick = (session: any) => {
     setSelectedSession(session);
-    // TODO: Implement session details modal
   };
 
   const renderComponent = () => {
     if (activeTab.toLowerCase() === "session-stats") {
       return (
         <>
-          <SessionStatsModal
-            isOpen={isSessionStatsOpen}
-            onClose={() => setIsSessionStatsOpen(false)}
-            onSuccess={async (sessionId) => {
-              setNewlyAddedSessionStatsId(sessionId);
-              await getSessionStatsByTrainingId(id as string);
-            }}
-          />
-          <SessionStatsTable
-            sessionStats={sessionStats}
-            onSessionStatsClick={handleSessionClick}
-            onSessionStatsEditClick={() => {}}
-            newlyAddedSessionId={newlyAddedSessionStatsId}
-          />
+          <SessionStatsTable sessionStats={sessionStats} onSessionStatsClick={handleSessionClick} onSessionStatsEditClick={() => {}} />
         </>
       );
     }
@@ -120,18 +104,16 @@ export function useTrainingPageLogic() {
     tabs,
     activeTab,
     setActiveTab,
-    newlyAddedSessionStatsId,
     selectedSession,
     pendingStatus,
 
-    // Modal states
     isAddAssignmentOpen,
     setIsAddAssignmentOpen,
     isConfirmModalOpen,
     setIsConfirmModalOpen,
     isSessionStatsOpen,
     setIsSessionStatsOpen,
-    // Handlers
+
     handleStatusChange,
     handleConfirmStatusChange,
     handleAddAssignment,
