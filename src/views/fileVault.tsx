@@ -6,10 +6,12 @@ import { FileText, Upload } from "lucide-react";
 import FileRecents from "@/components/FileRecents";
 import BaseButton from "@/components/base/BaseButton";
 import FileUploadShad from "@/components/FileUploadShad";
+import FileExplorerTable from "@/components/FileExplorerTable";
 
 export default function FileVault() {
   const { getBucketFiles, getRecentFiles, recentFiles } = fileStore();
   const [isOpen, setIsOpen] = useState(false);
+
   useEffect(() => {
     getBucketFiles();
     getRecentFiles();
@@ -33,12 +35,10 @@ export default function FileVault() {
       <SpPageDivider />
 
       <SpPageBody>
-        <div className="grid grid-cols-12 gap-4 h-full w-full">
-          <div className="col-span-12 md:col-span-12 h-full w-full flex flex-col gap-4">
-            <FileUploadShad isOpen={isOpen} setIsOpen={setIsOpen} />
-            <FileRecents recentFiles={recentFiles} />
-          </div>
-          <div className="col-span-12 md:col-span-3 h-full w-full flex flex-col gap-4 hidden md:flex"></div>
+        <div className="flex flex-col gap-6 h-full w-full">
+          <FileUploadShad isOpen={isOpen} setIsOpen={setIsOpen} />
+          <FileRecents recentFiles={recentFiles} />
+          <FileExplorerTable />
         </div>
       </SpPageBody>
     </SpPage>

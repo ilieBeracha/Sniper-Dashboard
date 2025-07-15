@@ -1,147 +1,220 @@
+import { useEffect, useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Card } from "@heroui/react";
-import { FileText, FileImage, FileVideo, FileArchive, File, MoreVertical, Download, Trash2 } from "lucide-react";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { fileStore } from "@/store/fileStore";
 import { userStore } from "@/store/userStore";
+import { ensureNativeBlob } from "@/utils/fileRecentBlob";
+import FilePreviewCard from "@/components/base/FilePreviewCard";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface FileItem {
   id: string;
   name: string;
   type?: string;
-  metadata?: {
-    size?: number;
-    lastModified?: string;
-  };
+  metadata?: { size?: number; lastModified?: string };
   created_at?: string;
 }
 
 export default function FileRecents({ recentFiles }: { recentFiles: FileItem[] }) {
   const { theme } = useTheme();
-  const { getFile } = fileStore();
-  const user = userStore((state) => state.user);
+  const { getFile, deleteFile } = fileStore();
+  const user = userStore((s) => s.user);
+  const team = user?.last_name || "";
+  const isMobile = useIsMobile(640);
+
+  const [previewUrls, setPreviewUrls] = useState<Record<string, string>>({}); 
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    let isMounted = true;
+    const urlsToCleanup: string[] = [];
+
+    const loadPreviews = async () => {
+      const imgLike = (f: FileItem) => ["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(f.name.split(".").pop()?.toLowerCase() || "");
+      const newUrls: Record<string, string> = {};
+
+      await Promise.all(
+        recentFiles.filter(imgLike).map(async (f) => {
+          try {
+            const blob = await ensureNativeBlob(await getFile(team, f.name));
+            if (!blob) throw new Error("not a blob");
+
+            let url: string;
+            try {
+              url = URL.createObjectURL(blob);
+            } catch {
+              url = await new Promise<string>((res, rej) => {
+                const r = new FileReader();
+                r.onload = () => res(r.result as string);
+                r.onerror = rej;
+                r.readAsDataURL(blob);
+              });
+            }
+            newUrls[f.id] = url;
+            urlsToCleanup.push(url);
+          } catch (err) {
+            console.warn("Preview load failed for", f.name, err);
+          }
+        }),
+      );
+
+      if (isMounted) {
+        console.log("Setting preview URLs:", Object.keys(newUrls).length, "images");
+        setPreviewUrls(newUrls);
+      }
+    };
+
+    loadPreviews();
+
+    return () => {
+      isMounted = false;
+      urlsToCleanup.forEach((url) => {
+        try {
+          URL.revokeObjectURL(url);
+        } catch (e) {}
+      });
+    };
+  }, [recentFiles, team, getFile]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   const downloadFile = async (file: FileItem) => {
     try {
-      const teamName = user?.last_name || "";
-      const fileData = await getFile(teamName, file.name);
+      const raw = await getFile(team, file.name);
+      const blob = await ensureNativeBlob(raw);
+      if (!blob) throw new Error("Failed to convert file to blob");
 
-      // Create blob URL and download
-      const url = URL.createObjectURL(fileData as unknown as Blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = file.name;
-      link.click();
-
-      // Clean up
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = file.name;
+      a.click();
       URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Download failed:", error);
+    } catch (err) {
+      console.error("Download failed:", err);
     }
   };
 
-  const getFileIcon = (fileName: string) => {
-    const ext = fileName?.split(".").pop()?.toLowerCase();
-
-    if (["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(ext || "")) {
-      return <FileImage className="w-12 h-12 text-blue-500" />;
-    } else if (["mp4", "avi", "mov", "wmv"].includes(ext || "")) {
-      return <FileVideo className="w-12 h-12 text-purple-500" />;
-    } else if (["zip", "rar", "7z", "tar", "gz"].includes(ext || "")) {
-      return <FileArchive className="w-12 h-12 text-yellow-500" />;
-    } else if (["pdf", "doc", "docx", "txt"].includes(ext || "")) {
-      return <FileText className="w-12 h-12 text-red-500" />;
+  const handleDeleteFile = async (file: FileItem) => {
+    try {
+      await deleteFile(team, file.name);
+      // Refresh the file list or handle the deletion in the parent component
+    } catch (err) {
+      console.error("Delete failed:", err);
     }
-    return <File className="w-12 h-12 text-gray-500" />;
   };
 
-  const formatFileSize = (bytes?: number) => {
-    if (!bytes) return "N/A";
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    if (bytes === 0) return "0 Byte";
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + " " + sizes[i];
+  const handleFileClick = (file: FileItem) => {
+    // Handle file click - could open a preview modal or details view
+    console.log("File clicked:", file.name);
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % recentFiles.length);
   };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + recentFiles.length) % recentFiles.length);
+  };
+
+
+  if (recentFiles.length === 0) {
+    return (
+      <div className="space-y-4 w-full">
+        <h2 className="text-lg font-semibold">Recent Files</h2>
+        <div className="text-center py-8 text-gray-500">
+          No recent files
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 w-full">
-      <div className="flex items-center  justify-between">Recent Files</div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        {recentFiles.map((file) => (
-          <Card
-            key={file.id}
-            className={`${
-              theme === "dark" ? "bg-zinc-900/50 border-neutral-700/70" : "bg-white border-gray-200"
-            } border shadow-sm rounded-xl overflow-hidden hover:shadow-md transition-all cursor-pointer relative h-48`}
-            isPressable
-          >
-            {/* Background preview for images */}
-            {/* {(() => {
-              const ext = file.name?.split(".").pop()?.toLowerCase();
-              if (["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(ext || "")) {
-                return (
-                  <div className="absolute inset-0">
-                    <img
-                      src={file.created_at || "https://via.placeholder.com/300x200"}
-                      alt={file.name}
-                      className="w-full h-full object-cover opacity-20"
+      <h2 className="text-lg font-semibold">Recent Files</h2>
+
+      {isMobile ? (
+        // Mobile carousel view
+        <div className="relative w-full">
+          <div className="overflow-hidden w-full">
+            <div 
+              className="flex transition-transform duration-300 ease-out"
+              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+            >
+              {recentFiles.map((file) => (
+                <div key={file.id} className="w-full flex-shrink-0">
+                  <div className="mx-4">
+                    <FilePreviewCard
+                      file={file}
+                      previewUrl={previewUrls[file.id]}
+                      onDownload={downloadFile}
+                      onDelete={handleDeleteFile}
+                      onClick={handleFileClick}
+                      isMobile={true}
                     />
                   </div>
-                );
-              }
-              return null;
-            })()} */}
-
-            <div className="relative h-full flex flex-col justify-between p-4">
-              <div className="flex items-start justify-between">
-                {getFileIcon(file.name)}
-                <Dropdown>
-                  <DropdownTrigger>
-                    <span className="min-w-unit-8 h-unit-8 rounded-full bg-black/20 dark:bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                      <MoreVertical className="w-4 h-4" />
-                    </span>
-                  </DropdownTrigger>
-                  <DropdownMenu aria-label="File actions" className={`${theme === "dark" ? "bg-zinc-900/50" : "bg-white"}`}>
-                    <DropdownItem
-                      key="download"
-                      startContent={<Download className="w-4 h-4" />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        downloadFile(file);
-                      }}
-                    >
-                      Download
-                    </DropdownItem>
-                    <DropdownItem key="delete" className="text-red-500" color="danger" startContent={<Trash2 className="w-4 h-4" />}>
-                      Delete
-                    </DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-              </div>
-
-              <div className="space-y-1 flex flex-col items-start justify-start">
-                <h4 className={`font-medium text-sm truncate ${theme === "dark" ? "text-white" : "text-gray-900"} drop-shadow-sm`}>{file.name}</h4>
-                <p className={`text-xs ${theme === "dark" ? "text-gray-300" : "text-gray-600"} drop-shadow-sm`}>
-                  {formatFileSize(file.metadata?.size)}
-                </p>
-                <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"} drop-shadow-sm`}>
-                  {formatDate(file.created_at || file.metadata?.lastModified)}
-                </p>
-              </div>
+                </div>
+              ))}
             </div>
-          </Card>
-        ))}
-      </div>
+          </div>
+
+          {/* Navigation buttons */}
+          {recentFiles.length > 1 && (
+            <>
+              <button
+                onClick={prevSlide}
+                className={`absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full shadow-lg backdrop-blur-sm transition-all transform hover:scale-110 ${
+                  theme === "dark" 
+                    ? "bg-zinc-800/70 hover:bg-zinc-700/80 text-white border border-zinc-600/30" 
+                    : "bg-white/80 hover:bg-white/90 text-gray-800 border border-gray-200/50"
+                }`}
+                aria-label="Previous file"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={nextSlide}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full shadow-lg backdrop-blur-sm transition-all transform hover:scale-110 ${
+                  theme === "dark" 
+                    ? "bg-zinc-800/70 hover:bg-zinc-700/80 text-white border border-zinc-600/30" 
+                    : "bg-white/80 hover:bg-white/90 text-gray-800 border border-gray-200/50"
+                }`}
+                aria-label="Next file"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </>
+          )}
+
+          {/* Dots indicator */}
+          <div className="flex justify-center mt-6 gap-2">
+            {recentFiles.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`transition-all duration-300 ${
+                  index === currentIndex
+                    ? "w-8 h-2 rounded-full " + (theme === "dark" ? "bg-white" : "bg-gray-800")
+                    : "w-2 h-2 rounded-full " + (theme === "dark" ? "bg-white/30 hover:bg-white/50" : "bg-gray-400 hover:bg-gray-600")
+                }`}
+                aria-label={`Go to file ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      ) : (
+        // Desktop grid view
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {recentFiles.map((file) => (
+            <FilePreviewCard
+              key={file.id}
+              file={file}
+              previewUrl={previewUrls[file.id]}
+              onDownload={downloadFile}
+              onDelete={handleDeleteFile}
+              onClick={handleFileClick}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

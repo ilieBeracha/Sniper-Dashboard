@@ -7,7 +7,7 @@ interface FileStore {
   recentFiles: any[];
   getBucketFiles: (trainingId?: string) => Promise<any>;
   uploadFile: (file: File, trainingId?: string) => Promise<void>;
-  getFile: (bucketName: string, fileName: string) => Promise<void>;
+  getFile: (bucketName: string, fileName: string) => Promise<any>;
   createFolder: (teamName: string) => Promise<void>;
   getRecentFiles: () => Promise<any>;
   deleteFile: (teamName: string, fileName: string) => Promise<void>;
@@ -61,6 +61,7 @@ export const fileStore = create<FileStore>((set, get) => ({
   getFile: async (teamName: string, fileName: string) => {
     const file = await getFile(teamName, fileName);
     console.log(file);
+    return file;
   },
 
   createFolder: async (teamName: string) => {
