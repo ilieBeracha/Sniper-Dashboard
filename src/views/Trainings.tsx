@@ -1,7 +1,7 @@
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import TrainingList from "@/components/TrainingList";
 import SpPagination from "@/layouts/SpPagination";
-import BaseButton from "@/components/BaseButton";
+import BaseButton from "@/components/base/BaseButton";
 import TrainingAddTrainingSessionModal from "@/components/TrainingModal/AddTrainingSessionModal";
 import { BiCurrentLocation } from "react-icons/bi";
 import { useTrainingsPageLogic } from "@/hooks/useTrainingsPageLogic";
@@ -27,7 +27,7 @@ export default function Trainings() {
 
   return (
     <SpPage>
-      <Header title="Trainings" />
+      <Header />
       <SpPageHeader
         title="Trainings"
         icon={<BiCurrentLocation />}

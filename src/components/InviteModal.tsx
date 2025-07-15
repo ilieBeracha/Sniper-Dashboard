@@ -5,7 +5,7 @@ import { useStore } from "zustand";
 import BaseDesktopDrawer from "./BaseDrawer/BaseDesktopDrawer";
 import BaseMobileDrawer from "./BaseDrawer/BaseMobileDrawer";
 import { isMobile } from "react-device-detect";
-import BaseButton from "./BaseButton";
+import BaseButton from "./base/BaseButton";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boolean; setIsOpen: (open: boolean) => void; userId: string }) {

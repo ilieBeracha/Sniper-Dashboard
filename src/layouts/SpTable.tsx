@@ -278,22 +278,21 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
           theme === "dark" ? "border-zinc-800 bg-zinc-900/50" : "border-gray-200 bg-white shadow-sm"
         }`}
       >
-        {(filters.length > 0 || searchFields.length > 0) && (
-          <SpTableFilters
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            filterValues={filterValues}
-            onFilterChange={handleFilterChange}
-            filters={filters}
-            searchPlaceholder={searchPlaceholder}
-            showFilters={showFilters}
-            setShowFilters={setShowFilters}
-            hasActiveFilters={hasActiveFilters}
-            clearFilters={clearFilters}
-            isMobile={isMobile}
-            theme={theme}
-          />
-        )}
+        <SpTableFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filterValues={filterValues}
+          onFilterChange={handleFilterChange}
+          filters={filters}
+          searchPlaceholder={searchPlaceholder}
+          showFilters={showFilters}
+          setShowFilters={setShowFilters}
+          hasActiveFilters={hasActiveFilters}
+          clearFilters={clearFilters}
+          isMobile={isMobile}
+          theme={theme}
+        />
+
         <div className="overflow-x-auto">
           <table className={`min-w-full text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
             <thead

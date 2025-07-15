@@ -5,13 +5,13 @@ import { isMobile } from "react-device-detect";
 import { useTheme } from "@/contexts/ThemeContext";
 import ThemeToggle from "@/components/ThemeToggle";
 
-export default function SpHeader({ children, title }: { children: React.ReactNode; title?: string }) {
+export default function Header({ children, title }: { children: React.ReactNode; title?: string }) {
   const { toggleDrawer } = useStore(useSidebarStore);
   const { theme } = useTheme();
 
   return (
     <div
-      className={`flex items-center justify-between px-8 py-4 h-16 border-b relative z-[50] transition-colors duration-200 ${
+      className={`flex items-center justify-between px-4 py-4 h-10 border-b relative z-[50] transition-colors duration-200 ${
         theme === "dark" ? "border-white/5" : "border-gray-200"
       }`}
     >
@@ -30,7 +30,7 @@ export default function SpHeader({ children, title }: { children: React.ReactNod
       <div className="flex items-center">
         {isMobile && <List className={`w-5 h-5 mr-3 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} onClick={toggleDrawer} />}
         <span
-          className={`${isMobile ? "text-lg" : "text-xl"} font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+          className={`${isMobile ? "text-md" : "text-xl"} font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
         >
           {title}
         </span>

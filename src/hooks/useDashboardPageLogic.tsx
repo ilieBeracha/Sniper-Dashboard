@@ -11,7 +11,7 @@ import DashboardRowOne from "@/components/DashboardRowOne";
 import DashboardRowKPI from "@/components/DashboardRowKPI";
 import DashboardRowThree from "@/components/DashboardRowThree";
 import DashboardRowFour from "@/components/DashboardRowFour";
-import CommanderView from "@/components/CommanderView";
+import CommanderView from "@/components/DashboardCommanderView";
 
 export function useDashboardPageLogic() {
   const useUserStore = useStore(userStore);
@@ -26,11 +26,11 @@ export function useDashboardPageLogic() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const tabs = [
-    { label: "Overview", icon: Activity },
-    { label: "AI Insights", icon: Brain },
-    { label: "Commander View", icon: SplinePointerIcon },
+    { id: "overview", label: "Overview", icon: Activity },
+    { id: "ai-insights", label: "Insights", icon: Brain },
+    { id: "commander-view", label: "Commander", icon: SplinePointerIcon },
   ];
-  const [activeTab, setActiveTab] = useState<string>(tabs[0].label);
+  const [activeTab, setActiveTab] = useState<string>(tabs[0].id);
 
   useEffect(() => {
     const load = async () => {
@@ -47,7 +47,7 @@ export function useDashboardPageLogic() {
   }, []);
 
   const RenderComponent = (): React.ReactNode => {
-    if (activeTab === "Overview") {
+    if (activeTab === "overview") {
       return (
         <div className="flex flex-col gap-4">
           <DashboardRowOne user={user} />
@@ -57,10 +57,10 @@ export function useDashboardPageLogic() {
         </div>
       );
     }
-    if (activeTab === "AI Insights") {
+    if (activeTab === "ai-insights") {
       return <DashboardAI />;
     }
-    if (activeTab === "Commander View") {
+    if (activeTab === "commander-view") {
       return <CommanderView />;
     }
   };

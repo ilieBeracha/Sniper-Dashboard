@@ -2,9 +2,8 @@ import { useStore } from "zustand";
 import { weaponsStore } from "@/store/weaponsStore";
 import { userStore } from "@/store/userStore";
 import AssetsWeaponsTable from "@/components/AssetsWeaponsTable";
-import BaseButton from "@/components/BaseButton";
 import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
-import BaseInput from "@/components/BaseInput";
+import BaseInput from "@/components/base/BaseInput";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import { FileQuestion } from "lucide-react";
 import { useState } from "react";
@@ -12,10 +11,8 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { isMobile } from "react-device-detect";
 import { toast } from "react-toastify";
 import { BASE_WEAPONS } from "@/utils/BaseData/BaseWeapons";
-import { isCommanderOrSquadCommander } from "@/utils/permissions";
-import { UserRole } from "@/types/user";
 
-export default function WeaponsTab() {
+export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) {
   const { weapons, createWeapon } = useStore(weaponsStore);
   const { user } = useStore(userStore);
   const { theme } = useTheme();
@@ -24,17 +21,12 @@ export default function WeaponsTab() {
   const baseWeapons = BASE_WEAPONS.map((weapon) => ({ ...weapon, team_id: user?.team_id }));
   const teamId = user?.team_id;
 
-  const [isOpen, setIsOpen] = useState(false);
   const [weaponForm, setWeaponForm] = useState({
     weapon_type: "",
     serial_number: "",
     mv: "",
     team_id: teamId,
   });
-
-  function handleIsOpen() {
-    setIsOpen(!isOpen);
-  }
 
   async function handleCreateWeapon() {
     if (weaponForm.weapon_type === "" || weaponForm.serial_number === "" || weaponForm.mv === "") {
@@ -134,21 +126,16 @@ export default function WeaponsTab() {
             {weapons.length} items
           </div>
         </div>
-        {isCommanderOrSquadCommander(user?.user_role as UserRole) && (
-          <BaseButton style="purple" onClick={handleIsOpen}>
-            Add Weapon
-          </BaseButton>
-        )}
       </div>
       <AssetsWeaponsTable weapons={weapons} />
-      
+
       {!isMobile && (
-        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={() => setIsOpen(false)} title="new weapons">
+        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={setIsOpen} title="new weapons">
           {WeaponsContent}
         </BaseDesktopDrawer>
       )}
       {isMobile && (
-        <BaseMobileDrawer isOpen={isOpen} setIsOpen={() => setIsOpen(false)} title="new weapons">
+        <BaseMobileDrawer isOpen={isOpen} setIsOpen={setIsOpen} title="new weapons">
           {WeaponsContent}
         </BaseMobileDrawer>
       )}

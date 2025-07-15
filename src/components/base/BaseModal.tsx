@@ -67,8 +67,7 @@ export default function BaseModal({
   position = "center",
   size = "md",
   showCloseButton = true,
-  className = "w-full h-full",
-  overlayClassName,
+  className = "w-full h-full flex items-center justify-center",
   contentClassName,
   closeOnOverlayClick = true,
   closeOnEsc = true,
@@ -119,24 +118,17 @@ export default function BaseModal({
 
   const isDrawer = position !== "center";
   const baseClasses = isDrawer
-    ? "fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+    ? "fixed inset-0 z-50 flex items-center sm:items-center justify-center"
     : "fixed inset-0 z-50 flex items-center justify-center h-full w-full";
 
   return (
     <div className={cn(baseClasses, className)} onClick={handleOverlayClick}>
-      {/* Overlay */}
-      <div className={cn(`fixed inset-0 backdrop-blur-sm transition-opacity duration-300 ${
-        theme === 'dark' ? 'bg-black/50' : 'bg-black/30'
-      }`, overlayClassName)} />
-
       {/* Modal/Drawer Content */}
       <div
         ref={modalRef}
         className={cn(
-          `relative rounded-lg shadow-xl transition-all duration-300 h-screen border ${
-            theme === 'dark' 
-              ? 'bg-zinc-900 border-zinc-800' 
-              : 'bg-white border-gray-200'
+          `relative rounded-lg shadow-xl transition-all duration-300 h-screen border overflow-y-auto ${
+            theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"
           }`,
           positionClasses[position],
           positionAnimations[position].enter,
@@ -150,21 +142,21 @@ export default function BaseModal({
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className={`flex items-center justify-between p-4 border-b sticky top-0 z-10 transition-colors duration-200 ${
-            theme === 'dark' 
-              ? 'border-zinc-800 bg-zinc-900' 
-              : 'border-gray-200 bg-white'
-          }`}>
-            {title && <h2 className={`text-lg font-semibold transition-colors duration-200 ${
-              theme === 'dark' ? 'text-white' : 'text-gray-900'
-            }`}>{title}</h2>}
+          <div
+            className={`flex items-center justify-between p-4 border-b sticky top-0 z-10 transition-colors duration-200 ${
+              theme === "dark" ? "border-zinc-800 bg-zinc-900" : "border-gray-200 bg-white"
+            }`}
+          >
+            {title && (
+              <h2 className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{title}</h2>
+            )}
             {showCloseButton && (
-              <button onClick={onClose} className={`p-1 rounded-lg transition-colors duration-200 ${
-                theme === 'dark' ? 'hover:bg-zinc-800' : 'hover:bg-gray-100'
-              }`} aria-label="Close">
-                <X className={`w-5 h-5 transition-colors duration-200 ${
-                  theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'
-                }`} />
+              <button
+                onClick={onClose}
+                className={`p-1 rounded-lg transition-colors duration-200 ${theme === "dark" ? "hover:bg-zinc-800" : "hover:bg-gray-100"}`}
+                aria-label="Close"
+              >
+                <X className={`w-5 h-5 transition-colors duration-200 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
               </button>
             )}
           </div>
