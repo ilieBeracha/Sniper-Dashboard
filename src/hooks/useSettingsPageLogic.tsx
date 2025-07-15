@@ -28,8 +28,8 @@ export function useSettingsPageLogic() {
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const tabs = [{ label: "Account", icon: SettingsIcon }];
-  const [activeTab, setActiveTab] = useState(tabs[0].label);
+  const tabs = [{ id: "account", label: "Account", icon: SettingsIcon }];
+  const [activeTab, setActiveTab] = useState(tabs[0].id);
 
   const handleSave = async () => {
     setLoading(true);
@@ -74,12 +74,12 @@ export function useSettingsPageLogic() {
     setActiveTab,
     availableWeapons,
     availableEquipment,
-    
+
     // Handlers
     handleSave,
     handleFormChange,
     handleDutyChange,
-    
+
     // Enums
     UserDuty,
   };

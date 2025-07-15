@@ -28,7 +28,7 @@ export default function BaseButton({
 
     switch (style) {
       case "default":
-        return `${baseClasses} ${theme === "dark" ? "bg-white/5 hover:bg-white/10 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-900"}`;
+        return `${baseClasses} ${theme === "dark" ? "bg-white/10 hover:bg-white/20 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-900"}`;
       case "purple":
         return `${baseClasses} bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 text-white shadow-sm disabled:cursor-not-allowed`;
       case "white":

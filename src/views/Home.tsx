@@ -18,6 +18,8 @@ const Training = lazy(() => import("./Trainings"));
 const TrainingPage = lazy(() => import("./Training"));
 const Assets = lazy(() => import("./Assets"));
 const ErrorPage = lazy(() => import("./404"));
+const SessionStatsFull = lazy(() => import("./sessionStatsFull"));
+const FileVault = lazy(() => import("./fileVault"));
 
 export default function AppRoutes() {
   const { token } = useStore(authStore);
@@ -93,10 +95,26 @@ export default function AppRoutes() {
             }
           />
           <Route
+            path="/file-vault"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <FileVault />
+              </Suspense>
+            }
+          />
+          <Route
             path="/training/:id"
             element={
               <Suspense fallback={<LoadingFallback />}>
                 <TrainingPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/training/:id/session-stats-full"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <SessionStatsFull />
               </Suspense>
             }
           />

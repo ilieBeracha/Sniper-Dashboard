@@ -6,7 +6,7 @@ import { BsBarChartFill } from "react-icons/bs";
 import { authStore } from "@/store/authStore";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
-import { FaCrosshairs } from "react-icons/fa";
+import { FaCrosshairs, FaFolderOpen } from "react-icons/fa";
 import { useSidebarStore } from "@/store/sidebarStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -17,7 +17,13 @@ const navSections = [
     items: [
       { name: "Dashboard", href: "/", icon: <BiSolidDashboard className="w-5 h-5" /> },
       { name: "Training", href: "/trainings", icon: <BsBarChartFill className="w-5 h-5" /> },
+    ],
+  },
+  {
+    title: "TEAM",
+    items: [
       { name: "Assets", href: "/assets", icon: <FaCrosshairs className="w-5 h-5" /> },
+      { name: "File Vault", href: "/file-vault", icon: <FaFolderOpen className="w-5 h-5" /> },
     ],
   },
   {
@@ -38,24 +44,12 @@ export default function Sidebar() {
   const SidebarContent = () => (
     <div
       className={`transition-all duration-300 ease-in-out flex flex-col border-r h-full relative z-[100] ${
-        theme === "dark" ? "bg-[#121212] border-[#1D1D1F]" : " border-gray-200"
+        theme === "dark" ? " border-[#1D1D1F]" : " border-gray-200"
       } ${collapsed ? "w-20" : "w-72"}`}
     >
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className={`absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl ${
-            theme === "dark" ? "bg-gradient-to-br from-purple-500/10 to-blue-500/10" : "bg-gradient-to-br from-purple-200/20 to-blue-200/20"
-          }`}
-        />
-        <div
-          className={`absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full blur-3xl ${
-            theme === "dark" ? "bg-gradient-to-tl from-blue-500/10" : "bg-gradient-to-tl from-blue-200/20"
-          }`}
-        />
-      </div>
       <div
-        className={`flex items-center justify-between h-16 px-4 border-b transition-colors duration-200 ${
-          theme === "dark" ? "border-[#1D1D1F] bg-[#121212]" : "border-gray-200 "
+        className={`flex items-center justify-between h-12 px-4 border-b transition-colors duration-200 ${
+          theme === "dark" ? "border-[#1D1D1F] " : "border-gray-200 "
         }`}
       >
         {!collapsed && (
@@ -122,7 +116,7 @@ export default function Sidebar() {
         ))}
       </div>
 
-      <div className={`p-4 border-t transition-colors duration-200 ${theme === "dark" ? "border-[#1D1D1F] bg-[#121212]" : "border-gray-200 "}`}>
+      <div className={`p-4 border-t transition-colors duration-200 ${theme === "dark" ? "border-[#1D1D1F] " : "border-gray-200 "}`}>
         <button
           onClick={logout}
           className={`flex items-center w-full px-4 py-2 text-sm text-red-400 hover:text-white rounded-lg hover:bg-red-600/20 transition-colors duration-200 ${
@@ -139,14 +133,11 @@ export default function Sidebar() {
   if (isMobile) {
     return (
       <>
-        <Dialog open={isDrawerOpen} onClose={() => toggleDrawer()} className="relative z-50">
+        <Dialog open={isDrawerOpen} onClose={() => toggleDrawer()} className="relative z-50 bg-black/30">
+          <div className={`fixed inset-0 transition-opacity duration-300`} aria-hidden="true" />
           <div
-            className={`fixed inset-0 transition-opacity duration-300 ${theme === "dark" ? "bg-black/30" : "bg-gray-900/30"}`}
-            aria-hidden="true"
-          />
-          <div
-            className={`fixed inset-y-0 left-0 max-w-xs shadow-xl transform transition-transform duration-300 ease-in-out ${
-              theme === "dark" ? "bg-[#121212]" : ""
+            className={`bg-black fixed inset-y-0 left-0 max-w-xs shadow-xl transform transition-transform duration-300 ease-in-out ${
+              theme === "dark" ? "bg-[#161616]" : "bg-white"
             }`}
           >
             {SidebarContent()}
@@ -156,5 +147,5 @@ export default function Sidebar() {
     );
   }
 
-  return <div className="h-screen sticky top-0">{SidebarContent()}</div>;
+  return <div className={`h-screen sticky top-0 ${theme === "dark" ? "bg-black/30" : ""}`}>{SidebarContent()}</div>;
 }

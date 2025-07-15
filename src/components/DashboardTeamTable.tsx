@@ -51,7 +51,7 @@ export default function DashboardTeamTable() {
   return (
     <>
       <div
-        className={`overflow-hidden rounded-sm text-sx max-h-[400px] overflow-y-auto transition-colors duration-200 ${theme === "dark" ? "bg-dashboard-card text-white" : "bg-white text-gray-900"}`}
+        className={`overflow-hidden rounded-sm text-sx max-h-[500px] overflow-y-auto transition-colors duration-200 ${theme === "dark" ? "bg-dashboard-card text-white" : "bg-white text-gray-900"}`}
       >
         <div className="max-w-full overflow-x-auto">
           <table className={`min-w-full divide-y transition-colors duration-200 ${theme === "dark" ? "divide-dashboard-border" : "divide-gray-200"}`}>

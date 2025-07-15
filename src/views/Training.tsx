@@ -4,41 +4,31 @@ import Header from "@/Headers/Header";
 import BaseButton from "@/components/base/BaseButton";
 import ConfirmStatusChangeModal from "@/components/ConfirmStatusChangeModal";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
-import TrainingPageScoreFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageScoreFormModal";
-import TrainingPageGroupFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageGroupFormModal";
-import ScoreDetailsModal from "@/components/ScoreDetailsModal";
 import { useTrainingPageLogic } from "@/hooks/useTrainingPageLogic";
+import { useNavigate } from "react-router-dom";
+import { FileText } from "lucide-react";
 
 export default function TrainingPage() {
+  const navigate = useNavigate();
   const {
     id,
     tabs,
     activeTab,
     setActiveTab,
-    selectedScore,
-    editingScore,
     pendingStatus,
     isAddAssignmentOpen,
     setIsAddAssignmentOpen,
-    isAddScoreOpen,
-    setIsAddScoreOpen,
-    isAddGroupScoreOpen,
-    setIsAddGroupScoreOpen,
     isConfirmModalOpen,
     setIsConfirmModalOpen,
-    isScoreDetailsOpen,
-    setIsScoreDetailsOpen,
     handleConfirmStatusChange,
     handleAddAssignment,
-    handleAddScore,
-    handleAddGroupScore,
     setIsSessionStatsOpen,
     renderComponent,
   } = useTrainingPageLogic();
 
   return (
     <SpPage>
-      <Header title="Training Session"> </Header>
+      <Header />
       <SpPageHeader
         breadcrumbs={[
           { label: "Dashboard", link: "/" },
@@ -50,27 +40,18 @@ export default function TrainingPage() {
         icon={<BiCurrentLocation />}
         button={[
           <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsSessionStatsOpen(true)}>
-            Add Session Stats
+            Add Session Stats (Modal)
           </BaseButton>,
-
-          <BaseButton onClick={() => setIsAddGroupScoreOpen(true)}>Add Group Score</BaseButton>,
+          <BaseButton className="flex items-center gap-2" style="white" onClick={() => navigate(`/training/${id}/session-stats-full`)}>
+            <FileText className="w-4 h-4" />
+            Full Page Form
+          </BaseButton>,
         ]}
       />
       <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={(tab) => setActiveTab(tab as string)} />
 
       <SpPageBody>{renderComponent()}</SpPageBody>
       <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
-      <TrainingPageScoreFormModal
-        trainingId={id as string}
-        editingScore={editingScore}
-        isOpen={isAddScoreOpen}
-        onClose={() => {
-          setIsAddScoreOpen(false);
-        }}
-        onSubmit={handleAddScore}
-      />
-      <TrainingPageGroupFormModal isOpen={isAddGroupScoreOpen} onClose={() => setIsAddGroupScoreOpen(false)} onSubmit={handleAddGroupScore} />
-      <ScoreDetailsModal isOpen={isScoreDetailsOpen} setIsOpen={setIsScoreDetailsOpen} score={selectedScore} />
       <ConfirmStatusChangeModal
         isOpen={isConfirmModalOpen}
         onClose={() => setIsConfirmModalOpen(false)}

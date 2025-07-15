@@ -4,17 +4,31 @@ import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import Header from "@/Headers/Header";
 import WeaponsTab from "@/components/AssetsWeaponsTab";
 import EquipmentTab from "@/components/AssetsEquipmentTab";
+import BaseButton from "@/components/base/BaseButton";
+import { isCommanderOrSquadCommander } from "@/utils/permissions";
+import { UserRole } from "@/types/user";
+import { useStore } from "zustand";
+import { userStore } from "@/store/userStore";
 
 export default function AssetsPage() {
   const [activeTab, setActiveTab] = useState<"weapons" | "equipments">("weapons");
-
+  const [isOpen, setIsOpen] = useState(false);
+  const { user } = useStore(userStore);
   const tabs = [
-    { label: "weapons", icon: FileQuestion },
-    { label: "equipments", icon: Package },
+    { id: "weapons", label: "weapons", icon: FileQuestion },
+    { id: "equipments", label: "equipments", icon: Package },
   ];
+
+  const renderComponent = () => {
+    if (activeTab === "weapons") {
+      return <WeaponsTab isOpen={isOpen} setIsOpen={setIsOpen} />;
+    }
+    return <EquipmentTab isOpen={isOpen} setIsOpen={setIsOpen} />;
+  };
+
   return (
     <SpPage>
-      <Header title="Assets"> </Header>
+      <Header />
       <SpPageHeader
         title="Assets"
         subtitle={`Manage ${activeTab === "weapons" ? "weapons" : "equipment"} inventory`}
@@ -23,11 +37,24 @@ export default function AssetsPage() {
           { label: "Dashboard", link: "/" },
           { label: "Assets", link: "/assets" },
         ]}
+        button={
+          isCommanderOrSquadCommander(user?.user_role as UserRole)
+            ? activeTab === "weapons"
+              ? [
+                  <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsOpen(true)}>
+                    Add Weapon
+                  </BaseButton>,
+                ]
+              : [
+                  <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsOpen(true)}>
+                    Add Equipment
+                  </BaseButton>,
+                ]
+            : []
+        }
       />
       <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={(tab) => setActiveTab(tab as "weapons" | "equipments")} />
-      <SpPageBody>
-        <div className="flex flex-col gap-6">{activeTab === "weapons" ? <WeaponsTab /> : <EquipmentTab />}</div>
-      </SpPageBody>
+      <SpPageBody>{renderComponent()}</SpPageBody>
     </SpPage>
   );
 }

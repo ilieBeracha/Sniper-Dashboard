@@ -5,16 +5,15 @@ import { useTheme } from "@/contexts/ThemeContext";
 import TrainingStatusButtons from "./TrainingStatusButtons";
 import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
-import { Score } from "@/types/score";
 import { isCommander } from "@/utils/permissions";
 
 export default function TrainingStatusTab({
   training,
-  scores,
+  sessionStats,
   handleStatusChange,
 }: {
   training: TrainingSession;
-  scores: Score[];
+  sessionStats: any[];
   handleStatusChange: (newStatus: TrainingStatus) => void;
 }) {
   const { user } = useStore(userStore);
@@ -60,8 +59,8 @@ export default function TrainingStatusTab({
             </span>
           </div>
           <div>
-            <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Total Scores</label>
-            <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>{scores.length} recorded</span>
+            <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Total Sessions</label>
+            <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>{sessionStats?.length || 0} recorded</span>
           </div>
           <div>
             <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Assignments</label>
