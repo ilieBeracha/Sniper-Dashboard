@@ -157,13 +157,13 @@ export default function FileRecents({ recentFiles }: { recentFiles: FileItem[] }
           </div>
 
           {/* Navigation buttons */}
-          {recentFiles.length > 1 && (
+            {recentFiles.length > 1 && (
             <>
               <button
                 onClick={prevSlide}
-                className={`absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full shadow-lg backdrop-blur-sm transition-all transform hover:scale-110 ${
-                  theme === "dark" 
-                    ? "bg-zinc-800/70 hover:bg-zinc-700/80 text-white border border-zinc-600/30" 
+                className={`absolute left-2 top-[45%] translate-y-[-50%] p-3 rounded-full shadow-lg backdrop-blur-sm transition-all transform hover:scale-110 ${
+                  theme === "dark"
+                    ? "bg-zinc-800/70 hover:bg-zinc-700/80 text-white border border-zinc-600/30"
                     : "bg-white/80 hover:bg-white/90 text-gray-800 border border-gray-200/50"
                 }`}
                 aria-label="Previous file"
@@ -172,9 +172,9 @@ export default function FileRecents({ recentFiles }: { recentFiles: FileItem[] }
               </button>
               <button
                 onClick={nextSlide}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full shadow-lg backdrop-blur-sm transition-all transform hover:scale-110 ${
-                  theme === "dark" 
-                    ? "bg-zinc-800/70 hover:bg-zinc-700/80 text-white border border-zinc-600/30" 
+                className={`absolute right-2 top-[45%] translate-y-[-50%] p-3 rounded-full shadow-lg backdrop-blur-sm transition-all transform hover:scale-110 ${
+                  theme === "dark"
+                    ? "bg-zinc-800/70 hover:bg-zinc-700/80 text-white border border-zinc-600/30"
                     : "bg-white/80 hover:bg-white/90 text-gray-800 border border-gray-200/50"
                 }`}
                 aria-label="Next file"
