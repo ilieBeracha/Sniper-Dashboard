@@ -216,16 +216,17 @@ export default function FilePreviewCard({ file, previewUrl, onDownload, onDelete
               >
                 Download
               </DropdownItem>
-              {onDelete && (
-                <DropdownItem 
-                  key="delete" 
-                  className="text-red-500" 
-                  color="danger" 
-                  startContent={<Trash2 className="w-4 h-4" />}
-                >
-                  Delete
-                </DropdownItem>
-              )}
+           {onDelete ? (
+  <DropdownItem 
+    key="delete" 
+    className="text-red-500" 
+    color="danger" 
+    startContent={<Trash2 className="w-4 h-4" />}
+  >
+    Delete
+  </DropdownItem>
+) : null}
+
             </DropdownMenu>
           </Dropdown>
         </div>
