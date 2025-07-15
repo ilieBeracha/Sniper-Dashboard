@@ -2,6 +2,7 @@ import { BiAddToQueue, BiInfoCircle } from "react-icons/bi";
 import { Tooltip } from "react-tooltip";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { Card } from "@heroui/react";
 
 export default function BaseDashboardCard({
   header,
@@ -25,12 +26,16 @@ export default function BaseDashboardCard({
   } ${isMobile ? "" : "h-full"}`;
 
   if (!header) {
-    return <div className={cardClassName}>{children}</div>;
+    return (
+      <Card shadow="none" className={cardClassName}>
+        {children}
+      </Card>
+    );
   }
 
   return (
-    <div
-      className={`flex flex-col bg-white border border-gray-200 h-full shadow-xs rounded-xl overflow-hidden ${theme === "dark" ? "dark:bg-neutral-900/50 dark:border-neutral-700/70" : ""}`}
+    <Card
+      className={`flex flex-col bg-white border border-gray-200 h-full shadow-xs rounded-xl overflow-hidden ${theme === "dark" ? "bg-zinc-900/50 border-neutral-700/70" : ""}`}
     >
       <div className={`${padding} border-b mb-2 transition-colors duration-200 ${theme === "dark" ? "border-white/10" : "border-gray-200"}`}>
         <div className="flex justify-between relative h-full items-center">
@@ -71,6 +76,6 @@ export default function BaseDashboardCard({
           zIndex: 1000,
         }}
       />
-    </div>
+    </Card>
   );
 }

@@ -20,7 +20,7 @@ export function useDashboardPageLogic() {
   const user = useUserStore.user;
   const userRole = useUserStore.user?.user_role ?? null;
 
-  const { getUserHitStatsFull, getSquadStats } = useStore(performanceStore);
+  const { getUserHitStatsFull, getSquadStatsByRole } = useStore(performanceStore);
   const { getSquadMetricsByRole } = useStore(squadStore);
   const { loadNextAndLastTraining } = useStore(TrainingStore);
 
@@ -28,12 +28,12 @@ export function useDashboardPageLogic() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const baseTabs = [
-    { label: "Overview", icon: Activity },
-    { label: "AI Insights", icon: Brain },
+    { id: "overview", label: "Overview", icon: Activity },
+    { id: "ai-insights", label: "AI Insights", icon: Brain },
   ];
 
   const tabs = isCommander(userRole as UserRole)
-    ? [...baseTabs, { label: "Commander View", icon: SplinePointerIcon }]
+    ? [...baseTabs, { id: "commander-view", label: "Commander View", icon: SplinePointerIcon }]
     : baseTabs;
 
   const [activeTab, setActiveTab] = useState<string>(tabs[0].id);
@@ -45,7 +45,7 @@ export function useDashboardPageLogic() {
         await getUserHitStatsFull(user?.id);
         await loadNextAndLastTraining(user?.team_id);
         await getSquadMetricsByRole(user?.id);
-        await getSquadStats(null, null);
+        await getSquadStatsByRole(null, null);
       }
       setLoading(false);
     };

@@ -2,14 +2,14 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Activity } from "lucide-react";
 import TrainingSessionStatsCard from "./TrainingSessionStatsCard";
 
-export default function TrainingAnalyticsTab({trainingSessionId }: { trainingSessionId: string }) {
+export default function TrainingAnalyticsTab({ trainingSessionId }: { trainingSessionId: string }) {
   const { theme } = useTheme();
 
   return (
     <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
       {/* Chart */}
       <div className="lg:col-span-2">
-      <TrainingSessionStatsCard trainingSessionId={trainingSessionId} />
+        <TrainingSessionStatsCard trainingSessionId={trainingSessionId} />
       </div>
 
       {/* Analytics placeholder */}

@@ -1,10 +1,40 @@
 import { supabase } from "./supabaseClient";
 import { APP_CONFIG } from "@/config/constants";
 
-export async function getBucketFiles(teamName: string, trainingId?: string): Promise<any[]> {
+export async function getBucketFiles(
+  teamName: string,
+  trainingId?: string,
+  filters: { limit: number; sortBy: { column: string; order: string } } = {
+    limit: APP_CONFIG.STORAGE.LIST_LIMIT,
+    sortBy: { column: "name", order: "asc" },
+  },
+): Promise<any[]> {
   const { data, error } = await supabase.storage
     .from(APP_CONFIG.STORAGE.BUCKET_NAME)
-    .list(buildRequestPath(teamName, trainingId), { limit: APP_CONFIG.STORAGE.LIST_LIMIT, sortBy: { column: "name", order: "asc" } });
+    .list(buildRequestPath(teamName, trainingId), { limit: filters.limit, sortBy: filters.sortBy });
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function getRecentFiles(teamName: string) {
+  const { data, error } = await supabase.storage.from(APP_CONFIG.STORAGE.BUCKET_NAME).list(buildRequestPath(teamName), {
+    limit: APP_CONFIG.STORAGE.RECENT_FILES_LIMIT,
+    sortBy: { column: "created_at", order: "desc" },
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function deleteFile(teamName: string, fileName: string) {
+  const { data, error } = await supabase.storage.from(APP_CONFIG.STORAGE.BUCKET_NAME).remove([buildRequestPath(teamName) + "/" + fileName]);
 
   if (error) {
     throw error;

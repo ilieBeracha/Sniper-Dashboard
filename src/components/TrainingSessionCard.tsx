@@ -40,11 +40,7 @@ export function TrainingSessionCard({
         text-sm
         justify-center
         items-center
-        ${
-          theme === "dark"
-            ? "border-white/10 bg-gradient-to-br from-black/5 to-white/[0.02] hover:from-white/10 hover:to-white/[0.05]"
-            : "border-gray-200 bg-white hover:bg-gray-50"
-        }
+        ${theme === "dark" ? "bg-zinc-900/50 border-white/10" : "border-gray-200 bg-white hover:bg-gray-50"}
       `}
     >
       {/* Status */}
