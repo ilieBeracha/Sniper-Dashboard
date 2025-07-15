@@ -152,6 +152,7 @@ export default function Auth() {
                     </p>
                     {authType === "squad_manager_register" && <SquadCommanderRegisterForm AuthSubmit={AuthSubmit} />}
                     {authType === "soldier_register" && <SoldierRegisterForm AuthSubmit={AuthSubmit} />}
+                    {authType === "team_manager_register" && <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />}
                   </div>
                 )}
               </div>
