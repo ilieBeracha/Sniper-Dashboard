@@ -110,7 +110,7 @@ export default function FilePreviewCard({ file, previewUrl, onDownload, onDelete
           </div>
 
           {/* Right half - File info */}
-        <div className="w-3/5 py-5 pr-5 flex flex-col justify-between overflow-hidden">
+        <div className="w-3/5 py-5 px-2 flex flex-col justify-between overflow-hidden">
   <div className="flex flex-col overflow-hidden gap-2">
     <h4
       className={`font-semibold text-base truncate text-left ${
