@@ -35,7 +35,7 @@ export default function FileVault() {
       <SpPageDivider />
 
       <SpPageBody>
-        <div className="flex flex-col gap-4 sm:gap-6 h-full w-full px-2 sm:px-0">
+        <div className="flex flex-col gap-4 sm:gap-6 h-full w-full sm:px-0">
           <FileUploadShad isOpen={isOpen} setIsOpen={setIsOpen} />
           
           {/* Recent Files Section */}
