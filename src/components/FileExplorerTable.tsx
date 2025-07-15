@@ -267,10 +267,6 @@ export default function FileExplorerTable() {
       {/* Folders Table */}
       {folders.length > 0 && (
         <div>
-          <h3 className={`text-base sm:text-lg font-semibold mb-2 sm:mb-3 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-            <FolderOpen className="w-4 h-4 sm:w-5 sm:h-5 inline mr-2" />
-            Folders
-          </h3>
           <SpTable
             data={folders}
             columns={folderColumns}
