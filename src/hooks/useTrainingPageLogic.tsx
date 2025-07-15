@@ -31,6 +31,7 @@ export function useTrainingPageLogic() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [isSessionStatsOpen, setIsSessionStatsOpen] = useState(false);
+
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>(tabs[0].id);
 
