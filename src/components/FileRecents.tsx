@@ -2,6 +2,8 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Card } from "@heroui/react";
 import { FileText, FileImage, FileVideo, FileArchive, File, MoreVertical, Download, Trash2 } from "lucide-react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
+import { fileStore } from "@/store/fileStore";
+import { userStore } from "@/store/userStore";
 
 interface FileItem {
   id: string;
@@ -16,12 +18,26 @@ interface FileItem {
 
 export default function FileRecents({ recentFiles }: { recentFiles: FileItem[] }) {
   const { theme } = useTheme();
+  const { getFile } = fileStore();
+  const user = userStore((state) => state.user);
 
-  const downloadFile = (file: FileItem) => {
-    const link = document.createElement("a");
-    link.href = file.created_at || "https://www.google.com";
-    link.download = file.name;
-    link.click();
+  const downloadFile = async (file: FileItem) => {
+    try {
+      const teamName = user?.last_name || "";
+      const fileData = await getFile(teamName, file.name);
+
+      // Create blob URL and download
+      const url = URL.createObjectURL(fileData as unknown as Blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = file.name;
+      link.click();
+
+      // Clean up
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
   };
 
   const getFileIcon = (fileName: string) => {
@@ -66,20 +82,44 @@ export default function FileRecents({ recentFiles }: { recentFiles: FileItem[] }
             key={file.id}
             className={`${
               theme === "dark" ? "bg-zinc-900/50 border-neutral-700/70" : "bg-white border-gray-200"
-            } border shadow-sm rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer`}
+            } border shadow-sm rounded-xl overflow-hidden hover:shadow-md transition-all cursor-pointer relative h-48`}
             isPressable
           >
-            <div className="p-2">
-              <div className="flex items-start justify-between mb-3">
+            {/* Background preview for images */}
+            {/* {(() => {
+              const ext = file.name?.split(".").pop()?.toLowerCase();
+              if (["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(ext || "")) {
+                return (
+                  <div className="absolute inset-0">
+                    <img
+                      src={file.created_at || "https://via.placeholder.com/300x200"}
+                      alt={file.name}
+                      className="w-full h-full object-cover opacity-20"
+                    />
+                  </div>
+                );
+              }
+              return null;
+            })()} */}
+
+            <div className="relative h-full flex flex-col justify-between p-4">
+              <div className="flex items-start justify-between">
                 {getFileIcon(file.name)}
                 <Dropdown>
                   <DropdownTrigger>
-                    <span className="min-w-unit-8 h-unit-8">
+                    <span className="min-w-unit-8 h-unit-8 rounded-full bg-black/20 dark:bg-white/10 backdrop-blur-sm flex items-center justify-center">
                       <MoreVertical className="w-4 h-4" />
                     </span>
                   </DropdownTrigger>
                   <DropdownMenu aria-label="File actions" className={`${theme === "dark" ? "bg-zinc-900/50" : "bg-white"}`}>
-                    <DropdownItem key="download" startContent={<Download className="w-4 h-4" />} onClick={() => downloadFile(file)}>
+                    <DropdownItem
+                      key="download"
+                      startContent={<Download className="w-4 h-4" />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        downloadFile(file);
+                      }}
+                    >
                       Download
                     </DropdownItem>
                     <DropdownItem key="delete" className="text-red-500" color="danger" startContent={<Trash2 className="w-4 h-4" />}>
@@ -90,9 +130,11 @@ export default function FileRecents({ recentFiles }: { recentFiles: FileItem[] }
               </div>
 
               <div className="space-y-1 flex flex-col items-start justify-start">
-                <h4 className={`font-medium text-sm truncate ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{file.name}</h4>
-                <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>{formatFileSize(file.metadata?.size)}</p>
-                <p className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
+                <h4 className={`font-medium text-sm truncate ${theme === "dark" ? "text-white" : "text-gray-900"} drop-shadow-sm`}>{file.name}</h4>
+                <p className={`text-xs ${theme === "dark" ? "text-gray-300" : "text-gray-600"} drop-shadow-sm`}>
+                  {formatFileSize(file.metadata?.size)}
+                </p>
+                <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"} drop-shadow-sm`}>
                   {formatDate(file.created_at || file.metadata?.lastModified)}
                 </p>
               </div>
