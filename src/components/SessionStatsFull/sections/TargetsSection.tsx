@@ -62,7 +62,9 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
               {targets.map((target, index) => (
                 <div key={target.id} className="transition-all">
                   {/* Main Row */}
-                  <div className={`grid grid-cols-12 gap-2 px-4 py-3 items-center ${theme === "dark" ? "hover:bg-zinc-800/30" : "hover:bg-gray-50"}`}>
+                  <div
+                    className={`grid grid-cols-12 gap-2 px-4  justify-between py-3 items-center ${theme === "dark" ? "hover:bg-zinc-800/30" : "hover:bg-gray-50"}`}
+                  >
                     {/* Index */}
                     <div className="col-span-1">
                       <div
@@ -75,7 +77,7 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                     </div>
 
                     {/* Distance Slider */}
-                    <div className="col-span-8">
+                    <div className="col-span-9">
                       <div className="flex items-center gap-3">
                         <input
                           type="range"
@@ -98,7 +100,7 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                     </div>
 
                     {/* Options Toggle */}
-                    <div className="col-span-2">
+                    <div className="col-span-2 flex justify-end">
                       <button
                         onClick={() => toggleExpanded(target.id)}
                         className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
@@ -112,20 +114,17 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                         }`}
                       >
                         {expandedTarget === target.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                        <span>Options</span>
                       </button>
-                    </div>
-
-                    {/* Delete */}
-                    <div className="col-span-1 flex justify-end">
-                      <button
-                        onClick={() => removeTarget(target.id)}
-                        className={`p-1.5 rounded transition-colors ${
-                          theme === "dark" ? "hover:bg-red-500/20 text-red-400" : "hover:bg-red-50 text-red-500"
-                        }`}
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
+                      <div className="col-span-1 flex justify-end">
+                        <button
+                          onClick={() => removeTarget(target.id)}
+                          className={`p-1.5 rounded transition-colors ${
+                            theme === "dark" ? "hover:bg-red-500/20 text-red-400" : "hover:bg-red-50 text-red-500"
+                          }`}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
                   </div>
 

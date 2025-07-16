@@ -48,7 +48,6 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
     <div className="w-full max-w-2xl mx-auto">
       <SectionHeader section={section} />
 
-      {/* Engagements Table - Single Card with horizontal scroll */}
       <div className={`mt-8 rounded-2xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}>
         <div className="overflow-x-auto">
           <div style={{ minWidth: `${200 + targets.length * 160}px` }}>
