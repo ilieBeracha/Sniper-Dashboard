@@ -4,6 +4,11 @@ export const APP_CONFIG = {
     MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
     ALLOWED_FILE_TYPES: [".pdf", ".doc", ".docx", ".txt", ".jpg", ".jpeg", ".png"],
     LIST_LIMIT: 100,
+    RECENT_FILES_LIMIT: 6,
+  },
+
+  AUTH: {
+    EMAIL_REDIRECT_URL: "http://localhost:5173",
   },
 
   ENV: {

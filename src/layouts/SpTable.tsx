@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Filter, Search, X } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export type FilterConfig<T> = {
   key: keyof T;
@@ -301,12 +302,17 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
               }`}
             >
               <tr>
-                {columns.map((col) => (
+                {columns.map((col, idx) => (
                   <th
-                    key={col.key}
+                    key={idx}
                     className={`px-4 py-3 ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}
                     style={col.width ? { width: col.width } : undefined}
                   >
+                    {idx === 0 && (
+                      <div className="flex items-center gap-2">
+                        <Checkbox />
+                      </div>
+                    )}
                     {col.label}
                   </th>
                 ))}
@@ -325,9 +331,14 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                       isLast ? "border-transparent" : theme === "dark" ? "border-zinc-800/50" : "border-gray-100"
                     } ${highlighted ? "bg-gray-100/60 dark:bg-gray-700/30" : theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-gray-50"}`}
                   >
-                    {columns.map((col) => (
-                      <td key={col.key} className={`px-4 py-3 ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
-                        {col.render ? col.render(row[col.key], row) : ((row as any)[col.key] ?? "N/A")}
+                    {columns.map((col, idx) => (
+                      <td key={idx} className={`px-4 py-3 ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
+                        {idx === 0 && (
+                          <div className="flex items-center gap-2">
+                            <Checkbox />
+                          </div>
+                        )}
+                        {col.render ? col.render(row[col.key as keyof T], row) : ((row as any)[col.key] ?? "N/A")}
                       </td>
                     ))}
                     {(actions || onView || onEdit || onDelete) && (

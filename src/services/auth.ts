@@ -1,5 +1,7 @@
 import { axiosInstance as axios } from "./requestService";
 import { LoginUserData, RegisterUserData } from "@/types/auth";
+import { supabase } from "./supabaseClient";
+import { APP_CONFIG } from "@/config/constants";
 
 async function registerCommander(user: RegisterUserData) {
   user.user_role = "commander";
@@ -21,7 +23,22 @@ async function login(user: LoginUserData) {
   return res.data;
 }
 
+async function signInWithEmail(email: string) {
+  const { data, error } = await supabase.auth.signInWithOtp({
+    email: email,
+    options: {
+      shouldCreateUser: false,
+      emailRedirectTo: APP_CONFIG.AUTH.EMAIL_REDIRECT_URL,
+    },
+  });
+  if (error) {
+    throw error;
+  }
+  return data;
+}
+
 export const authService = {
+  signInWithEmail,
   registerCommander,
   registerSoldier,
   registerSquadCommander,

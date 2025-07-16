@@ -3,8 +3,8 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator, BreadcrumbLink } from "@/components/ui/breadcrumb";
 import React, { ReactNode } from "react";
 import { MoreVertical } from "lucide-react";
-import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
 import { Link } from "react-router-dom";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
 
 export function SpPage({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
@@ -35,14 +35,14 @@ export function SpPageHeader({
   const isMobile = useIsMobile();
 
   return (
-    <div className="m-0 p-0">
+    <div className="">
       {breadcrumbs && (
         <div className={`${isMobile ? "px-2" : "md:px-4 2xl:px-6"}`}>
           <SpPageBreadcrumbs breadcrumbs={breadcrumbs} />
         </div>
       )}
 
-      <div className={` ${isMobile ? "pl-6 pr-4 mb-8 mt-6" : "px-6 pt-8 pb-8"} transition-all duration-200 relative`}>
+      <div className={` ${isMobile ? "px-6 mb-8 mt-6" : "px-6 pt-8 pb-8"} transition-all duration-200 relative py-2`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 justify-between w-full">
             <div className="flex items-center gap-3">
@@ -61,18 +61,26 @@ export function SpPageHeader({
             {button &&
               button.length > 0 &&
               (isMobile ? (
-                <Menubar className="bg-transparent border-none shadow-none">
-                  <MenubarMenu>
-                    <MenubarTrigger>
-                      <MoreVertical className="w-6 h-6 cursor-pointer" />
-                    </MenubarTrigger>
-                    <MenubarContent className="bg-zinc-900 border-zinc-800 shadow-2xl">
-                      {button.map((item, index) => (
-                        <MenubarItem key={index}>{item}</MenubarItem>
-                      ))}
-                    </MenubarContent>
-                  </MenubarMenu>
-                </Menubar>
+                <Dropdown>
+                  <DropdownTrigger className="cursor-pointer">
+                    <span
+                      className={`min-w-unit-8 p-2 h-unit-8 rounded-lg ${theme === "dark" ? "bg-black/20" : "bg-gray-400/10"} backdrop-blur-sm flex items-center justify-center`}
+                    >
+                      <MoreVertical className="w-5 h-5" />
+                    </span>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    aria-label="Static Actions"
+                    className={`${theme === "dark" ? "bg-zinc-900" : "bg-gray-100"} rounded-lg p-1`}
+                    onAction={() => {}}
+                  >
+                    {button.map((item, index) => (
+                      <DropdownItem className="text-sm  rounded-md bg-zinc-900 text-white" key={index}>
+                        {item}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
               ) : (
                 <div className="flex items-center gap-2">
                   {button.map((item, index) => (
@@ -100,7 +108,7 @@ export function SpPageTabs({
   const isMobile = useIsMobile();
 
   return (
-    <div className={`border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+    <div className={`border-b my-6 transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
       <nav className={`flex ${isMobile ? "justify-center space-x-4" : "justify-start space-x-8"} items-center px-4`} aria-label="Tabs">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
@@ -130,7 +138,7 @@ export function SpPageTabs({
 }
 
 export function SpPageBody({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-4 md:px-6 2xl:px-6 px-4 pb-10 space-y-6">{children}</div>;
+  return <div className="flex flex-col gap-4 md:px-4 2xl:px-6 px-2 space-y-6">{children}</div>;
 }
 
 export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: string; link: string }[] }) {
@@ -144,13 +152,13 @@ export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: strin
           <React.Fragment key={breadcrumb.label}>
             <BreadcrumbItem>
               {isLastItem(index) ? (
-                <BreadcrumbLink asChild className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} text-sm font-medium cursor-default`}>
+                <BreadcrumbLink asChild className={`${theme === "dark" ? "text-gray-300" : "text-gray-500"} text-xs font-medium cursor-default`}>
                   <span>{breadcrumb.label}</span>
                 </BreadcrumbLink>
               ) : (
                 <BreadcrumbLink
                   asChild
-                  className={`${theme === "dark" ? "text-gray-400 hover:text-gray-200" : "text-gray-600 hover:text-gray-900"} text-sm transition-colors`}
+                  className={`${theme === "dark" ? "text-gray-400 hover:text-gray-200" : "text-gray-600 hover:text-gray-900"} text-xs transition-colors`}
                 >
                   <Link to={breadcrumb.link}>{breadcrumb.label}</Link>
                 </BreadcrumbLink>
@@ -162,4 +170,9 @@ export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: strin
       </BreadcrumbList>
     </Breadcrumb>
   );
+}
+
+export function SpPageDivider() {
+  const { theme } = useTheme();
+  return <div className={`border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`} />;
 }

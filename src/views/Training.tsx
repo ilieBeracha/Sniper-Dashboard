@@ -22,7 +22,6 @@ export default function TrainingPage() {
     setIsConfirmModalOpen,
     handleConfirmStatusChange,
     handleAddAssignment,
-    setIsSessionStatsOpen,
     renderComponent,
   } = useTrainingPageLogic();
 
@@ -39,9 +38,6 @@ export default function TrainingPage() {
         title={"Training Session"}
         icon={<BiCurrentLocation />}
         button={[
-          <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsSessionStatsOpen(true)}>
-            Add Session Stats (Modal)
-          </BaseButton>,
           <BaseButton className="flex items-center gap-2" style="white" onClick={() => navigate(`/training/${id}/session-stats-full`)}>
             <FileText className="w-4 h-4" />
             Full Page Form

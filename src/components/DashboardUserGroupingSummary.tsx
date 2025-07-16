@@ -67,33 +67,41 @@ const UserGroupingSummary = () => {
     <div ref={containerRef} className="flex flex-col h-full w-full">
       {/* Stats Overview */}
       <div className="grid grid-cols-4 gap-3 mb-6">
-        <div className={`p-4 rounded-lg text-center transition-all duration-200 ${theme === "dark" ? "bg-[#1A1A1A] hover:bg-[#222222] border border-gray-800" : "bg-gray-50 hover:bg-gray-100 border border-gray-200"}`}>
+        <div
+          className={`p-4 rounded-lg text-center transition-all duration-200 ${theme === "dark" ? "bg-[#1A1A1A] hover:bg-[#222222] border border-gray-800" : "bg-gray-50 hover:bg-gray-100 border border-gray-200"}`}
+        >
           <div className="text-2xl font-semibold text-indigo-500">{groupingSummary.avg_dispersion ?? "-"}</div>
           <div className={`text-xs font-medium mt-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Average CM</div>
         </div>
-        <div className={`p-4 rounded-lg text-center transition-all duration-200 ${theme === "dark" ? "bg-[#1A1A1A] hover:bg-[#222222] border border-gray-800" : "bg-gray-50 hover:bg-gray-100 border border-gray-200"}`}>
+        <div
+          className={`p-4 rounded-lg text-center transition-all duration-200 ${theme === "dark" ? "bg-[#1A1A1A] hover:bg-[#222222] border border-gray-800" : "bg-gray-50 hover:bg-gray-100 border border-gray-200"}`}
+        >
           <div className="text-2xl font-semibold text-green-500">{groupingSummary.best_dispersion ?? "-"}</div>
           <div className={`text-xs font-medium mt-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Best CM</div>
         </div>
-        <div className={`p-4 rounded-lg text-center transition-all duration-200 ${theme === "dark" ? "bg-[#1A1A1A] hover:bg-[#222222] border border-gray-800" : "bg-gray-50 hover:bg-gray-100 border border-gray-200"}`}>
+        <div
+          className={`p-4 rounded-lg text-center transition-all duration-200 ${theme === "dark" ? "bg-[#1A1A1A] hover:bg-[#222222] border border-gray-800" : "bg-gray-50 hover:bg-gray-100 border border-gray-200"}`}
+        >
           <div className="text-2xl font-semibold text-amber-500">{groupingSummary.avg_time_to_group ?? "-"}</div>
           <div className={`text-xs font-medium mt-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Avg Time</div>
         </div>
-        <div className={`p-4 rounded-lg text-center transition-all duration-200 ${theme === "dark" ? "bg-[#1A1A1A] hover:bg-[#222222] border border-gray-800" : "bg-gray-50 hover:bg-gray-100 border border-gray-200"}`}>
+        <div
+          className={`p-4 rounded-lg text-center transition-all duration-200 ${theme === "dark" ? "bg-[#1A1A1A] hover:bg-[#222222] border border-gray-800" : "bg-gray-50 hover:bg-gray-100 border border-gray-200"}`}
+        >
           <div className="text-2xl font-semibold text-blue-500">{groupingSummary.total_groupings ?? 0}</div>
           <div className={`text-xs font-medium mt-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Total Groupings</div>
         </div>
       </div>
 
       {/* Chart Title */}
-      <h3 className={`text-center text-base font-semibold mb-4 ${theme === "dark" ? "text-gray-200" : "text-gray-800"}`}>
-        Recent Dispersion Trend
-      </h3>
+      <h3 className={`text-center text-base font-semibold mb-4 ${theme === "dark" ? "text-gray-200" : "text-gray-800"}`}>Recent Dispersion Trend</h3>
 
       {/* Chart */}
-      <div className={`flex-1 w-full flex justify-center items-center rounded-lg p-4 ${theme === "dark" ? "bg-[#0A0A0A] border border-gray-800" : "bg-white border border-gray-200"}`}>
-        <ResponsiveContainer width="95%" height={chartHeight}>
-          <LineChart data={recentData} margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
+      <div
+        className={`flex-1 w-full flex justify-center items-center rounded-lg p-4 ${theme === "dark" ? "bg-[#0A0A0A] border border-gray-800" : "bg-white border border-gray-200"}`}
+      >
+        <ResponsiveContainer width="95%">
+          <LineChart height={chartHeight} data={recentData} margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#333" : "#e5e7eb"} />
             <XAxis dataKey="label" stroke={theme === "dark" ? "#9ca3af" : "#4b5563"} />
             <Tooltip

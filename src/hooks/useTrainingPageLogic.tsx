@@ -30,7 +30,6 @@ export function useTrainingPageLogic() {
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
-  const [isSessionStatsOpen, setIsSessionStatsOpen] = useState(false);
 
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>(tabs[0].id);
@@ -91,7 +90,7 @@ export function useTrainingPageLogic() {
     }
 
     if (activeTab.toLowerCase() === "analytics") {
-      return <TrainingAnalyticsTab sessionStats={sessionStats} />;
+      return <TrainingAnalyticsTab trainingSessionId={id!} />;
     }
 
     if (activeTab.toLowerCase() === "status") {
@@ -112,8 +111,6 @@ export function useTrainingPageLogic() {
     setIsAddAssignmentOpen,
     isConfirmModalOpen,
     setIsConfirmModalOpen,
-    isSessionStatsOpen,
-    setIsSessionStatsOpen,
 
     handleStatusChange,
     handleConfirmStatusChange,

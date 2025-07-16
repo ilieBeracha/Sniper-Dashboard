@@ -12,6 +12,15 @@ export interface HitPercentageData {
   total_hits: number;
   assignments_count: number;
 }
+export interface UserHitsData {
+  hit_percentage: number | null;
+  shots_fired: number;
+  target_hits: number;
+  session_count: number;
+  confirmed_hit_percentage: number | null;
+  confirmed_hits: number;
+  eliminated_targets: number;
+}
 
 export enum UserPosition {
   SNIPER = "Sniper",
@@ -58,7 +67,33 @@ export interface SquadStats {
   squad_name: string;
 }
 
+export interface WeaponUsageStats {
+  weapon_id: string;
+  total_shots_fired: number;
+  total_hits: number;
+  hit_percentage: number;
+  avg_cm_dispersion: number | null;
+  best_cm_dispersion: number | null;
+}
 
+export type TrainingTeamAnalytics = {
+  total_participants: number;
+  total_shots_fired: number;
+  overall_hit_percentage: number;
+  total_targets_eliminated: number;
+  avg_time_to_first_shot: number;
+  short_shots: number;
+  short_hit_percentage: number;
+  medium_shots: number;
+  medium_hit_percentage: number;
+  long_shots: number;
+  long_hit_percentage: number | null;
+  avg_cm_dispersion: number;
+  best_cm_dispersion: number;
+  best_user_first_name: string;
+  best_user_last_name: string;
+  times_grouped: number;
+};
 
 export interface OverallAccuracyStats {
   total_scores: number;
@@ -66,3 +101,38 @@ export interface OverallAccuracyStats {
   total_target_hits: number;
   accuracy_percent: number;
 }
+
+
+// commander view
+export type SquadUserPerformance = {
+  first_name: string;
+  last_name: string;
+  role_or_weapon: string; // e.g. "spotter", "sniper", "semi_auto"
+  hit_percentage: number;
+  shots: number;
+  hits: number;
+  sessions: number;
+};
+
+export type CommanderUserRoleBreakdown = {
+  squad_name: string;
+  first_name: string;
+  last_name: string;
+  role_or_weapon: string; // "spotter", "sniper", "semi_auto"
+  hit_percentage: number;
+  shots: number;
+  hits: number;
+  sessions: number;
+};
+
+
+// new
+export type SquadMajorityPerformance = {
+  squad_name: string;
+  total_shots: number;
+  total_hits: number;
+  total_sessions: number;
+  hit_percentage: number;
+  avg_time_to_first_shot: number;
+  elimination_rate: number;
+};

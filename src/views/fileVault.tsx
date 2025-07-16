@@ -1,16 +1,25 @@
 import Header from "@/Headers/Header";
-import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
+import { SpPage, SpPageBody, SpPageDivider, SpPageHeader } from "@/layouts/SpPage";
 import { fileStore } from "@/store/fileStore";
 import { useEffect, useState } from "react";
-import { FileText, Folder } from "lucide-react";
-import BaseButton from "@/components/base/BaseButton";
+import { FileText, Upload } from "lucide-react";
+import FileRecents from "@/components/FileRecents";
+import FileUploadShad from "@/components/FileUploadShad";
+import FileExplorerTable from "@/components/FileExplorerTable";
+import { Button } from "@heroui/react";
 
 export default function FileVault() {
-  const { getBucketFiles } = fileStore();
-  const [activeTab, setActiveTab] = useState("files");
+  const { getBucketFiles, getRecentFiles } = fileStore();
+  const [isOpen, setIsOpen] = useState(false);
+
   useEffect(() => {
-    getBucketFiles();
+    loadFiles();
   }, []);
+
+  const loadFiles = async () => {
+    await getBucketFiles();
+    await getRecentFiles();
+  };
 
   return (
     <SpPage>
@@ -19,25 +28,35 @@ export default function FileVault() {
         title="File Vault"
         subtitle="Upload and manage your files"
         icon={<FileText className="w-5 h-5" />}
-        breadcrumbs={[
-          { label: "Dashboard", link: "/" },
-          { label: "File Vault", link: "/file-vault" },
-        ]}
         button={[
-          <BaseButton style="purple" onClick={() => {}}>
+          <Button color="primary" className="flex items-center " onClick={() => setIsOpen(true)}>
+            <Upload className="w-4 h-4" />
             Upload File
-          </BaseButton>,
+          </Button>,
         ]}
       />
-      <SpPageTabs
-        tabs={[
-          { id: "files", label: "Files", icon: FileText },
-          { id: "folders", label: "Folders", icon: Folder },
-        ]}
-        activeTab="files"
-        onChange={setActiveTab}
-      />
-      <SpPageBody>{activeTab === "files" ? "files" : "folders"}</SpPageBody>
+
+      <SpPageDivider />
+
+      <SpPageBody>
+        <div className="flex flex-col gap-4 sm:gap-6 h-full w-full sm:px-0">
+          <FileUploadShad isOpen={isOpen} setIsOpen={setIsOpen} onUpload={loadFiles} />
+
+          {/* Recent Files Section */}
+          <section className="w-full">
+            <FileRecents />
+          </section>
+
+          {/* File Explorer Section */}
+          <section className="w-full">
+            <div className="mb-3 sm:mb-4">
+              <h2 className="text-lg sm:text-xl font-semibold">File Explorer</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Browse and manage all your files and folders</p>
+            </div>
+            <FileExplorerTable />
+          </section>
+        </div>
+      </SpPageBody>
     </SpPage>
   );
 }

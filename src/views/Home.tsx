@@ -9,7 +9,7 @@ import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
 import { getSquadsWithUsersByTeamId } from "@/services/squadService";
 import DefaultLayout from "@/layouts/DefaultLayout";
-import { Loader2 } from "lucide-react";
+import { WaveLoader } from "@/components/ui/loader";
 import Settings from "./Settings";
 // import SessionStats from "./SessionStats";
 // Dynamic imports for better code splitting
@@ -45,13 +45,9 @@ export default function AppRoutes() {
     load();
   }, []);
 
-  // Loading fallback component
   const LoadingFallback = () => (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="flex items-center gap-2 text-gray-600">
-        <Loader2 className="w-6 h-6 animate-spin" />
-        <span>Loading...</span>
-      </div>
+    <div className="flex items-center justify-center min-h-screen bg-transparent">
+      <WaveLoader />
     </div>
   );
 

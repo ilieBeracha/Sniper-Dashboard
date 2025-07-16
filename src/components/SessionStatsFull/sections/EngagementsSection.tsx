@@ -16,14 +16,14 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
   const { theme } = useTheme();
 
   return (
-    <div id="engagements" className="snap-start scroll-mt-4 min-h-[85vh] space-y-4 ">
+    <div id="engagements" className="snap-start scroll-mt-4 h-[calc(100vh-5rem)] flex flex-col space-y-6 py-8">
       <SectionHeader section={section} />
-      <Card className={`border ${theme === "dark" ? "border-white/10 bg-zinc-900/30" : "border-gray-200 bg-gray-50/50"} rounded-lg p-4`}>
+      <Card className={`border ${theme === "dark" ? "border-white/10 bg-zinc-900/30" : "border-gray-200 bg-gray-50/50"} rounded-lg p-6 lg:p-8 flex-1 overflow-auto`}>
         <CardContent className="p-0">
-          <div className="space-y-6 lg:space-y-8">
+          <div className="space-y-8 lg:space-y-12">
             {targets.map((target, targetIndex) => (
               <div key={target.id}>
-                <div className={`border-b ${theme === "dark" ? "border-white/10" : "border-gray-200"} p-4 lg:p-6`}>
+                <div className={`border-b ${theme === "dark" ? "border-white/10" : "border-gray-200"} p-6 lg:p-8`}>
                   <h3 className={`text-lg font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                       <span>
@@ -37,9 +37,9 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
                     </div>
                   </h3>
                 </div>
-                <div className="p-4 lg:p-6">
+                <div className="p-6 lg:p-8">
                   {/* Header row */}
-                  <div className={`grid grid-cols-3 gap-4 mb-4 pb-3 border-b ${theme === "dark" ? "border-white/5" : "border-gray-100"}`}>
+                  <div className={`grid grid-cols-3 gap-4 mb-6 pb-4 border-b ${theme === "dark" ? "border-white/5" : "border-gray-100"}`}>
                     <span className={`text-xs font-semibold ${theme === "dark" ? "text-gray-300" : "text-gray-700"} uppercase tracking-wider`}></span>
                     <span
                       className={`text-xs font-semibold ${theme === "dark" ? "text-gray-300" : "text-gray-700"} uppercase tracking-wider text-center`}
@@ -54,7 +54,7 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
                   </div>
 
                   {/* Data rows */}
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {participants
                       .filter((p) => p.userDuty === "Sniper")
                       .map((participant) => {

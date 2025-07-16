@@ -5,15 +5,10 @@ import Header from "@/Headers/Header";
 import WeaponsTab from "@/components/AssetsWeaponsTab";
 import EquipmentTab from "@/components/AssetsEquipmentTab";
 import BaseButton from "@/components/base/BaseButton";
-import { isCommanderOrSquadCommander } from "@/utils/permissions";
-import { UserRole } from "@/types/user";
-import { useStore } from "zustand";
-import { userStore } from "@/store/userStore";
 
 export default function AssetsPage() {
   const [activeTab, setActiveTab] = useState<"weapons" | "equipments">("weapons");
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useStore(userStore);
   const tabs = [
     { id: "weapons", label: "weapons", icon: FileQuestion },
     { id: "equipments", label: "equipments", icon: Package },
@@ -37,24 +32,34 @@ export default function AssetsPage() {
           { label: "Dashboard", link: "/" },
           { label: "Assets", link: "/assets" },
         ]}
-        button={
-          isCommanderOrSquadCommander(user?.user_role as UserRole)
-            ? activeTab === "weapons"
-              ? [
-                  <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsOpen(true)}>
-                    Add Weapon
-                  </BaseButton>,
-                ]
-              : [
-                  <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsOpen(true)}>
-                    Add Equipment
-                  </BaseButton>,
-                ]
-            : []
-        }
+        button={[
+          activeTab === "weapons" ? (
+            <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsOpen(true)}>
+              Add Weapon
+            </BaseButton>
+          ) : (
+            <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsOpen(true)}>
+              Add Equipment
+            </BaseButton>
+          ),
+        ]}
       />
       <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={(tab) => setActiveTab(tab as "weapons" | "equipments")} />
       <SpPageBody>{renderComponent()}</SpPageBody>
     </SpPage>
   );
 }
+
+// isCommanderOrSquadCommander(user?.user_role as UserRole)
+//             ? activeTab === "weapons"
+//               ? [
+//                   <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsOpen(true)}>
+//                     Add Weapon
+//                   </BaseButton>,
+//                 ]
+//               : [
+//                   <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsOpen(true)}>
+//                     Add Equipment
+//                   </BaseButton>,
+//                 ]
+//             : []

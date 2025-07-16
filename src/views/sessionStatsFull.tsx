@@ -44,12 +44,12 @@ export default function ImprovedSessionStats() {
   } = useSessionStats();
 
   return (
-    <div className={`min-h-screen  flex flex-col  gap${theme === "dark" ? "dark bg-[#121212]" : "bg-gray-100"}`}>
+    <div className={`min-h-screen flex flex-col ${theme === "dark" ? "bg-[#121212]" : "bg-gray-100"}`}>
       <Header />
       <ProgressIndicator sections={sections} activeSection={activeSection} getSectionValidationStatus={getSectionValidationStatus} />
 
       <div
-        className="max-w-6xl mx-auto px-4 py-4 lg:py-12 space-y-24 snap-y snap-mandatory h-[calc(100vh-5rem)] overflow-y-auto scroll-smooth"
+        className="max-w-6xl mx-auto px-4 py-4 lg:py-8 flex flex-col gap-0 snap-y snap-mandatory h-[calc(100vh-5rem)] overflow-y-auto scroll-smooth"
         onScroll={handleScroll}
       >
         <SessionConfigSection

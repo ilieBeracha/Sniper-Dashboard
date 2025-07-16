@@ -3,24 +3,57 @@ import BaseInput from "@/components/base/BaseInput";
 import { useTheme } from "@/contexts/ThemeContext";
 import { validateAuthForm } from "@/lib/formValidation";
 
-export function ModernLogin({ AuthSubmit, onRegisterClick }: { AuthSubmit: any; onRegisterClick?: (type: string) => any }) {
+export function ModernLogin({
+  AuthSubmit,
+  onRegisterClick,
+  onSignInWithEmail,
+}: {
+  AuthSubmit: any;
+  onRegisterClick?: (type: string) => any;
+  onSignInWithEmail?: (email: string) => void;
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loginMethod, setLoginMethod] = useState<"password" | "magiclink">("password");
+  const [isLoading, setIsLoading] = useState(false);
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
   const { theme } = useTheme();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
-    const validationError = validateAuthForm({ email, password });
-    if (validationError) {
-      setError(validationError);
-      return;
+    try {
+      if (loginMethod === "password") {
+        const validationError = validateAuthForm({ email, password });
+        if (validationError) {
+          setError(validationError);
+          setIsLoading(false);
+          return;
+        }
+        await AuthSubmit({ email, password });
+      } else {
+        // Magic link login
+        if (!email) {
+          setError("Please enter your email address");
+          setIsLoading(false);
+          return;
+        }
+        if (onSignInWithEmail) {
+          await onSignInWithEmail(email);
+          setMagicLinkSent(true);
+        } else {
+          setError("Magic link login is not configured");
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || "An error occurred");
+    } finally {
+      setIsLoading(false);
     }
-
-    AuthSubmit({ email, password });
   };
 
   const emailIcon = (
@@ -88,90 +121,182 @@ export function ModernLogin({ AuthSubmit, onRegisterClick }: { AuthSubmit: any; 
 
   return (
     <form className="space-y-6 " onSubmit={handleSubmit}>
-      {error && (
+      {magicLinkSent ? (
         <div
-          className={`p-3 rounded-lg text-sm ${
-            theme === "dark" ? "bg-red-900/50 text-red-300 border border-red-800" : "bg-red-50 text-red-700 border border-red-200"
+          className={`p-6 rounded-lg text-center space-y-4 ${
+            theme === "dark" ? "bg-green-900/20 border border-green-800" : "bg-green-50 border border-green-200"
           }`}
         >
-          {error}
+          <svg
+            className={`w-16 h-16 mx-auto ${theme === "dark" ? "text-green-400" : "text-green-600"}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+            />
+          </svg>
+          <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            Check your email!
+          </h3>
+          <p className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+            We've sent a magic link to <strong>{email}</strong>. Click the link in the email to sign in.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setMagicLinkSent(false);
+              setLoginMethod("password");
+            }}
+            className={`text-sm underline ${theme === "dark" ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"}`}
+          >
+            Back to login
+          </button>
         </div>
+      ) : (
+        <>
+          {error && (
+            <div
+              className={`p-3 rounded-lg text-sm ${
+                theme === "dark" ? "bg-red-900/50 text-red-300 border border-red-800" : "bg-red-50 text-red-700 border border-red-200"
+              }`}
+            >
+              {error}
+            </div>
+          )}
+
+          {/* Login method selector */}
+          <div className="flex gap-2 p-1 rounded-lg bg-gray-100 dark:bg-zinc-800">
+            <button
+              type="button"
+              onClick={() => setLoginMethod("password")}
+              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+                loginMethod === "password"
+                  ? theme === "dark"
+                    ? "bg-white text-black shadow-sm"
+                    : "bg-white text-gray-900 shadow-sm"
+                  : theme === "dark"
+                  ? "text-gray-400 hover:text-white"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Password
+            </button>
+            <button
+              type="button"
+              onClick={() => setLoginMethod("magiclink")}
+              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+                loginMethod === "magiclink"
+                  ? theme === "dark"
+                    ? "bg-white text-black shadow-sm"
+                    : "bg-white text-gray-900 shadow-sm"
+                  : theme === "dark"
+                  ? "text-gray-400 hover:text-white"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Magic Link
+            </button>
+          </div>
+
+          <BaseInput
+            label="Email address"
+            type="email"
+            id="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            className="text-sm"
+            leftIcon={emailIcon}
+          />
+
+          {loginMethod === "password" && (
+            <BaseInput
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              id="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              className="text-md"
+              leftIcon={passwordIcon}
+              rightIcon={togglePasswordIcon}
+            />
+          )}
+        </>
       )}
 
-      <BaseInput
-        label="Email address"
-        type="email"
-        id="email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Enter your email"
-        className="text-sm"
-        leftIcon={emailIcon}
-      />
+      {!magicLinkSent && (
+        <div className="space-y-4">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={`w-full flex justify-center items-center px-4 py-4 rounded-2xl font-semibold focus:outline-none focus:ring-2 transition-all duration-200 ${
+              theme === "dark"
+                ? "bg-white text-[#0A0A0A] hover:bg-gray-100 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] disabled:opacity-50 disabled:cursor-not-allowed"
+                : "bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed"
+            }`}
+          >
+            {isLoading ? (
+              <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+            ) : loginMethod === "password" ? (
+              "Sign In"
+            ) : (
+              "Send Magic Link"
+            )}
+          </button>
 
-      <BaseInput
-        label="Password"
-        type={showPassword ? "text" : "password"}
-        id="password"
-        required
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Enter your password"
-        className="text-md"
-        leftIcon={passwordIcon}
-        rightIcon={togglePasswordIcon}
-      />
-
-      <div className="space-y-4">
-        <button
-          type="submit"
-          className={`w-full flex justify-center items-center px-4 py-4 rounded-2xl font-semibold focus:outline-none focus:ring-2 transition-all duration-200 ${
-            theme === "dark"
-              ? "bg-white text-[#0A0A0A] hover:bg-gray-100 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
-              : "bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-white"
-          }`}
-        >
-          Sign In
-        </button>
-
-        {onRegisterClick && (
-          <div className={`mt-6 pt-4 border-t transition-colors duration-200 ${theme === "dark" ? "border-[#2A2A2A]" : "border-gray-300"}`}>
-            <p className={`text-sm text-center mb-3 transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-              Don't have an account?
-            </p>
-            <div className="space-y-2">
-              <button
-                type="button"
-                onClick={() => onRegisterClick("team_manager_register")}
-                className={`w-full px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
-                  theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#1E1E20]" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                }`}
-              >
-                Register as Team Commander
-              </button>
-              <button
-                type="button"
-                onClick={() => onRegisterClick("squad_manager_register")}
-                className={`w-full px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
-                  theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#1E1E20]" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                }`}
-              >
-                Register as Squad Commander
-              </button>
-              <button
-                type="button"
-                onClick={() => onRegisterClick("soldier_register")}
-                className={`w-full px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
-                  theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#1E1E20]" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                }`}
-              >
-                Register as Soldier
-              </button>
+          {onRegisterClick && (
+            <div className={`mt-6 pt-4 border-t transition-colors duration-200 ${theme === "dark" ? "border-[#2A2A2A]" : "border-gray-300"}`}>
+              <p className={`text-sm text-center mb-3 transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                Don't have an account?
+              </p>
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => onRegisterClick("team_manager_register")}
+                  className={`w-full px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
+                    theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#1E1E20]" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
+                >
+                  Register as Team Commander
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRegisterClick("squad_manager_register")}
+                  className={`w-full px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
+                    theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#1E1E20]" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
+                >
+                  Register as Squad Commander
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRegisterClick("soldier_register")}
+                  className={`w-full px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
+                    theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#1E1E20]" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
+                >
+                  Register as Soldier
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </form>
   );
 }

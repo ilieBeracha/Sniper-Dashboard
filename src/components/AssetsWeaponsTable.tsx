@@ -1,19 +1,24 @@
 import { useState, useMemo } from "react";
 import { Weapon } from "@/types/weapon";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Eye, Edit, Search, X, Save } from "lucide-react";
+import { Eye, Edit, Search, X, Save, BarChart3 } from "lucide-react";
 import { format } from "date-fns";
 import { useStore } from "zustand";
 import { weaponsStore } from "@/store/weaponsStore";
+import { performanceStore } from "@/store/performance";
 import { SpTable, SpTableColumn } from "@/layouts/SpTable";
+import WeaponUsageModal from "./WeaponUsageModal";
 
 export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
   // Filter out weapons without IDs for SpTable compatibility
   const weaponsWithIds = weapons.filter((weapon): weapon is Weapon & { id: string } => Boolean(weapon.id));
   const { theme } = useTheme();
   const { updateWeapon } = useStore(weaponsStore);
+  const { getWeaponUsageStats } = useStore(performanceStore);
   const [editingWeapon, setEditingWeapon] = useState<Weapon | null>(null);
   const [editForm, setEditForm] = useState<Partial<Weapon>>({});
+  const [usageModalOpen, setUsageModalOpen] = useState(false);
+  const [selectedWeaponForUsage, setSelectedWeaponForUsage] = useState<Weapon | null>(null);
 
   // Get unique weapon types for filter
   const uniqueWeaponTypes = useMemo(() => {
@@ -45,6 +50,15 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
 
   const handleViewWeapon = (weapon: Weapon) => {
     console.log("Viewing weapon:", weapon);
+  };
+
+  const handleViewUsage = async (weapon: Weapon) => {
+    if (!weapon.id) return;
+    console.log("AssetsWeaponsTable - handleViewUsage called with weapon:", weapon);
+    console.log("AssetsWeaponsTable - weapon.id:", weapon.id);
+    setSelectedWeaponForUsage(weapon);
+    setUsageModalOpen(true);
+    await getWeaponUsageStats(weapon.id);
   };
 
   const columns: SpTableColumn<Weapon>[] = [
@@ -167,9 +181,19 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
                 handleViewWeapon(weapon);
               }}
               className={`p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
-              title="View"
+              title="View Details"
             >
               <Eye size={16} />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleViewUsage(weapon);
+              }}
+              className={`p-2 rounded hover:bg-green-100 dark:hover:bg-green-800/40 ${theme === "dark" ? "text-green-400" : "text-green-600"}`}
+              title="Usage Statistics"
+            >
+              <BarChart3 size={16} />
             </button>
             <button
               onClick={(e) => {
@@ -198,20 +222,31 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
   }
 
   return (
-    <SpTable
-      data={weaponsWithIds}
-      columns={columns}
-      filters={filters}
-      searchPlaceholder="Search by serial number, type, or MV..."
-      searchFields={["serial_number", "weapon_type", "mv"]}
-      actions={actions}
-      emptyState={
-        <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
-          <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <h3 className="text-lg font-medium mb-2">No weapons match your filters</h3>
-          <p className="text-sm">Try adjusting your search criteria</p>
-        </div>
-      }
-    />
+    <>
+      <SpTable
+        data={weaponsWithIds}
+        columns={columns}
+        filters={filters}
+        searchPlaceholder="Search by serial number, type, or MV..."
+        searchFields={["serial_number", "weapon_type", "mv"]}
+        actions={actions}
+        emptyState={
+          <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+            <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <h3 className="text-lg font-medium mb-2">No weapons match your filters</h3>
+            <p className="text-sm">Try adjusting your search criteria</p>
+          </div>
+        }
+      />
+      
+      <WeaponUsageModal
+        isOpen={usageModalOpen}
+        onClose={() => {
+          setUsageModalOpen(false);
+          setSelectedWeaponForUsage(null);
+        }}
+        weapon={selectedWeaponForUsage}
+      />
+    </>
   );
 }

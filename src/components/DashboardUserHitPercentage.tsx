@@ -5,10 +5,10 @@ import NoDataDisplay from "./base/BaseNoData";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function UserHitPercentage() {
-  const { userHitPercentage } = useStore(performanceStore);
+  const { userHitsStats } = useStore(performanceStore);
   const { theme } = useTheme();
 
-  if (!userHitPercentage) {
+  if (!userHitsStats) {
     return (
       <div className="h-full flex justify-center items-center w-full text-sm">
         <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-indigo-500"></div>
@@ -16,7 +16,7 @@ export default function UserHitPercentage() {
     );
   }
 
-  const percentage = userHitPercentage.hit_percentage;
+  const percentage = userHitsStats.hit_percentage ?? 0;
   const gaugeData = [
     { name: "Hit", value: percentage },
     { name: "Miss", value: 100 - percentage },
@@ -33,7 +33,7 @@ export default function UserHitPercentage() {
   return (
     <div className="flex w-full flex-col h-full justify-evenly col-auto text-sm p-4">
       <div className=" relative justify-between flex h-full flex-col gap-2">
-        {!userHitPercentage.hit_percentage && userHitPercentage.total_shots === 0 ? (
+        {!userHitsStats.hit_percentage && userHitsStats.shots_fired === 0 ? (
           <NoDataDisplay />
         ) : (
           <>
@@ -76,7 +76,7 @@ export default function UserHitPercentage() {
                   <span
                     className={`text-xs px-1.5 py-0.5 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
                   >
-                    {userHitPercentage.total_shots}
+                    {userHitsStats.shots_fired}
                   </span>
                 </div>
                 <div
@@ -94,7 +94,7 @@ export default function UserHitPercentage() {
                   <span
                     className={`text-xs px-1.5 py-0.5 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
                   >
-                    {userHitPercentage.total_hits}
+                    {userHitsStats.confirmed_hits}
                   </span>
                 </div>
                 <div
@@ -102,14 +102,14 @@ export default function UserHitPercentage() {
                 >
                   <div
                     className="h-full rounded-full"
-                    style={{ width: `${(userHitPercentage.total_hits / userHitPercentage.total_shots) * 100}%`, backgroundColor: hitColor }}
+                    style={{ width: `${(userHitsStats.confirmed_hits / userHitsStats.shots_fired) * 100}%`, backgroundColor: hitColor }}
                   ></div>
                 </div>
               </div>
             </div>
             <div className={`mt-3 text-center text-xs transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
               <span className={`px-2 py-0.5 rounded transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
-                {userHitPercentage.assignments_count} Assignments Completed
+                {userHitsStats.session_count} Training Sessions Completed
               </span>
             </div>
           </>

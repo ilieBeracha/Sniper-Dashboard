@@ -22,7 +22,7 @@ const formatValue = (value: number, type: string | undefined) => {
 export default function DashboardSquadStats() {
   const { user } = useStore(userStore);
   const [chartData, setChartData] = useState<any[]>([]);
-  const { getSquadStats, squadStats } = useStore(performanceStore);
+  const { getSquadStatsByRole, squadStats } = useStore(performanceStore);
   const [selectedFilter, setSelectedFilter] = useState<string>("");
   const [selectedDistance, setSelectedDistance] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -71,7 +71,7 @@ export default function DashboardSquadStats() {
 
   useEffect(() => {
     setIsLoading(true);
-    getSquadStats(null, null);
+    getSquadStatsByRole(null, null);
   }, [user?.squad_id]);
 
   const handleFilterChange = async (filter: string) => {
@@ -79,21 +79,21 @@ export default function DashboardSquadStats() {
     if (filter !== "distance") setSelectedDistance("");
     if (filter === "") {
       setIsLoading(true);
-      await getSquadStats(null, null);
+      await getSquadStatsByRole(null, null);
     }
   };
 
   const handleDistanceChange = async (distance: string) => {
     setSelectedDistance(distance);
     setIsLoading(true);
-    await getSquadStats(null, distance);
+    await getSquadStatsByRole(null, distance);
   };
 
   const resetFilters = async () => {
     setSelectedFilter("");
     setSelectedDistance("");
     setIsLoading(true);
-    await getSquadStats(null, null);
+    await getSquadStatsByRole(null, null);
   };
 
   return (
