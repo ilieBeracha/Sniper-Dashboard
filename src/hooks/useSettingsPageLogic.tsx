@@ -6,13 +6,21 @@ import { equipmentStore } from "@/store/equipmentStore";
 import { BASE_WEAPONS } from "@/utils/BaseData/BaseWeapons";
 import { BASE_EQUIPMENTS } from "@/utils/BaseData/BaseEquipments";
 import { User } from "@/types/user";
+import { Team } from "@/types/team";
+import { Squad } from "@/types/squad";
 import { UserDuty } from "@/types/score";
 import { Settings as SettingsIcon } from "lucide-react";
+import { getTeamById, updateTeamName } from "@/services/teamService";
+import { getSquadById, updateSquadName } from "@/services/squadService";
 
 export function useSettingsPageLogic() {
   const { user, updateUser, fetchUserFromDB } = useStore(userStore);
   const { weapons } = useStore(weaponsStore);
   const { equipments } = useStore(equipmentStore);
+
+  const [team, setTeam] = useState<Team | null>(null);
+  const [squad, setSquad] = useState<Squad | null>(null);
+  const [emailError, setEmailError] = useState<string>("");
 
   const [formData, setFormData] = useState({
     user_role: user?.user_role || "",
@@ -20,6 +28,8 @@ export function useSettingsPageLogic() {
     first_name: user?.first_name || "",
     last_name: user?.last_name || "",
     email: user?.email || "",
+    team_name: "",
+    squad_name: "",
     user_default_duty: user?.user_default_duty || UserDuty.SNIPER,
     user_default_weapon: user?.user_default_weapon || null,
     user_default_equipment: user?.user_default_equipment || null,
@@ -33,7 +43,22 @@ export function useSettingsPageLogic() {
     fetchData();
   }, [fetchUserFromDB]);
 
-  // Update formData when user changes
+  // Fetch team and squad data when user changes
+  useEffect(() => {
+    const fetchRelatedData = async () => {
+      if (user?.team_id) {
+        const teamData = await getTeamById(user.team_id);
+        setTeam(teamData);
+      }
+      if (user?.squad_id) {
+        const squadData = await getSquadById(user.squad_id);
+        setSquad(squadData);
+      }
+    };
+    fetchRelatedData();
+  }, [user?.team_id, user?.squad_id]);
+
+  // Update formData when user, team, or squad changes
   useEffect(() => {
     if (user) {
       setFormData({
@@ -42,12 +67,14 @@ export function useSettingsPageLogic() {
         first_name: user.first_name || "",
         last_name: user.last_name || "",
         email: user.email || "",
+        team_name: team?.team_name || "",
+        squad_name: squad?.squad_name || "",
         user_default_duty: user.user_default_duty || UserDuty.SNIPER,
         user_default_weapon: user.user_default_weapon || null,
         user_default_equipment: user.user_default_equipment || null,
       });
     }
-  }, [user]);
+  }, [user, team, squad]);
 
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -76,11 +103,56 @@ export function useSettingsPageLogic() {
     }
   };
 
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleFormChange = async (field: string, value: any) => {
     // Update local state first
     setFormData(prev => ({ ...prev, [field]: value }));
     
-    // Then save to DB and update store
+    // Handle email validation
+    if (field === "email") {
+      if (!isValidEmail(value)) {
+        setEmailError("Please enter a valid email address");
+        return; // Don't save invalid email
+      } else {
+        setEmailError("");
+      }
+    }
+    
+    // Handle team name updates
+    if (field === "team_name" && user?.team_id) {
+      try {
+        const updatedTeam = await updateTeamName(user.team_id, value);
+        if (updatedTeam) {
+          setTeam(updatedTeam);
+        }
+      } catch (error) {
+        console.error("Error updating team name:", error);
+        // Revert local state
+        setFormData(prev => ({ ...prev, team_name: team?.team_name || "" }));
+      }
+      return;
+    }
+    
+    // Handle squad name updates
+    if (field === "squad_name" && user?.squad_id) {
+      try {
+        const updatedSquad = await updateSquadName(user.squad_id, value);
+        if (updatedSquad) {
+          setSquad(updatedSquad);
+        }
+      } catch (error) {
+        console.error("Error updating squad name:", error);
+        // Revert local state
+        setFormData(prev => ({ ...prev, squad_name: squad?.squad_name || "" }));
+      }
+      return;
+    }
+    
+    // Handle other user fields
     try {
       await updateUser({ [field]: value });
     } catch (error) {
@@ -173,6 +245,7 @@ export function useSettingsPageLogic() {
     setActiveTab,
     availableWeapons,
     availableEquipment,
+    emailError,
 
     // Handlers
     handleSave,
