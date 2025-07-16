@@ -1,6 +1,5 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import BaseInput from "@/components/base/BaseInput";
-import BaseButton from "@/components/base/BaseButton";
 import { User as UserIcon, Settings as SettingsIcon, Shield, Target, Crosshair } from "lucide-react";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import Header from "@/Headers/Header";
@@ -10,16 +9,15 @@ const Settings = () => {
   const { theme } = useTheme();
   const {
     formData,
-    loading,
-    saved,
     tabs,
     activeTab,
     setActiveTab,
     availableWeapons,
     availableEquipment,
-    handleSave,
     handleFormChange,
     handleDutyChange,
+    handleWeaponChange,
+    handleEquipmentChange,
     UserDuty,
   } = useSettingsPageLogic();
 
@@ -135,19 +133,38 @@ const Settings = () => {
                   </label>
                   <select
                     value={formData.user_default_weapon || ""}
-                    onChange={(e) => handleFormChange("user_default_weapon", e.target.value)}
-                    className={`w-full px-4 py-2 rounded-lg border transition-all duration-200 ${
+                    onChange={(e) => handleWeaponChange(e.target.value)}
+                    className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 shadow-sm ${
                       theme === "dark"
-                        ? "bg-zinc-800 border-gray-700 text-gray-300 focus:border-gray-500"
-                        : "bg-white border-gray-300 text-gray-900 focus:border-gray-500"
+                        ? "bg-zinc-800 border-zinc-700 text-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                        : "bg-white border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                     }`}
                   >
                     <option value="">Select a weapon</option>
-                    {availableWeapons.map((weapon) => (
-                      <option key={weapon.id} value={weapon.id}>
-                        {weapon.weapon_type}
-                      </option>
-                    ))}
+                    {(() => {
+                      const groupedWeapons = availableWeapons
+                        .filter(weapon => weapon.serial_number && weapon.serial_number.trim() !== '')
+                        .reduce(
+                          (acc, weapon) => {
+                            if (!acc[weapon.weapon_type]) {
+                              acc[weapon.weapon_type] = [];
+                            }
+                            acc[weapon.weapon_type].push(weapon);
+                            return acc;
+                          },
+                          {} as Record<string, typeof availableWeapons>,
+                        );
+
+                      return Object.entries(groupedWeapons).map(([type, weapons]) => (
+                        <optgroup key={type} label={type}>
+                          {weapons.map((weapon) => (
+                            <option key={weapon.id} value={weapon.id}>
+                              SN: {weapon.serial_number}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ));
+                    })()}
                   </select>
                 </div>
               ) : (
@@ -157,31 +174,43 @@ const Settings = () => {
                   </label>
                   <select
                     value={formData.user_default_equipment || ""}
-                    onChange={(e) => handleFormChange("user_default_equipment", e.target.value)}
-                    className={`w-full px-4 py-2 rounded-lg border transition-all duration-200 ${
+                    onChange={(e) => handleEquipmentChange(e.target.value)}
+                    className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 shadow-sm ${
                       theme === "dark"
-                        ? "bg-zinc-800 border-gray-700 text-gray-300 focus:border-gray-500"
-                        : "bg-white border-gray-300 text-gray-900 focus:border-gray-500"
+                        ? "bg-zinc-800 border-zinc-700 text-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                        : "bg-white border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                     }`}
                   >
                     <option value="">Select equipment</option>
-                    {availableEquipment.map((eq) => (
-                      <option key={eq.id} value={eq.id}>
-                        {eq.equipment_type} ({eq.day_night})
-                      </option>
-                    ))}
+                    {(() => {
+                      const groupedEquipment = availableEquipment
+                        .filter(eq => eq.serial_number && eq.serial_number.trim() !== '')
+                        .reduce(
+                          (acc, eq) => {
+                            if (!acc[eq.equipment_type]) {
+                              acc[eq.equipment_type] = [];
+                            }
+                            acc[eq.equipment_type].push(eq);
+                            return acc;
+                          },
+                          {} as Record<string, typeof availableEquipment>,
+                        );
+
+                      return Object.entries(groupedEquipment).map(([type, equipment]) => (
+                        <optgroup key={type} label={type}>
+                          {equipment.map((eq) => (
+                            <option key={eq.id} value={eq.id}>
+                              SN: {eq.serial_number}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ));
+                    })()}
                   </select>
                 </div>
               )}
             </div>
           </div>
-        </div>
-
-        {/* Save Button */}
-        <div className="flex justify-end mt-8">
-          <BaseButton onClick={handleSave} disabled={loading} style="purple">
-            {loading ? "Saving..." : saved ? "Saved!" : "Save Changes"}
-          </BaseButton>
         </div>
       </SpPageBody>
     </SpPage>

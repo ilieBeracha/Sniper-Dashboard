@@ -116,7 +116,7 @@ export const ParticipantsSection = ({
                       onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
                       className={`w-full h-10 px-2 text-xs border ${theme === "dark" ? "border-zinc-600 bg-zinc-800 text-white" : "border-gray-300"} rounded-md focus:ring-indigo-500 focus:border-indigo-500`}
                     >
-                      <option value="Lying">Prone</option>
+                      <option value="Lying">Lying</option>
                       <option value="Standing">Standing</option>
                       <option value="Sitting">Sitting</option>
                       <option value="Operational">Operational</option>
@@ -139,12 +139,12 @@ export const ParticipantsSection = ({
                       {participant.userDuty === "Sniper"
                         ? weapons.map((weapon: any) => (
                             <option key={weapon.id} value={weapon.id || ""}>
-                              {weapon.weapon_type}
+                              {weapon.weapon_type} - SN: {weapon.serial_number}
                             </option>
                           ))
                         : equipments.map((equipment: any) => (
                             <option key={equipment.id} value={equipment.id || ""}>
-                              {equipment.equipment_type}
+                              {equipment.equipment_type} - SN: {equipment.serial_number}
                             </option>
                           ))}
                     </select>

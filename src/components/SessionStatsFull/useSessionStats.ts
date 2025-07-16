@@ -147,7 +147,23 @@ export const useSessionStats = () => {
   };
 
   const updateParticipant = (userId: string, field: keyof Participant, value: any) => {
-    setParticipants((prev) => prev.map((p) => (p.userId === userId ? { ...p, [field]: value } : p)));
+    setParticipants((prev) => prev.map((p) => {
+      if (p.userId === userId) {
+        const updatedParticipant = { ...p, [field]: value };
+        
+        // Clear conflicting fields when duty changes
+        if (field === 'userDuty') {
+          if (value === 'Sniper') {
+            updatedParticipant.equipmentId = '';
+          } else if (value === 'Spotter') {
+            updatedParticipant.weaponId = '';
+          }
+        }
+        
+        return updatedParticipant;
+      }
+      return p;
+    }));
   };
 
   const addParticipant = (memberId: string) => {
@@ -156,10 +172,10 @@ export const useSessionStats = () => {
       const newParticipant: Participant = {
         userId: member.id,
         name: member.first_name || member.last_name ? `${member.first_name || ""} ${member.last_name || ""}`.trim() : member.email,
-        userDuty: "Sniper",
+        userDuty: member.user_default_duty || "Sniper",
         position: "Lying",
-        weaponId: "",
-        equipmentId: "",
+        weaponId: member.user_default_weapon || "",
+        equipmentId: member.user_default_equipment || "",
       };
       setParticipants((prev) => [...prev, newParticipant]);
     }
@@ -174,10 +190,10 @@ export const useSessionStats = () => {
       const newParticipant: Participant = {
         userId: member.id,
         name: member.first_name || member.last_name ? `${member.first_name || ""} ${member.last_name || ""}`.trim() : member.email,
-        userDuty: "Sniper",
+        userDuty: member.user_default_duty || "Sniper",
         position: "Lying",
-        weaponId: "",
-        equipmentId: "",
+        weaponId: member.user_default_weapon || "",
+        equipmentId: member.user_default_equipment || "",
       };
       setParticipants((prev) => [...prev, newParticipant]);
     });
