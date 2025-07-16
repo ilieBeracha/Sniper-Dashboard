@@ -1,7 +1,6 @@
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import TrainingList from "@/components/TrainingList";
 import SpPagination from "@/layouts/SpPagination";
-import BaseButton from "@/components/base/BaseButton";
 import TrainingAddTrainingSessionModal from "@/components/TrainingModal/AddTrainingSessionModal";
 import { BiCurrentLocation } from "react-icons/bi";
 import { useTrainingsPageLogic } from "@/hooks/useTrainingsPageLogic";
@@ -35,11 +34,7 @@ export default function Trainings() {
           { label: "Dashboard", link: "/" },
           { label: "Trainings", link: "/trainings" },
         ]}
-        button={[
-          <BaseButton style="purple" onClick={() => setIsAddTrainingOpen(true)}>
-            Add Training
-          </BaseButton>,
-        ]}
+        dropdownItems={[{ label: "Add Training", onClick: () => setIsAddTrainingOpen(true) }]}
       />
       <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
@@ -52,13 +47,13 @@ export default function Trainings() {
           prevPageWithScroll={() => {
             if (currentPage > 0) {
               setIsPageChanging(true);
-              setActiveTab(tabs[0].label);
+              setActiveTab(tabs[0].id);
             }
           }}
           nextPageWithScroll={() => {
             if (hasMore) {
               setIsPageChanging(true);
-              setActiveTab(tabs[0].label);
+              setActiveTab(tabs[0].id);
             }
           }}
         />

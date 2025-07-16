@@ -44,7 +44,7 @@ export default function FilePreviewCard({ file, previewUrl, onDownload, onDelete
           <div
             className={`w-1/2 relative flex items-center justify-center ${
               previewUrl
-                ? "bg-gray-100 bg-zinc-800"
+                ? " bg-zinc-800"
                 : theme === "dark"
                   ? "bg-gradient-to-br from-zinc-800/50 to-zinc-900/50"
                   : "bg-gradient-to-br from-gray-50 to-gray-100"
@@ -77,22 +77,21 @@ export default function FilePreviewCard({ file, previewUrl, onDownload, onDelete
           </div>
 
           {/* Right half - File info */}
-          <div className="w-1/2 py-2 px-3 flex flex-col justify-between overflow-hidden min-w-0">
-            <div className="flex flex-col overflow-hidden gap-0.5 min-w-0">
-              <h4 className={`font-medium text-xs truncate text-left ${theme === "dark" ? "text-white" : "text-gray-900"}`} title={file.name}>
+          <div className="w-1/2 py-4 px-4 flex flex-col justify-between overflow-hidden min-w-0">
+            <div className="flex flex-col overflow-hidden gap-1 min-w-0">
+              <h4 className={`font-semibold text-sm truncate text-left ${theme === "dark" ? "text-white" : "text-gray-900"}`} title={file.name}>
                 <span className="block truncate">{file.name}</span>
               </h4>
-              <p className={`text-[10px] text-left ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+              <p className={`text-xs text-left font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
                 {formatSize(file.metadata?.size)}
+              </p>
+              <p className={`text-xs text-left ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+                {formatDate(file.created_at || file.metadata?.lastModified)}
               </p>
             </div>
 
             <div className="flex items-center justify-between gap-2 mt-2">
-              <div
-                className={`text-xs px-2 py-1 rounded-full ${
-                  isImage ? "bg-blue-500/10 text-blue-500 bg-blue-500/20" : "bg-gray-500/10 text-gray-500 bg-gray-500/20"
-                }`}
-              >
+              <div className={`text-xs px-2 py-1 rounded-full ${isImage ? " text-blue-500 bg-blue-500/20" : " text-gray-500 bg-gray-500/20"}`}>
                 {getFileExtension(file.name).toUpperCase() || "FILE"}
               </div>
               <div className="flex items-center gap-2">

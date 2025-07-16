@@ -4,7 +4,6 @@ import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import Header from "@/Headers/Header";
 import WeaponsTab from "@/components/AssetsWeaponsTab";
 import EquipmentTab from "@/components/AssetsEquipmentTab";
-import BaseButton from "@/components/base/BaseButton";
 
 export default function AssetsPage() {
   const [activeTab, setActiveTab] = useState<"weapons" | "equipments">("weapons");
@@ -32,16 +31,10 @@ export default function AssetsPage() {
           { label: "Dashboard", link: "/" },
           { label: "Assets", link: "/assets" },
         ]}
-        button={[
-          activeTab === "weapons" ? (
-            <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsOpen(true)}>
-              Add Weapon
-            </BaseButton>
-          ) : (
-            <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsOpen(true)}>
-              Add Equipment
-            </BaseButton>
-          ),
+        dropdownItems={[
+          activeTab === "weapons"
+            ? { label: "Add Weapon", onClick: () => setIsOpen(true) }
+            : { label: "Add Equipment", onClick: () => setIsOpen(true) },
         ]}
       />
       <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={(tab) => setActiveTab(tab as "weapons" | "equipments")} />

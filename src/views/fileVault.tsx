@@ -2,11 +2,10 @@ import Header from "@/Headers/Header";
 import { SpPage, SpPageBody, SpPageDivider, SpPageHeader } from "@/layouts/SpPage";
 import { fileStore } from "@/store/fileStore";
 import { useEffect, useState } from "react";
-import { FileText, Upload } from "lucide-react";
+import { FileText } from "lucide-react";
 import FileRecents from "@/components/FileRecents";
 import FileUploadShad from "@/components/FileUploadShad";
 import FileExplorerTable from "@/components/FileExplorerTable";
-import { Button } from "@heroui/react";
 
 export default function FileVault() {
   const { getBucketFiles, getRecentFiles } = fileStore();
@@ -28,12 +27,7 @@ export default function FileVault() {
         title="File Vault"
         subtitle="Upload and manage your files"
         icon={<FileText className="w-5 h-5" />}
-        button={[
-          <Button color="primary" className="flex items-center " onClick={() => setIsOpen(true)}>
-            <Upload className="w-4 h-4" />
-            Upload File
-          </Button>,
-        ]}
+        dropdownItems={[{ label: "Upload File", onClick: () => setIsOpen(true) }]}
       />
 
       <SpPageDivider />

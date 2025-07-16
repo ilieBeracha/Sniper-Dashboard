@@ -5,6 +5,7 @@ import React, { ReactNode } from "react";
 import { MoreVertical } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
+import BaseButton from "@/components/base/BaseButton";
 
 export function SpPage({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
@@ -23,13 +24,13 @@ export function SpPageHeader({
   subtitle,
   icon,
   breadcrumbs,
-  button,
+  dropdownItems,
 }: {
   title: string;
   subtitle?: string;
   icon: ReactNode;
   breadcrumbs?: { label: string; link: string }[];
-  button?: ReactNode[];
+  dropdownItems?: { label: string; onClick: () => void }[];
 }) {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
@@ -41,7 +42,6 @@ export function SpPageHeader({
           <SpPageBreadcrumbs breadcrumbs={breadcrumbs} />
         </div>
       )}
-
       <div className={` ${isMobile ? "px-6 mb-8 mt-6" : "px-6 pt-8 pb-8"} transition-all duration-200 relative py-2`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 justify-between w-full">
@@ -58,8 +58,8 @@ export function SpPageHeader({
                 )}
               </div>
             </div>
-            {button &&
-              button.length > 0 &&
+            {dropdownItems &&
+              dropdownItems.length > 0 &&
               (isMobile ? (
                 <Dropdown>
                   <DropdownTrigger className="cursor-pointer">
@@ -69,22 +69,26 @@ export function SpPageHeader({
                       <MoreVertical className="w-5 h-5" />
                     </span>
                   </DropdownTrigger>
-                  <DropdownMenu
-                    aria-label="Static Actions"
-                    className={`${theme === "dark" ? "bg-zinc-900" : "bg-gray-100"} rounded-lg p-1`}
-                    onAction={() => {}}
-                  >
-                    {button.map((item, index) => (
-                      <DropdownItem className="text-sm  rounded-md bg-zinc-900 text-white" key={index}>
-                        {item}
+                  <DropdownMenu aria-label="Static Actions" className={`${theme === "dark" ? "bg-zinc-900" : "bg-gray-100"} rounded-lg p-1`}>
+                    {dropdownItems.map((item, index) => (
+                      <DropdownItem
+                        className="text-sm  rounded-md bg-zinc-900 text-white"
+                        key={index}
+                        onPress={() => {
+                          item.onClick();
+                        }}
+                      >
+                        {item.label}
                       </DropdownItem>
                     ))}
                   </DropdownMenu>
                 </Dropdown>
               ) : (
                 <div className="flex items-center gap-2">
-                  {button.map((item, index) => (
-                    <div key={index}>{item}</div>
+                  {dropdownItems.map((item, index) => (
+                    <BaseButton style="purple" className="text-sm px-2 py-1 rounded-md" key={index} onClick={item.onClick}>
+                      <span className="text-sm">{item.label}</span>
+                    </BaseButton>
                   ))}
                 </div>
               ))}

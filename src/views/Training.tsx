@@ -1,12 +1,10 @@
 import { BiCurrentLocation } from "react-icons/bi";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import Header from "@/Headers/Header";
-import BaseButton from "@/components/base/BaseButton";
 import ConfirmStatusChangeModal from "@/components/ConfirmStatusChangeModal";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
 import { useTrainingPageLogic } from "@/hooks/useTrainingPageLogic";
 import { useNavigate } from "react-router-dom";
-import { FileText } from "lucide-react";
 
 export default function TrainingPage() {
   const navigate = useNavigate();
@@ -37,11 +35,13 @@ export default function TrainingPage() {
         subtitle={"Training Session"}
         title={"Training Session"}
         icon={<BiCurrentLocation />}
-        button={[
-          <BaseButton className="flex items-center gap-2" style="white" onClick={() => navigate(`/training/${id}/session-stats-full`)}>
-            <FileText className="w-4 h-4" />
-            Full Page Form
-          </BaseButton>,
+        dropdownItems={[
+          {
+            label: "Full Page Form",
+            onClick: () => {
+              navigate(`/training/${id}/session-stats-full`);
+            },
+          },
         ]}
       />
       <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={(tab) => setActiveTab(tab as string)} />
