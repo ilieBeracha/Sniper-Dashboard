@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, ReactNode } from "react";
-import { ChevronLeft, ChevronRight, Filter, Search, X } from "lucide-react";
+import { useState, useEffect, useMemo, ReactNode, useCallback } from "react";
+import { ChevronLeft, ChevronRight, Filter, Search, X, Edit, Eye, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -152,6 +152,7 @@ export type SpTableColumn<T> = {
   width?: number | string;
   className?: string;
   hideOnMobile?: boolean;
+  sortable?: boolean;
   render?: (value: any, row: T) => ReactNode;
 };
 
@@ -187,6 +188,9 @@ export interface SpTableProps<T extends { id: string | number }> {
   emptyState?: ReactNode;
   className?: string;
   highlightRow?: (row: T) => boolean;
+  selectable?: boolean;
+  onSelectionChange?: (selectedIds: Set<string | number>) => void;
+  bulkActions?: ReactNode;
 }
 
 export function SpTable<T extends { id: string | number }>(props: SpTableProps<T>) {
@@ -211,6 +215,9 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
     emptyState,
     className = "",
     highlightRow,
+    selectable = false,
+    onSelectionChange,
+    bulkActions,
   } = props;
 
   const { theme } = useTheme();
@@ -236,6 +243,8 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
   const [searchTerm, setSearchTerm] = useState("");
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
   const [showFilters, setShowFilters] = useState(!isMobile);
+  const [selectedRows, setSelectedRows] = useState<Set<string | number>>(new Set());
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
 
   useEffect(() => {
     setShowFilters(!isMobile);
@@ -251,6 +260,43 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
   };
 
   const hasActiveFilters = searchTerm.trim() !== "" || Object.values(filterValues).some(Boolean);
+
+  const handleSort = useCallback((key: string) => {
+    setSortConfig((prev) => {
+      if (prev?.key === key) {
+        return prev.direction === "asc" ? { key, direction: "desc" } : null;
+      }
+      return { key, direction: "asc" };
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(
+    (checked: boolean, currentFilteredData: T[]) => {
+      if (checked) {
+        const allIds = new Set(currentFilteredData.map((row) => row.id));
+        setSelectedRows(allIds);
+        onSelectionChange?.(allIds);
+      } else {
+        setSelectedRows(new Set());
+        onSelectionChange?.(new Set());
+      }
+    },
+    [onSelectionChange],
+  );
+
+  const handleSelectRow = useCallback(
+    (id: string | number, checked: boolean) => {
+      const newSelected = new Set(selectedRows);
+      if (checked) {
+        newSelected.add(id);
+      } else {
+        newSelected.delete(id);
+      }
+      setSelectedRows(newSelected);
+      onSelectionChange?.(newSelected);
+    },
+    [selectedRows, onSelectionChange],
+  );
 
   const filteredData = data.filter((row) => {
     const matchesSearch =
@@ -272,8 +318,24 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
     return matchesSearch && matchesFilters;
   });
 
+  const sortedData = useMemo(() => {
+    if (!sortConfig) return filteredData;
+
+    return [...filteredData].sort((a, b) => {
+      const aVal = a[sortConfig.key as keyof T];
+      const bVal = b[sortConfig.key as keyof T];
+
+      if (aVal === null || aVal === undefined) return 1;
+      if (bVal === null || bVal === undefined) return -1;
+
+      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [filteredData, sortConfig]);
+
   return (
-    <div className={`space-y-4 w-full ${className}`}>
+    <div className={`w-full ${className}`}>
       <div
         className={`rounded-xl border transition-colors duration-200 ${
           theme === "dark" ? "border-zinc-800 bg-zinc-900/50" : "border-gray-200 bg-white shadow-sm"
@@ -292,82 +354,140 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
           clearFilters={clearFilters}
           isMobile={isMobile}
           theme={theme}
+          selectedCount={selectedRows.size}
+          bulkActions={bulkActions}
+          selectable={selectable}
         />
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto sm:mx-0">
           <table className={`min-w-full text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
             <thead
-              className={`text-xs uppercase border-b transition-colors duration-200 ${
-                theme === "dark" ? "border-zinc-800 bg-zinc-800/50" : "border-gray-200 bg-gray-50"
+              className={`text-xs uppercase border-b transition-colors duration-200 sticky top-0 z-10 ${
+                theme === "dark" ? "border-zinc-800 bg-zinc-900" : "border-gray-200 bg-white"
               }`}
             >
               <tr>
+                {selectable && (
+                  <th className="px-4 py-3 w-12">
+                    <Checkbox
+                      checked={selectedRows.size === sortedData.length && sortedData.length > 0}
+                      onCheckedChange={(checked) => handleSelectAll(checked as boolean, sortedData)}
+                    />
+                  </th>
+                )}
                 {columns.map((col, idx) => (
                   <th
                     key={idx}
-                    className={`px-4 py-3 ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}
+                    className={`px-4 py-3 text-left ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""} ${
+                      col.sortable ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800" : ""
+                    }`}
                     style={col.width ? { width: col.width } : undefined}
+                    onClick={col.sortable ? () => handleSort(col.key) : undefined}
                   >
-                    {idx === 0 && (
-                      <div className="flex items-center gap-2">
-                        <Checkbox />
-                      </div>
-                    )}
-                    {col.label}
+                    <div className="flex items-center gap-1">
+                      {col.label}
+                      {col.sortable && (
+                        <div className="flex flex-col">
+                          <ChevronUp
+                            className={`w-3 h-3 -mb-1 ${
+                              sortConfig?.key === col.key && sortConfig.direction === "asc"
+                                ? theme === "dark"
+                                  ? "text-purple-400"
+                                  : "text-purple-600"
+                                : "text-gray-400"
+                            }`}
+                          />
+                          <ChevronDown
+                            className={`w-3 h-3 -mt-1 ${
+                              sortConfig?.key === col.key && sortConfig.direction === "desc"
+                                ? theme === "dark"
+                                  ? "text-purple-400"
+                                  : "text-purple-600"
+                                : "text-gray-400"
+                            }`}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </th>
                 ))}
                 {(actions || onView || onEdit || onDelete) && <th className="px-4 py-3 text-right">Actions</th>}
               </tr>
             </thead>
             <tbody>
-              {filteredData.map((row, idx) => {
-                const isLast = idx === filteredData.length - 1;
-                const highlighted = highlightRow?.(row);
-                return (
-                  <tr
-                    key={row.id}
-                    onClick={() => onRowClick?.(row)}
-                    className={`transition-colors border-b cursor-pointer ${
-                      isLast ? "border-transparent" : theme === "dark" ? "border-zinc-800/50" : "border-gray-100"
-                    } ${highlighted ? "bg-gray-100/60 dark:bg-gray-700/30" : theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-gray-50"}`}
-                  >
-                    {columns.map((col, idx) => (
-                      <td key={idx} className={`px-4 py-3 ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
-                        {idx === 0 && (
-                          <div className="flex items-center gap-2">
-                            <Checkbox />
+              {loading && sortedData.length === 0
+                ? // Loading skeleton
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <tr key={`skeleton-${idx}`} className="animate-pulse">
+                      {selectable && (
+                        <td className="px-4 py-2 w-12">
+                          <div className="w-4 h-4 bg-gray-200 dark:bg-zinc-700 rounded" />
+                        </td>
+                      )}
+                      {columns.map((col, colIdx) => (
+                        <td key={colIdx} className={`px-4 py-2 ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
+                          <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-full" />
+                        </td>
+                      ))}
+                      {(actions || onView || onEdit || onDelete) && (
+                        <td className="px-4 py-2 text-right">
+                          <div className="inline-flex gap-2">
+                            <div className="w-8 h-8 bg-gray-200 dark:bg-zinc-700 rounded" />
+                            <div className="w-8 h-8 bg-gray-200 dark:bg-zinc-700 rounded" />
                           </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))
+                : sortedData.map((row, idx) => {
+                    const isLast = idx === sortedData.length - 1;
+                    const isSelected = selectedRows.has(row.id);
+                    const highlighted = highlightRow?.(row);
+                    return (
+                      <tr
+                        key={row.id}
+                        onClick={() => onRowClick?.(row)}
+                        className={`transition-colors border-b cursor-pointer ${
+                          isLast ? "border-transparent" : theme === "dark" ? "border-zinc-800/50" : "border-gray-100"
+                        } ${
+                          highlighted
+                            ? "bg-purple-50 dark:bg-purple-900/20"
+                            : isSelected
+                              ? "bg-blue-50 dark:bg-blue-900/20"
+                              : theme === "dark"
+                                ? "hover:bg-zinc-800/30"
+                                : "hover:bg-gray-50"
+                        }`}
+                      >
+                        {selectable && (
+                          <td className="px-4 py-2 w-12" onClick={(e) => e.stopPropagation()}>
+                            <Checkbox checked={isSelected} onCheckedChange={(checked) => handleSelectRow(row.id, checked as boolean)} />
+                          </td>
                         )}
-                        {col.render ? col.render(row[col.key as keyof T], row) : ((row as any)[col.key] ?? "N/A")}
-                      </td>
-                    ))}
-                    {(actions || onView || onEdit || onDelete) && (
-                      <td className="px-4 py-3 text-right">
-                        <SpTableActions row={row} onView={onView} onEdit={onEdit} onDelete={onDelete} actions={actions} theme={theme} />
-                      </td>
-                    )}
-                  </tr>
-                );
-              })}
+                        {columns.map((col, idx) => (
+                          <td key={idx} className={`px-4 py-2 ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
+                            {col.render ? col.render(row[col.key as keyof T], row) : ((row as any)[col.key] ?? "N/A")}
+                          </td>
+                        ))}
+                        {(actions || onView || onEdit || onDelete) && (
+                          <td className="px-4 py-2 text-right">
+                            <SpTableActions row={row} onView={onView} onEdit={onEdit} onDelete={onDelete} actions={actions} theme={theme} />
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
             </tbody>
           </table>
         </div>
-        {filteredData.length === 0 && data.length > 0 && (
-          <div className={`text-center py-8 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+        {sortedData.length === 0 && data.length > 0 && (
+          <div className={`text-center py-2 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
             <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">No items match your current filters</p>
           </div>
         )}
-        {filteredData.length === 0 && data.length === 0 && emptyState && <div className="py-8">{emptyState}</div>}
+        {sortedData.length === 0 && data.length === 0 && emptyState && !loading && <div className="py-8">{emptyState}</div>}
         {pagination && <SpTablePagination pagination={pagination} loading={loading} theme={theme} />}
-        {loading && (
-          <div className={`text-center py-4 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
-            <div className="flex items-center justify-center gap-2">
-              <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin border-current" />
-              <span className="text-sm">Loading...</span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -386,6 +506,9 @@ function SpTableFilters({
   clearFilters,
   isMobile,
   theme,
+  selectedCount,
+  bulkActions,
+  selectable,
 }: {
   searchTerm: string;
   setSearchTerm: (v: string) => void;
@@ -399,16 +522,31 @@ function SpTableFilters({
   clearFilters: () => void;
   isMobile: boolean;
   theme: string;
+  selectedCount?: number;
+  bulkActions?: ReactNode;
+  selectable?: boolean;
 }) {
   return (
     <div className={`p-4 border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+      {selectable && selectedCount && selectedCount > 0 && (
+        <div
+          className={`mb-4 p-3 rounded-lg flex items-center justify-between ${
+            theme === "dark" ? "bg-blue-900/20 border border-blue-800" : "bg-blue-50 border border-blue-200"
+          }`}
+        >
+          <span className={`text-sm font-medium ${theme === "dark" ? "text-blue-300" : "text-blue-700"}`}>
+            {selectedCount} item{selectedCount > 1 ? "s" : ""} selected
+          </span>
+          {bulkActions && <div className="flex gap-2">{bulkActions}</div>}
+        </div>
+      )}
       <div className={`${isMobile ? "" : "space-y-4"}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {isMobile ? (
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
+                className={`flex items-center gap-2 px-2 py-1 rounded-lg text-sm transition-colors duration-200 ${
                   theme === "dark" ? "bg-zinc-800 text-gray-300 hover:bg-zinc-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
@@ -531,7 +669,7 @@ function SpTableActions({
               className={`p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
               title="View"
             >
-              <Search size={16} />
+              <Eye size={16} />
             </button>
           )}
           {onEdit && (
@@ -543,7 +681,7 @@ function SpTableActions({
               className={`p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
               title="Edit"
             >
-              <Search size={16} />
+              <Edit size={16} />
             </button>
           )}
           {onDelete && (
@@ -555,7 +693,7 @@ function SpTableActions({
               className={`p-2 rounded hover:bg-red-100 dark:hover:bg-red-800/40 ${theme === "dark" ? "text-red-400" : "text-red-600"}`}
               title="Delete"
             >
-              <X size={16} />
+              <Trash2 size={16} />
             </button>
           )}
         </>

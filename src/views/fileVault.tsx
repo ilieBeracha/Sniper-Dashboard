@@ -1,19 +1,24 @@
 import Header from "@/Headers/Header";
 import { SpPage, SpPageBody, SpPageDivider, SpPageHeader } from "@/layouts/SpPage";
 import { fileStore } from "@/store/fileStore";
+import { teamStore } from "@/store/teamStore";
 import { useEffect, useState } from "react";
 import { FileText } from "lucide-react";
 import FileRecents from "@/components/FileRecents";
 import FileUploadShad from "@/components/FileUploadShad";
 import FileExplorerTable from "@/components/FileExplorerTable";
+import { useStore } from "zustand";
 
 export default function FileVault() {
-  const { getBucketFiles, getRecentFiles } = fileStore();
+  const { getBucketFiles, getRecentFiles } = useStore(fileStore);
+  const { teamId } = useStore(teamStore);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    loadFiles();
-  }, []);
+    if (teamId) {
+      loadFiles();
+    }
+  }, [teamId]);
 
   const loadFiles = async () => {
     await getBucketFiles();

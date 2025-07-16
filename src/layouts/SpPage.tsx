@@ -142,7 +142,7 @@ export function SpPageTabs({
 }
 
 export function SpPageBody({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-4 md:px-4 2xl:px-6 px-2 space-y-6">{children}</div>;
+  return <div className="flex flex-col px-2 gap-4 md:px-4 2xl:px-6 px-4 space-y-6">{children}</div>;
 }
 
 export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: string; link: string }[] }) {
