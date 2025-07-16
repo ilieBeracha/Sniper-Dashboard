@@ -1,9 +1,11 @@
 import { AlertCircleIcon, ImageUpIcon, XIcon, UploadIcon } from "lucide-react";
 
 import { useFileUpload } from "@/hooks/use-file-upload";
-import { Modal, ModalContent, ModalHeader, ModalFooter, Button } from "@heroui/react";
+import { Modal, ModalContent, ModalHeader, ModalFooter, Button, Input, Select, SelectItem } from "@heroui/react";
 import { fileStore } from "@/store/fileStore";
-import { useState } from "react";
+import { TrainingStore } from "@/store/trainingStore";
+import { useState, useEffect } from "react";
+import { userStore } from "@/store/userStore";
 
 export default function FileUploadShad({
   isOpen,
@@ -17,7 +19,11 @@ export default function FileUploadShad({
   const maxSizeMB = 5;
   const maxSize = maxSizeMB * 1024 * 1024;
   const [isUploading, setIsUploading] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const [selectedTrainingId, setSelectedTrainingId] = useState("");
   const { uploadFile } = fileStore();
+  const { trainings, loadTrainingByTeamId } = TrainingStore();
+  const { user } = userStore();
 
   const [{ files, isDragging, errors }, { handleDragEnter, handleDragLeave, handleDragOver, handleDrop, openFileDialog, removeFile, getInputProps }] =
     useFileUpload({
@@ -27,15 +33,35 @@ export default function FileUploadShad({
 
   const previewUrl = files[0]?.preview || null;
 
+  useEffect(() => {
+    if (user?.team_id && isOpen) {
+      loadTrainingByTeamId(user.team_id, 50, 0);
+    }
+  }, [user?.team_id, isOpen, loadTrainingByTeamId]);
+
+  useEffect(() => {
+    if (files[0]?.file) {
+      setFileName(files[0].file.name);
+    }
+  }, [files]);
+
   const handleUpload = async () => {
     if (!files[0]?.file || !(files[0].file instanceof File)) return;
 
     setIsUploading(true);
     try {
-      await uploadFile(files[0].file);
+      // Create a new file with the custom name if it's different
+      let fileToUpload = files[0].file;
+      if (fileName && fileName !== files[0].file.name) {
+        fileToUpload = new File([files[0].file], fileName, { type: files[0].file.type });
+      }
+      
+      await uploadFile(fileToUpload, selectedTrainingId || undefined);
       onUpload();
       setIsOpen(false);
       removeFile(files[0].id);
+      setFileName("");
+      setSelectedTrainingId("");
     } catch (error) {
       console.error("Upload failed:", error);
     } finally {
@@ -51,9 +77,9 @@ export default function FileUploadShad({
       classNames={{ base: "bg-zinc-900/50 rounded-xl", wrapper: "bg-black/20", body: "bg-zinc-900/90 rounded-xl" }}
     >
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-2 p-8">
+        <ModalHeader className="flex flex-col gap-4 p-8">
           <h2 className="text-2xl font-bold">Upload File</h2>
-          <div className="flex flex-col gap-2 w-full h-full">
+          <div className="flex flex-col gap-4 w-full h-full">
             <div className="relative">
               {/* Drop area */}
               <div
@@ -102,6 +128,41 @@ export default function FileUploadShad({
                 </div>
               </div>
             </div>
+            
+            {/* File settings */}
+            {files[0] && (
+              <div className="flex flex-col gap-3 mt-4">
+                <Input
+                  label="File Name"
+                  placeholder="Enter file name"
+                  value={fileName}
+                  onChange={(e) => setFileName(e.target.value)}
+                  classNames={{
+                    base: "max-w-full",
+                    input: "bg-zinc-800/50",
+                    inputWrapper: "bg-zinc-800/50 hover:bg-zinc-800/70",
+                  }}
+                />
+                
+                <Select
+                  label="Assign to Training Session (Optional)"
+                  placeholder="Select a training session"
+                  selectedKeys={selectedTrainingId ? [selectedTrainingId] : []}
+                  onChange={(e) => setSelectedTrainingId(e.target.value)}
+                  classNames={{
+                    base: "max-w-full",
+                    trigger: "bg-zinc-800/50 hover:bg-zinc-800/70",
+                    popoverContent: "bg-zinc-900",
+                  }}
+                >
+                  {trainings.map((training) => (
+                    <SelectItem key={training.id || ""} value={training.id}>
+                      {training.session_name} - {new Date(training.date).toLocaleDateString()}
+                    </SelectItem>
+                  ))}
+                </Select>
+              </div>
+            )}
           </div>
         </ModalHeader>
         <ModalFooter className="p-6 pt-0">
@@ -110,6 +171,8 @@ export default function FileUploadShad({
             variant="light"
             onPress={() => {
               files.forEach((f) => removeFile(f.id));
+              setFileName("");
+              setSelectedTrainingId("");
               setIsOpen(false);
             }}
           >

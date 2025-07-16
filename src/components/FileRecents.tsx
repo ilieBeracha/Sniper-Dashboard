@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileText, Clock } from "lucide-react";
 import { fileStore } from "@/store/fileStore";
 import { ensureNativeBlob, downloadFile } from "@/utils/fileOperations";
 import FilePreviewCard from "@/components/base/FilePreviewCard";
@@ -16,7 +16,7 @@ export default function FileRecents() {
 
   const [previewUrls, setPreviewUrls] = useState<Record<string, string>>({});
   const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 1; // Show 1 card at a time on mobile for better sizing
+  const cardsPerView = 1;
   const [urlsToCleanup, setUrlsToCleanup] = useState<string[]>([]);
 
   const getPreviewUrl = async (file: FileItem) => {
@@ -80,38 +80,44 @@ export default function FileRecents() {
   const totalSlides = Math.ceil(recentFiles.length / cardsPerView);
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => {
-      const nextIndex = prev + 1;
-      // Reset to start when reaching the end
-      return nextIndex >= totalSlides ? 0 : nextIndex;
-    });
+    setCurrentIndex((prev) => (prev + 1 >= totalSlides ? 0 : prev + 1));
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => {
-      // Go to last slide when at the beginning
-      return prev === 0 ? totalSlides - 1 : prev - 1;
-    });
+    setCurrentIndex((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
   };
 
   if (recentFiles.length === 0) {
     return (
-      <div className="space-y-4 w-full">
-        <div className="text-center py-8 text-gray-500">No recent files</div>
+      <div className="w-full">
+        <div className="flex items-center gap-2 mb-3">
+          <Clock className={`w-4 h-4 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`} />
+          <h2 className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Recent Files</h2>
+        </div>
+        <div className={`text-center py-8 rounded-lg border border-dashed ${theme === "dark" ? "border-zinc-700" : "border-gray-300"}`}>
+          <FileText className={`w-8 h-8 mx-auto mb-2 ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`} />
+          <p className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>No recent files</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2 w-full">
-      <h2 className="text-lg font-semibold">Recent Files</h2>
+    <div className="w-full">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Clock className={`w-4 h-4 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`} />
+          <h2 className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Recent Files</h2>
+        </div>
+        <span className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>{recentFiles.length}</span>
+      </div>
       {isMobile ? (
         <div className="relative w-full">
-          <div className="overflow-hidden w-full py-4">
+          <div className="overflow-hidden w-full">
             <div className="flex transition-transform duration-300 ease-out" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
               {Array.from({ length: totalSlides }).map((_, slideIndex) => (
-                <div key={slideIndex} className="w-full flex-shrink-0 px-4">
-                  <div className="aspect-[16/10] max-w-md mx-auto">
+                <div key={slideIndex} className="w-full flex-shrink-0">
+                  <div className="h-32">
                     {recentFiles.slice(slideIndex * cardsPerView, (slideIndex + 1) * cardsPerView).map((file) => (
                       <FilePreviewCard
                         key={file.id}
@@ -133,36 +139,34 @@ export default function FileRecents() {
             <>
               <button
                 onClick={prevSlide}
-                className={`absolute left-2 top-[45%] -translate-y-[45%] p-3 rounded-full shadow-lg backdrop-blur-sm transition-all transform hover:scale-110 ${
-                  theme === "dark"
-                    ? "bg-zinc-800/70 hover:bg-zinc-700/80 text-white border border-zinc-600/30"
-                    : "bg-white/80 hover:bg-white/90 text-gray-800 border border-gray-200/50"
+                className={`absolute left-1 top-[50%] -translate-y-[50%] p-1.5 rounded-full shadow-sm transition-all ${
+                  theme === "dark" ? "bg-zinc-800/80 text-gray-400 hover:text-white" : "bg-white/80 text-gray-600 hover:text-gray-900"
                 }`}
                 aria-label="Previous file"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={nextSlide}
-                className={`absolute right-2 top-[45%] -translate-y-[45%] p-3 rounded-full shadow-lg backdrop-blur-sm transition-all transform hover:scale-110 ${
-                  theme === "dark"
-                    ? "bg-zinc-800/70 hover:bg-zinc-700/80 text-white border border-zinc-600/30"
-                    : "bg-white/80 hover:bg-white/90 text-gray-800 border border-gray-200/50"
+                className={`absolute right-1 top-[50%] -translate-y-[50%] p-1.5 rounded-full shadow-sm transition-all ${
+                  theme === "dark" ? "bg-zinc-800/80 text-gray-400 hover:text-white" : "bg-white/80 text-gray-600 hover:text-gray-900"
                 }`}
                 aria-label="Next file"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-4 h-4" />
               </button>
             </>
           )}
 
-          <div className="flex justify-center mt-4 gap-1">
+          <div className="flex justify-center mt-3 gap-1">
             {Array.from({ length: totalSlides }).map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentIndex ? (theme === "dark" ? "bg-white w-6" : "bg-gray-800 w-6") : theme === "dark" ? "bg-white/30" : "bg-gray-400"
+                className={`h-1 rounded-full transition-all ${
+                  index === currentIndex
+                    ? `w-4 ${theme === "dark" ? "bg-white" : "bg-gray-800"}`
+                    : `w-1 ${theme === "dark" ? "bg-zinc-600" : "bg-gray-300"}`
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -170,7 +174,7 @@ export default function FileRecents() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2">
           {recentFiles.map((file) => (
             <FilePreviewCard
               key={file.id}

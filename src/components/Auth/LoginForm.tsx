@@ -140,9 +140,7 @@ export function ModernLogin({
               d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
             />
           </svg>
-          <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-            Check your email!
-          </h3>
+          <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Check your email!</h3>
           <p className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
             We've sent a magic link to <strong>{email}</strong>. Click the link in the email to sign in.
           </p>
@@ -169,7 +167,6 @@ export function ModernLogin({
             </div>
           )}
 
-          {/* Login method selector */}
           <div className="flex gap-2 p-1 rounded-lg bg-gray-100 dark:bg-zinc-800">
             <button
               type="button"
@@ -180,8 +177,8 @@ export function ModernLogin({
                     ? "bg-white text-black shadow-sm"
                     : "bg-white text-gray-900 shadow-sm"
                   : theme === "dark"
-                  ? "text-gray-400 hover:text-white"
-                  : "text-gray-600 hover:text-gray-900"
+                    ? "text-gray-400 hover:text-white"
+                    : "text-gray-600 hover:text-gray-900"
               }`}
             >
               Password
@@ -195,8 +192,8 @@ export function ModernLogin({
                     ? "bg-white text-black shadow-sm"
                     : "bg-white text-gray-900 shadow-sm"
                   : theme === "dark"
-                  ? "text-gray-400 hover:text-white"
-                  : "text-gray-600 hover:text-gray-900"
+                    ? "text-gray-400 hover:text-white"
+                    : "text-gray-600 hover:text-gray-900"
               }`}
             >
               Magic Link
