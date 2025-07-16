@@ -11,6 +11,7 @@ interface props {
   registerCommander: (userData: RegisterUserData) => Promise<string | Error>;
   login: (userData: LoginUserData) => Promise<string | Error | any>;
   logout: () => void;
+  signInWithEmail: (email: string) => Promise<string | Error | any>;
   checkAuth: () => void;
   registerSoldier: (user: RegisterUserData) => Promise<string | Error>;
   registerSquadCommander: (user: RegisterUserData) => Promise<string | Error>;
@@ -58,6 +59,16 @@ export const authStore = create<props>((set, get) => ({
     }
   },
 
+  signInWithEmail: async (email: string) => {
+    try {
+      const res = await authService.signInWithEmail(email);
+      console.log(res);
+      // set({ token: res });
+    } catch (error: any) {
+      set({ error: error.message });
+      console.log(error);
+    }
+  },
   registerCommander: async (user: RegisterUserData) => {
     try {
       authStore.getState().resetError();

@@ -6,11 +6,11 @@ interface FileStore {
   files: any[];
   recentFiles: any[];
   getBucketFiles: (trainingId?: string) => Promise<any>;
-  uploadFile: (file: File, trainingId?: string) => Promise<void>;
-  getFile: (bucketName: string, fileName: string) => Promise<any>;
-  createFolder: (teamName: string) => Promise<void>;
+  uploadFile: (file: File, trainingId?: string) => Promise<any>;
+  getFile: (fileName: string) => Promise<any>;
+  createFolder: () => Promise<any>;
   getRecentFiles: () => Promise<any>;
-  deleteFile: (teamName: string, fileName: string) => Promise<void>;
+  deleteFile: (fileName: string) => Promise<any>;
   setFiles: (files: any[]) => void;
   setRecentFiles: (recentFiles: any[]) => void;
   setFile: (file: any) => void;
@@ -34,38 +34,40 @@ export const fileStore = create<FileStore>((set, get) => ({
   },
 
   getBucketFiles: async (trainingId?: string) => {
-    const teamName = userStore.getState().user?.last_name || "";
-    const files = await getBucketFiles(teamName, trainingId);
+    const teamId = userStore.getState().user?.team_id || "";
+    const files = await getBucketFiles(teamId, trainingId);
     set({ files: files });
     return files;
   },
 
   getRecentFiles: async () => {
-    const teamName = userStore.getState().user?.last_name || "";
-    const files = await getRecentFiles(teamName);
+    const teamId = userStore.getState().user?.team_id || "";
+    const files = await getRecentFiles(teamId);
     set({ recentFiles: files });
     return files;
   },
 
-  deleteFile: async (teamName: string, fileName: string) => {
-    const bucket = await deleteFile(teamName, fileName);
-    console.log(bucket);
+  deleteFile: async (fileName: string) => {
+    const teamId = userStore.getState().user?.team_id || "";
+    const bucket = await deleteFile(teamId, fileName);
+    return bucket;
   },
 
   uploadFile: async (file: File, trainingId?: string) => {
-    const teamName = userStore.getState().user?.last_name || "";
-    const bucket = await uploadFile(file, teamName, trainingId);
-    console.log(bucket);
+    const teamId = userStore.getState().user?.team_id || "";
+    const bucket = await uploadFile(file, teamId, trainingId);
+    return bucket;
   },
 
-  getFile: async (teamName: string, fileName: string) => {
-    const file = await getFile(teamName, fileName);
-    console.log(file);
+  getFile: async (fileName: string) => {
+    const teamId = userStore.getState().user?.team_id || "";
+    const file = await getFile(teamId, fileName);
     return file;
   },
 
-  createFolder: async (teamName: string) => {
-    const bucket = await createFolder(teamName);
-    console.log(bucket);
+  createFolder: async () => {
+    const teamId = userStore.getState().user?.team_id || "";
+    const bucket = await createFolder(teamId);
+    return bucket;
   },
 }));

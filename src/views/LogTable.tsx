@@ -3,7 +3,6 @@ import BaseDashboardCard from "@/components/base/BaseDashboardCard";
 export default function LogTable() {
   return (
     <BaseDashboardCard header="Feeds" tooltipContent="View and manage your feeds">
-      {/* Header */}
       <div className="py-3 px-5 flex flex-wrap justify-between items-center gap-2 border-b border-gray-200 dark:border-neutral-700">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="font-medium text-gray-800 dark:text-neutral-200">Feeds</h2>
@@ -64,8 +63,7 @@ export default function LogTable() {
           </button>
         </div>
       </div>
-      {/* End Header */}
-      {/* Filter */}
+
       <div className="py-3 px-5 border-b border-gray-200 dark:border-neutral-700">
         <div className="flex justify-between gap-x-3">
           <div className="w-1/2">
@@ -136,11 +134,9 @@ export default function LogTable() {
           {/* End Switch/Toggle */}
         </div>
       </div>
-      {/* End Filter */}
-      {/* Table Section */}
+
       <div className="overflow-x-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
         <div className="min-w-full inline-block align-middle">
-          {/* Table */}
           <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
             <thead>
               <tr>

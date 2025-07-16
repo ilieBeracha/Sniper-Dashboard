@@ -7,6 +7,10 @@ export const APP_CONFIG = {
     RECENT_FILES_LIMIT: 6,
   },
 
+  AUTH: {
+    EMAIL_REDIRECT_URL: "http://localhost:5173",
+  },
+
   ENV: {
     IS_DEVELOPMENT: process.env.NODE_ENV === "development",
     IS_PRODUCTION: process.env.NODE_ENV === "production",

@@ -19,11 +19,11 @@ export const SessionConfigSection = ({ section, sessionData, updateSessionData, 
   const { theme } = useTheme();
 
   return (
-    <div id="session-config" className="snap-start scroll-mt-4 min-h-[85vh] space-y-4">
+    <div id="session-config" className="snap-start scroll-mt-4 h-[calc(100vh-5rem)] flex flex-col justify-center space-y-12 py-4">
       <SectionHeader section={section} />
-      <Card className={`border ${theme === "dark" ? "border-white/10 bg-zinc-900/30" : "border-gray-200 bg-gray-50/50"} rounded-lg p-4`}>
+      <Card className={`border ${theme === "dark" ? "border-white/10 bg-zinc-900/30" : "border-gray-200 bg-gray-50/50"} rounded-lg p-8 lg:p-12`}>
         <CardContent className="p-0">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             <div className="space-y-3">
               <Label htmlFor="assignment" className={`text-base font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                 Training Assignment <span className="text-red-500">*</span>
@@ -42,7 +42,7 @@ export const SessionConfigSection = ({ section, sessionData, updateSessionData, 
               </select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-4">
               <Label htmlFor="dayPeriod" className={`block text-sm font-medium ${theme === "dark" ? "text-neutral-300" : "text-gray-700"} sm:mb-2`}>
                 Day Period <span className="text-red-500">*</span>
               </Label>
@@ -141,7 +141,7 @@ export const SessionConfigSection = ({ section, sessionData, updateSessionData, 
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-4">
               <Label htmlFor="timeToFirstShot" className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                 Time to First Shot (seconds) <span className="text-red-500">*</span>
               </Label>

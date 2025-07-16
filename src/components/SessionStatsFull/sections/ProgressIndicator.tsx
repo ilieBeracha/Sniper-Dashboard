@@ -1,5 +1,6 @@
 import { CheckCircle2 } from "lucide-react";
 import { Section } from "../types";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface ProgressIndicatorProps {
   sections: Section[];
@@ -8,8 +9,9 @@ interface ProgressIndicatorProps {
 }
 
 export const ProgressIndicator = ({ sections, activeSection, getSectionValidationStatus }: ProgressIndicatorProps) => {
+  const { theme } = useTheme();
   return (
-    <div className="fixed top-20 right-4 z-10 flex flex-col gap-3 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm p-3 rounded-lg shadow-lg">
+    <div className={`fixed top-20 right-4 z-10 flex flex-col gap-3 ${theme === "dark" ? "bg-zinc-900/80" : "bg-white/80"} backdrop-blur-sm p-3 rounded-lg shadow-lg`}>
       {sections.map((section, index) => (
         <div
           key={section.id}
@@ -27,7 +29,7 @@ export const ProgressIndicator = ({ sections, activeSection, getSectionValidatio
                     ? getSectionValidationStatus(index)
                       ? "bg-indigo-600 scale-125"
                       : "bg-yellow-500 scale-125"
-                    : "bg-gray-300 dark:bg-gray-600"
+                    : theme === "dark" ? "bg-gray-600" : "bg-gray-300"
               }`}
             >
               {index < activeSection && getSectionValidationStatus(index) && <CheckCircle2 className="w-3 h-3 text-white absolute inset-0" />}
@@ -35,7 +37,7 @@ export const ProgressIndicator = ({ sections, activeSection, getSectionValidatio
             {index < sections.length - 1 && (
               <div
                 className={`absolute top-3 left-1/2 -translate-x-1/2 w-0.5 h-6 transition-all ${
-                  index < activeSection ? (getSectionValidationStatus(index) ? "bg-green-500" : "bg-yellow-500") : "bg-gray-300 dark:bg-gray-600"
+                  index < activeSection ? (getSectionValidationStatus(index) ? "bg-green-500" : "bg-yellow-500") : theme === "dark" ? "bg-gray-600" : "bg-gray-300"
                 }`}
               />
             )}
@@ -43,12 +45,12 @@ export const ProgressIndicator = ({ sections, activeSection, getSectionValidatio
           <div className="hidden lg:block">
             <div
               className={`text-xs transition-all ${
-                index === activeSection ? "text-indigo-600 dark:text-indigo-400 font-medium" : "text-gray-600 dark:text-gray-400"
+                index === activeSection ? `${theme === "dark" ? "text-indigo-400" : "text-indigo-600"} font-medium` : theme === "dark" ? "text-gray-400" : "text-gray-600"
               }`}
             >
               {section.title}
             </div>
-            <div className="text-[10px] text-gray-500 dark:text-gray-500">{section.description}</div>
+            <div className="text-[10px] text-gray-500">{section.description}</div>
           </div>
         </div>
       ))}

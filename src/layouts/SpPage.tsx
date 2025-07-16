@@ -62,10 +62,18 @@ export function SpPageHeader({
               button.length > 0 &&
               (isMobile ? (
                 <Dropdown>
-                  <DropdownTrigger>
-                    <MoreVertical className="w-5 h-5 cursor-pointer" />
+                  <DropdownTrigger className="cursor-pointer">
+                    <span
+                      className={`min-w-unit-8 p-2 h-unit-8 rounded-lg ${theme === "dark" ? "bg-black/20" : "bg-gray-400/10"} backdrop-blur-sm flex items-center justify-center`}
+                    >
+                      <MoreVertical className="w-5 h-5" />
+                    </span>
                   </DropdownTrigger>
-                  <DropdownMenu aria-label="Static Actions">
+                  <DropdownMenu
+                    aria-label="Static Actions"
+                    className={`${theme === "dark" ? "bg-zinc-900" : "bg-gray-100"} rounded-lg p-1`}
+                    onAction={() => {}}
+                  >
                     {button.map((item, index) => (
                       <DropdownItem className="text-sm  rounded-md bg-zinc-900 text-white" key={index}>
                         {item}
@@ -130,7 +138,7 @@ export function SpPageTabs({
 }
 
 export function SpPageBody({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-4 md:px-4 2xl:px-6 px-2 pb-10 space-y-6">{children}</div>;
+  return <div className="flex flex-col gap-4 md:px-4 2xl:px-6 px-2 space-y-6">{children}</div>;
 }
 
 export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: string; link: string }[] }) {

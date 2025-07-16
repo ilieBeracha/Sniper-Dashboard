@@ -14,7 +14,7 @@ type AuthType = "login" | "team_manager_register" | "squad_manager_register" | "
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { login, registerCommander, registerSquadCommander, registerSoldier, error, resetError } = useStore(authStore);
+  const { login, registerCommander, registerSquadCommander, signInWithEmail, registerSoldier, error, resetError } = useStore(authStore);
   const { theme } = useTheme();
 
   const [authType, setAuthType] = useState<AuthType>("login");
@@ -139,7 +139,13 @@ export default function Auth() {
               )}
 
               <div className="relative z-10">
-                {authType === "login" && <ModernLogin AuthSubmit={AuthSubmit} onRegisterClick={(type) => setAuthType(type as AuthType)} />}
+                {authType === "login" && (
+                  <ModernLogin
+                    AuthSubmit={AuthSubmit}
+                    onRegisterClick={(type) => setAuthType(type as AuthType)}
+                    onSignInWithEmail={(email) => signInWithEmail(email)}
+                  />
+                )}
                 {authType !== "login" && (
                   <div>
                     <p

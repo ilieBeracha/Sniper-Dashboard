@@ -2,7 +2,7 @@ import { supabase } from "./supabaseClient";
 import { APP_CONFIG } from "@/config/constants";
 
 export async function getBucketFiles(
-  teamName: string,
+  teamId: string,
   trainingId?: string,
   filters: { limit: number; sortBy: { column: string; order: string } } = {
     limit: APP_CONFIG.STORAGE.LIST_LIMIT,
@@ -11,17 +11,15 @@ export async function getBucketFiles(
 ): Promise<any[]> {
   const { data, error } = await supabase.storage
     .from(APP_CONFIG.STORAGE.BUCKET_NAME)
-    .list(buildRequestPath(teamName, trainingId), { limit: filters.limit, sortBy: filters.sortBy });
-
+    .list(buildRequestPath(teamId, trainingId), { limit: filters.limit, sortBy: filters.sortBy });
   if (error) {
     throw error;
   }
-
   return data;
 }
 
-export async function getRecentFiles(teamName: string) {
-  const { data, error } = await supabase.storage.from(APP_CONFIG.STORAGE.BUCKET_NAME).list(buildRequestPath(teamName), {
+export async function getRecentFiles(teamId: string) {
+  const { data, error } = await supabase.storage.from(APP_CONFIG.STORAGE.BUCKET_NAME).list(buildRequestPath(teamId), {
     limit: APP_CONFIG.STORAGE.RECENT_FILES_LIMIT,
     sortBy: { column: "created_at", order: "desc" },
   });
@@ -33,8 +31,8 @@ export async function getRecentFiles(teamName: string) {
   return data;
 }
 
-export async function deleteFile(teamName: string, fileName: string) {
-  const { data, error } = await supabase.storage.from(APP_CONFIG.STORAGE.BUCKET_NAME).remove([buildRequestPath(teamName) + "/" + fileName]);
+export async function deleteFile(teamId: string, fileName: string) {
+  const { data, error } = await supabase.storage.from(APP_CONFIG.STORAGE.BUCKET_NAME).remove([buildRequestPath(teamId) + "/" + fileName]);
 
   if (error) {
     throw error;
@@ -43,8 +41,8 @@ export async function deleteFile(teamName: string, fileName: string) {
   return data;
 }
 
-export async function getFile(teamName: string, fileName: string): Promise<any> {
-  const { data, error } = await supabase.storage.from(APP_CONFIG.STORAGE.BUCKET_NAME).download(buildRequestPath(teamName) + "/" + fileName);
+export async function getFile(teamId: string, fileName: string): Promise<any> {
+  const { data, error } = await supabase.storage.from(APP_CONFIG.STORAGE.BUCKET_NAME).download(buildRequestPath(teamId) + "/" + fileName);
 
   if (error) {
     throw error;
@@ -53,10 +51,10 @@ export async function getFile(teamName: string, fileName: string): Promise<any> 
   return data;
 }
 
-export async function uploadFile(file: File, teamName: string, trainingId?: string) {
+export async function uploadFile(file: File, teamId: string, trainingId?: string) {
   const { data, error } = await supabase.storage
     .from(APP_CONFIG.STORAGE.BUCKET_NAME)
-    .upload(buildRequestPath(teamName, trainingId) + "/" + file.name, file, { upsert: true });
+    .upload(buildRequestPath(teamId, trainingId) + "/" + file.name, file, { upsert: true });
 
   if (error) {
     throw error;
@@ -65,8 +63,8 @@ export async function uploadFile(file: File, teamName: string, trainingId?: stri
   return data;
 }
 
-export async function createFolder(teamName: string) {
-  const { data, error } = await supabase.storage.updateBucket(teamName, { public: true });
+export async function createFolder(teamId: string) {
+  const { data, error } = await supabase.storage.updateBucket(teamId, { public: true });
 
   if (error) {
     throw error;
@@ -75,10 +73,10 @@ export async function createFolder(teamName: string) {
   return data;
 }
 
-function buildRequestPath(teamName: string, trainingId?: string) {
+function buildRequestPath(teamId: string, trainingId?: string) {
   if (trainingId) {
-    return teamName + "/" + trainingId;
+    return teamId + "/" + trainingId;
   }
 
-  return teamName;
+  return teamId;
 }

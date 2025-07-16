@@ -5,7 +5,15 @@ import { Modal, ModalContent, ModalHeader, ModalFooter, Button } from "@heroui/r
 import { fileStore } from "@/store/fileStore";
 import { useState } from "react";
 
-export default function FileUploadShad({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) {
+export default function FileUploadShad({
+  isOpen,
+  setIsOpen,
+  onUpload,
+}: {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  onUpload: () => void;
+}) {
   const maxSizeMB = 5;
   const maxSize = maxSizeMB * 1024 * 1024;
   const [isUploading, setIsUploading] = useState(false);
@@ -21,14 +29,15 @@ export default function FileUploadShad({ isOpen, setIsOpen }: { isOpen: boolean;
 
   const handleUpload = async () => {
     if (!files[0]?.file || !(files[0].file instanceof File)) return;
-    
+
     setIsUploading(true);
     try {
       await uploadFile(files[0].file);
+      onUpload();
       setIsOpen(false);
       removeFile(files[0].id);
     } catch (error) {
-      console.error('Upload failed:', error);
+      console.error("Upload failed:", error);
     } finally {
       setIsUploading(false);
     }
@@ -96,18 +105,18 @@ export default function FileUploadShad({ isOpen, setIsOpen }: { isOpen: boolean;
           </div>
         </ModalHeader>
         <ModalFooter className="p-6 pt-0">
-          <Button 
-            color="danger" 
-            variant="light" 
+          <Button
+            color="danger"
+            variant="light"
             onPress={() => {
-              files.forEach(f => removeFile(f.id));
+              files.forEach((f) => removeFile(f.id));
               setIsOpen(false);
             }}
           >
             Cancel
           </Button>
-          <Button 
-            color="primary" 
+          <Button
+            color="primary"
             onPress={handleUpload}
             isDisabled={!files.length || isUploading}
             isLoading={isUploading}

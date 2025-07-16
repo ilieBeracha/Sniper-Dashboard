@@ -1,45 +1,23 @@
 import { useEffect, useState } from "react";
 import { SpTable, SpTableColumn } from "@/layouts/SpTable";
-import { File, Download, Trash2, FolderOpen, FileImage, FileVideo, FileArchive, FileText } from "lucide-react";
+import { File, Download, Trash2, FolderOpen } from "lucide-react";
 import { fileStore } from "@/store/fileStore";
-import { userStore } from "@/store/userStore";
 import { useTheme } from "@/contexts/ThemeContext";
-import { ensureNativeBlob } from "@/utils/fileRecentBlob";
 import { useIsMobile } from "@/hooks/useIsMobile";
-
-interface FileItem {
-  id: string;
-  name: string;
-  metadata?: {
-    size?: number;
-    lastModified?: string;
-    mimetype?: string;
-  };
-  created_at?: string;
-  updated_at?: string;
-  type?: string; // For filtering
-}
+import type { FileItem } from "@/types/file.types";
+import { getFileType, getFileIcon } from "@/utils/fileUtils";
+import { formatDate, formatSize } from "@/utils/formatUtils";
+import { downloadFile, deleteFileWithConfirm } from "@/utils/fileOperations";
 
 export default function FileExplorerTable() {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
-  const { getBucketFiles, getFile, deleteFile } = fileStore();
-  const user = userStore((s) => s.user);
-  const team = user?.last_name || "";
+  const { getBucketFiles } = fileStore();
 
   const [folders, setFolders] = useState<FileItem[]>([]);
   const [fileItems, setFileItems] = useState<FileItem[]>([]);
   const [currentPath, setCurrentPath] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const getFileType = (name: string) => {
-    const ext = name.split(".").pop()?.toLowerCase() || "";
-    if (["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(ext)) return "Image";
-    if (["mp4", "avi", "mov", "wmv"].includes(ext)) return "Video";
-    if (["zip", "rar", "7z", "tar", "gz"].includes(ext)) return "Archive";
-    if (["pdf", "doc", "docx", "txt"].includes(ext)) return "Document";
-    return "File";
-  };
 
   useEffect(() => {
     loadFiles();
@@ -50,34 +28,27 @@ export default function FileExplorerTable() {
     try {
       const allItems = await getBucketFiles(currentPath);
 
-      // Separate folders and files
       const folderList: FileItem[] = [];
       const fileList: FileItem[] = [];
 
-      // Group items by potential folders
       const folderMap = new Map<string, boolean>();
 
       allItems.forEach((item: any) => {
-        // Check if this is a folder placeholder or has subfolder structure
         const pathParts = item.name.split("/");
 
-        // If there are multiple parts, the first parts are folders
         if (pathParts.length > 1) {
           const folderName = pathParts[0];
           folderMap.set(folderName, true);
         }
 
-        // If item is in root of current path (no additional slashes)
         if (!item.name.includes("/") || (item.name.endsWith("/") && item.name.split("/").length === 1)) {
           if (item.name.endsWith("/")) {
-            // It's a folder placeholder
             folderList.push({
               ...item,
               id: item.id || item.name,
-              name: item.name.replace(/\/$/, ""), // Remove trailing slash
+              name: item.name.replace(/\/$/, ""),
             });
           } else {
-            // It's a file
             fileList.push({
               ...item,
               id: item.id || item.name,
@@ -87,7 +58,7 @@ export default function FileExplorerTable() {
         }
       });
 
-      // Add detected folders that aren't already in the list
+      // Add detected folders to the list
       folderMap.forEach((_, folderName) => {
         if (!folderList.some((f) => f.name === folderName)) {
           folderList.push({
@@ -107,73 +78,18 @@ export default function FileExplorerTable() {
     }
   };
 
-  const getFileIcon = (name: string) => {
-    const ext = name.split(".").pop()?.toLowerCase();
-    const iconClass = "w-4 h-4 sm:w-5 sm:h-5";
-
-    if (["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(ext || "")) return <FileImage className={`${iconClass} text-blue-500`} />;
-    if (["mp4", "avi", "mov", "wmv"].includes(ext || "")) return <FileVideo className={`${iconClass} text-purple-500`} />;
-    if (["zip", "rar", "7z", "tar", "gz"].includes(ext || "")) return <FileArchive className={`${iconClass} text-yellow-500`} />;
-    if (["pdf", "doc", "docx", "txt"].includes(ext || "")) return <FileText className={`${iconClass} text-red-500`} />;
-
-    return <File className={`${iconClass} text-gray-500`} />;
-  };
-
-  const formatSize = (bytes?: number) => {
-    if (!bytes) return "—";
-    const units = ["B", "KB", "MB", "GB"];
-    const index = Math.floor(Math.log(bytes) / Math.log(1024));
-    const value = Math.round((bytes / Math.pow(1024, index)) * 10) / 10;
-    return `${value} ${units[index]}`;
-  };
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return "—";
-    const date = new Date(dateStr);
-    if (isMobile) {
-      return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      });
-    }
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const handleFolderClick = (folder: FileItem) => {
     setCurrentPath(currentPath ? `${currentPath}/${folder.name}` : folder.name);
   };
 
   const handleDownloadFile = async (file: FileItem) => {
-    try {
-      const raw = await getFile(team, file.name);
-      const blob = await ensureNativeBlob(raw);
-      if (!blob) throw new Error("Failed to convert file to blob");
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = file.name;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Download failed:", err);
-    }
+    await downloadFile(file.name);
   };
 
   const handleDeleteFile = async (file: FileItem) => {
-    if (confirm(`Are you sure you want to delete ${file.name}?`)) {
-      try {
-        await deleteFile(team, file.name);
-        await loadFiles(); // Refresh the list
-      } catch (err) {
-        console.error("Delete failed:", err);
-      }
+    const deleted = await deleteFileWithConfirm(file.name);
+    if (deleted) {
+      await loadFiles();
     }
   };
 
@@ -184,7 +100,9 @@ export default function FileExplorerTable() {
       render: (value) => (
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <FolderOpen className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 flex-shrink-0" />
-          <span className="font-medium truncate block" title={value}>{value}</span>
+          <span className="font-medium truncate block" title={value}>
+            {value}
+          </span>
         </div>
       ),
     },
@@ -193,7 +111,7 @@ export default function FileExplorerTable() {
       label: "Created",
       width: "200px",
       hideOnMobile: true,
-      render: (value) => formatDate(value),
+      render: (value) => formatDate(value, isMobile),
     },
   ];
 
@@ -203,10 +121,10 @@ export default function FileExplorerTable() {
       label: "Name",
       render: (value) => (
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="flex-shrink-0">
-            {getFileIcon(value)}
-          </div>
-          <span className="truncate block" title={value}>{value}</span>
+          <div className="flex-shrink-0">{getFileIcon(value, "sm")}</div>
+          <span className="truncate block" title={value}>
+            {value}
+          </span>
         </div>
       ),
     },
@@ -232,7 +150,7 @@ export default function FileExplorerTable() {
       label: "Modified",
       width: "200px",
       hideOnMobile: true,
-      render: (value, row) => formatDate(row.updated_at || value),
+      render: (value, row) => formatDate(row.updated_at || value, isMobile),
     },
   ];
 
@@ -240,31 +158,29 @@ export default function FileExplorerTable() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Breadcrumb navigation */}
       {(currentPath || breadcrumbs.length > 0) && (
         <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm overflow-x-auto pb-2 px-3 sm:px-4 py-2 bg-gray-50 dark:bg-zinc-800/50 rounded-lg">
-        <button
-          onClick={() => setCurrentPath("")}
-          className={`hover:underline flex-shrink-0 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-        >
-          <FolderOpen className="w-4 h-4 inline mr-1" />
-          Root
-        </button>
-        {breadcrumbs.map((crumb, index) => (
-          <div key={index} className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-            <span className={theme === "dark" ? "text-gray-500" : "text-gray-400"}>/</span>
-            <button
-              onClick={() => setCurrentPath(breadcrumbs.slice(0, index + 1).join("/"))}
-              className={`hover:underline truncate max-w-[100px] sm:max-w-none ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-            >
-              {crumb}
-            </button>
-          </div>
-        ))}
+          <button
+            onClick={() => setCurrentPath("")}
+            className={`hover:underline flex-shrink-0 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+          >
+            <FolderOpen className="w-4 h-4 inline mr-1" />
+            Root
+          </button>
+          {breadcrumbs.map((crumb, index) => (
+            <div key={index} className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+              <span className={theme === "dark" ? "text-gray-500" : "text-gray-400"}>/</span>
+              <button
+                onClick={() => setCurrentPath(breadcrumbs.slice(0, index + 1).join("/"))}
+                className={`hover:underline truncate max-w-[100px] sm:max-w-none ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+              >
+                {crumb}
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Folders Table */}
       {folders.length > 0 && (
         <div>
           <SpTable
@@ -278,12 +194,7 @@ export default function FileExplorerTable() {
         </div>
       )}
 
-      {/* Files Table */}
       <div>
-        <h3 className={`text-base sm:text-lg font-semibold mb-2 sm:mb-3 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-          <File className="w-4 h-4 sm:w-5 sm:h-5 inline mr-2" />
-          Files
-        </h3>
         <SpTable
           data={fileItems}
           columns={fileColumns}
@@ -338,9 +249,7 @@ export default function FileExplorerTable() {
               <p className={`text-base font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                 {currentPath ? "No files in this folder" : "No files found"}
               </p>
-              <p className={`text-sm mt-1 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
-                Upload files to see them here
-              </p>
+              <p className={`text-sm mt-1 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>Upload files to see them here</p>
             </div>
           }
         />
