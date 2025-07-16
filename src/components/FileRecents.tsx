@@ -1,23 +1,23 @@
-import { useEffect, useState } from "react";
-import { useTheme } from "@/contexts/ThemeContext";
-import { ChevronLeft, ChevronRight, FileText, Clock } from "lucide-react";
 import { fileStore } from "@/store/fileStore";
-import { ensureNativeBlob, downloadFile } from "@/utils/fileOperations";
-import FilePreviewCard from "@/components/base/FilePreviewCard";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import { useTheme } from "@/contexts/ThemeContext";
+import { FileText, Download, Clock, Trash2, ChevronLeft, ChevronRight, MoreVertical } from "lucide-react";
 import type { FileItem } from "@/types/file.types";
-import { isImageFile } from "@/utils/fileUtils";
+import { downloadFile, ensureNativeBlob, deleteFileWithConfirm } from "@/utils/fileOperations";
+import { formatDate, formatSize } from "@/utils/formatUtils";
+import { useState, useEffect } from "react";
+import { useIsMobile } from "@/hooks/useIsMobile";
+import { isImageFile, getFileIcon } from "@/utils/fileUtils";
 
-export default function FileRecents() {
+const FileRecents = () => {
   const { theme } = useTheme();
-  const { getFile, deleteFile, recentFiles, getRecentFiles } = fileStore();
-
+  const { recentFiles, getFile, deleteFile, getRecentFiles } = fileStore();
   const isMobile = useIsMobile(640);
 
   const [previewUrls, setPreviewUrls] = useState<Record<string, string>>({});
   const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 1;
+  const cardsPerView = isMobile ? 1 : 4;
   const [urlsToCleanup, setUrlsToCleanup] = useState<string[]>([]);
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   const getPreviewUrl = async (file: FileItem) => {
     const blob = await ensureNativeBlob(await getFile(file.name));
@@ -45,7 +45,6 @@ export default function FileRecents() {
       );
 
       if (isMounted) {
-        console.log("Setting preview URLs:", Object.keys(newUrls).length, "images");
         setPreviewUrls(newUrls);
       }
     };
@@ -67,14 +66,10 @@ export default function FileRecents() {
   };
 
   const handleDeleteFile = async (file: FileItem) => {
-    const deleted = await deleteFile(file.name);
+    const deleted = await deleteFileWithConfirm(file.name);
     if (deleted) {
       await getRecentFiles();
     }
-  };
-
-  const handleFileClick = (file: FileItem) => {
-    console.log("File clicked:", file.name);
   };
 
   const totalSlides = Math.ceil(recentFiles.length / cardsPerView);
@@ -90,13 +85,17 @@ export default function FileRecents() {
   if (recentFiles.length === 0) {
     return (
       <div className="w-full">
-        <div className="flex items-center gap-2 mb-3">
-          <Clock className={`w-4 h-4 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`} />
-          <h2 className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Recent Files</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800" : "bg-gray-100"}`}>
+              <Clock className="w-4 h-4 text-indigo-500" />
+            </div>
+            <h2 className={`text-lg font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Recent Files</h2>
+          </div>
         </div>
-        <div className={`text-center py-8 rounded-lg border border-dashed ${theme === "dark" ? "border-zinc-700" : "border-gray-300"}`}>
-          <FileText className={`w-8 h-8 mx-auto mb-2 ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`} />
-          <p className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>No recent files</p>
+        <div className={`text-center py-12 rounded-xl border-2 border-dashed ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+          <FileText className={`w-10 h-10 mx-auto mb-3 ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`} />
+          <p className={`text-sm ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>No recent files</p>
         </div>
       </div>
     );
@@ -104,89 +103,174 @@ export default function FileRecents() {
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Clock className={`w-4 h-4 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`} />
-          <h2 className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Recent Files</h2>
+          <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800" : "bg-gray-100"}`}>
+            <Clock className="w-4 h-4 text-indigo-500" />
+          </div>
+          <h2 className={`text-lg font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Recent Files</h2>
         </div>
-        <span className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>{recentFiles.length}</span>
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-medium ${theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-700"}`}
+        >
+          {recentFiles.length} files
+        </span>
       </div>
-      {isMobile ? (
-        <div className="relative w-full">
-          <div className="overflow-hidden w-full">
+
+      <div className="relative">
+        {isMobile ? (
+          // Mobile carousel view
+          <div className="overflow-hidden">
             <div className="flex transition-transform duration-300 ease-out" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
-              {Array.from({ length: totalSlides }).map((_, slideIndex) => (
-                <div key={slideIndex} className="w-full flex-shrink-0">
-                  <div className="h-32">
-                    {recentFiles.slice(slideIndex * cardsPerView, (slideIndex + 1) * cardsPerView).map((file) => (
-                      <FilePreviewCard
-                        key={file.id}
-                        file={file}
-                        previewUrl={previewUrls[file.id]}
-                        onDownload={handleDownload}
-                        onDelete={handleDeleteFile}
-                        onClick={handleFileClick}
-                        isMobile={true}
-                      />
-                    ))}
-                  </div>
+              {recentFiles.map((file) => (
+                <div key={file.id} className="w-full flex-shrink-0 px-2">
+                  <RecentFileCard
+                    file={file}
+                    previewUrl={previewUrls[file.id]}
+                    onDownload={handleDownload}
+                    onDelete={handleDeleteFile}
+                    theme={theme}
+                    hoveredCard={hoveredCard}
+                    setHoveredCard={setHoveredCard}
+                  />
                 </div>
               ))}
             </div>
           </div>
-
-          {recentFiles.length > 1 && (
-            <>
-              <button
-                onClick={prevSlide}
-                className={`absolute left-1 top-[50%] -translate-y-[50%] p-1.5 rounded-full shadow-sm transition-all ${
-                  theme === "dark" ? "bg-zinc-800/80 text-gray-400 hover:text-white" : "bg-white/80 text-gray-600 hover:text-gray-900"
-                }`}
-                aria-label="Previous file"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={nextSlide}
-                className={`absolute right-1 top-[50%] -translate-y-[50%] p-1.5 rounded-full shadow-sm transition-all ${
-                  theme === "dark" ? "bg-zinc-800/80 text-gray-400 hover:text-white" : "bg-white/80 text-gray-600 hover:text-gray-900"
-                }`}
-                aria-label="Next file"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </>
-          )}
-
-          <div className="flex justify-center mt-3 gap-1">
-            {Array.from({ length: totalSlides }).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`h-1 rounded-full transition-all ${
-                  index === currentIndex
-                    ? `w-4 ${theme === "dark" ? "bg-white" : "bg-gray-800"}`
-                    : `w-1 ${theme === "dark" ? "bg-zinc-600" : "bg-gray-300"}`
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
+        ) : (
+          // Desktop grid view
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {recentFiles.slice(0, 10).map((file) => (
+              <RecentFileCard
+                key={file.id}
+                file={file}
+                previewUrl={previewUrls[file.id]}
+                onDownload={handleDownload}
+                onDelete={handleDeleteFile}
+                theme={theme}
+                hoveredCard={hoveredCard}
+                setHoveredCard={setHoveredCard}
               />
             ))}
           </div>
+        )}
+
+        {/* Navigation for mobile */}
+        {isMobile && recentFiles.length > 1 && (
+          <>
+            <button
+              onClick={prevSlide}
+              className={`absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full shadow-lg transition-all ${
+                theme === "dark" ? "bg-zinc-800 text-zinc-400 hover:text-white" : "bg-white text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className={`absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full shadow-lg transition-all ${
+                theme === "dark" ? "bg-zinc-800 text-zinc-400 hover:text-white" : "bg-white text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+            {/* Dots indicator */}
+            <div className="flex justify-center mt-4 gap-1">
+              {Array.from({ length: totalSlides }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`h-1.5 rounded-full transition-all ${
+                    index === currentIndex
+                      ? `w-6 ${theme === "dark" ? "bg-indigo-500" : "bg-indigo-600"}`
+                      : `w-1.5 ${theme === "dark" ? "bg-zinc-700" : "bg-gray-300"}`
+                  }`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Separate component for file card
+function RecentFileCard({
+  file,
+  previewUrl,
+  onDownload,
+  onDelete,
+  theme,
+  hoveredCard,
+  setHoveredCard,
+}: {
+  file: FileItem;
+  previewUrl?: string;
+  onDownload: (file: FileItem) => void;
+  onDelete: (file: FileItem) => void;
+  theme: string;
+  hoveredCard: string | null;
+  setHoveredCard: (id: string | null) => void;
+}) {
+  const isImage = isImageFile(file.name);
+
+  return (
+    <div
+      className={`group relative rounded-xl overflow-hidden transition-all cursor-pointer ${
+        theme === "dark" ? "bg-zinc-900 hover:bg-zinc-800" : "bg-white hover:bg-gray-50"
+      } border ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} ${hoveredCard === file.id ? "scale-105 shadow-xl" : ""}`}
+      onMouseEnter={() => setHoveredCard(file.id)}
+      onMouseLeave={() => setHoveredCard(null)}
+    >
+      {/* Preview Area */}
+      <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900">
+        {isImage && previewUrl ? (
+          <img src={previewUrl} alt={file.name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">{getFileIcon(file.name, "lg")}</div>
+        )}
+
+        {/* Overlay with actions */}
+        <div
+          className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity`}
+        >
+          <div className="absolute bottom-3 right-3 flex gap-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDownload(file);
+              }}
+              className="p-2 bg-white/90 dark:bg-zinc-800/90 rounded-lg hover:bg-white dark:hover:bg-zinc-700 transition-colors"
+              title="Download"
+            >
+              <Download className="w-4 h-4" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(file);
+              }}
+              className="p-2 bg-white/90 dark:bg-zinc-800/90 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
+              title="Delete"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2">
-          {recentFiles.map((file) => (
-            <FilePreviewCard
-              key={file.id}
-              file={file}
-              previewUrl={previewUrls[file.id]}
-              onDownload={handleDownload}
-              onDelete={handleDeleteFile}
-              onClick={handleFileClick}
-            />
-          ))}
+      </div>
+
+      {/* File Info */}
+      <div className="p-4">
+        <h4 className={`font-medium truncate mb-1 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{file.name}</h4>
+        <div className={`flex items-center justify-between text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+          <span>{formatSize(file.metadata?.size || 0)}</span>
+          <span>{formatDate(file.created_at || "", true)}</span>
         </div>
-      )}
+      </div>
     </div>
   );
 }
+
+export default FileRecents;
