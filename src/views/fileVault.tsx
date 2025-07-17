@@ -3,7 +3,7 @@ import { SpPage, SpPageBody, SpPageDivider, SpPageHeader } from "@/layouts/SpPag
 import { fileStore } from "@/store/fileStore";
 import { teamStore } from "@/store/teamStore";
 import { useEffect, useState } from "react";
-import { FileText, FolderPlus } from "lucide-react";
+import { FileText } from "lucide-react";
 import FileQuickActions from "@/components/FileQuickActions";
 import FileUploadShad from "@/components/FileUploadShad";
 import FileExplorerTable from "@/components/FileExplorerTable";
