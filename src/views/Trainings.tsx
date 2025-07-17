@@ -29,6 +29,7 @@ export default function Trainings() {
       <Header />
       <SpPageHeader
         title="Trainings"
+        subtitle={"Add, edit, and manage training sessions"}
         icon={<BiCurrentLocation />}
         breadcrumbs={[
           { label: "Dashboard", link: "/" },

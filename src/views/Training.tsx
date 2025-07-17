@@ -32,7 +32,6 @@ export default function TrainingPage() {
           { label: "Trainings", link: "/trainings" },
           { label: "Training Session", link: `/trainings/${id}` },
         ]}
-        subtitle={"Training Session"}
         title={"Training Session"}
         icon={<BiCurrentLocation />}
         dropdownItems={[
@@ -45,7 +44,6 @@ export default function TrainingPage() {
         ]}
       />
       <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={(tab) => setActiveTab(tab as string)} />
-
       <SpPageBody>{renderComponent()}</SpPageBody>
       <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
       <ConfirmStatusChangeModal

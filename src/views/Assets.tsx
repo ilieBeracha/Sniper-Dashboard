@@ -26,7 +26,7 @@ export default function AssetsPage() {
       <SpPageHeader
         title="Assets"
         subtitle={`Manage ${activeTab === "weapons" ? "weapons" : "equipment"} inventory`}
-        icon={<Package />}
+        icon={<Package className="w-5 h-5" />}
         breadcrumbs={[
           { label: "Dashboard", link: "/" },
           { label: "Assets", link: "/assets" },
@@ -42,17 +42,3 @@ export default function AssetsPage() {
     </SpPage>
   );
 }
-
-// isCommanderOrSquadCommander(user?.user_role as UserRole)
-//             ? activeTab === "weapons"
-//               ? [
-//                   <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsOpen(true)}>
-//                     Add Weapon
-//                   </BaseButton>,
-//                 ]
-//               : [
-//                   <BaseButton className="flex items-center gap-2" style="purple" onClick={() => setIsOpen(true)}>
-//                     Add Equipment
-//                   </BaseButton>,
-//                 ]
-//             : []
