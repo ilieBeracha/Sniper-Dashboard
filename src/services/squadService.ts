@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient";
+import { Squad } from "@/types/squad";
 
 export async function getSquadsWithUsersByTeamId(team_id: string) {
   const { data, error } = await supabase
@@ -76,6 +77,37 @@ export async function getSquadsHitsByTeamId(team_id: string) {
   if (error) {
     console.error("Failed to fetch squad average hit percentage:", error.message);
     throw new Error("Could not fetch squad average hit percentage");
+  }
+
+  return data;
+}
+
+export async function getSquadById(squadId: string): Promise<Squad | null> {
+  const { data, error } = await supabase
+    .from("squads")
+    .select("*")
+    .eq("id", squadId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching squad:", error.message);
+    return null;
+  }
+
+  return data;
+}
+
+export async function updateSquadName(squadId: string, squadName: string): Promise<Squad | null> {
+  const { data, error } = await supabase
+    .from("squads")
+    .update({ squad_name: squadName })
+    .eq("id", squadId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating squad name:", error.message);
+    throw new Error("Failed to update squad name");
   }
 
   return data;
