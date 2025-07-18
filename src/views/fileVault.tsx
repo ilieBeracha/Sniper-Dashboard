@@ -1,24 +1,57 @@
 import Header from "@/Headers/Header";
 import { SpPage, SpPageBody, SpPageDivider, SpPageHeader } from "@/layouts/SpPage";
 import { fileStore } from "@/store/fileStore";
+import { teamStore } from "@/store/teamStore";
 import { useEffect, useState } from "react";
-import { FileText, Upload } from "lucide-react";
-import FileRecents from "@/components/FileRecents";
+import { FileText } from "lucide-react";
+import FileQuickActions from "@/components/FileQuickActions";
 import FileUploadShad from "@/components/FileUploadShad";
 import FileExplorerTable from "@/components/FileExplorerTable";
-import { Button } from "@heroui/react";
+import { useStore } from "zustand";
+import { supabase } from "@/services/supabaseClient";
 
 export default function FileVault() {
-  const { getBucketFiles, getRecentFiles } = fileStore();
+  const { getBucketFiles, getRecentFiles } = useStore(fileStore);
+  const { teamId } = useStore(teamStore);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    loadFiles();
-  }, []);
+    if (teamId) {
+      loadFiles();
+    }
+  }, [teamId]);
 
   const loadFiles = async () => {
     await getBucketFiles();
     await getRecentFiles();
+  };
+
+  const handleNewFolder = async () => {
+    const folderName = prompt("Enter folder name:");
+    if (folderName && folderName.trim()) {
+      try {
+        // Since Supabase doesn't support empty folders, we create a placeholder file
+        const placeholderContent = new Blob([""], { type: "text/plain" });
+        const placeholderFile = new File([placeholderContent], ".folder", { type: "text/plain" });
+
+        // Upload the placeholder file to create the folder structure
+        if (teamId) {
+          const folderPath = `${teamId}/${folderName}/.folder`;
+
+          const { error } = await supabase.storage.from("team-files").upload(folderPath, placeholderFile);
+
+          if (error) {
+            console.error("Error creating folder:", error);
+            alert("Failed to create folder");
+          } else {
+            await loadFiles();
+          }
+        }
+      } catch (err) {
+        console.error("Error creating folder:", err);
+        alert("Failed to create folder");
+      }
+    }
   };
 
   return (
@@ -28,30 +61,25 @@ export default function FileVault() {
         title="File Vault"
         subtitle="Upload and manage your files"
         icon={<FileText className="w-5 h-5" />}
-        button={[
-          <Button color="primary" className="flex items-center " onClick={() => setIsOpen(true)}>
-            <Upload className="w-4 h-4" />
-            Upload File
-          </Button>,
+        dropdownItems={[
+          { label: "Upload File", onClick: () => setIsOpen(true) },
+          { label: "New Folder", onClick: handleNewFolder },
         ]}
       />
 
       <SpPageDivider />
 
       <SpPageBody>
-        <div className="flex flex-col gap-4 sm:gap-6 h-full w-full sm:px-0">
+        <div className="flex flex-col h-full w-full sm:px-0">
           <FileUploadShad isOpen={isOpen} setIsOpen={setIsOpen} onUpload={loadFiles} />
 
-          {/* Recent Files Section */}
-          <section className="w-full">
-            <FileRecents />
-          </section>
+          {/* Quick Actions */}
+          <FileQuickActions onUploadClick={() => setIsOpen(true)} onNewFolderClick={handleNewFolder} />
 
           {/* File Explorer Section */}
           <section className="w-full">
-            <div className="mb-3 sm:mb-4">
-              <h2 className="text-lg sm:text-xl font-semibold">File Explorer</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Browse and manage all your files and folders</p>
+            <div className="mb-4">
+              <h3 className="text-lg font-medium text-gray-600 dark:text-gray-400">File explorer</h3>
             </div>
             <FileExplorerTable />
           </section>

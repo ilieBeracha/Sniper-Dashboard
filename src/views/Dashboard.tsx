@@ -1,7 +1,6 @@
 import { useDashboardPageLogic } from "@/hooks/useDashboardPageLogic";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import InviteModal from "@/components/InviteModal";
-import BaseButton from "@/components/base/BaseButton";
 import Header from "@/Headers/Header";
 import { SplinePointerIcon } from "lucide-react";
 
@@ -16,7 +15,14 @@ export default function Dashboard() {
         subtitle={activeTab === "Overview" ? "Team, Squad, and more" : "By Date, Squad, and more"}
         icon={<SplinePointerIcon />}
         breadcrumbs={[{ label: "Dashboard", link: "/" }]}
-        button={[<BaseButton onClick={() => setIsInviteModalOpen(true)}>Invite</BaseButton>]}
+        dropdownItems={[
+          {
+            label: "Invite",
+            onClick: () => {
+              setIsInviteModalOpen(true);
+            },
+          },
+        ]}
       />
 
       <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />

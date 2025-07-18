@@ -125,6 +125,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
           <h2 className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
             Equipment Inventory
           </h2>
+
           <div
             className={`px-3 py-1 text-sm rounded border ${
               theme === "dark" ? "bg-emerald-500/20 text-emerald-200 border-emerald-500/30" : "bg-emerald-100 text-emerald-700 border-emerald-300"

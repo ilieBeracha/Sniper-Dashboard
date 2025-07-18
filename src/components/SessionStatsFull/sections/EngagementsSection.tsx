@@ -1,9 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Target as TargetIcon, Crosshair } from "lucide-react";
 import { Target, Participant } from "../types";
 import { SectionHeader } from "./SectionHeader";
 import { useTheme } from "@/contexts/ThemeContext";
+import React from "react";
 
 interface EngagementsSectionProps {
   section: any;
@@ -14,115 +14,190 @@ interface EngagementsSectionProps {
 
 export const EngagementsSection = ({ section, targets, participants, updateEngagement }: EngagementsSectionProps) => {
   const { theme } = useTheme();
+  const snipers = participants.filter((p) => p.userDuty === "Sniper");
+
+  if (targets.length === 0 || snipers.length === 0) {
+    return (
+      <div className="w-full max-w-2xl mx-auto" id="engagements">
+        <SectionHeader section={section} />
+
+        <div
+          className={`mt-8 justify-between text-center py-16 rounded-2xl border-2 ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}
+        >
+          {targets.length === 0 ? (
+            <>
+              <TargetIcon className={`w-12 h-12 mx-auto mb-4 ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`} />
+              <h3 className={`text-lg font-medium ${theme === "dark" ? "text-white" : "text-gray-900"} mb-2`}>No targets to engage</h3>
+              <p className={`text-sm ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Configure targets first to record engagements</p>
+            </>
+          ) : (
+            <>
+              <Crosshair className={`w-12 h-12 mx-auto mb-4 ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`} />
+              <h3 className={`text-lg font-medium ${theme === "dark" ? "text-white" : "text-gray-900"} mb-2`}>No snipers assigned</h3>
+              <p className={`text-sm ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                Add participants with sniper role to record engagements
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div id="engagements" className="snap-start scroll-mt-4 h-[calc(100vh-5rem)] flex flex-col space-y-6 py-8">
+    <div className="w-full max-w-2xl mx-auto">
       <SectionHeader section={section} />
-      <Card className={`border ${theme === "dark" ? "border-white/10 bg-zinc-900/30" : "border-gray-200 bg-gray-50/50"} rounded-lg p-6 lg:p-8 flex-1 overflow-auto`}>
-        <CardContent className="p-0">
-          <div className="space-y-8 lg:space-y-12">
-            {targets.map((target, targetIndex) => (
-              <div key={target.id}>
-                <div className={`border-b ${theme === "dark" ? "border-white/10" : "border-gray-200"} p-6 lg:p-8`}>
-                  <h3 className={`text-lg font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                      <span>
-                        Target #{targetIndex + 1} - {target.distance}m
-                      </span>
-                      {(target.windStrength || target.windDirection) && (
-                        <span className={`text-sm font-normal ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                          (Wind: {target.windStrength || 0}m/s at {target.windDirection || 0}°)
+
+      <div className={`mt-8 rounded-2xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}>
+        <div className="overflow-x-auto">
+          <div style={{ minWidth: `${200 + targets.length * 160}px` }}>
+            {/* Table Header */}
+            <div
+              className={`grid gap-2 px-4 py-3 text-xs font-medium border-b ${
+                theme === "dark" ? "bg-zinc-800/50 border-zinc-700 text-zinc-400" : "bg-gray-50 border-gray-200 text-gray-600"
+              }`}
+              style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 80px)` }}
+            >
+              <div>Participant</div>
+              {targets.map((target, index) => (
+                <React.Fragment key={target.id}>
+                  <div className="text-center col-span-2">
+                    Target {index + 1} ({target.distance}m)
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
+
+            {/* Sub-header with Shots/Hits */}
+            <div
+              className={`grid gap-2 px-4 py-2 text-xs border-b ${
+                theme === "dark" ? "bg-zinc-900/50 border-zinc-700 text-zinc-500" : "bg-gray-100 border-gray-200 text-gray-500"
+              }`}
+              style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 80px)` }}
+            >
+              <div></div>
+              {targets.map((target) => (
+                <React.Fragment key={`${target.id}-header`}>
+                  <div className="text-center">Shots</div>
+                  <div className="text-center">Hits</div>
+                </React.Fragment>
+              ))}
+            </div>
+
+            {/* Data Rows */}
+            <div className="divide-y divide-zinc-800 dark:divide-zinc-700">
+              {snipers.map((participant, pIndex) => {
+                return (
+                  <div
+                    key={participant.userId}
+                    className={`grid gap-2 px-4 py-3 items-center ${theme === "dark" ? "hover:bg-zinc-800/30" : "hover:bg-gray-50"}`}
+                    style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 80px)` }}
+                  >
+                    {/* Participant Info */}
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                          theme === "dark" ? "bg-amber-500/20 text-amber-400" : "bg-amber-100 text-amber-600"
+                        }`}
+                      >
+                        {pIndex + 1}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className={`text-sm font-medium truncate ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{participant.name}</div>
+                        <div className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{participant.position}</div>
+                      </div>
+                    </div>
+
+                    {/* Engagement Inputs */}
+                    {targets.map((target) => {
+                      const engagement = target.engagements.find((e) => e.userId === participant.userId);
+                      const shots = engagement?.shotsFired || 0;
+                      const hits = engagement?.targetHits || 0;
+                      const accuracy = shots > 0 ? Math.round((hits / shots) * 100) : 0;
+
+                      return (
+                        <React.Fragment key={`${participant.userId}-${target.id}`}>
+                          <div className="px-1">
+                            <Input
+                              type="number"
+                              min="0"
+                              placeholder="0"
+                              value={engagement?.shotsFired || ""}
+                              onChange={(e) => updateEngagement(target.id, participant.userId, "shotsFired", parseInt(e.target.value) || 0)}
+                              className={`h-8 text-center text-sm font-medium rounded ${
+                                theme === "dark"
+                                  ? "bg-zinc-800 border-zinc-700 focus:border-indigo-500"
+                                  : "bg-white border-gray-200 focus:border-indigo-500"
+                              }`}
+                            />
+                          </div>
+                          <div className="px-1 relative">
+                            <Input
+                              type="number"
+                              min="0"
+                              max={engagement?.shotsFired || 999}
+                              placeholder="0"
+                              value={engagement?.targetHits || ""}
+                              onChange={(e) => updateEngagement(target.id, participant.userId, "targetHits", parseInt(e.target.value) || 0)}
+                              className={`h-8 text-center text-sm font-medium rounded ${
+                                theme === "dark"
+                                  ? "bg-zinc-800 border-zinc-700 focus:border-indigo-500"
+                                  : "bg-white border-gray-200 focus:border-indigo-500"
+                              }`}
+                            />
+                            {shots > 0 && (
+                              <div
+                                className={`absolute -top-1 -right-1 text-[10px] font-bold px-1 rounded ${
+                                  accuracy >= 80
+                                    ? "bg-green-500/20 text-green-500"
+                                    : accuracy >= 60
+                                      ? "bg-yellow-500/20 text-yellow-500"
+                                      : "bg-red-500/20 text-red-500"
+                                }`}
+                              >
+                                {accuracy}%
+                              </div>
+                            )}
+                          </div>
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Summary Row */}
+            <div
+              className={`grid gap-2 px-4 py-3 border-t font-medium ${
+                theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-200"
+              }`}
+              style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 80px)` }}
+            >
+              <div className={`text-sm ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>Total</div>
+              {targets.map((target) => {
+                const totalShots = target.engagements.reduce((sum, e) => sum + (e.shotsFired || 0), 0);
+                const totalHits = target.engagements.reduce((sum, e) => sum + (e.targetHits || 0), 0);
+                const accuracy = totalShots > 0 ? Math.round((totalHits / totalShots) * 100) : 0;
+
+                return (
+                  <React.Fragment key={`${target.id}-total`}>
+                    <div className={`text-center text-sm ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>{totalShots}</div>
+                    <div className={`text-center text-sm ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                      {totalHits}
+                      {totalShots > 0 && (
+                        <span className={`ml-1 text-xs ${accuracy >= 80 ? "text-green-500" : accuracy >= 60 ? "text-yellow-500" : "text-red-500"}`}>
+                          ({accuracy}%)
                         </span>
                       )}
                     </div>
-                  </h3>
-                </div>
-                <div className="p-6 lg:p-8">
-                  {/* Header row */}
-                  <div className={`grid grid-cols-3 gap-4 mb-6 pb-4 border-b ${theme === "dark" ? "border-white/5" : "border-gray-100"}`}>
-                    <span className={`text-xs font-semibold ${theme === "dark" ? "text-gray-300" : "text-gray-700"} uppercase tracking-wider`}></span>
-                    <span
-                      className={`text-xs font-semibold ${theme === "dark" ? "text-gray-300" : "text-gray-700"} uppercase tracking-wider text-center`}
-                    >
-                      Shots
-                    </span>
-                    <span
-                      className={`text-xs font-semibold ${theme === "dark" ? "text-gray-300" : "text-gray-700"} uppercase tracking-wider text-center`}
-                    >
-                      Hits
-                    </span>
-                  </div>
-
-                  {/* Data rows */}
-                  <div className="space-y-4">
-                    {participants
-                      .filter((p) => p.userDuty === "Sniper")
-                      .map((participant) => {
-                        const engagement = target.engagements.find((e) => e.userId === participant.userId);
-
-                        return (
-                          <div
-                            key={participant.userId}
-                            className={`grid grid-cols-3 gap-4 items-center py-3 ${theme === "dark" ? "hover:bg-white/5" : "hover:bg-gray-50"} rounded-lg transition-colors`}
-                          >
-                            {/* Name column */}
-                            <div className="flex items-center space-x-3">
-                              <div className="min-w-0 flex-1">
-                                <p className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"} truncate`}>{participant.name}</p>
-                                <p className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{participant.position} position</p>
-                              </div>
-                            </div>
-
-                            {/* Shots fired column */}
-                            <div className="flex justify-center">
-                              <Input
-                                type="number"
-                                min="0"
-                                placeholder="0"
-                                value={engagement?.shotsFired || ""}
-                                onChange={(e) => updateEngagement(target.id, participant.userId, "shotsFired", parseInt(e.target.value) || 0)}
-                                className={`w-20 h-9 text-center ${theme === "dark" ? "border-white/10 focus:border-indigo-400 focus:ring-indigo-400 bg-zinc-800 text-white" : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"} focus:ring-1 transition-all`}
-                              />
-                            </div>
-
-                            {/* Target hits column */}
-                            <div className="flex justify-center">
-                              <Input
-                                type="number"
-                                min="0"
-                                placeholder="0"
-                                value={engagement?.targetHits || ""}
-                                onChange={(e) => updateEngagement(target.id, participant.userId, "targetHits", parseInt(e.target.value) || 0)}
-                                className={`w-20 h-9 text-center ${theme === "dark" ? "border-white/10 focus:border-indigo-400 focus:ring-indigo-400 bg-zinc-800 text-white" : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"} focus:ring-1 transition-all`}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-
-                    {participants.filter((p) => p.userDuty === "Sniper").length === 0 && (
-                      <div className={`text-center ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
-                        <Crosshair className={`w-10 h-10 mx-auto mb-2 ${theme === "dark" ? "text-zinc-600" : "text-gray-300"}`} />
-                        <p>No snipers assigned. Add participants with sniper role to record engagements.</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {targets.length === 0 && (
-              <div
-                className={`text-center py-12 border-2 border-dashed ${theme === "dark" ? "border-white/10 bg-zinc-800" : "border-gray-300 bg-gray-50/50"} rounded-lg`}
-              >
-                <TargetIcon className={`w-14 h-14 mx-auto ${theme === "dark" ? "text-zinc-600" : "text-gray-400"} mb-4`} />
-                <h3 className={`text-xl font-medium ${theme === "dark" ? "text-white" : "text-gray-900"} mb-2`}>No targets to engage</h3>
-                <p className={`${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Configure targets above to record engagements</p>
-              </div>
-            )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

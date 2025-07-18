@@ -1,9 +1,12 @@
 import { AlertCircleIcon, ImageUpIcon, XIcon, UploadIcon } from "lucide-react";
 
 import { useFileUpload } from "@/hooks/use-file-upload";
-import { Modal, ModalContent, ModalHeader, ModalFooter, Button } from "@heroui/react";
+import { Drawer, DrawerHeader, DrawerFooter, Button, Input, Select, SelectItem, DrawerContent } from "@heroui/react";
 import { fileStore } from "@/store/fileStore";
-import { useState } from "react";
+import { TrainingStore } from "@/store/trainingStore";
+import { useState, useEffect } from "react";
+import { userStore } from "@/store/userStore";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function FileUploadShad({
   isOpen,
@@ -17,8 +20,12 @@ export default function FileUploadShad({
   const maxSizeMB = 5;
   const maxSize = maxSizeMB * 1024 * 1024;
   const [isUploading, setIsUploading] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const [selectedTrainingId, setSelectedTrainingId] = useState("");
   const { uploadFile } = fileStore();
-
+  const { trainings, loadTrainingByTeamId } = TrainingStore();
+  const { user } = userStore();
+  const { theme } = useTheme();
   const [{ files, isDragging, errors }, { handleDragEnter, handleDragLeave, handleDragOver, handleDrop, openFileDialog, removeFile, getInputProps }] =
     useFileUpload({
       accept: "image/*",
@@ -27,15 +34,35 @@ export default function FileUploadShad({
 
   const previewUrl = files[0]?.preview || null;
 
+  useEffect(() => {
+    if (user?.team_id && isOpen) {
+      loadTrainingByTeamId(user.team_id, 50, 0);
+    }
+  }, [user?.team_id, isOpen, loadTrainingByTeamId]);
+
+  useEffect(() => {
+    if (files[0]?.file) {
+      setFileName(files[0].file.name);
+    }
+  }, [files]);
+
   const handleUpload = async () => {
     if (!files[0]?.file || !(files[0].file instanceof File)) return;
 
     setIsUploading(true);
     try {
-      await uploadFile(files[0].file);
+      // Create a new file with the custom name if it's different
+      let fileToUpload = files[0].file;
+      if (fileName && fileName !== files[0].file.name) {
+        fileToUpload = new File([files[0].file], fileName, { type: files[0].file.type });
+      }
+
+      await uploadFile(fileToUpload, selectedTrainingId || undefined);
       onUpload();
       setIsOpen(false);
       removeFile(files[0].id);
+      setFileName("");
+      setSelectedTrainingId("");
     } catch (error) {
       console.error("Upload failed:", error);
     } finally {
@@ -44,16 +71,18 @@ export default function FileUploadShad({
   };
 
   return (
-    <Modal
-      size="3xl"
+    <Drawer
+      size="2xl"
       isOpen={isOpen}
+      backdrop="blur"
       onOpenChange={setIsOpen}
-      classNames={{ base: "bg-zinc-900/50 rounded-xl", wrapper: "bg-black/20", body: "bg-zinc-900/90 rounded-xl" }}
+      placement="right"
+      className={`${theme === "dark" ? "bg-zinc-900 border border-zinc-800" : "bg-white border border-zinc-200"}`}
     >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-2 p-8">
+      <DrawerContent>
+        <DrawerHeader className="flex flex-col gap-4 p-8">
           <h2 className="text-2xl font-bold">Upload File</h2>
-          <div className="flex flex-col gap-2 w-full h-full">
+          <div className="flex flex-col gap-4 w-full h-full">
             <div className="relative">
               {/* Drop area */}
               <div
@@ -102,14 +131,68 @@ export default function FileUploadShad({
                 </div>
               </div>
             </div>
+
+            {/* File settings */}
+            {files[0] && (
+              <div className="flex flex-col gap-4 mt-4">
+                <div className="space-y-2">
+                  <label className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                    File Name
+                  </label>
+                  <Input
+                    placeholder="Enter file name"
+                    value={fileName}
+                    onChange={(e) => setFileName(e.target.value)}
+                    classNames={{
+                      base: "max-w-full",
+                      input: theme === "dark" ? "bg-transparent text-white placeholder:text-zinc-500" : "bg-transparent text-zinc-900 placeholder:text-zinc-400",
+                      inputWrapper: theme === "dark" 
+                        ? "bg-zinc-800 border-zinc-700 hover:bg-zinc-800/80 data-[hover=true]:bg-zinc-800/80 group-data-[focus=true]:bg-zinc-800 group-data-[focus=true]:border-indigo-400" 
+                        : "bg-white border-zinc-300 hover:bg-zinc-50 data-[hover=true]:bg-zinc-50 group-data-[focus=true]:bg-white group-data-[focus=true]:border-indigo-500",
+                    }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                    Training Session Assignment (Optional)
+                  </label>
+                  <Select
+                    placeholder="Select a training session"
+                    selectedKeys={selectedTrainingId ? [selectedTrainingId] : []}
+                    onChange={(e) => setSelectedTrainingId(e.target.value)}
+                    classNames={{
+                      base: "max-w-full",
+                      trigger: theme === "dark"
+                        ? "bg-zinc-800 border-zinc-700 hover:bg-zinc-800/80 text-white data-[hover=true]:bg-zinc-800/80"
+                        : "bg-white border-zinc-300 hover:bg-zinc-50 text-zinc-900 data-[hover=true]:bg-zinc-50",
+                      value: theme === "dark" ? "text-white" : "text-zinc-900",
+                      popoverContent: theme === "dark" ? "bg-zinc-900 border border-zinc-800" : "bg-white border border-zinc-200",
+                      listboxWrapper: "max-h-[200px]",
+                    }}
+                  >
+                    {trainings.map((training) => (
+                      <SelectItem 
+                        key={training.id || ""}
+                        className={theme === "dark" ? "text-white" : "text-zinc-900"}
+                      >
+                        {training.session_name} - {new Date(training.date).toLocaleDateString()}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                </div>
+              </div>
+            )}
           </div>
-        </ModalHeader>
-        <ModalFooter className="p-6 pt-0">
+        </DrawerHeader>
+        <DrawerFooter className="p-6 pt-0">
           <Button
             color="danger"
             variant="light"
             onPress={() => {
               files.forEach((f) => removeFile(f.id));
+              setFileName("");
+              setSelectedTrainingId("");
               setIsOpen(false);
             }}
           >
@@ -124,8 +207,8 @@ export default function FileUploadShad({
           >
             {isUploading ? "Uploading..." : "Upload"}
           </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

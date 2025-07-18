@@ -158,8 +158,8 @@ export const useSessionStats = () => {
         name: member.first_name || member.last_name ? `${member.first_name || ""} ${member.last_name || ""}`.trim() : member.email,
         userDuty: "Sniper",
         position: "Lying",
-        weaponId: "",
-        equipmentId: "",
+        weaponId: user?.user_default_weapon || "",
+        equipmentId: user?.user_default_equipment || "",
       };
       setParticipants((prev) => [...prev, newParticipant]);
     }
@@ -176,8 +176,8 @@ export const useSessionStats = () => {
         name: member.first_name || member.last_name ? `${member.first_name || ""} ${member.last_name || ""}`.trim() : member.email,
         userDuty: "Sniper",
         position: "Lying",
-        weaponId: "",
-        equipmentId: "",
+        weaponId: user?.user_default_weapon || "",
+        equipmentId: user?.user_default_equipment || "",
       };
       setParticipants((prev) => [...prev, newParticipant]);
     });
