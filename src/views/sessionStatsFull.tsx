@@ -5,9 +5,9 @@ import {
   TargetsSection,
   EngagementsSection,
   SummarySection,
-  ProgressIndicator,
 } from "../components/SessionStatsFull/sections";
 import { useSessionStats } from "../components/SessionStatsFull/useSessionStats";
+import { ScrollProgress } from "@/components/magicui/scroll-progress";
 
 export default function ImprovedSessionStats() {
   const { theme } = useTheme();
@@ -46,7 +46,7 @@ export default function ImprovedSessionStats() {
     <div className={`min-h-screen ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-gray-50"} relative`}>
       {/* Progress Indicator - Fixed on larger screens, hidden on mobile */}
       <div className="hidden lg:block">
-        <ProgressIndicator sections={sections} activeSection={activeSection} getSectionValidationStatus={getSectionValidationStatus} />
+        <ScrollProgress activeSection={activeSection} totalSections={sections.length} />
       </div>
 
       {/* Mobile Progress Bar */}
