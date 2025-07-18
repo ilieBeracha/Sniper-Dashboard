@@ -18,7 +18,7 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
 
   if (targets.length === 0 || snipers.length === 0) {
     return (
-      <div className="w-full max-w-2xl mx-auto">
+      <div className="w-full max-w-2xl mx-auto" id="engagements">
         <SectionHeader section={section} />
 
         <div

@@ -19,7 +19,7 @@ export const SummarySection = ({ section, participants, targets, validationError
   const accuracy = totalShots > 0 ? Math.round((totalHits / totalShots) * 100) : 0;
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto" id="summary">
       <SectionHeader section={section} />
 
       <div className="mt-8 space-y-6">

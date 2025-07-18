@@ -20,7 +20,7 @@ export const SessionConfigSection = ({ section, sessionData, updateSessionData, 
   const [showNotesField, setShowNotesField] = useState(sessionData.note !== "");
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto" id="session-config">
       <SectionHeader section={section} />
 
       <div className="mt-8 space-y-6">
