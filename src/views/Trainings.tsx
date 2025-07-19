@@ -11,6 +11,7 @@ export default function Trainings() {
     tabs,
     activeTab,
     setActiveTab,
+    setIsAddTrainingOpen,
     trainings,
     totalCount,
     currentPage,
@@ -18,7 +19,6 @@ export default function Trainings() {
     hasMore,
     setIsPageChanging,
     isAddTrainingOpen,
-    setIsAddTrainingOpen,
     assignments,
     fetchTrainings,
     handleModalClose,
@@ -26,15 +26,16 @@ export default function Trainings() {
 
   return (
     <SpPage>
-      <Header />
-      <SpPageHeader
-        title="Trainings"
-        subtitle={"Add, edit, and manage training sessions"}
-        icon={<BiCurrentLocation />}
+      <Header
         breadcrumbs={[
           { label: "Dashboard", link: "/" },
           { label: "Trainings", link: "/trainings" },
         ]}
+      />
+      <SpPageHeader
+        title="Trainings"
+        subtitle={"Add, edit, and manage training sessions"}
+        icon={<BiCurrentLocation />}
         dropdownItems={[{ label: "Add Training", onClick: () => setIsAddTrainingOpen(true) }]}
       />
       <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />

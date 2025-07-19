@@ -25,13 +25,14 @@ export default function TrainingPage() {
 
   return (
     <SpPage>
-      <Header />
-      <SpPageHeader
+      <Header
         breadcrumbs={[
           { label: "Dashboard", link: "/" },
           { label: "Trainings", link: "/trainings" },
           { label: "Training Session", link: `/trainings/${id}` },
         ]}
+      />
+      <SpPageHeader
         title={"Training Session"}
         icon={<BiCurrentLocation />}
         dropdownItems={[

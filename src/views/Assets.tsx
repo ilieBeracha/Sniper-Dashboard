@@ -22,15 +22,16 @@ export default function AssetsPage() {
 
   return (
     <SpPage>
-      <Header />
-      <SpPageHeader
-        title="Assets"
-        subtitle={`Manage ${activeTab === "weapons" ? "weapons" : "equipment"} inventory`}
-        icon={<Package className="w-5 h-5" />}
+      <Header
         breadcrumbs={[
           { label: "Dashboard", link: "/" },
           { label: "Assets", link: "/assets" },
         ]}
+      />
+      <SpPageHeader
+        title="Assets"
+        subtitle={`Manage ${activeTab === "weapons" ? "weapons" : "equipment"} inventory`}
+        icon={<Package className="w-5 h-5" />}
         dropdownItems={[
           activeTab === "weapons"
             ? { label: "Add Weapon", onClick: () => setIsOpen(true) }

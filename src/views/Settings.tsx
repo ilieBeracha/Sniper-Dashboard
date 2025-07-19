@@ -25,16 +25,8 @@ const Settings = () => {
 
   return (
     <SpPage>
-      <Header />
-      <SpPageHeader
-        breadcrumbs={[
-          { label: "Dashboard", link: "/" },
-          { label: "Settings", link: "/settings" },
-        ]}
-        title="Settings"
-        subtitle="Manage your account settings and preferences"
-        icon={<SettingsIcon />}
-      />
+      <Header breadcrumbs={[{ label: "Settings", link: "/settings" }]} />
+      <SpPageHeader title="Settings" subtitle="Manage your account settings and preferences" icon={<SettingsIcon />} />
       <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={(tab) => setActiveTab(tab as string)} />
       <SpPageBody>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

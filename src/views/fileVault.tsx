@@ -56,7 +56,7 @@ export default function FileVault() {
 
   return (
     <SpPage>
-      <Header />
+      <Header breadcrumbs={[{ label: "File Vault", link: "/file-vault" }]} />
       <SpPageHeader
         title="File Vault"
         subtitle="Upload and manage your files"
