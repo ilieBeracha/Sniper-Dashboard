@@ -9,12 +9,11 @@ export default function Dashboard() {
 
   return (
     <SpPage>
-      <Header />
+      <Header breadcrumbs={[{ label: "Dashboard", link: "/" }]} />
       <SpPageHeader
         title={activeTab}
         subtitle={activeTab === "Overview" ? "Team, Squad, and more" : "By Date, Squad, and more"}
         icon={<SplinePointerIcon />}
-        breadcrumbs={[{ label: "Dashboard", link: "/" }]}
         dropdownItems={[
           {
             label: "Invite",
