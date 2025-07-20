@@ -1,5 +1,5 @@
 import Header from "@/Headers/Header";
-import { SpPage, SpPageBody, SpPageDivider, SpPageHeader } from "@/layouts/SpPage";
+import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
 import { fileStore } from "@/store/fileStore";
 import { teamStore } from "@/store/teamStore";
 import { useEffect, useState } from "react";
@@ -67,10 +67,8 @@ export default function FileVault() {
         ]}
       />
 
-      <SpPageDivider />
-
       <SpPageBody>
-        <div className="flex flex-col h-full w-full sm:px-0">
+        <div className="flex flex-col h-full w-full sm:px-0 pt-4">
           <FileUploadShad isOpen={isOpen} setIsOpen={setIsOpen} onUpload={loadFiles} />
 
           {/* Quick Actions */}

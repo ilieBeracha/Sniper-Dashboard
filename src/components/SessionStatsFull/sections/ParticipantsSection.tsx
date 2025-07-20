@@ -2,6 +2,7 @@ import { Users, Trash2, UserPlus } from "lucide-react";
 import { Participant } from "../types";
 import { SectionHeader } from "./SectionHeader";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useEffect } from "react";
 
 interface ParticipantsSectionProps {
   section: any;
@@ -29,6 +30,10 @@ export const ParticipantsSection = ({
   updateParticipant,
 }: ParticipantsSectionProps) => {
   const { theme } = useTheme();
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   return (
     <div className="w-full max-w-2xl mx-auto" id="participants">
@@ -71,14 +76,15 @@ export const ParticipantsSection = ({
           <>
             {/* Table Header */}
             <div
-              className={`grid grid-cols-4 gap-2 px-4 py-3 text-xs font-medium border-b ${
+              className={`grid grid-cols-5 gap-2 px-4 py-3 text-xs font-medium border-b ${
                 theme === "dark" ? "bg-zinc-800/50 border-zinc-700 text-zinc-400" : "bg-gray-50 border-gray-200 text-gray-600"
               }`}
             >
               <div className="col-span-1">Name</div>
               <div className="col-span-1">Role</div>
               <div className="col-span-1">Position</div>
-              <div className="col-span-1">Equipment</div>
+              <div className="col-span-1">{participants[0].userDuty === "Sniper" ? "Weapon" : "Equipment"}</div>
+              <div className="col-span-1 text-right">Actions</div>
             </div>
 
             {/* Participants Rows */}
@@ -86,7 +92,7 @@ export const ParticipantsSection = ({
               {participants.map((participant, index) => (
                 <div
                   key={participant.userId}
-                  className={`grid grid-cols-4 gap-2 px-4 py-3 items-center transition-colors ${
+                  className={`grid grid-cols-5 gap-2 px-4 py-3 items-center transition-colors ${
                     theme === "dark" ? "hover:bg-zinc-800/30" : "hover:bg-gray-50"
                   }`}
                 >
@@ -116,6 +122,7 @@ export const ParticipantsSection = ({
                         theme === "dark" ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-gray-200"
                       }`}
                     >
+                      <option value=""></option>
                       <option value="Sniper">Sniper</option>
                       <option value="Spotter">Spotter</option>
                     </select>
@@ -130,6 +137,7 @@ export const ParticipantsSection = ({
                         theme === "dark" ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-gray-200"
                       }`}
                     >
+                      <option value=""></option>
                       <option value="Lying">Prone</option>
                       <option value="Standing">Standing</option>
                       <option value="Sitting">Sitting</option>
@@ -140,7 +148,7 @@ export const ParticipantsSection = ({
                   {/* Weapon/Equipment */}
                   <div className="col-span-1">
                     <select
-                      value={participant.userDuty === "Sniper" ? participant.weaponId : participant.equipmentId}
+                      value={participant.userDuty === "Sniper" ? (participant.weaponId || "") : (participant.equipmentId || "")}
                       onChange={(e) =>
                         updateParticipant(participant.userId, participant.userDuty === "Sniper" ? "weaponId" : "equipmentId", e.target.value)
                       }
@@ -148,7 +156,7 @@ export const ParticipantsSection = ({
                         theme === "dark" ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-gray-200"
                       }`}
                     >
-                      <option value="">Select</option>
+                      <option value=""></option>
                       {participant.userDuty === "Sniper"
                         ? weapons.map((weapon: any) => (
                             <option key={weapon.id} value={weapon.id || ""}>

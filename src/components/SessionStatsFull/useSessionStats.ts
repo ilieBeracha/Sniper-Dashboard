@@ -156,10 +156,10 @@ export const useSessionStats = () => {
       const newParticipant: Participant = {
         userId: member.id,
         name: member.first_name || member.last_name ? `${member.first_name || ""} ${member.last_name || ""}`.trim() : member.email,
-        userDuty: "Sniper",
+        userDuty: member?.user_default_duty || "Sniper",
         position: "Lying",
-        weaponId: user?.user_default_weapon || "",
-        equipmentId: user?.user_default_equipment || "",
+        weaponId: member?.user_default_weapon || "",
+        equipmentId: member?.user_default_equipment || "",
       };
       setParticipants((prev) => [...prev, newParticipant]);
     }
@@ -174,10 +174,10 @@ export const useSessionStats = () => {
       const newParticipant: Participant = {
         userId: member.id,
         name: member.first_name || member.last_name ? `${member.first_name || ""} ${member.last_name || ""}`.trim() : member.email,
-        userDuty: "Sniper",
+        userDuty: member?.user_default_duty || "Sniper",
         position: "Lying",
-        weaponId: user?.user_default_weapon || "",
-        equipmentId: user?.user_default_equipment || "",
+        weaponId: member?.user_default_weapon || "",
+        equipmentId: member?.user_default_equipment || "",
       };
       setParticipants((prev) => [...prev, newParticipant]);
     });
@@ -241,9 +241,6 @@ export const useSessionStats = () => {
     if (!sessionData.assignment_id) errors.push("Training Assignment is required");
     if (!sessionData.squad_id) errors.push("Squad is required");
     if (!sessionData.dayPeriod) errors.push("Time Period is required");
-    if (sessionData.timeToFirstShot === null || sessionData.timeToFirstShot === undefined) {
-      errors.push("Time to First Shot is required");
-    }
 
     // Validate participants
     if (participants.length === 0) {

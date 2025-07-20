@@ -19,6 +19,7 @@ import { Target } from "lucide-react";
 import SessionStatsTable from "@/components/SessionStatsTable";
 import TrainingAnalyticsTab from "@/components/TrainingAnalyticsTab";
 import TrainingStatusTab from "@/components/TrainingStatusTab";
+import TrainingSessionStatsCard from "@/components/TrainingSessionStatsCard";
 
 export default function TrainingPage() {
   const navigate = useNavigate();
@@ -86,6 +87,7 @@ export default function TrainingPage() {
     if (activeTab.id === "session-stats") {
       return (
         <>
+          <TrainingSessionStatsCard trainingSessionId={id!} />
           <SessionStatsTable sessionStats={selectedSession} onSessionStatsClick={handleSessionClick} onSessionStatsEditClick={() => {}} />
         </>
       );
