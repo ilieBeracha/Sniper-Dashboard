@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { getSessionStatsCountByTrainingId, saveCompleteSession } from "@/services/sessionService";
-import type { CreateSessionStatsData, CreateParticipantData, CreateTargetStatsData, CreateTargetEngagementData } from "@/services/sessionService";
+import type { CreateSessionStatsData, CreateParticipantData, CreateTargetStatsData, CreateTargetEngagementData } from "@/types/sessionStats";
 import { TrainingStore } from "./trainingStore";
 import { getSessionStatsByTrainingId } from "@/services/sessionService";
 import { formatForSupabaseInsert, processTrainingSessionToEmbeddings } from "@/services/embedSniperSession";
@@ -120,7 +120,6 @@ export const sessionStore = create<SessionStatsState>((set) => ({
             mistake_code: target.mistakeCode || null,
           };
 
-          // Target engagements (without target_id - service will add it)
           const engagements: Omit<CreateTargetEngagementData, "target_stats_id">[] = target.engagements.map((eng) => {
             return {
               user_id: eng.user_id,

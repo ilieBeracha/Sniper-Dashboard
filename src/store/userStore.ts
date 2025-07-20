@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { User as SupabaseAuthUser } from "@supabase/supabase-js";
 import { User } from "@/types/user";
-import { updateUser, getUserById } from "@/services/userService";
+import { updateUser, getUserProfileById } from "@/services/userService";
 
 interface UserStore {
   user: User | null;
@@ -25,39 +25,31 @@ export const userStore = create<UserStore>((set, get) => ({
 
   setUserFromAuth: (authUser: SupabaseAuthUser) => {
     if (!authUser) return;
-    const user_metadata = authUser.user_metadata || {};
+    const app_metadata = authUser.app_metadata || {};
 
     const mappedUser = {
       id: authUser.id,
       email: authUser.email ?? "",
-      first_name: user_metadata.first_name ?? "",
-      last_name: user_metadata.last_name ?? "",
-      user_role: user_metadata.user_role ?? "",
-      team_id: user_metadata.team_id ?? "",
-      squad_id: user_metadata.squad_id ?? "",
-      team_name: user_metadata.team_name ?? "",
-      user_default_duty: user_metadata.user_default_duty ?? "",
-      user_default_weapon: user_metadata.user_default_weapon ?? "",
-      user_default_equipment: user_metadata.user_default_equipment ?? "",
-      squad_name: user_metadata.squad_name ?? "",
+      first_name: app_metadata.first_name ?? "",
+      last_name: app_metadata.last_name ?? "",
+      user_role: app_metadata.user_role ?? "",
+      team_id: app_metadata.team_id ?? "",
+      squad_id: app_metadata.squad_id ?? "",
+      team_name: app_metadata.team_name ?? "",
+      user_default_duty: app_metadata.user_default_duty ?? "",
+      user_default_weapon: app_metadata.user_default_weapon ?? "",
+      user_default_equipment: app_metadata.user_default_equipment ?? "",
+      squad_name: app_metadata.squad_name ?? "",
       created_at: authUser.created_at ?? "",
-      user_default_duty: meta.user_default_duty ?? null,
-      user_default_weapon: meta.user_default_weapon ?? null,
-      user_default_equipment: meta.user_default_equipment ?? null,
     };
 
     set({ user: mappedUser });
   },
 
   updateUser: async (user_data: Partial<User>) => {
-    const currentUser = get().user;
-    const id = currentUser?.id;
-
-    if (!id) return null;
-    const updatedUser = await updateUser(id, user_data);
-    
-    // Merge the updated data with the existing user data
-    const mergedUser = { ...currentUser, ...updatedUser };
+    const user = get().user;
+    const updatedUser = await updateUser(user?.id || "", user_data);
+    const mergedUser = { ...user, ...updatedUser };
     set({ user: mergedUser });
     return mergedUser;
   },
@@ -67,9 +59,9 @@ export const userStore = create<UserStore>((set, get) => ({
     const id = currentUser?.id;
 
     if (!id) return null;
-    
+
     try {
-      const freshUser = await getUserById(id);
+      const freshUser = await getUserProfileById(id);
       set({ user: freshUser });
       return freshUser;
     } catch (error) {
@@ -78,4 +70,3 @@ export const userStore = create<UserStore>((set, get) => ({
     }
   },
 }));
-

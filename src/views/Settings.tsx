@@ -6,51 +6,42 @@ import Header from "@/Headers/Header";
 import { useSettingsPageLogic } from "@/hooks/useSettingsPageLogic";
 import { useTabs } from "@/hooks/useTabs";
 import { UserRole } from "@/types/user";
+import { useStore } from "zustand";
+import { userStore } from "@/store/userStore";
 
 const InfoField = ({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) => {
   const { theme } = useTheme();
-  
+
   return (
     <div className="space-y-2">
-      <label className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-        {label}
-      </label>
-      <div className={`flex items-center gap-3 p-3 rounded-lg border ${
-        theme === "dark" 
-          ? "bg-zinc-800/30 border-zinc-700 text-gray-200" 
-          : "bg-gray-50 border-gray-200 text-gray-900"
-      }`}>
-        <div className={`flex-shrink-0 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
-          {icon}
-        </div>
+      <label className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>{label}</label>
+      <div
+        className={`flex items-center gap-3 p-3 rounded-lg border ${
+          theme === "dark" ? "bg-zinc-800/30 border-zinc-700 text-gray-200" : "bg-gray-50 border-gray-200 text-gray-900"
+        }`}
+      >
+        <div className={`flex-shrink-0 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>{icon}</div>
         <span className="font-medium">{value || "Not assigned"}</span>
       </div>
     </div>
   );
 };
 
-const Settings = () => {
+export default function Settings() {
   const { theme } = useTheme();
+  const { user } = useStore(userStore);
   const {
     formData,
-    user,
-    tabs,
-    activeTab,
-    setActiveTab,
+
     availableWeapons,
     availableEquipment,
     handleFormChange,
     handleDutyChange,
-    handleWeaponChange,
-    handleEquipmentChange,
     UserDuty,
     emailError,
+    handleWeaponChange,
+    handleEquipmentChange,
   } = useSettingsPageLogic();
-
-const Settings = () => {
-  const { theme } = useTheme();
-  const { formData, loading, saved, availableWeapons, availableEquipment, handleSave, handleFormChange, handleDutyChange, UserDuty } =
-    useSettingsPageLogic();
 
   const { tabs, activeTab, handleTabChange } = useTabs({ tabs: [{ id: "account", label: "Account", icon: SettingsIcon }] });
 
@@ -128,11 +119,7 @@ const Settings = () => {
                     {/* Squad Commander: Show Team Name as read-only, Squad Name as editable */}
                     {userRole === UserRole.SquadCommander && (
                       <>
-                        <InfoField
-                          label="Team Name"
-                          value={formData.team_name}
-                          icon={<Crown className="w-4 h-4" />}
-                        />
+                        <InfoField label="Team Name" value={formData.team_name} icon={<Crown className="w-4 h-4" />} />
                         <BaseInput
                           label="Squad Name"
                           value={formData.squad_name}
@@ -145,16 +132,8 @@ const Settings = () => {
                     {/* Other roles: Show both Team Name and Squad Name as read-only */}
                     {userRole === UserRole.Soldier && (
                       <>
-                        <InfoField
-                          label="Team Name"
-                          value={formData.team_name}
-                          icon={<Crown className="w-4 h-4" />}
-                        />
-                        <InfoField
-                          label="Squad Name"
-                          value={formData.squad_name}
-                          icon={<Users className="w-4 h-4" />}
-                        />
+                        <InfoField label="Team Name" value={formData.team_name} icon={<Crown className="w-4 h-4" />} />
+                        <InfoField label="Squad Name" value={formData.squad_name} icon={<Users className="w-4 h-4" />} />
                       </>
                     )}
                   </div>
@@ -172,9 +151,7 @@ const Settings = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Role Selection */}
                 <div className="space-y-3">
-                  <label className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-                    Default Role
-                  </label>
+                  <label className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Default Role</label>
                   <div className="space-y-2">
                     <button
                       onClick={() => handleDutyChange(UserDuty.SNIPER)}
@@ -233,7 +210,7 @@ const Settings = () => {
                       <option value="">Select a weapon</option>
                       {(() => {
                         const groupedWeapons = availableWeapons
-                          .filter(weapon => weapon.serial_number && weapon.serial_number.trim() !== '')
+                          .filter((weapon) => weapon.serial_number && weapon.serial_number.trim() !== "")
                           .reduce(
                             (acc, weapon) => {
                               if (!acc[weapon.weapon_type]) {
@@ -269,7 +246,7 @@ const Settings = () => {
                       <option value="">Select equipment</option>
                       {(() => {
                         const groupedEquipment = availableEquipment
-                          .filter(eq => eq.serial_number && eq.serial_number.trim() !== '')
+                          .filter((eq) => eq.serial_number && eq.serial_number.trim() !== "")
                           .reduce(
                             (acc, eq) => {
                               if (!acc[eq.equipment_type]) {
@@ -301,6 +278,4 @@ const Settings = () => {
       </SpPageBody>
     </SpPage>
   );
-};
-
-export default Settings;
+}

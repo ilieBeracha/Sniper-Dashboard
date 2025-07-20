@@ -10,8 +10,6 @@ import { equipmentStore } from "@/store/equipmentStore";
 import { getSquadsWithUsersByTeamId } from "@/services/squadService";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import { WaveLoader } from "@/components/ui/loader";
-import Settings from "./Settings";
-import { supabase } from "@/services/supabaseClient";
 // import SessionStats from "./SessionStats";
 // Dynamic imports for better code splitting
 const Dashboard = lazy(() => import("./Dashboard"));
@@ -20,29 +18,18 @@ const TrainingPage = lazy(() => import("./Training"));
 const Assets = lazy(() => import("./Assets"));
 const ErrorPage = lazy(() => import("./404"));
 const SessionStatsFull = lazy(() => import("./sessionStatsFull"));
-const FileVault = lazy(() => import("./fileVault"));
+const SettingsPage = lazy(() => import("./Settings"));
 
 export default function AppRoutes() {
   const { token } = useStore(authStore);
-  const useUserStore = useStore(userStore);
   const { fetchMembers } = useStore(teamStore);
   const { getSquadUsersBySquadId } = useStore(squadStore);
   const { getWeapons } = useStore(weaponsStore);
   const { getEqipmentsByTeamId } = useStore(equipmentStore);
-  const user = useUserStore.user;
+  const { user } = useStore(userStore);
 
   useEffect(() => {
     const load = async () => {
-      supabase.auth.admin.updateUserById(user?.id || "", {
-        user_metadata: {
-          team_id: user?.team_id,
-          squad_id: user?.squad_id,
-          user_default_duty: user?.user_default_duty,
-          user_default_weapon: user?.user_default_weapon,
-          user_default_equipment: user?.user_default_equipment,
-          user_role: user?.user_role,
-        },
-      });
       if (user?.team_id && user?.squad_id) {
         await fetchMembers(user.team_id);
         await getEqipmentsByTeamId(user.team_id);
@@ -97,18 +84,18 @@ export default function AppRoutes() {
             path="/settings"
             element={
               <Suspense fallback={<LoadingFallback />}>
-                <Settings />
+                <SettingsPage />
               </Suspense>
             }
           />
-          <Route
+          {/* <Route
             path="/file-vault"
             element={
               <Suspense fallback={<LoadingFallback />}>
                 <FileVault />
               </Suspense>
-            }
-          />
+            } */}
+          {/* /> */}
           <Route
             path="/training/:id"
             element={

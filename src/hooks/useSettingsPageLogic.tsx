@@ -8,11 +8,9 @@ import { BASE_EQUIPMENTS } from "@/utils/BaseData/BaseEquipments";
 import { User } from "@/types/user";
 import { Team } from "@/types/team";
 import { Squad } from "@/types/squad";
-import { UserDuty } from "@/types/score";
-import { Settings as SettingsIcon } from "lucide-react";
+import { UserDuty } from "@/types/user";
 import { getTeamById, updateTeamName } from "@/services/teamService";
 import { getSquadById, updateSquadName } from "@/services/squadService";
-
 
 export function useSettingsPageLogic() {
   const { user, updateUser, fetchUserFromDB } = useStore(userStore);
@@ -31,9 +29,9 @@ export function useSettingsPageLogic() {
     email: user?.email || "",
     team_name: "",
     squad_name: "",
-    user_default_duty: user?.user_default_duty || UserDuty.SNIPER,
     user_default_weapon: user?.user_default_weapon || null,
     user_default_equipment: user?.user_default_equipment || null,
+    user_default_duty: user?.user_default_duty || UserDuty.SNIPER,
   });
 
   // Fetch fresh user data on component mount
@@ -106,8 +104,8 @@ export function useSettingsPageLogic() {
 
   const handleFormChange = async (field: string, value: any) => {
     // Update local state first
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Handle email validation
     if (field === "email") {
       if (!isValidEmail(value)) {
@@ -117,7 +115,7 @@ export function useSettingsPageLogic() {
         setEmailError("");
       }
     }
-    
+
     // Handle team name updates
     if (field === "team_name" && user?.team_id) {
       try {
@@ -128,11 +126,11 @@ export function useSettingsPageLogic() {
       } catch (error) {
         console.error("Error updating team name:", error);
         // Revert local state
-        setFormData(prev => ({ ...prev, team_name: team?.team_name || "" }));
+        setFormData((prev) => ({ ...prev, team_name: team?.team_name || "" }));
       }
       return;
     }
-    
+
     // Handle squad name updates
     if (field === "squad_name" && user?.squad_id) {
       try {
@@ -143,11 +141,11 @@ export function useSettingsPageLogic() {
       } catch (error) {
         console.error("Error updating squad name:", error);
         // Revert local state
-        setFormData(prev => ({ ...prev, squad_name: squad?.squad_name || "" }));
+        setFormData((prev) => ({ ...prev, squad_name: squad?.squad_name || "" }));
       }
       return;
     }
-    
+
     // Handle other user fields
     try {
       await updateUser({ [field]: value });
@@ -155,21 +153,21 @@ export function useSettingsPageLogic() {
       console.error("Error auto-saving field:", field, error);
       // On error, revert local state to match store
       if (user) {
-        setFormData(prev => ({ ...prev, [field]: user[field as keyof User] }));
+        setFormData((prev) => ({ ...prev, [field]: user[field as keyof User] }));
       }
     }
   };
 
   const handleDutyChange = async (duty: UserDuty) => {
     // Update local state first
-    const newFormData = { 
-      ...formData, 
+    const newFormData = {
+      ...formData,
       user_default_duty: duty,
       user_default_weapon: duty === UserDuty.SPOTTER ? null : formData.user_default_weapon,
       user_default_equipment: duty === UserDuty.SNIPER ? null : formData.user_default_equipment,
     };
     setFormData(newFormData);
-    
+
     // Prepare update data for DB
     const updateData: Partial<User> = { user_default_duty: duty };
     if (duty === UserDuty.SNIPER) {
@@ -177,7 +175,7 @@ export function useSettingsPageLogic() {
     } else if (duty === UserDuty.SPOTTER) {
       updateData.user_default_weapon = null;
     }
-    
+
     // Then save to DB and update store
     try {
       await updateUser(updateData);
@@ -185,8 +183,8 @@ export function useSettingsPageLogic() {
       console.error("Error auto-saving duty change:", error);
       // On error, revert local state to match store
       if (user) {
-        setFormData(prev => ({ 
-          ...prev, 
+        setFormData((prev) => ({
+          ...prev,
           user_default_duty: user.user_default_duty || UserDuty.SNIPER,
           user_default_weapon: user.user_default_weapon || null,
           user_default_equipment: user.user_default_equipment || null,
@@ -197,8 +195,8 @@ export function useSettingsPageLogic() {
 
   const handleWeaponChange = async (weaponId: string) => {
     // Update local state first
-    setFormData(prev => ({ ...prev, user_default_weapon: weaponId }));
-    
+    setFormData((prev) => ({ ...prev, user_default_weapon: weaponId }));
+
     // Then save to DB and update store
     try {
       await updateUser({ user_default_weapon: weaponId });
@@ -206,15 +204,15 @@ export function useSettingsPageLogic() {
       console.error("Error auto-saving weapon change:", error);
       // On error, revert local state to match store
       if (user) {
-        setFormData(prev => ({ ...prev, user_default_weapon: user.user_default_weapon || null }));
+        setFormData((prev) => ({ ...prev, user_default_weapon: user.user_default_weapon || null }));
       }
     }
   };
 
   const handleEquipmentChange = async (equipmentId: string) => {
     // Update local state first
-    setFormData(prev => ({ ...prev, user_default_equipment: equipmentId }));
-    
+    setFormData((prev) => ({ ...prev, user_default_equipment: equipmentId }));
+
     // Then save to DB and update store
     try {
       await updateUser({ user_default_equipment: equipmentId });
@@ -222,7 +220,7 @@ export function useSettingsPageLogic() {
       console.error("Error auto-saving equipment change:", error);
       // On error, revert local state to match store
       if (user) {
-        setFormData(prev => ({ ...prev, user_default_equipment: user.user_default_equipment || null }));
+        setFormData((prev) => ({ ...prev, user_default_equipment: user.user_default_equipment || null }));
       }
     }
   };

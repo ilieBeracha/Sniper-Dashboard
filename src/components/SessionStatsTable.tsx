@@ -38,7 +38,7 @@ export default function SessionStatsTable({
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const SESSION_LIMIT = 20;
-  
+
   // Expanded groups state - initialize with all groups expanded
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [isInitialized, setIsInitialized] = useState(false);
@@ -115,11 +115,11 @@ export default function SessionStatsTable({
   // Group sessions by assignment
   const groupedData = useMemo(() => {
     const groups: Record<string, GroupedAssignment> = {};
-    
+
     paginatedSessionStats.forEach((session) => {
       const assignmentId = session.assignment_id;
       const assignmentName = session.assignment_session?.assignment?.assignment_name || "Unknown Assignment";
-      
+
       if (!groups[assignmentId]) {
         groups[assignmentId] = {
           assignmentId,
@@ -128,10 +128,10 @@ export default function SessionStatsTable({
           expanded: expandedGroups.has(assignmentId),
         };
       }
-      
+
       groups[assignmentId].sessions.push(session);
     });
-    
+
     // Convert to array and sort by assignment name
     return Object.values(groups).sort((a, b) => a.assignmentName.localeCompare(b.assignmentName));
   }, [paginatedSessionStats, expandedGroups]);
@@ -139,7 +139,7 @@ export default function SessionStatsTable({
   // Flatten grouped data for table display
   const flattenedData = useMemo(() => {
     const flattened: any[] = [];
-    
+
     groupedData.forEach((group) => {
       // Add group header
       flattened.push({
@@ -150,7 +150,7 @@ export default function SessionStatsTable({
         sessionCount: group.sessions.length,
         expanded: group.expanded,
       });
-      
+
       // Add sessions if expanded
       if (group.expanded) {
         group.sessions.forEach((session) => {
@@ -162,7 +162,7 @@ export default function SessionStatsTable({
         });
       }
     });
-    
+
     return flattened;
   }, [groupedData]);
 
@@ -198,9 +198,7 @@ export default function SessionStatsTable({
       render: (_value: any, row: any) => {
         if (row.isGroup) {
           return (
-            <div 
-              className="flex items-center gap-2 font-semibold"
-            >
+            <div className="flex items-center gap-2 font-semibold">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -208,11 +206,7 @@ export default function SessionStatsTable({
                 }}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
               >
-                {row.expanded ? (
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-gray-500" />
-                )}
+                {row.expanded ? <ChevronDown className="w-4 h-4 text-gray-500" /> : <ChevronRight className="w-4 h-4 text-gray-500" />}
               </button>
               <span>{row.assignmentName}</span>
               <span className="text-sm text-gray-500">({row.sessionCount})</span>
@@ -220,11 +214,9 @@ export default function SessionStatsTable({
           );
         }
         return (
-          <div className={`${row.isChild ? 'pl-8' : ''} flex items-center gap-2`}>
+          <div className={`${row.isChild ? "pl-8" : ""} flex items-center gap-2`}>
             <span className="text-sm text-gray-500">•</span>
-            <span className="truncate max-w-[150px]">
-              Session {format(new Date(row.created_at), "MMM dd, HH:mm")}
-            </span>
+            <span className="truncate max-w-[150px]">Session {format(new Date(row.created_at), "MMM dd, HH:mm")}</span>
           </div>
         );
       },
@@ -284,7 +276,7 @@ export default function SessionStatsTable({
 
   const actions = (row: any) => {
     if (row.isGroup) return null;
-    
+
     return (
       <div className="inline-flex gap-1 sm:gap-2">
         <button

@@ -63,9 +63,12 @@ export const authStore = create<props>((set, get) => ({
 
   signInWithEmail: async (email: string) => {
     try {
-      const res = await authService.signInWithEmail(email);
-      console.log(res);
-      // set({ token: res });
+      const res = await authService.login({ email, password: "" });
+      set({ token: res.access_token });
+      get().supabaseLogin(res);
+      userStore.getState().setUser(res.user as unknown as User);
+
+      return res;
     } catch (error: any) {
       set({ error: error.message });
       console.log(error);
@@ -124,6 +127,7 @@ export const authStore = create<props>((set, get) => ({
 
   login: async (user: LoginUserData) => {
     try {
+      console.log("login", user);
       authStore.getState().resetError();
       const res = await authService.login(user);
       get().supabaseLogin(res);
@@ -142,6 +146,7 @@ export const authStore = create<props>((set, get) => ({
 
   logout: async () => {
     set({ token: null });
+
     await supabase.auth.signOut();
 
     authStore.getState().resetError();

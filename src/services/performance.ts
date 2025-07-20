@@ -8,7 +8,7 @@ import {
   CommanderUserRoleBreakdown,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
-import { PositionScore } from "@/types/score";
+import { PositionScore } from "@/types/user";
 
 export async function getUserHitStatsFull(userId: string): Promise<UserHitsData> {
   const { data, error } = await supabase.rpc("get_user_hit_stats_full", {
@@ -155,9 +155,7 @@ export async function overallAccuracyStats() {
 }
 
 // commander view
-export const getCommanderUserRoleBreakdown = async (
-  teamId: string
-): Promise<CommanderUserRoleBreakdown[]> => {
+export const getCommanderUserRoleBreakdown = async (teamId: string): Promise<CommanderUserRoleBreakdown[]> => {
   const { data, error } = await supabase.rpc("get_commander_user_role_breakdown", {
     p_team_id: teamId,
   });
@@ -170,17 +168,10 @@ export const getCommanderUserRoleBreakdown = async (
   return data ?? [];
 };
 
-
-
 // new
-export const getSquadMajoritySessionsPerformance = async (
-  teamId: string
-): Promise<SquadMajorityPerformance[]> => {
-  const { data, error } = await supabase.rpc(
-    "get_squad_majority_sessions_performance",
-    { p_team_id: teamId }
-  );
-console.log(data, "Data from getSquadMajoritySessionsPerformance");
+export const getSquadMajoritySessionsPerformance = async (teamId: string): Promise<SquadMajorityPerformance[]> => {
+  const { data, error } = await supabase.rpc("get_squad_majority_sessions_performance", { p_team_id: teamId });
+  console.log(data, "Data from getSquadMajoritySessionsPerformance");
   if (error) {
     console.error("Error fetching squad majority performance:", error);
     throw error;

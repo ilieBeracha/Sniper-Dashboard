@@ -26,7 +26,7 @@ import {
   getSquadMajoritySessionsPerformance,
 } from "@/services/performance";
 import { userStore } from "./userStore";
-import { PositionScore } from "@/types/score";
+import { PositionScore } from "@/types/user";
 
 interface PerformanceStore {
   squadWeaponPerformance: SquadWeaponPerformance[];

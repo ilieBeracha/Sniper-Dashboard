@@ -6,7 +6,7 @@ import { BsBarChartFill } from "react-icons/bs";
 import { authStore } from "@/store/authStore";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
-import { FaCrosshairs, FaFolderOpen } from "react-icons/fa";
+import { FaCrosshairs } from "react-icons/fa";
 import { useSidebarStore } from "@/store/sidebarStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -23,7 +23,7 @@ const navSections = [
     title: "TEAM",
     items: [
       { name: "Assets", href: "/assets", icon: <FaCrosshairs className="w-5 h-5" /> },
-      { name: "File Vault", href: "/file-vault", icon: <FaFolderOpen className="w-5 h-5" /> },
+      // { name: "File Vault", href: "/file-vault", icon: <FaFolderOpen className="w-5 h-5" /> },
     ],
   },
   {
