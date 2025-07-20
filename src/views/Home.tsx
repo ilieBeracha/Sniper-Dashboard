@@ -11,6 +11,7 @@ import { getSquadsWithUsersByTeamId } from "@/services/squadService";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import { WaveLoader } from "@/components/ui/loader";
 import Settings from "./Settings";
+import { supabase } from "@/services/supabaseClient";
 // import SessionStats from "./SessionStats";
 // Dynamic imports for better code splitting
 const Dashboard = lazy(() => import("./Dashboard"));
@@ -32,7 +33,17 @@ export default function AppRoutes() {
 
   useEffect(() => {
     const load = async () => {
-      if (user?.team_id) {
+      supabase.auth.admin.updateUserById(user?.id || "", {
+        user_metadata: {
+          team_id: user?.team_id,
+          squad_id: user?.squad_id,
+          user_default_duty: user?.user_default_duty,
+          user_default_weapon: user?.user_default_weapon,
+          user_default_equipment: user?.user_default_equipment,
+          user_role: user?.user_role,
+        },
+      });
+      if (user?.team_id && user?.squad_id) {
         await fetchMembers(user.team_id);
         await getEqipmentsByTeamId(user.team_id);
         await getWeapons(user.team_id);
@@ -46,7 +57,7 @@ export default function AppRoutes() {
   }, []);
 
   const LoadingFallback = () => (
-    <div className="flex items-center justify-center min-h-screen bg-transparent">
+    <div className="flex items-center h-screen justify-center bg-transparent">
       <WaveLoader />
     </div>
   );

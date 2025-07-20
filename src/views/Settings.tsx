@@ -4,6 +4,7 @@ import { User as UserIcon, Settings as SettingsIcon, Shield, Target, Crosshair, 
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import Header from "@/Headers/Header";
 import { useSettingsPageLogic } from "@/hooks/useSettingsPageLogic";
+import { useTabs } from "@/hooks/useTabs";
 import { UserRole } from "@/types/user";
 
 const InfoField = ({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) => {
@@ -46,21 +47,20 @@ const Settings = () => {
     emailError,
   } = useSettingsPageLogic();
 
+const Settings = () => {
+  const { theme } = useTheme();
+  const { formData, loading, saved, availableWeapons, availableEquipment, handleSave, handleFormChange, handleDutyChange, UserDuty } =
+    useSettingsPageLogic();
+
+  const { tabs, activeTab, handleTabChange } = useTabs({ tabs: [{ id: "account", label: "Account", icon: SettingsIcon }] });
+
   const userRole = user?.user_role ?? null;
 
   return (
     <SpPage>
-      <Header />
-      <SpPageHeader
-        breadcrumbs={[
-          { label: "Dashboard", link: "/" },
-          { label: "Settings", link: "/settings" },
-        ]}
-        title="Settings"
-        subtitle="Manage your account settings and preferences"
-        icon={<SettingsIcon />}
-      />
-      <SpPageTabs tabs={tabs} activeTab={activeTab} onChange={(tab) => setActiveTab(tab as string)} />
+      <Header breadcrumbs={[{ label: "Settings", link: "/settings" }]} />
+      <SpPageHeader title="Settings" subtitle="Manage your account settings and preferences" icon={SettingsIcon} />
+      <SpPageTabs tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
       <SpPageBody>
         <div className="max-w-5xl mx-auto">
           <div className="space-y-6">

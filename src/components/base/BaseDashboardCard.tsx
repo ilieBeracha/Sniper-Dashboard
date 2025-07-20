@@ -5,14 +5,16 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Card } from "@heroui/react";
 
 export default function BaseDashboardCard({
-  header,
+  header = "",
   children,
+  height = "h-full",
   padding = "p-4",
   tooltipContent = "",
   withBtn = false,
 }: {
-  header: string | React.ReactNode;
+  header?: string | React.ReactNode | null;
   children: React.ReactNode;
+  height?: string;
   padding?: string;
   tooltipContent?: string;
   withBg?: boolean;
@@ -25,7 +27,7 @@ export default function BaseDashboardCard({
     theme === "dark" ? "bg-[#1A1AA] border-white/10 shadow-lg shadow-black/20" : "bg-white border-gray-200 shadow-sm shadow-gray-200/50"
   } ${isMobile ? "" : "h-full"}`;
 
-  if (!header) {
+  if (!header || header === "" || header === null) {
     return (
       <Card shadow="none" className={cardClassName}>
         {children}
@@ -35,9 +37,9 @@ export default function BaseDashboardCard({
 
   return (
     <Card
-      className={`flex flex-col bg-white border border-gray-200 h-full shadow-xs rounded-xl overflow-hidden ${theme === "dark" ? "bg-zinc-900/50 border-neutral-700/70" : ""}`}
+      className={`flex flex-col bg-white rounded-4xl border border-gray-200 ${height} shadow-xsoverflow-hidden ${theme === "dark" ? "bg-zinc-900/50 border-neutral-700/70" : ""}`}
     >
-      <div className={`${padding} border-b mb-2 transition-colors duration-200 ${theme === "dark" ? "border-white/10" : "border-gray-200"}`}>
+      <div className={`${padding} border-none transition-colors duration-200 ${theme === "dark" ? "border-white/10" : "border-gray-200"}`}>
         <div className="flex justify-between relative h-full items-center">
           {tooltipContent && (
             <BiInfoCircle

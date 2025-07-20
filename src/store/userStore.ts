@@ -25,18 +25,21 @@ export const userStore = create<UserStore>((set, get) => ({
 
   setUserFromAuth: (authUser: SupabaseAuthUser) => {
     if (!authUser) return;
-    const meta = authUser.app_metadata || {};
+    const user_metadata = authUser.user_metadata || {};
 
     const mappedUser = {
       id: authUser.id,
       email: authUser.email ?? "",
-      first_name: meta.first_name ?? "",
-      last_name: meta.last_name ?? "",
-      user_role: meta.user_role ?? "",
-      team_id: meta.team_id ?? "",
-      squad_id: meta.squad_id ?? "",
-      team_name: meta.team_name ?? "",
-      squad_name: meta.squad_name ?? "",
+      first_name: user_metadata.first_name ?? "",
+      last_name: user_metadata.last_name ?? "",
+      user_role: user_metadata.user_role ?? "",
+      team_id: user_metadata.team_id ?? "",
+      squad_id: user_metadata.squad_id ?? "",
+      team_name: user_metadata.team_name ?? "",
+      user_default_duty: user_metadata.user_default_duty ?? "",
+      user_default_weapon: user_metadata.user_default_weapon ?? "",
+      user_default_equipment: user_metadata.user_default_equipment ?? "",
+      squad_name: user_metadata.squad_name ?? "",
       created_at: authUser.created_at ?? "",
       user_default_duty: meta.user_default_duty ?? null,
       user_default_weapon: meta.user_default_weapon ?? null,

@@ -8,13 +8,13 @@ import { User } from "@/types/user";
 
 interface props {
   token: string | null;
-  registerCommander: (userData: RegisterUserData) => Promise<string | Error>;
-  login: (userData: LoginUserData) => Promise<string | Error | any>;
+  registerCommander: (userData: RegisterUserData) => Promise<any>;
+  login: (userData: LoginUserData) => Promise<any>;
   logout: () => void;
-  signInWithEmail: (email: string) => Promise<string | Error | any>;
+  signInWithEmail: (email: string) => Promise<any>;
   checkAuth: () => void;
-  registerSoldier: (user: RegisterUserData) => Promise<string | Error>;
-  registerSquadCommander: (user: RegisterUserData) => Promise<string | Error>;
+  registerSoldier: (user: RegisterUserData) => Promise<any>;
+  registerSquadCommander: (user: RegisterUserData) => Promise<any>;
   supabaseLogin: (session: { access_token: string; refresh_token: string }) => void;
   error: string;
   resetError: () => void;
@@ -48,6 +48,8 @@ export const authStore = create<props>((set, get) => ({
           data: { user },
         } = await supabase.auth.getUser();
 
+        console.log("user", user);
+
         if (user) {
           userStore.getState().setUserFromAuth(user);
         }
@@ -80,7 +82,9 @@ export const authStore = create<props>((set, get) => ({
 
       return res;
     } catch (error: any) {
-      set({ error: error.response.data.error });
+      const errorMessage = error?.message || "Registration failed";
+      set({ error: errorMessage });
+      throw error;
     }
   },
 
@@ -94,8 +98,10 @@ export const authStore = create<props>((set, get) => ({
 
       return res;
     } catch (error: any) {
-      set({ error: error.response.data.error });
+      const errorMessage = error?.message || "Squad commander registration failed";
+      set({ error: errorMessage });
       console.log(error);
+      throw error;
     }
   },
 
@@ -109,8 +115,10 @@ export const authStore = create<props>((set, get) => ({
 
       return res;
     } catch (error: any) {
-      set({ error: error.response.data.error });
+      const errorMessage = error?.message || "Soldier registration failed";
+      set({ error: errorMessage });
       console.log(error);
+      throw error;
     }
   },
 
@@ -125,8 +133,10 @@ export const authStore = create<props>((set, get) => ({
 
       return res;
     } catch (error: any) {
-      set({ error: error.response.data.error });
+      const errorMessage = error?.message || "Login failed";
+      set({ error: errorMessage });
       console.log(error);
+      throw error;
     }
   },
 

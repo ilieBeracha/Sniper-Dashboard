@@ -13,6 +13,7 @@ import { Settings as SettingsIcon } from "lucide-react";
 import { getTeamById, updateTeamName } from "@/services/teamService";
 import { getSquadById, updateSquadName } from "@/services/squadService";
 
+
 export function useSettingsPageLogic() {
   const { user, updateUser, fetchUserFromDB } = useStore(userStore);
   const { weapons } = useStore(weaponsStore);
@@ -79,9 +80,6 @@ export function useSettingsPageLogic() {
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const tabs = [{ id: "account", label: "Account", icon: SettingsIcon }];
-  const [activeTab, setActiveTab] = useState(tabs[0].id);
-
   const handleSave = async () => {
     setLoading(true);
     try {
@@ -89,8 +87,6 @@ export function useSettingsPageLogic() {
         console.error("User is missing required properties");
         return;
       }
-
-      console.log(formData);
 
       await updateUser(formData as Partial<User>);
 
@@ -240,9 +236,7 @@ export function useSettingsPageLogic() {
     formData,
     loading,
     saved,
-    tabs,
-    activeTab,
-    setActiveTab,
+
     availableWeapons,
     availableEquipment,
     emailError,
