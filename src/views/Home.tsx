@@ -57,7 +57,7 @@ export default function AppRoutes() {
   }, []);
 
   const LoadingFallback = () => (
-    <div className="flex items-center justify-center bg-transparent">
+    <div className="flex items-center h-screen justify-center bg-transparent">
       <WaveLoader />
     </div>
   );
