@@ -10,13 +10,11 @@ export default function DashboardCalendar() {
   const useTrainingCalendar = useStore(TrainingStore);
   const { last, next } = useTrainingCalendar.trainingsChartDisplay;
   const navigate = useNavigate();
-  const { theme } = useTheme();
+
   return (
     <div className="h-full max-h-[300px] sm:max-h-[400px] lg:max-h-full px-4 py-4 overflow-auto">
       <div className="w-full h-full flex flex-col justify-center">
-        <div
-          className={`relative border-l-2 pl-6 space-y-4 transition-colors duration-200 ${theme === "dark" ? "border-gray-700" : "border-gray-200"}`}
-        >
+        <div className={`relative space-y-4 transition-colors duration-200`}>
           {last ? (
             <TrainingTimelineItem
               onClick={() => navigate(`/training/${last.id}`)}
