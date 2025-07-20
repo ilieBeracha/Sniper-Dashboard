@@ -5,13 +5,13 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Card } from "@heroui/react";
 
 export default function BaseDashboardCard({
-  header,
+  header = "",
   children,
   padding = "p-4",
   tooltipContent = "",
   withBtn = false,
 }: {
-  header: string | React.ReactNode;
+  header?: string | React.ReactNode | null;
   children: React.ReactNode;
   padding?: string;
   tooltipContent?: string;
@@ -25,7 +25,7 @@ export default function BaseDashboardCard({
     theme === "dark" ? "bg-[#1A1AA] border-white/10 shadow-lg shadow-black/20" : "bg-white border-gray-200 shadow-sm shadow-gray-200/50"
   } ${isMobile ? "" : "h-full"}`;
 
-  if (!header) {
+  if (!header || header === "" || header === null) {
     return (
       <Card shadow="none" className={cardClassName}>
         {children}

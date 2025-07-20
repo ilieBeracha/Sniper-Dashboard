@@ -14,7 +14,7 @@ export function SpPage({ children }: { children: ReactNode }) {
     <div
       className={` min-h-screen w-full bg-black/30 transition-colors duration-200 ${theme === "dark" ? " text-gray-100" : "bg-gray-50 text-gray-900"}`}
     >
-      <main className={`${isMobile ? "space-y-2" : "space-y-4"}`}>{children}</main>
+      <main className={`${isMobile ? "space-y-2" : ""}`}>{children}</main>
     </div>
   );
 }
@@ -28,7 +28,7 @@ export function SpPageHeader({
 }: {
   title: string;
   subtitle?: string;
-  icon: ReactNode;
+  icon: React.ComponentType<any>;
   breadcrumbs?: { label: string; link: string }[];
   dropdownItems?: { label: string; onClick: () => void }[];
 }) {
@@ -42,11 +42,13 @@ export function SpPageHeader({
           <SpPageBreadcrumbs breadcrumbs={breadcrumbs} />
         </div>
       )}
-      <div className={` ${isMobile ? "px-6 mb-8 mt-6" : "px-6 pt-8 pb-8"} transition-all duration-200 relative py-2`}>
+      <div className={` ${isMobile ? "px-6 mb-8" : "px-6 pb-8"} transition-all duration-200 relative py-2`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 justify-between w-full">
             <div className="flex items-center gap-3">
-              <div className={`p-3 rounded-xl ${theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"}`}>{icon}</div>
+              <div className={`p-3 rounded-xl ${theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"}`}>
+                {React.createElement(icon, { className: "w-5 h-5" })}
+              </div>
               <div>
                 <h2 className={`text-lg font-bold ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>{title}</h2>
                 {subtitle && (
@@ -104,34 +106,40 @@ export function SpPageTabs({
   activeTab,
   onChange,
 }: {
-  tabs: { id: string; label: string; icon: React.ComponentType<any> }[];
+  tabs: { id: string; label: string; icon: React.ComponentType<any>; disabled?: boolean }[];
   activeTab: string;
-  onChange: (id: string) => void;
+  onChange: (tab: { id: string; label: string; icon: React.ComponentType<any>; disabled?: boolean }) => void;
 }) {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
 
   return (
-    <div className={`border-b my-6 transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
-      <nav className={`flex ${isMobile ? "justify-center space-x-4" : "justify-start space-x-8"} items-center px-4`} aria-label="Tabs">
+    <div className={`${isMobile ? "pb-4" : "pb-8"} transition-colors duration-200`}>
+      <nav className={`flex ${isMobile ? "justify-center gap-2" : "justify-start gap-4"} items-center px-4`} aria-label="Tabs">
         {tabs.map((tab) => {
+          if (tab.disabled) {
+            return null;
+          }
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.label}
-              onClick={() => onChange(tab.id)}
-              className={`group relative flex items-center gap-2 py-3 px-2 border-b-2 font-medium text-sm transition-all duration-200 ${
+              onClick={() => onChange(tab)}
+              disabled={tab.disabled}
+              className={`relative flex items-center gap-2 ${
+                isMobile ? "px-4 py-2" : "px-6 py-2.5"
+              } font-medium rounded-full transition-all duration-300 ${
                 isActive
                   ? theme === "dark"
-                    ? "border-purple-400 text-purple-400"
-                    : "border-purple-600 text-purple-600"
+                    ? "bg-zinc-800 text-white"
+                    : "bg-gray-900 text-white"
                   : theme === "dark"
-                    ? "border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    ? "text-gray-400 hover:text-gray-300"
+                    : "text-gray-600 hover:text-gray-800"
               }`}
               title={tab.label}
             >
-              <tab.icon className="w-4 h-4" />
+              {tab.icon && <tab.icon className="w-4 h-4" />}
               <span className={isMobile ? "text-xs" : "text-sm"}>{tab.label}</span>
             </button>
           );

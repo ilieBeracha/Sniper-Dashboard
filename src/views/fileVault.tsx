@@ -60,7 +60,7 @@ export default function FileVault() {
       <SpPageHeader
         title="File Vault"
         subtitle="Upload and manage your files"
-        icon={<FileText className="w-5 h-5" />}
+        icon={FileText}
         dropdownItems={[
           { label: "Upload File", onClick: () => setIsOpen(true) },
           { label: "New Folder", onClick: handleNewFolder },

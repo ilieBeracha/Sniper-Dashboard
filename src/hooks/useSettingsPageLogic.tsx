@@ -28,9 +28,6 @@ export function useSettingsPageLogic() {
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const tabs = [{ id: "account", label: "Account", icon: SettingsIcon }];
-  const [activeTab, setActiveTab] = useState(tabs[0].id);
-
   const handleSave = async () => {
     setLoading(true);
     try {
@@ -69,9 +66,7 @@ export function useSettingsPageLogic() {
     formData,
     loading,
     saved,
-    tabs,
-    activeTab,
-    setActiveTab,
+
     availableWeapons,
     availableEquipment,
 
