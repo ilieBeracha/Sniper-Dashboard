@@ -34,7 +34,7 @@ export default function DashboardTeamTable() {
       key: "id",
       label: "ID",
       render: (value: string) => (
-        <span className={`text-xs sm:text-sx transition-colors duration-200 ${theme === "dark" ? "text-gray-200" : "text-gray-600"}`}>
+        <span className={`text-xs sm:text-xs transition-colors duration-200 ${theme === "dark" ? "text-gray-200" : "text-gray-600"}`}>
           {value.slice(0, 8).toUpperCase()}
         </span>
       ),
@@ -43,23 +43,24 @@ export default function DashboardTeamTable() {
     {
       key: "first_name",
       label: "Operative",
-      render: (row: User) => {
-        const initials = row.first_name?.charAt(0).toUpperCase() + row.last_name?.charAt(0).toUpperCase();
+      render: (_value: string, row: User) => {
+        console.log("Row data:", row);
+        const initials = (row?.first_name?.charAt(0) || "?").toUpperCase() + (row?.last_name?.charAt(0) || "?").toUpperCase();
         return (
           <div className="flex items-center gap-3">
             <div
-              className={`h-10 w-10 rounded-lg flex items-center justify-center font-medium border text-sx sm:text-base transition-colors duration-200 ${theme === "dark" ? "bg-white/5 text-white border-white/10" : "bg-gray-100 text-gray-700 border-gray-200"}`}
+              className={`h-10 w-10 rounded-lg flex items-center justify-center font-medium border text-xs sm:text-base transition-colors duration-200 ${theme === "dark" ? "bg-white/5 text-white border-white/10" : "bg-gray-100 text-gray-700 border-gray-200"}`}
             >
               {initials}
             </div>
             <div className="flex flex-col">
-              <span className={`text-sx transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                {row.first_name} {row.last_name}
+              <span className={`text-sm font-medium transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                {row?.first_name || "Unknown"} {row?.last_name || "User"}
               </span>
               <span
-                className={`text-xs sm:text-sx transition-colors duration-200 ${theme === "dark" ? "text-dashboard-text-muted" : "text-gray-600"}`}
+                className={`text-xs sm:text-xs transition-colors duration-200 ${theme === "dark" ? "text-dashboard-text-muted" : "text-gray-600"}`}
               >
-                {row.email}
+                {row?.email}
               </span>
             </div>
           </div>
@@ -72,7 +73,7 @@ export default function DashboardTeamTable() {
       label: "Squad",
       render: (value: any) => (
         <div
-          className={`px-3 py-1 rounded-md text-xs sm:text-sx inline-block transition-colors duration-200 ${theme === "dark" ? "bg-[#1E3A8A]/20 border border-[#1E3A8A]/30 text-blue-400" : "bg-blue-100 border border-blue-200 text-blue-700"}`}
+          className={`px-3 py-1 rounded-md text-xs sm:text-xs inline-block transition-colors duration-200 ${theme === "dark" ? "bg-[#1E3A8A]/20 border border-[#1E3A8A]/30 text-blue-400" : "bg-blue-100 border border-blue-200 text-blue-700"}`}
         >
           {value?.squad_name || "Unassigned"}
         </div>
@@ -94,7 +95,7 @@ export default function DashboardTeamTable() {
           }
         };
         return (
-          <div className={`px-3 py-1 rounded-4xl text-xs sm:text-sx inline-block border transition-colors duration-200 ${getBadgeColor()}`}>
+          <div className={`px-3 py-1 rounded-4xl text-xs sm:text-xs inline-block border transition-colors duration-200 ${getBadgeColor()}`}>
             {value}
           </div>
         );
@@ -163,16 +164,17 @@ export default function DashboardTeamTable() {
     return (
       <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
         <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
-        <h3 className="text-lg font-medium mb-2">No sniper units available</h3>
+        <h3 className="text-lg font-medium ">No sniper units available</h3>
         <p className="text-sm">Deploy new units to begin tracking</p>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-auto max-h-[500px]">
+    <div className="overflow-auto max-h-[400px] sm:max-h-[500px] lg:max-h-[600px]">
       <SpTable
         data={membersWithIds}
+        className="bg-transparent"
         columns={columns}
         filters={filters as SpTableFilter[]}
         searchPlaceholder="Search by name, email, or role..."

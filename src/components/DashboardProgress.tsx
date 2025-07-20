@@ -56,7 +56,7 @@ const topContributors = [
   },
 ];
 
-export default function Example() {
+export default function DashboardProgress() {
   return (
     <>
       <div className="sm:flex sm:items-center sm:justify-between">

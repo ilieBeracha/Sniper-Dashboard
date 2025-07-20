@@ -10,15 +10,12 @@ import InviteModal from "@/components/InviteModal";
 import Header from "@/Headers/Header";
 import { Activity, Brain, SplinePointerIcon } from "lucide-react";
 import { isCommander } from "@/utils/permissions";
-import { UserRole } from "@/types/user";
+import { User, UserRole } from "@/types/user";
 import { useTabs } from "@/hooks/useTabs";
 import DashboardOverview from "@/components/DashboardOverview";
-import DashboardRowOne from "@/components/DashboardRowOne";
-import DashboardRowKPI from "@/components/DashboardRowKPI";
-import DashboardRowThree from "@/components/DashboardRowThree";
-import DashboardRowFour from "@/components/DashboardRowFour";
 import DashboardAI from "@/components/DashboardAI";
 import CommanderView from "@/components/DashboardCommanderView";
+import DashboardAnalytics from "@/components/DashboardAnalytics";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
@@ -60,14 +57,7 @@ export default function Dashboard() {
       return <DashboardOverview />;
     }
     if (activeTab.id === "analytics") {
-      return (
-        <div className="flex flex-col gap-4">
-          <DashboardRowOne user={user} />
-          <DashboardRowKPI />
-          <DashboardRowThree loading={loading} />
-          <DashboardRowFour />
-        </div>
-      );
+      return <DashboardAnalytics user={user as User} loading={loading} />;
     }
     if (activeTab.id === "ai-insights") {
       return <DashboardAI />;
