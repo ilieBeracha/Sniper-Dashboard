@@ -137,8 +137,7 @@ export const ParticipantsSection = ({
                         theme === "dark" ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-gray-200"
                       }`}
                     >
-                      <option value=""></option>
-                      <option value="Lying">Prone</option>
+                      <option value="Lying">Lying</option>
                       <option value="Standing">Standing</option>
                       <option value="Sitting">Sitting</option>
                       <option value="Operational">Operational</option>
@@ -160,12 +159,12 @@ export const ParticipantsSection = ({
                       {participant.userDuty === "Sniper"
                         ? weapons.map((weapon: any) => (
                             <option key={weapon.id} value={weapon.id || ""}>
-                              {weapon.weapon_type}
+                              {weapon.weapon_type} - SN: {weapon.serial_number}
                             </option>
                           ))
                         : equipments.map((equipment: any) => (
                             <option key={equipment.id} value={equipment.id || ""}>
-                              {equipment.equipment_type}
+                              {equipment.equipment_type} - SN: {equipment.serial_number}
                             </option>
                           ))}
                     </select>

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { User as SupabaseAuthUser } from "@supabase/supabase-js";
 import { User } from "@/types/user";
-import { updateUser } from "@/services/userService";
+import { updateUser, getUserById } from "@/services/userService";
 
 interface UserStore {
   user: User | null;
@@ -9,6 +9,7 @@ interface UserStore {
   setUser: (user: User) => void;
   setUserFromAuth: (authUser: SupabaseAuthUser) => void;
   updateUser: (user_data: Partial<User>) => Promise<User | null>;
+  fetchUserFromDB: () => Promise<User | null>;
 }
 
 export const userStore = create<UserStore>((set, get) => ({
@@ -40,17 +41,41 @@ export const userStore = create<UserStore>((set, get) => ({
       user_default_equipment: user_metadata.user_default_equipment ?? "",
       squad_name: user_metadata.squad_name ?? "",
       created_at: authUser.created_at ?? "",
+      user_default_duty: meta.user_default_duty ?? null,
+      user_default_weapon: meta.user_default_weapon ?? null,
+      user_default_equipment: meta.user_default_equipment ?? null,
     };
 
     set({ user: mappedUser });
   },
 
   updateUser: async (user_data: Partial<User>) => {
-    const id = get().user?.id;
+    const currentUser = get().user;
+    const id = currentUser?.id;
 
     if (!id) return null;
     const updatedUser = await updateUser(id, user_data);
-    set({ user: updatedUser as unknown as User });
-    return updatedUser;
+    
+    // Merge the updated data with the existing user data
+    const mergedUser = { ...currentUser, ...updatedUser };
+    set({ user: mergedUser });
+    return mergedUser;
+  },
+
+  fetchUserFromDB: async () => {
+    const currentUser = get().user;
+    const id = currentUser?.id;
+
+    if (!id) return null;
+    
+    try {
+      const freshUser = await getUserById(id);
+      set({ user: freshUser });
+      return freshUser;
+    } catch (error) {
+      console.error("Error fetching user from DB:", error);
+      return null;
+    }
   },
 }));
+

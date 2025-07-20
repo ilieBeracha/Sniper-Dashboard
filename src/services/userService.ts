@@ -2,24 +2,15 @@ import { User } from "@/types/user";
 import { supabase } from "./supabaseClient";
 
 export const updateUser = async (id: string, user_data: Partial<User>) => {
-  // If we have all the required fields, use the comprehensive update function
-  if (user_data.email && user_data.first_name && user_data.last_name && user_data.user_role && user_data.team_id) {
-    return await updateUserMetadata(
-      id,
-      user_data.email,
-      user_data.first_name,
-      user_data.last_name,
-      user_data.user_role,
-      user_data.team_id,
-      user_data.squad_id || "",
-      user_data.user_default_duty || "",
-      user_data.user_default_weapon || "",
-      user_data.user_default_equipment || "",
-    );
-  }
+  const { data, error } = await supabase.schema("public").from("users").update(user_data).eq("id", id).select().single();
 
-  // Otherwise, do a partial update
-  const { data, error } = await supabase.from("users").update(user_data).eq("id", id).select().single();
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+export const getUserById = async (id: string): Promise<User> => {
+  const { data, error } = await supabase.schema("public").from("users").select("*").eq("id", id).single();
+
 
   if (error) throw new Error(error.message);
 
