@@ -4,7 +4,6 @@ import { useStore } from "zustand";
 import { feedStore } from "@/store/feedStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Activity, Target, Users, Trophy, Calendar, BarChart3 } from "lucide-react";
-import BaseDashboardCard from "./base/BaseDashboardCard";
 
 interface FeedItem {
   id: string;
