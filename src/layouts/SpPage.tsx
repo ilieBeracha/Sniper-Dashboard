@@ -114,7 +114,7 @@ export function SpPageTabs({
   const isMobile = useIsMobile();
 
   return (
-    <div className={`${isMobile ? "pb-4" : "pb-8"} transition-colors duration-200`}>
+    <div className={`${isMobile ? "pb-4" : "pb-4"} transition-colors duration-200`}>
       <nav className={`flex ${isMobile ? "justify-center gap-2" : "justify-start gap-4"} items-center px-4`} aria-label="Tabs">
         {tabs.map((tab) => {
           if (tab.disabled) {

@@ -86,10 +86,10 @@ export default function TrainingPage() {
   const renderComponent = () => {
     if (activeTab.id === "session-stats") {
       return (
-        <>
+        <div className="grid grid-cols-1 gap-4">
           <TrainingSessionStatsCard trainingSessionId={id!} />
           <SessionStatsTable sessionStats={selectedSession} onSessionStatsClick={handleSessionClick} onSessionStatsEditClick={() => {}} />
-        </>
+        </div>
       );
     }
 
