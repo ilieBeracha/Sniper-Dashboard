@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
 import { squadStore } from "@/store/squadStore";
 import { performanceStore } from "@/store/performance";
 import { TrainingStore } from "@/store/trainingStore";
 import { getUserGroupingStatsRpc } from "@/services/performance";
-import { useLoadingState } from "@/hooks/useLoadingState";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import InviteModal from "@/components/InviteModal";
 import Header from "@/Headers/Header";
@@ -33,15 +32,18 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
-  useLoadingState(async () => {
-    if (user?.team_id) {
-      await getUserGroupingStatsRpc(user.id);
-      await getUserHitStatsFull(user?.id);
-      await loadNextAndLastTraining(user?.team_id);
-      await getSquadMetricsByRole(user?.id);
-      await getSquadStatsByRole(null, null);
-    }
-    setLoading(false);
+  useEffect(() => {
+    const load = async () => {
+      if (user?.team_id) {
+        await getUserGroupingStatsRpc(user.id);
+        await getUserHitStatsFull(user?.id);
+        await loadNextAndLastTraining(user?.team_id);
+        await getSquadMetricsByRole(user?.id);
+        await getSquadStatsByRole(null, null);
+      }
+      setLoading(false);
+    };
+    load();
   }, []);
 
   const baseTabs = [
@@ -91,11 +93,8 @@ export default function Dashboard() {
           },
         ]}
       />
-
       <SpPageTabs tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
-
       <SpPageBody>{RenderComponent()}</SpPageBody>
-
       {userRole !== "soldier" && user?.id && <InviteModal isOpen={isInviteModalOpen} setIsOpen={setIsInviteModalOpen} userId={user.id} />}
     </SpPage>
   );

@@ -12,9 +12,9 @@ export function SpPage({ children }: { children: ReactNode }) {
   const isMobile = useIsMobile();
   return (
     <div
-      className={` min-h-screen w-full bg-black/30 transition-colors duration-200 ${theme === "dark" ? " text-gray-100" : "bg-gray-50 text-gray-900"}`}
+      className={`w-full h-screen bg-black/30 transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "bg-gray-50 text-gray-900"}`}
     >
-      <main className={`${isMobile ? "space-y-2" : ""}`}>{children}</main>
+      <main className={`flex flex-col h-screen ${isMobile ? "space-y-2" : ""}`}>{children}</main>
     </div>
   );
 }
@@ -36,13 +36,13 @@ export function SpPageHeader({
   const isMobile = useIsMobile();
 
   return (
-    <div className="">
+    <div className="flex-shrink-0">
       {breadcrumbs && (
         <div className={`${isMobile ? "px-2" : "md:px-4 2xl:px-6"}`}>
           <SpPageBreadcrumbs breadcrumbs={breadcrumbs} />
         </div>
       )}
-      <div className={` ${isMobile ? "px-6 mb-8" : "px-6 pb-8"} transition-all duration-200 relative py-2`}>
+      <div className={`${isMobile ? "px-6 py-4" : "px-6 py-4"} transition-all duration-200 relative`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 justify-between w-full">
             <div className="flex items-center gap-3">
@@ -114,7 +114,7 @@ export function SpPageTabs({
   const isMobile = useIsMobile();
 
   return (
-    <div className={`${isMobile ? "pb-4" : "pb-4"} transition-colors duration-200`}>
+    <div className={`flex-shrink-0 ${isMobile ? "pb-4" : "pb-4"} transition-colors duration-200`}>
       <nav className={`flex ${isMobile ? "justify-center gap-2" : "justify-start gap-4"} items-center px-4`} aria-label="Tabs">
         {tabs.map((tab) => {
           if (tab.disabled) {
@@ -150,7 +150,11 @@ export function SpPageTabs({
 }
 
 export function SpPageBody({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col px-2 gap-4 md:px-4 2xl:px-6 px-4 space-y-6">{children}</div>;
+  return (
+    <div className="flex-1 overflow-y-auto">
+      <div className="px-2 md:px-4 2xl:px-6 pb-6">{children}</div>
+    </div>
+  );
 }
 
 export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: string; link: string }[] }) {

@@ -12,7 +12,6 @@ export default function TrainingAnalyticsTab({ trainingSessionId }: { trainingSe
         <TrainingSessionStatsCard trainingSessionId={trainingSessionId} />
       </div>
 
-      {/* Analytics placeholder */}
       <div className={`p-6 rounded-2xl ${theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-white border border-gray-100"}`}>
         <h3 className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Performance Analytics</h3>
         <div className={`text-center py-8 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
