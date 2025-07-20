@@ -7,12 +7,12 @@ import UnifiedFeed from "./UnifiedFeed";
 
 export default function DashboardOverview() {
   return (
-    <div className="grid grid-cols-12 gap-4">
+    <div className="grid grid-cols-12 gap-8">
       {/* Row 1: Profile Overview (spans 9 cols) + Feed (spans 3 cols, starts row 1) */}
       <div className="col-span-12 lg:col-span-9">
-        <BaseDashboardCard withBtn header="Profile Overview" tooltipContent="View your profile, stats, and notifications">
-          <DashboardProfileCard />
-        </BaseDashboardCard>
+        {/* <BaseDashboardCard withBtn header="Profile Overview" tooltipContent="View your profile, stats, and notifications"> */}
+        <DashboardProfileCard />
+        {/* </BaseDashboardCard> */}
       </div>
 
       {/* Feed - spans 3 columns and 2 rows */}
