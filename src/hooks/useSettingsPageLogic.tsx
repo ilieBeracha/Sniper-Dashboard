@@ -7,7 +7,6 @@ import { BASE_WEAPONS } from "@/utils/BaseData/BaseWeapons";
 import { BASE_EQUIPMENTS } from "@/utils/BaseData/BaseEquipments";
 import { User } from "@/types/user";
 import { UserDuty } from "@/types/score";
-import { Settings as SettingsIcon } from "lucide-react";
 
 export function useSettingsPageLogic() {
   const { user, updateUser } = useStore(userStore);
@@ -35,8 +34,6 @@ export function useSettingsPageLogic() {
         console.error("User is missing required properties");
         return;
       }
-
-      console.log(formData);
 
       await updateUser(formData as Partial<User>);
 
