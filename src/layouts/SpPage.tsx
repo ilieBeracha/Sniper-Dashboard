@@ -12,7 +12,7 @@ export function SpPage({ children }: { children: ReactNode }) {
   const isMobile = useIsMobile();
   return (
     <div className={`w-full h-full bg-black/30 transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "bg-gray-50 text-gray-900"}`}>
-      <main className={`flex flex-col h-screen gap-3 ${isMobile ? "space-y-2" : ""}`}>{children}</main>
+      <main className={`flex flex-col min-h-screen gap-3 ${isMobile ? "space-y-2" : ""}`}>{children}</main>
     </div>
   );
 }

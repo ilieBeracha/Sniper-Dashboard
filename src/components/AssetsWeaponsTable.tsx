@@ -10,7 +10,6 @@ import { SpTable, SpTableColumn } from "@/layouts/SpTable";
 import WeaponUsageModal from "./WeaponUsageModal";
 
 export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
-  // Filter out weapons without IDs for SpTable compatibility
   const weaponsWithIds = weapons.filter((weapon): weapon is Weapon & { id: string } => Boolean(weapon.id));
   const { theme } = useTheme();
   const { updateWeapon } = useStore(weaponsStore);
@@ -20,7 +19,6 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
   const [usageModalOpen, setUsageModalOpen] = useState(false);
   const [selectedWeaponForUsage, setSelectedWeaponForUsage] = useState<Weapon | null>(null);
 
-  // Get unique weapon types for filter
   const uniqueWeaponTypes = useMemo(() => {
     const types = weaponsWithIds.map((weapon) => weapon.weapon_type).filter(Boolean);
     return [...new Set(types)];
@@ -238,7 +236,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
           </div>
         }
       />
-      
+
       <WeaponUsageModal
         isOpen={usageModalOpen}
         onClose={() => {

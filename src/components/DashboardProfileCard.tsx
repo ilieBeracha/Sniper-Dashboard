@@ -2,6 +2,8 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import DashboardCalendar from "./DashboardCalendar";
+import { isCommander } from "@/utils/permissions";
+import { UserRole } from "@/types/user";
 
 export default function DashboardProfileCard() {
   const { theme } = useTheme();
@@ -19,10 +21,12 @@ export default function DashboardProfileCard() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-baseline gap-4 sm:gap-8">
-          <div>
-            <p className={`text-sm sm:text-base lg:text-lg ${theme === "dark" ? "text-gray-500" : "text-gray-600"}`}>Squad</p>
-            <p className={`text-lg sm:text-xl lg:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{user?.squad_name}</p>
-          </div>
+          {isCommander(user?.user_role as UserRole) && (
+            <div>
+              <p className={`text-sm sm:text-base lg:text-lg ${theme === "dark" ? "text-gray-500" : "text-gray-600"}`}>Squad</p>
+              <p className={`text-lg sm:text-xl lg:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{user?.squad_name}</p>
+            </div>
+          )}
           <div>
             <p className={`text-sm sm:text-base lg:text-lg ${theme === "dark" ? "text-gray-500" : "text-gray-600"}`}>Team</p>
             <p className={`text-lg sm:text-xl lg:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{user?.team_name}</p>

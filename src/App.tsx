@@ -7,13 +7,20 @@ import { authStore } from "./store/authStore";
 import { useEffect } from "react";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { WaveLoader } from "./components/ui/loader";
+import { userStore } from "./store/userStore";
 
 function AppContent() {
   const { checkAuth, token, isLoadingAuth } = useStore(authStore);
 
+  const { user } = useStore(userStore);
+
   useEffect(() => {
     checkAuth();
   }, []);
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   if (isLoadingAuth) {
     return (

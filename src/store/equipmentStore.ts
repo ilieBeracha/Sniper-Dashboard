@@ -4,7 +4,7 @@ import { Equipment } from "@/types/equipment";
 
 interface EquipmentStore {
   equipments: Equipment[];
-  getEqipmentsByTeamId: (teamId: string) => Promise<void>;
+  getEquipments: (teamId: string) => Promise<void>;
   createEquipment: (equipment: Equipment) => Promise<void>;
   updateEquipment: (id: string, equipment: Partial<Equipment>) => Promise<void>;
 }
@@ -12,7 +12,7 @@ interface EquipmentStore {
 export const equipmentStore = createStore<EquipmentStore>((set) => ({
   equipments: [],
 
-  getEqipmentsByTeamId: async (teamId: string) => {
+  getEquipments: async (teamId: string) => {
     const equipment = await getEquipmentsByTeamId(teamId);
     set({ equipments: equipment as Equipment[] });
   },

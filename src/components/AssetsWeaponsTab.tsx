@@ -37,7 +37,6 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
     setIsOpen(false);
   }
 
-
   const WeaponsContent = (
     <div
       className={` ${isMobile ? "w-full" : "w-[600px]"} p-4 space-y-6 transition-colors duration-200 ${
