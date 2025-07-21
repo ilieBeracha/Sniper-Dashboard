@@ -25,14 +25,14 @@ export default function AppRoutes() {
   const { fetchMembers } = useStore(teamStore);
   const { getSquadUsersBySquadId } = useStore(squadStore);
   const { getWeapons } = useStore(weaponsStore);
-  const { getEqipmentsByTeamId } = useStore(equipmentStore);
+  const { getEquipments } = useStore(equipmentStore);
   const { user } = useStore(userStore);
 
   useEffect(() => {
     const load = async () => {
       if (user?.team_id && user?.squad_id) {
         await fetchMembers(user.team_id);
-        await getEqipmentsByTeamId(user.team_id);
+        await getEquipments(user.team_id);
         await getWeapons(user.team_id);
         await getSquadsWithUsersByTeamId(user.team_id);
         if (user?.squad_id) {
