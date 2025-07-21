@@ -20,6 +20,11 @@ import SessionStatsTable from "@/components/SessionStatsTable";
 import TrainingAnalyticsTab from "@/components/TrainingAnalyticsTab";
 import TrainingStatusTab from "@/components/TrainingStatusTab";
 import TrainingSessionStatsCard from "@/components/TrainingSessionStatsCard";
+import { OutlineExportButton } from "@/components/TrainingPDFExportButton";
+import { performanceStore } from "@/store/performance";
+import { weaponsStore } from "@/store/weaponsStore";
+import { equipmentStore } from "@/store/equipmentStore";
+import { userStore } from "@/store/userStore";
 
 export default function TrainingPage() {
   const navigate = useNavigate();
@@ -27,7 +32,11 @@ export default function TrainingPage() {
   const { loadTrainingById, loadAssignments, createAssignment } = useStore(TrainingStore);
   const { setIsLoading } = useStore(loaderStore);
   const { training } = useStore(TrainingStore);
-  const { getSessionStatsByTrainingId } = useStore(sessionStore);
+  const { getSessionStatsByTrainingId, sessionStats } = useStore(sessionStore);
+  const { trainingTeamAnalytics, getTrainingTeamAnalytics, squadStats, getSquadStatsByRole } = performanceStore();
+  const { weapons, getWeapons } = useStore(weaponsStore);
+  const { equipments, getEquipments } = useStore(equipmentStore);
+  const { user } = useStore(userStore);
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
 
@@ -36,11 +45,15 @@ export default function TrainingPage() {
   const [selectedSession, setSelectedSession] = useState<any>(null);
 
   useLoadingState(async () => {
-    if (!id) return;
+    if (!id || !user?.team_id) return;
     await loadAssignments();
     await loadTrainingById(id);
     await getSessionStatsByTrainingId(id);
-  }, [id]);
+    await getTrainingTeamAnalytics(id);
+    await getSquadStatsByRole(null, null); // Get all squad stats
+    await getWeapons(user.team_id);
+    await getEquipments(user.team_id);
+  }, [id, user?.team_id]);
 
   const handleStatusChange = (newStatus: TrainingStatus) => {
     setPendingStatus(newStatus);
@@ -112,7 +125,7 @@ export default function TrainingPage() {
         ]}
       />
       <SpPageHeader
-        title={"Training Session"}
+        title={training?.session_name || "Training Session"}
         icon={BiCurrentLocation}
         dropdownItems={[
           {
@@ -123,6 +136,45 @@ export default function TrainingPage() {
           },
         ]}
       />
+      
+      {/* Custom Export Section */}
+      <div className="px-6 pb-4 -mt-2">
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-600">
+            {training?.date && (
+              <span>Training Date: {new Date(training.date).toLocaleDateString()}</span>
+            )}
+            {training?.location && (
+              <span className="ml-4">Location: {training.location}</span>
+            )}
+          </div>
+                     <OutlineExportButton
+             trainingData={{
+               training: training!,
+               participants: training?.participants || [],
+               analytics: trainingTeamAnalytics!,
+               squadStats: squadStats || [],
+               weaponStats: [], // This would need to be fetched separately if available
+               dayNightPerformance: [], // This would need to be fetched separately if available
+               squadPerformance: [], // This would need to be fetched separately if available
+               trainingEffectiveness: [], // This would need to be fetched separately if available
+               weapons: weapons || [],
+               equipment: equipments || []
+             }}
+             size="sm"
+             buttonText="Export PDF Report"
+             disabled={!training || !trainingTeamAnalytics}
+             onExportComplete={() => {
+               console.log('Training report exported successfully!');
+               // You can add a toast notification here later
+             }}
+             onExportError={(error) => {
+               console.error('Export failed:', error);
+               // You can add an error toast notification here later
+             }}
+           />
+        </div>
+      </div>
       <SpPageTabs tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
       <SpPageBody>{renderComponent()}</SpPageBody>
       <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
