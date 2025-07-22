@@ -81,7 +81,7 @@ export default function GroupStatsTable({
     {
       key: "sniper_name",
       label: "Sniper",
-      render: (value: string, row: GroupingScoreEntry) => (
+      render: (_: string, row: GroupingScoreEntry) => (
         <span className="truncate max-w-[120px]">
           {`${row.sniper_first_name} ${row.sniper_last_name}` || "N/A"}
         </span>
@@ -91,7 +91,7 @@ export default function GroupStatsTable({
     {
       key: "weapon_info",
       label: "Weapon",
-      render: (value: string, row: GroupingScoreEntry) => (
+      render: (_: string, row: GroupingScoreEntry) => (
         <div className="truncate max-w-[120px]">
           <div className="font-medium">{row.weapon_type || "N/A"}</div>
           <div className="text-xs text-gray-500 dark:text-gray-400">

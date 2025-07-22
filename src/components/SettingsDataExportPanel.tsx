@@ -100,6 +100,8 @@ export default function SettingsDataExportPanel() {
       },
     };
 
+    console.log(mockData);
+
     setIsGenerating(false);
   };
 
