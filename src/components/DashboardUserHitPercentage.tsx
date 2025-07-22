@@ -23,9 +23,9 @@ export default function UserHitPercentage() {
   ];
 
   const getColor = (pct: number) => {
-    if (pct >= 75) return "#2CB67D";
+    if (pct >= 75) return "#7E3AF2";
     if (pct >= 50) return "#FF8906";
-    return "#F25F4C";
+    return "#ec4242";
   };
 
   const hitColor = getColor(percentage);
@@ -52,17 +52,17 @@ export default function UserHitPercentage() {
                   cornerRadius={6}
                 >
                   <Cell fill={hitColor} />
-                  <Cell fill={theme === "dark" ? "#333" : "#e5e7eb"} />
+                  <Cell fill={theme === "dark" ? "#333" : " #e5e7eb"} />
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
 
             <div className="absolute inset-0 flex flex-col mt-1 h-8">
-              <span className={`text-2xl font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+              <span className={`px-2 text-2xl font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                 {percentage ? percentage.toFixed(1) : 0}%
               </span>
               <span
-                className={`text-xs uppercase tracking-wider transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+                className={`text-lg uppercase tracking-wider transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
               >
                 Accuracy
               </span>
@@ -82,7 +82,7 @@ export default function UserHitPercentage() {
                 <div
                   className={`mt-1 h-1 w-full rounded-full overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-gray-800" : "bg-gray-300"}`}
                 >
-                  <div className="h-full rounded-full bg-blue-500" style={{ width: `100%` }}></div>
+                  <div className="h-full rounded-full bg-purple-600" style={{ width: `100%` }}></div>
                 </div>
               </div>
 

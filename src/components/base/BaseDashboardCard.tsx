@@ -130,13 +130,13 @@ export function BaseDashboardCardFilter({
         <PopoverTrigger asChild>
           <Button
             variant="light"
-            className="p-1.5 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 transition"
+            className="p-1.5 rounded-lg border border-gray-200 dark:border-white/10   bg-zinc-900/90 hover:bg-gray-100 dark:hover:bg-zinc-700 transition"
           >
             <FilterIcon className={`h-4 w-4 ${theme === "dark" ? "text-indigo-300" : "text-indigo-600"}`} strokeWidth={2.5} />
           </Button>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[320px] rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-zinc-900 shadow-xl p-6 space-y-2">
+        <PopoverContent className="w-[320px] rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-zinc-900/90 backdrop-blur-2xl shadow-xl p-6 space-y-2">
           <div className="space-y-0.5 justify-between w-full grid grid-cols-6 items-center pb-2">
             <div className="flex justify-end gap-3 col-span-1">
               <Button variant="light" className="w-full" onPress={() => onClearFilters?.()} isIconOnly size="lg">

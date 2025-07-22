@@ -168,7 +168,7 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
                 {/* Summary Grid */}
                 <div className="grid grid-cols-4 gap-2 mb-4">
                   <div className="text-center">
-                    <div className="text-lg font-semibold" style={{ color: primitives.blue.blue400 }}>
+                    <div className="text-lg font-semibold" style={{ color: primitives.white.white }}>
                       {groupingSummary.avg_dispersion ?? "-"}
                     </div>
                     <div className="text-xs" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
@@ -176,7 +176,7 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-lg font-semibold" style={{ color: primitives.green.green400 }}>
+                    <div className="text-lg font-semibold" style={{ color: primitives.white.white }}>
                       {groupingSummary.best_dispersion ?? "-"}
                     </div>
                     <div className="text-xs" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
@@ -184,7 +184,7 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-lg font-semibold" style={{ color: primitives.purple.purple400 }}>
+                    <div className="text-lg font-semibold" style={{ color: primitives.white.white }}>
                       {groupingSummary.avg_time_to_group ?? "-"}
                     </div>
                     <div className="text-xs" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
@@ -192,7 +192,7 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-lg font-semibold" style={{ color: primitives.grey.grey500 }}>
+                    <div className="text-lg font-semibold" style={{ color: primitives.white.white }}>
                       {groupingSummary.total_groupings ?? 0}
                     </div>
                     <div className="text-xs" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
@@ -224,7 +224,7 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
                             }),
                           })) || []
                       }
-                      margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                      margin={{ top: 0, right: 20, left: -30, bottom: 0 }}
                     >
                       <CartesianGrid
                         strokeDasharray="3 3"
@@ -246,19 +246,20 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
                       />
                       <Tooltip content={<CustomTooltip />} />
                       <Line
+                        spacing={10}
                         type="monotone"
                         dataKey="cm_dispersion"
-                        stroke={primitives.purple.purple400}
+                        stroke={primitives.grey.grey500}
                         strokeWidth={5.5}
-                        dot={{ fill: primitives.purple.purple400, strokeWidth: 0, r: 3.5 }}
-                        activeDot={{ r: 6, strokeWidth: 10, stroke: primitives.purple.purple400 }}
+                        dot={{ fill: primitives.grey.grey500, strokeWidth: 0, r: 3.5 }}
+                        activeDot={{ r: 6, strokeWidth: 10, stroke: primitives.grey.grey500 }}
                         name="Dispersion"
                         unit=" cm"
                       />
                       <Line
                         type="monotone"
                         dataKey="avg_dispersion"
-                        stroke={primitives.blue.blue300}
+                        stroke={primitives.purple.purple100}
                         strokeWidth={2}
                         strokeDasharray="5 5"
                         dot={false}
@@ -281,11 +282,11 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
               {barData.map((item, index) => {
                 const barColor =
                   index === 0
-                    ? primitives.green.green400
+                    ? primitives.purple.purple400
                     : index === 1
-                      ? primitives.blue.blue400
+                      ? primitives.purple.purple100
                       : index === 2
-                        ? primitives.purple.purple400
+                        ? primitives.purple.purple100
                         : primitives.grey.grey500;
 
                 return (
