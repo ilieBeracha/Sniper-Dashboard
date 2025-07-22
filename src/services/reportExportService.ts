@@ -2,6 +2,12 @@ import { getTrainingById } from "./trainingService";
 import { getSessionStatsByTrainingId } from "./sessionService";
 import { getTeamById } from "./teamService";
 import { getSquadById } from "./squadService";
+import { uploadFile } from "./fileService";
+import { formatForSupabaseInsert } from "./embedSniperSession";
+// jsPDF is only used in browser context – it will be tree-shaken out of SSR build
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { jsPDF } from "jspdf";
 import { TrainingSession } from "@/types/training";
 import { Team } from "@/types/team";
 import { Squad } from "@/types/squad";
@@ -105,24 +111,127 @@ export async function prepareTrainingReport({
  * Keep implementation separate so it can be replaced with jspdf, pdf-make, etc.
  */
 async function triggerDownload(report: PreparedReport) {
-  // TODO: implement actual PDF generation & download in UI layer
-  if (typeof window !== "undefined") {
-    console.info("[prepareTrainingReport] Commander report ready for download", report);
-  }
+  if (typeof window === "undefined") return; // only run in browser
+
+  const pdfBytes = generatePdf(report);
+
+  // Create a blob & trigger download
+  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = getFileName(report);
+  document.body.appendChild(link);
+  link.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+  }, 0);
 }
 
 /**
  * Placeholder for emailing or uploading the report so that a superior officer can access it.
  */
 async function triggerSendToSuperior(report: PreparedReport) {
-  // TODO: integrate with e-mail / notification service
-  console.info("[prepareTrainingReport] Report sent to superior officer", report);
+  try {
+    const pdfBytes = generatePdf(report);
+
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    const fileName = getFileName(report);
+
+    // Convert blob to File (browser) or fallback to a File-like object (Node)
+    const file = typeof File !== "undefined" ? new File([blob], fileName, { type: "application/pdf" }) : (blob as any);
+
+    const teamId = report.trainings[0]?.team?.id;
+    if (!teamId) throw new Error("Missing teamId for storage upload");
+
+    const trainingId = report.trainings[0]?.training?.id;
+
+    await uploadFile(file, teamId, trainingId);
+
+    console.info("[prepareTrainingReport] PDF uploaded to Supabase storage for superior officer", {
+      teamId,
+      trainingId,
+      fileName,
+    });
+  } catch (err) {
+    console.error("[prepareTrainingReport] Failed to upload report for superior officer", err);
+  }
 }
 
 /**
  * Placeholder for chunking & embedding the report so that a RAG model can consume it.
  */
 async function embedForRAG(report: PreparedReport) {
-  // TODO: integrate with embed service (e.g. OpenAI, Supabase Vector, etc.)
-  console.info("[prepareTrainingReport] Report embedded for RAG consumption", report);
+  try {
+    const embeddingsPayload: any[] = [];
+
+    for (const tr of report.trainings) {
+      // If we have full sessionStats wizard structure, process them.
+      // Here each sessionStat may not contain the participants/targets arrays directly.
+      // Extend logic as needed. For now we concatenate JSON strings for lightweight embedding.
+      const content = JSON.stringify({
+        training: tr.training,
+        sessionStats: tr.sessionStats,
+        team: tr.team,
+        squads: tr.squads,
+      });
+
+      embeddingsPayload.push({
+        session_id: tr.training?.id,
+        team_id: tr.team?.id,
+        squad_id: tr.squads?.[0]?.id,
+        content,
+        embedding: null,
+        created_at: new Date().toISOString(),
+      });
+    }
+
+    // Format for Supabase insert – reuse helper for consistency
+    const records = formatForSupabaseInsert({ embeddings: embeddingsPayload, sessionSummary: {} });
+    console.info("[prepareTrainingReport] Generated embeddings payload (stub)", records);
+    // TODO: call vector DB insert / OpenAI embedding API
+  } catch (err) {
+    console.error("[prepareTrainingReport] Failed embedding for RAG", err);
+  }
+}
+
+// ---------------- PDF helpers ------------------ //
+
+function generatePdf(report: PreparedReport): Uint8Array {
+  // Safety: jsPDF exists only in browser – callers ensure this.
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text("Training Report", 10, 20);
+
+  doc.setFontSize(10);
+
+  report.trainings.forEach((tr, idx) => {
+    const startY = 30 + idx * 80;
+    doc.setFont(undefined, "bold");
+    doc.text(`Training #${idx + 1}: ${tr.training?.session_name ?? "-"}`, 10, startY);
+    doc.setFont(undefined, "normal");
+
+    const details = [
+      `Date: ${tr.training?.date ?? "-"}`,
+      `Location: ${tr.training?.location ?? "-"}`,
+      `Team: ${tr.team?.team_name ?? "-"}`,
+      `Squads: ${(tr.squads || []).map((s) => s.squad_name).join(", ") || "-"}`,
+      `Session stats records: ${tr.sessionStats.length}`,
+    ].join(" | ");
+
+    const lines = doc.splitTextToSize(details, 190);
+    doc.text(lines, 10, startY + 6);
+  });
+
+  doc.setFontSize(8);
+  doc.text(`Generated at ${report.generatedAt}`, 10, 290);
+
+  return doc.output("arraybuffer");
+}
+
+function getFileName(report: PreparedReport) {
+  const date = new Date(report.generatedAt).toISOString().split("T")[0];
+  return `training-report-${date}.pdf`;
 }
