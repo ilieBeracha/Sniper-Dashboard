@@ -164,10 +164,10 @@ export default function TrainingPageGroupFormModal({
             } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <option value="">Select Position</option>
-            <option value="lying">Lying</option>
-            <option value="standing">Standing</option>
-            <option value="sitting">Sitting</option>
-            <option value="operational">Operational</option>
+            <option value="Lying">Lying</option>
+            <option value="Standing">Standing</option>
+            <option value="Sitting">Sitting</option>
+            <option value="Operational">Operational</option>
           </select>
           {isDisabled && message}
         </div>
