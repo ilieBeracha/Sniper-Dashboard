@@ -14,12 +14,13 @@ import ConfirmStatusChangeModal from "@/components/ConfirmStatusChangeModal";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
 import { useModal } from "@/hooks/useModal";
 import { useTabs } from "@/hooks/useTabs";
-import { Calendar } from "lucide-react";
-import { Target } from "lucide-react";
+import { Calendar, Target, Crosshair } from "lucide-react";
 import SessionStatsTable from "@/components/SessionStatsTable";
+import GroupStatsTable from "@/components/GroupStatsTable";
 import TrainingStatusTab from "@/components/TrainingStatusTab";
 import TrainingSessionStatsCard from "@/components/TrainingSessionStatsCard";
 import TrainingPageGroupFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageGroupFormModal";
+import { toast } from "react-toastify";
 
 export default function TrainingPage() {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ export default function TrainingPage() {
   const { setIsLoading } = useStore(loaderStore);
   const { training } = useStore(TrainingStore);
   const { getSessionStatsByTrainingId } = useStore(sessionStore);
+  const { createGroupScore } = useStore(sessionStore);
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { isOpen: isOpen, setIsOpen: setIsOpen } = useModal();
@@ -76,14 +78,21 @@ export default function TrainingPage() {
     setSelectedSession(session);
   };
 
-  const handleAddGroup = (group: any) => {
-    console.log(group);
+  const handleCreateGroupScore = async (groupScore: any) => {
+  try {
+    await createGroupScore(groupScore);
+    setIsOpen(false);
+    toast.success("Group score created successfully");
+    await loadTrainingById(id as string);
+  } catch (error) {
+    console.error("Error creating group score:", error);
+  }
   };
 
   const { tabs, activeTab, handleTabChange } = useTabs({
     tabs: [
       { id: "session-stats", label: "Session Stats", icon: Target },
-      // { id: "analytics", label: "Analytics", icon: Activity },
+      { id: "group-stats", label: "Group Stats", icon: Crosshair },
       { id: "status", label: "Status", icon: Calendar },
     ],
   });
@@ -98,9 +107,16 @@ export default function TrainingPage() {
       );
     }
 
-    // if (activeTab.id === "analytics") {
-    //   return <TrainingAnalyticsTab trainingSessionId={id!} />;
-    // }
+    if (activeTab.id === "group-stats") {
+      return (
+        <div className="grid grid-cols-1 gap-4">
+          <GroupStatsTable 
+            onGroupStatsClick={handleSessionClick} 
+            onGroupStatsEditClick={() => {}} 
+          />
+        </div>
+      );
+    }
 
     if (activeTab.id === "status") {
       return <TrainingStatusTab training={training as TrainingSession} sessionStats={selectedSession} handleStatusChange={handleStatusChange} />;
@@ -143,7 +159,7 @@ export default function TrainingPage() {
         onConfirm={handleConfirmStatusChange}
         newStatus={pendingStatus!}
       />
-      <TrainingPageGroupFormModal isOpen={isOpen} onClose={() => setIsOpen(false)} onSubmit={handleAddGroup} />
+      <TrainingPageGroupFormModal isOpen={isOpen} onClose={() => setIsOpen(false)} onSubmit={handleCreateGroupScore} />
     </SpPage>
   );
 }

@@ -14,16 +14,21 @@ export interface GroupingScore {
   weapon_serial: string;
 }
 
+export interface LastGroupEntry {
+  cm_dispersion: number;
+  created_at: string;
+  weapon_type: string;
+  type: string;
+  effort: boolean; // ✅ Add this line
+}
+
 export interface GroupingSummary {
   avg_dispersion: number | null;
   best_dispersion: number | null;
   avg_time_to_group: number | null;
   total_groupings: number;
-  weapon_breakdown: any[]; // still placeholder
-  last_five_groups: {
-    cm_dispersion: number;
-    created_at: string; // YYYY-MM-DD
-  }[];
+  last_five_groups: LastGroupEntry[];
+  weapon_breakdown: any[]; // future expansion
 }
 
 

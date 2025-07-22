@@ -146,3 +146,11 @@ export const saveCompleteSession = async (sessionData: {
     throw error;
   }
 };
+export async function createGroupScoreService(groupScoreData: any, trainingSessionId: string): Promise<any> {
+  const { data, error } = await supabase
+    .from("group_scores")
+    .insert({ ...groupScoreData, training_session_id: trainingSessionId })
+    .select("*");
+  if (error) throw error;
+  return data;
+}
