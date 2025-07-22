@@ -56,7 +56,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
           <select
             value={editForm.equipment_type || ""}
             onChange={(e) => setEditForm({ ...editForm, equipment_type: e.target.value })}
-            className="w-full px-2 py-1 rounded border text-sm"
+            className="w-full px-2 py-2 h-9 rounded border text-sm"
             style={{
               borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
               backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
@@ -85,7 +85,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
             type="text"
             value={editForm.serial_number || ""}
             onChange={(e) => setEditForm({ ...editForm, serial_number: e.target.value })}
-            className="w-full px-2 py-1 rounded border text-sm"
+            className="w-full px-2 py-2 h-9 rounded border text-sm"
             style={{
               borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
               backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
@@ -106,7 +106,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
           <select
             value={editForm.day_night || ""}
             onChange={(e) => setEditForm({ ...editForm, day_night: e.target.value })}
-            className="w-full px-2 py-1 rounded border text-sm"
+            className="w-full px-2 py-2 h-9 rounded border text-sm"
             style={{
               borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
               backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,

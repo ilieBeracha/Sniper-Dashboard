@@ -53,7 +53,7 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
       </div>
 
       <select
-        className="min-h-9 rounded-lg px-3 py-2 text-sm border transition-colors duration-200"
+        className="min-h-9 rounded-lg px-3 text-sm border transition-colors duration-200 h-full"
         style={{
           backgroundColor: theme === "dark" ? `${primitives.grey.grey800}80` : primitives.white.white,
           color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
@@ -78,6 +78,7 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
         placeholder="Enter serial number"
         leftIcon={<FileQuestion size={16} style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey500 }} />}
         containerClassName="bg-transparent"
+        className="h-full"
       />
 
       <BaseInput
@@ -88,6 +89,7 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
         placeholder="Enter MV"
         leftIcon={<FileQuestion size={16} style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey500 }} />}
         containerClassName="bg-transparent"
+        className="h-full"
       />
 
       <div className="flex items-center justify-end gap-x-4">

@@ -24,6 +24,14 @@ const barData = [
 export default function DashboardSquadProgress({ loading }: { loading: boolean }) {
   const { theme } = useTheme();
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <WaveLoader />
+      </div>
+    );
+  }
+
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -54,13 +62,7 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
       {/* Performance Overview - Full width on mobile, left side on desktop */}
       <div className="w-full">
         <BaseDashboardCard header="Performance Overview" tooltipContent="Current performance metrics">
-          {loading ? (
-            <div className="flex justify-center items-center h-full">
-              <WaveLoader />
-            </div>
-          ) : (
-            <UserHitPercentage />
-          )}
+          <UserHitPercentage />
         </BaseDashboardCard>
       </div>
 
