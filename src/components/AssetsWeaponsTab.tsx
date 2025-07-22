@@ -18,8 +18,7 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
   const { user } = useStore(userStore);
   const { theme } = useTheme();
 
-  const weaponsTypes = new Set(weapons.map((weapon) => weapon.weapon_type));
-  const baseWeapons = BASE_WEAPONS.map((weapon) => ({ ...weapon, team_id: user?.team_id }));
+  const weaponsTypes = new Set(BASE_WEAPONS.map((weapon) => weapon.weapon_type));
   const teamId = user?.team_id;
 
   const [weaponForm, setWeaponForm] = useState({
@@ -64,11 +63,6 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
         onChange={(e) => setWeaponForm({ ...weaponForm, weapon_type: e.target.value })}
       >
         <option value="">Select weapon</option>
-        {baseWeapons.map((weapon) => (
-          <option key={weapon.id} value={weapon.weapon_type}>
-            {weapon.weapon_type}
-          </option>
-        ))}
         {Array.from(weaponsTypes)?.map((weaponType, index) => (
           <option key={index} value={weaponType}>
             {weaponType}

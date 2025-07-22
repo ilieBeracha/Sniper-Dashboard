@@ -15,7 +15,6 @@ import { useTabs } from "@/hooks/useTabs";
 import DashboardOverview from "@/components/DashboardOverview";
 import CommanderView from "@/components/DashboardCommanderView";
 import ActivityFeedDrawer from "@/components/ActivityFeedDrawer";
-import { Spinner } from "@heroui/spinner";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
@@ -52,21 +51,13 @@ export default function Dashboard() {
 
   const RenderComponent = (): React.ReactNode => {
     if (activeTab.id === "overview") {
-      return <DashboardOverview />;
+      return <DashboardOverview loading={loading} />;
     }
 
     if (activeTab.id === "commander-view") {
       return <CommanderView />;
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-full">
-        <Spinner />
-      </div>
-    );
-  }
 
   return (
     <SpPage>

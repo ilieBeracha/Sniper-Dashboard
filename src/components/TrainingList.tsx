@@ -32,15 +32,13 @@ export default function TrainingList({ trainings }: TrainingListProps) {
     <>
       {isMobile ? (
         <div className="space-y-4">
-          <div className="space-y-3">
-            {trainings.length === 0 && <TrainingListEmpty />}
+          {trainings.length === 0 && <TrainingListEmpty />}
 
-            <TrainingSection title="Today" trainings={todaySessions} color="green" highlight={true} showDate={false} />
+          <TrainingSection title="Today" trainings={todaySessions} color="green" highlight={true} showDate={false} />
 
-            <TrainingSection title="Upcoming" trainings={upcoming} color="blue" showCount={true} />
+          <TrainingSection title="Upcoming" trainings={upcoming} color="blue" showCount={true} />
 
-            <TrainingSection title="Past Sessions" trainings={past} color="gray" isPast={true} />
-          </div>
+          <TrainingSection title="Past Sessions" trainings={past} color="gray" isPast={true} />
         </div>
       ) : (
         <>
@@ -83,10 +81,13 @@ export default function TrainingList({ trainings }: TrainingListProps) {
                 className="sticky top-8 border rounded-lg p-4 transition-colors duration-200"
                 style={{
                   backgroundColor: theme === "dark" ? "#1A1A1A" : primitives.white.white,
-                  borderColor: theme === "dark" ? `${primitives.white.white}1A` : primitives.grey.grey200
+                  borderColor: theme === "dark" ? `${primitives.white.white}1A` : primitives.grey.grey200,
                 }}
               >
-                <h3 className="text-sm font-semibold mb-4 transition-colors duration-200" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
+                <h3
+                  className="text-sm font-semibold mb-4 transition-colors duration-200"
+                  style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}
+                >
                   Training Calendar
                 </h3>
                 <TrainingCalendar trainings={trainings} />

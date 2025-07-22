@@ -3,6 +3,7 @@ import BaseDashboardCard from "./base/BaseDashboardCard";
 import { ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 import { primitives } from "@/styles/core";
 import UserHitPercentage from "./DashboardUserHitPercentage";
+import { WaveLoader } from "./ui/loader";
 
 const lineData = [
   { date: "Jun", percent: 20, count: 18 },
@@ -20,7 +21,7 @@ const barData = [
   { name: "Improving", value: 34, percent: 34 },
 ];
 
-export default function DashboardSquadProgress() {
+export default function DashboardSquadProgress({ loading }: { loading: boolean }) {
   const { theme } = useTheme();
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -53,7 +54,13 @@ export default function DashboardSquadProgress() {
       {/* Performance Overview - Full width on mobile, left side on desktop */}
       <div className="w-full">
         <BaseDashboardCard header="Performance Overview" tooltipContent="Current performance metrics">
-          <UserHitPercentage />
+          {loading ? (
+            <div className="flex justify-center items-center h-full">
+              <WaveLoader />
+            </div>
+          ) : (
+            <UserHitPercentage />
+          )}
         </BaseDashboardCard>
       </div>
 

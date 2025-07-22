@@ -19,8 +19,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
   const { theme } = useTheme();
   const isMobile = useIsMobile();
 
-  const equipmentsTypes = new Set(equipments.map((equipment) => equipment.equipment_type));
-  const baseEquipments = BASE_EQUIPMENTS.map((equipment) => ({ ...equipment, team_id: user?.team_id }));
+  const equipmentsTypes = new Set(BASE_EQUIPMENTS.map((equipment) => equipment.equipment_type));
   const teamId = user?.team_id;
 
   const [equipmentForm, setEquipmentForm] = useState({
@@ -41,7 +40,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
 
   const EquipmentContent = (
     <div
-      className={`p-4 space-y-6 transition-colors duration-200`}
+      className={` ${isMobile ? "w-full" : "w-[600px]"} p-4 space-y-6 transition-colors duration-200`}
       style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}
     >
       <div>
@@ -65,11 +64,6 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
         onChange={(e) => setEquipmentForm({ ...equipmentForm, equipment_type: e.target.value })}
       >
         <option value="">Select equipment</option>
-        {baseEquipments.map((equipment) => (
-          <option key={equipment.id} value={equipment.equipment_type}>
-            {equipment.equipment_type}
-          </option>
-        ))}
         {Array.from(equipmentsTypes)?.map((equipmentsType, index) => {
           return (
             <option key={index} value={equipmentsType}>
