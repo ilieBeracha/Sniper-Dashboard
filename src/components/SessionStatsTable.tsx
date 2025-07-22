@@ -31,35 +31,32 @@ export default function SessionStatsTable({
   const { id } = useParams();
   const { getSessionStatsByTrainingId, getSessionStatsCountByTrainingId } = useStore(sessionStore);
 
-  // Pagination state
+  // Group-aware pagination state
+  const ROW_LIMIT = 20; // preferred maximum rows per page (may overflow if a single group is larger)
   const [currentPage, setCurrentPage] = useState(0);
-  const [paginatedSessionStats, setPaginatedSessionStats] = useState<any[]>([]);
-  const [hasMore, setHasMore] = useState(true);
+  const [allSessionStats, setAllSessionStats] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const SESSION_LIMIT = 20;
+  // derived state – whether there is a next page (re-computed later)
+  const [hasMore, setHasMore] = useState(false);
 
   // Expanded groups state - initialize with all groups expanded
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load paginated session stats
-  const loadSessionStats = async (page: number = 0, reset: boolean = false) => {
+  // Load ALL session stats once – we will paginate client-side by group.
+  const loadAllSessionStats = async () => {
     if (!id) return;
 
     setIsLoading(true);
     try {
-      const offset = page * SESSION_LIMIT;
-      const result = await getSessionStatsByTrainingId(id, SESSION_LIMIT, offset);
+      // 1. Fetch total count so we can request all rows in one call.
+      const count = await getSessionStatsCountByTrainingId(id);
+      setTotalCount(count);
 
-      if (reset) {
-        setPaginatedSessionStats(result);
-      } else {
-        setPaginatedSessionStats((prev) => [...prev, ...result]);
-      }
-
-      setHasMore(result.length === SESSION_LIMIT);
-      setCurrentPage(page);
+      // 2. Fetch ALL rows. If count is 0 we still proceed to show empty state.
+      const result = await getSessionStatsByTrainingId(id, count || 1, 0);
+      setAllSessionStats(result);
     } catch (error) {
       console.error("Error loading session stats:", error);
     } finally {
@@ -67,42 +64,29 @@ export default function SessionStatsTable({
     }
   };
 
-  // Load initial session stats and total count
+  // Load data once when component mounts / id changes
   useEffect(() => {
-    const loadInitialData = async () => {
-      if (!id) return;
-
-      // Load both session stats and total count
-      await loadSessionStats(0, true);
-
-      try {
-        const count = await getSessionStatsCountByTrainingId(id);
-        setTotalCount(count);
-      } catch (error) {
-        console.error("Error loading total count:", error);
-      }
-    };
-
-    loadInitialData();
+    loadAllSessionStats();
   }, [id]);
 
+  // Reload ALL stats if parent component provides refreshed list or added session
   useEffect(() => {
-    if (sessionStats?.length > 0 && currentPage === 0) {
-      loadSessionStats(0, true);
+    if (sessionStats?.length > 0) {
+      loadAllSessionStats();
     }
   }, [sessionStats?.length]);
 
   useEffect(() => {
     if (newlyAddedSessionId) {
-      loadSessionStats(0, true);
+      loadAllSessionStats();
     }
   }, [newlyAddedSessionId]);
 
   // Initialize expanded groups when data loads
   useEffect(() => {
-    if (paginatedSessionStats.length > 0 && !isInitialized) {
+    if (allSessionStats.length > 0 && !isInitialized) {
       const assignmentIds = new Set<string>();
-      paginatedSessionStats.forEach((session) => {
+      allSessionStats.forEach((session) => {
         if (session.assignment_id) {
           assignmentIds.add(session.assignment_id);
         }
@@ -110,13 +94,13 @@ export default function SessionStatsTable({
       setExpandedGroups(assignmentIds);
       setIsInitialized(true);
     }
-  }, [paginatedSessionStats, isInitialized]);
+  }, [allSessionStats, isInitialized]);
 
-  // Group sessions by assignment
+  // Group sessions by assignment (from ALL data)
   const groupedData = useMemo(() => {
     const groups: Record<string, GroupedAssignment> = {};
 
-    paginatedSessionStats.forEach((session) => {
+    allSessionStats.forEach((session) => {
       const assignmentId = session.assignment_id;
       const assignmentName = session.assignment_session?.assignment?.assignment_name || "Unknown Assignment";
 
@@ -134,13 +118,52 @@ export default function SessionStatsTable({
 
     // Convert to array and sort by assignment name
     return Object.values(groups).sort((a, b) => a.assignmentName.localeCompare(b.assignmentName));
-  }, [paginatedSessionStats, expandedGroups]);
+  }, [allSessionStats, expandedGroups]);
 
-  // Flatten grouped data for table display
-  const flattenedData = useMemo(() => {
-    const flattened: any[] = [];
+  // Build group-aware pages – ensures a group is never split across pages.
+  const groupPages = useMemo(() => {
+    const pages: GroupedAssignment[][] = [];
+    let current: GroupedAssignment[] = [];
+    let rowCount = 0;
+
+    const getGroupRows = (g: GroupedAssignment) => (g.expanded ? g.sessions.length + 1 : 1);
 
     groupedData.forEach((group) => {
+      const rows = getGroupRows(group);
+
+      // If adding this group exceeds ROW_LIMIT and we already have at least one group on the page, start new page.
+      if (rowCount > 0 && rowCount + rows > ROW_LIMIT) {
+        pages.push(current);
+        current = [];
+        rowCount = 0;
+      }
+
+      current.push(group);
+      rowCount += rows;
+    });
+
+    if (current.length) pages.push(current);
+
+    return pages;
+  }, [groupedData]);
+
+  // Adjust current page index if number of pages changed (e.g., after collapsing groups)
+  useEffect(() => {
+    if (currentPage >= groupPages.length) {
+      setCurrentPage(groupPages.length === 0 ? 0 : groupPages.length - 1);
+    }
+    setHasMore(currentPage < groupPages.length - 1);
+  }, [groupPages.length, currentPage]);
+
+  // Flatten data for the CURRENT page only
+  const flattenedData = useMemo(() => {
+    if (groupPages.length === 0) return [];
+
+    const flattened: any[] = [];
+
+    const pageGroups = groupPages[currentPage] || [];
+
+    pageGroups.forEach((group) => {
       // Add group header
       flattened.push({
         id: `group-${group.assignmentId}`,
@@ -151,7 +174,6 @@ export default function SessionStatsTable({
         expanded: group.expanded,
       });
 
-      // Add sessions if expanded
       if (group.expanded) {
         group.sessions.forEach((session) => {
           flattened.push({
@@ -164,7 +186,7 @@ export default function SessionStatsTable({
     });
 
     return flattened;
-  }, [groupedData]);
+  }, [groupPages, currentPage]);
 
   const toggleGroup = (assignmentId: string) => {
     setExpandedGroups((prev) => {
@@ -178,16 +200,16 @@ export default function SessionStatsTable({
     });
   };
 
-  // Pagination handlers
+  // Pagination handlers – purely client-side now
   const nextPage = () => {
-    if (hasMore && !isLoading) {
-      loadSessionStats(currentPage + 1, true); // Reset to replace data, not append
+    if (currentPage < groupPages.length - 1) {
+      setCurrentPage((p) => p + 1);
     }
   };
 
   const prevPage = () => {
-    if (currentPage > 0 && !isLoading) {
-      loadSessionStats(currentPage - 1, true);
+    if (currentPage > 0) {
+      setCurrentPage((p) => p - 1);
     }
   };
 
@@ -305,10 +327,10 @@ export default function SessionStatsTable({
 
   const pagination = {
     currentPage,
-    totalPages: Math.ceil(totalCount / SESSION_LIMIT),
-    pageSize: SESSION_LIMIT,
+    totalPages: groupPages.length || 1,
+    pageSize: flattenedData.length,
     totalItems: totalCount,
-    onPageChange: (page: number) => loadSessionStats(page, true),
+    onPageChange: (page: number) => setCurrentPage(page),
     onNextPage: nextPage,
     onPrevPage: prevPage,
     hasMore,
