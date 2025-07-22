@@ -19,6 +19,7 @@ import { Target } from "lucide-react";
 import SessionStatsTable from "@/components/SessionStatsTable";
 import TrainingStatusTab from "@/components/TrainingStatusTab";
 import TrainingSessionStatsCard from "@/components/TrainingSessionStatsCard";
+import TrainingPageGroupFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageGroupFormModal";
 
 export default function TrainingPage() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export default function TrainingPage() {
   const { getSessionStatsByTrainingId } = useStore(sessionStore);
 
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
-
+  const { isOpen: isOpen, setIsOpen: setIsOpen } = useModal();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [selectedSession, setSelectedSession] = useState<any>(null);
@@ -74,6 +75,11 @@ export default function TrainingPage() {
   const handleSessionClick = (session: any) => {
     setSelectedSession(session);
   };
+
+  const handleAddGroup = (group: any) => {
+    console.log(group);
+  };
+
   const { tabs, activeTab, handleTabChange } = useTabs({
     tabs: [
       { id: "session-stats", label: "Session Stats", icon: Target },
@@ -115,9 +121,15 @@ export default function TrainingPage() {
         icon={BiCurrentLocation}
         dropdownItems={[
           {
-            label: "Full Page Form",
+            label: "Add Session",
             onClick: () => {
               navigate(`/training/${id}/session-stats-full`);
+            },
+          },
+          {
+            label: "Add Group",
+            onClick: () => {
+              setIsOpen(true);
             },
           },
         ]}
@@ -131,6 +143,7 @@ export default function TrainingPage() {
         onConfirm={handleConfirmStatusChange}
         newStatus={pendingStatus!}
       />
+      <TrainingPageGroupFormModal isOpen={isOpen} onClose={() => setIsOpen(false)} onSubmit={handleAddGroup} />
     </SpPage>
   );
 }
