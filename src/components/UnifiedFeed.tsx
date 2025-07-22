@@ -39,7 +39,7 @@ export default function UnifiedFeed() {
   // Filter feed to show only items related to current user
   const userFeed = useMemo(() => {
     if (!user?.id) return [];
-    return feed.filter(item => item.actor_id === user.id);
+    return feed.filter((item) => item.actor_id === user.id);
   }, [feed, user]);
 
   const getActionEmoji = (actionType: string) => {
@@ -58,7 +58,7 @@ export default function UnifiedFeed() {
   };
 
   const renderActionMessage = (item: FeedItem) => {
-    const names = ["Alex Chen", "Sarah Johnson", "Mike Torres", "Emma Wilson", "David Kim", "Lisa Anderson"];
+    const names = ["..."];
     const userName = names[item.actor_id.charCodeAt(0) % names.length];
 
     const messages: Record<string, string[]> = {

@@ -5,7 +5,7 @@ export const getSessionStatsByTrainingId = async (trainingId: string, limit: num
   const { data, error } = await supabase
     .from("session_stats")
     .select(
-      ` *, assignment_session ( assignment ( assignment_name ) ), users!session_stats_creator_id_fkey ( first_name, last_name, email ), squads ( squad_name ), teams ( team_name )  `,
+      ` *, assignment_session ( assignment ( assignment_name ) ), users!session_stats_creator_id_fkey ( first_name, last_name, email ), teams ( team_name )  `,
     )
     .eq("training_session_id", trainingId)
     .order("created_at", { ascending: false })

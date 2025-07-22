@@ -60,7 +60,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
             style={{
               borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
               backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
-              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
             }}
           >
             <option value="">Select type</option>
@@ -89,7 +89,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
             style={{
               borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
               backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
-              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
             }}
           />
         ) : (
@@ -110,7 +110,7 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
             style={{
               borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
               backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
-              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
             }}
           >
             <option value="">Select</option>
@@ -164,18 +164,10 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
       <div className="inline-flex gap-2">
         {isEditing ? (
           <>
-            <button
-              onClick={handleSaveEquipment}
-              className={`p-2 rounded hover:bg-green-100 dark:hover:bg-green-800/40 ${theme === "dark" ? "text-green-400" : "text-green-600"}`}
-              title="Save"
-            >
+            <button onClick={handleSaveEquipment} className={`p-2 rounded  ${theme === "dark" ? "text-green-400" : "text-green-600"}`} title="Save">
               <Save size={16} />
             </button>
-            <button
-              onClick={handleCancelEdit}
-              className={`p-2 rounded hover:bg-red-100 dark:hover:bg-red-800/40 ${theme === "dark" ? "text-red-400" : "text-red-600"}`}
-              title="Cancel"
-            >
+            <button onClick={handleCancelEdit} className={`p-2 rounded ${theme === "dark" ? "text-red-400" : "text-red-600"}`} title="Cancel">
               <X size={16} />
             </button>
           </>
@@ -183,14 +175,14 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
           <>
             <button
               onClick={() => handleViewEquipment(equipment)}
-              className={`p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
+              className={`p-2 rounded  ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
               title="View"
             >
               <Eye size={16} />
             </button>
             <button
               onClick={() => handleEditEquipment(equipment)}
-              className={`p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
+              className={`p-2 rounded  ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
               title="Edit"
             >
               <Edit size={16} />

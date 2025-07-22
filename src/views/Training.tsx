@@ -14,10 +14,9 @@ import ConfirmStatusChangeModal from "@/components/ConfirmStatusChangeModal";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
 import { useModal } from "@/hooks/useModal";
 import { useTabs } from "@/hooks/useTabs";
-import { Activity, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { Target } from "lucide-react";
 import SessionStatsTable from "@/components/SessionStatsTable";
-import TrainingAnalyticsTab from "@/components/TrainingAnalyticsTab";
 import TrainingStatusTab from "@/components/TrainingStatusTab";
 import TrainingSessionStatsCard from "@/components/TrainingSessionStatsCard";
 
@@ -78,7 +77,7 @@ export default function TrainingPage() {
   const { tabs, activeTab, handleTabChange } = useTabs({
     tabs: [
       { id: "session-stats", label: "Session Stats", icon: Target },
-      { id: "analytics", label: "Analytics", icon: Activity },
+      // { id: "analytics", label: "Analytics", icon: Activity },
       { id: "status", label: "Status", icon: Calendar },
     ],
   });
@@ -93,9 +92,9 @@ export default function TrainingPage() {
       );
     }
 
-    if (activeTab.id === "analytics") {
-      return <TrainingAnalyticsTab trainingSessionId={id!} />;
-    }
+    // if (activeTab.id === "analytics") {
+    //   return <TrainingAnalyticsTab trainingSessionId={id!} />;
+    // }
 
     if (activeTab.id === "status") {
       return <TrainingStatusTab training={training as TrainingSession} sessionStats={selectedSession} handleStatusChange={handleStatusChange} />;

@@ -3,6 +3,8 @@ import { Participant } from "../types";
 import { SectionHeader } from "./SectionHeader";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useEffect } from "react";
+import { isCommander } from "@/utils/permissions";
+import { UserRole } from "@/types/user";
 
 interface ParticipantsSectionProps {
   section: any;
@@ -42,9 +44,9 @@ export const ParticipantsSection = ({
       {/* Add Controls */}
       <div className="flex flex-col sm:flex-row gap-3 mt-6">
         <select
-          className={`flex-1 h-12 px-4 rounded-xl border-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-            theme === "dark" 
-              ? "bg-zinc-900 border-zinc-800 text-white focus:border-indigo-500 focus:ring-indigo-500/20" 
+          className={`flex-1 py-2 h-12 px-4 rounded-xl border-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+            theme === "dark"
+              ? "bg-zinc-900 border-zinc-800 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
               : "bg-white border-gray-200 focus:border-indigo-500 focus:ring-indigo-500/20"
           }`}
           onChange={(e) => {
@@ -65,11 +67,11 @@ export const ParticipantsSection = ({
         </select>
         <button
           onClick={addSquad}
-          className="flex items-center justify-center gap-2 px-6 h-12 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+          disabled={isCommander(user?.user_role as UserRole)}
+          className="flex items-center justify-center gap-2 px-6 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Users className="w-4 h-4" />
-          <span className="hidden sm:inline">Add Squad</span>
-          <span className="sm:hidden">Add All</span>
+          <span className="sm:inline">Add Squad</span>
         </button>
       </div>
 
@@ -83,11 +85,7 @@ export const ParticipantsSection = ({
                 theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"
               }`}
             >
-              <div
-                className={`px-4 py-3 border-b ${
-                  theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-200"
-                }`}
-              >
+              <div className={`px-4 py-3 border-b ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-200"}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div
@@ -98,9 +96,7 @@ export const ParticipantsSection = ({
                       {index + 1}
                     </div>
                     <div>
-                      <div className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                        {participant.name}
-                      </div>
+                      <div className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{participant.name}</div>
                       {participant.userId === user?.id && (
                         <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>You</span>
                       )}
@@ -125,8 +121,8 @@ export const ParticipantsSection = ({
                       value={participant.userDuty}
                       onChange={(e) => updateParticipant(participant.userId, "userDuty", e.target.value)}
                       className={`w-full mt-1 h-10 px-3 rounded-lg text-sm border transition-all ${
-                        theme === "dark" 
-                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500" 
+                        theme === "dark"
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500"
                           : "bg-gray-50 border-gray-200 focus:border-indigo-500"
                       }`}
                     >
@@ -142,8 +138,8 @@ export const ParticipantsSection = ({
                       value={participant.position}
                       onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
                       className={`w-full mt-1 h-10 px-3 rounded-lg text-sm border transition-all ${
-                        theme === "dark" 
-                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500" 
+                        theme === "dark"
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500"
                           : "bg-gray-50 border-gray-200 focus:border-indigo-500"
                       }`}
                     >
@@ -160,17 +156,13 @@ export const ParticipantsSection = ({
                     {participant.userDuty === "Sniper" ? "Weapon" : "Equipment"}
                   </label>
                   <select
-                    value={participant.userDuty === "Sniper" ? (participant.weaponId || "") : (participant.equipmentId || "")}
+                    value={participant.userDuty === "Sniper" ? participant.weaponId || "" : participant.equipmentId || ""}
                     onChange={(e) =>
-                      updateParticipant(
-                        participant.userId,
-                        participant.userDuty === "Sniper" ? "weaponId" : "equipmentId",
-                        e.target.value
-                      )
+                      updateParticipant(participant.userId, participant.userDuty === "Sniper" ? "weaponId" : "equipmentId", e.target.value)
                     }
                     className={`w-full mt-1 h-10 px-3 rounded-lg text-sm border transition-all ${
-                      theme === "dark" 
-                        ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500" 
+                      theme === "dark"
+                        ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500"
                         : "bg-gray-50 border-gray-200 focus:border-indigo-500"
                     }`}
                   >
@@ -195,15 +187,15 @@ export const ParticipantsSection = ({
           <div className={`rounded-xl border-2 p-8 text-center ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}>
             <UserPlus className={`w-12 h-12 mx-auto mb-4 ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`} />
             <h3 className={`text-lg font-medium ${theme === "dark" ? "text-white" : "text-gray-900"} mb-2`}>No participants yet</h3>
-            <p className={`text-sm ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-              Add team members to start the training session
-            </p>
+            <p className={`text-sm ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Add team members to start the training session</p>
           </div>
         )}
       </div>
 
       {/* Desktop Participants List */}
-      <div className={`hidden md:block mt-8 rounded-2xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}>
+      <div
+        className={`hidden md:block mt-8 rounded-2xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}
+      >
         {participants.length > 0 ? (
           <>
             {/* Table Header */}
@@ -238,9 +230,7 @@ export const ParticipantsSection = ({
                       {index + 1}
                     </div>
                     <div className="min-w-0">
-                      <div className={`text-sm font-medium truncate ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                        {participant.name}
-                      </div>
+                      <div className={`text-sm font-medium truncate ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{participant.name}</div>
                       {participant.userId === user?.id && (
                         <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>You</span>
                       )}
@@ -253,8 +243,8 @@ export const ParticipantsSection = ({
                       value={participant.userDuty}
                       onChange={(e) => updateParticipant(participant.userId, "userDuty", e.target.value)}
                       className={`w-full h-9 px-2 rounded-lg text-sm border transition-all ${
-                        theme === "dark" 
-                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:bg-zinc-700" 
+                        theme === "dark"
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:bg-zinc-700"
                           : "bg-gray-50 border-gray-200 focus:border-indigo-500 focus:bg-white"
                       }`}
                     >
@@ -270,8 +260,8 @@ export const ParticipantsSection = ({
                       value={participant.position}
                       onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
                       className={`w-full h-9 px-2 rounded-lg text-sm border transition-all ${
-                        theme === "dark" 
-                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:bg-zinc-700" 
+                        theme === "dark"
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:bg-zinc-700"
                           : "bg-gray-50 border-gray-200 focus:border-indigo-500 focus:bg-white"
                       }`}
                     >
@@ -285,13 +275,13 @@ export const ParticipantsSection = ({
                   {/* Weapon/Equipment */}
                   <div className="col-span-1">
                     <select
-                      value={participant.userDuty === "Sniper" ? (participant.weaponId || "") : (participant.equipmentId || "")}
+                      value={participant.userDuty === "Sniper" ? participant.weaponId || "" : participant.equipmentId || ""}
                       onChange={(e) =>
                         updateParticipant(participant.userId, participant.userDuty === "Sniper" ? "weaponId" : "equipmentId", e.target.value)
                       }
                       className={`w-full h-9 px-2 rounded-lg text-sm border transition-all ${
-                        theme === "dark" 
-                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:bg-zinc-700" 
+                        theme === "dark"
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:bg-zinc-700"
                           : "bg-gray-50 border-gray-200 focus:border-indigo-500 focus:bg-white"
                       }`}
                     >

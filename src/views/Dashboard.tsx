@@ -8,21 +8,21 @@ import { getUserGroupingStatsRpc } from "@/services/performance";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import InviteModal from "@/components/InviteModal";
 import Header from "@/Headers/Header";
-import { Activity, Brain, SplinePointerIcon } from "lucide-react";
+import { Activity, SplinePointerIcon } from "lucide-react";
 import { isCommander } from "@/utils/permissions";
-import { User, UserRole } from "@/types/user";
+import { UserRole } from "@/types/user";
 import { useTabs } from "@/hooks/useTabs";
 import DashboardOverview from "@/components/DashboardOverview";
-import DashboardAI from "@/components/DashboardAI";
 import CommanderView from "@/components/DashboardCommanderView";
-import DashboardAnalytics from "@/components/DashboardAnalytics";
 import ActivityFeedDrawer from "@/components/ActivityFeedDrawer";
+import { Spinner } from "@heroui/spinner";
+
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
   const user = useUserStore.user;
   const userRole = useUserStore.user?.user_role ?? null;
 
-  const { getUserHitStatsFull, getSquadStatsByRole } = useStore(performanceStore);
+  const { getUserHitStatsFull } = useStore(performanceStore);
   const { getSquadMetricsByRole } = useStore(squadStore);
   const { loadNextAndLastTraining } = useStore(TrainingStore);
 
@@ -30,13 +30,13 @@ export default function Dashboard() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isActivityFeedOpen, setIsActivityFeedOpen] = useState(false);
   useEffect(() => {
+    setLoading(true);
     const load = async () => {
       if (user?.team_id) {
         await getUserGroupingStatsRpc(user.id);
         await getUserHitStatsFull(user?.id);
         await loadNextAndLastTraining(user?.team_id);
         await getSquadMetricsByRole(user?.id);
-        await getSquadStatsByRole(null, null);
       }
       setLoading(false);
     };
@@ -45,8 +45,6 @@ export default function Dashboard() {
 
   const baseTabs = [
     { id: "overview", label: "Overview", icon: Activity },
-    { id: "analytics", label: "Analytics", icon: Activity },
-    { id: "ai-insights", label: "AI Insights", icon: Brain },
     { id: "commander-view", label: "Commander View", icon: SplinePointerIcon, disabled: !isCommander(userRole as UserRole) },
   ];
 
@@ -56,16 +54,19 @@ export default function Dashboard() {
     if (activeTab.id === "overview") {
       return <DashboardOverview />;
     }
-    if (activeTab.id === "analytics") {
-      return <DashboardAnalytics user={user as User} loading={loading} />;
-    }
-    if (activeTab.id === "ai-insights") {
-      return <DashboardAI />;
-    }
+
     if (activeTab.id === "commander-view") {
       return <CommanderView />;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <SpPage>

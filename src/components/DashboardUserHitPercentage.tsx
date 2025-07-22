@@ -37,7 +37,7 @@ export default function UserHitPercentage() {
           <NoDataDisplay />
         ) : (
           <>
-            <ResponsiveContainer width="100%" height={200} className="text-sm ">
+            <ResponsiveContainer width="100%" height={220} className="text-sm ">
               <PieChart>
                 <Pie
                   data={gaugeData}

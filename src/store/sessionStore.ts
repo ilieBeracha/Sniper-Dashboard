@@ -23,7 +23,6 @@ export interface SessionStatsSaveData {
   sessionData: {
     training_session_id: string | null;
     assignment_id: string | null;
-    squad_id: string | null;
     team_id: string | null;
     dayPeriod: string | null;
     timeToFirstShot: number | null;
@@ -80,16 +79,12 @@ export const sessionStore = create<SessionStatsState>((set) => ({
     set({ isLoading: true, error: null });
     const trainingStore = TrainingStore.getState().training;
 
-    console.log("wizardData", wizardData);
-
-    console.log("trainingStore", trainingStore);
     try {
       // Transform wizard data to database format
       const sessionStatsData: CreateSessionStatsData = {
         training_session_id: wizardData.sessionData.training_session_id || trainingStore?.id || "",
         assignment_id: wizardData.sessionData.assignment_id,
         creator_id: wizardData.currentUser?.id || null,
-        squad_id: wizardData.sessionData.squad_id,
         team_id: wizardData.sessionData.team_id,
         day_period: wizardData.sessionData.dayPeriod,
         time_to_first_shot_sec: wizardData.sessionData.timeToFirstShot,

@@ -21,7 +21,8 @@ export default function AssetsPage() {
   const { getWeapons } = useStore(weaponsStore);
   const { getEquipments } = useStore(equipmentStore);
   const { user } = useStore(userStore);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isWeaponsOpen, setIsWeaponsOpen] = useState(false);
+  const [isEquipmentsOpen, setIsEquipmentsOpen] = useState(false);
 
   useEffect(() => {
     if (user?.team_id) {
@@ -29,13 +30,6 @@ export default function AssetsPage() {
       getEquipments(user?.team_id as string);
     }
   }, [user?.team_id]);
-
-  const renderComponent = () => {
-    if (activeTab.id === "weapons") {
-      return <WeaponsTab isOpen={isOpen} setIsOpen={setIsOpen} />;
-    }
-    return <EquipmentTab isOpen={isOpen} setIsOpen={setIsOpen} />;
-  };
 
   return (
     <SpPage>
@@ -51,12 +45,18 @@ export default function AssetsPage() {
         icon={Package}
         dropdownItems={[
           activeTab.id === "weapons"
-            ? { label: "Add Weapon", onClick: () => setIsOpen(true) }
-            : { label: "Add Equipment", onClick: () => setIsOpen(true) },
+            ? { label: "Add Weapon", onClick: () => setIsWeaponsOpen(true) }
+            : { label: "Add Equipment", onClick: () => setIsEquipmentsOpen(true) },
         ]}
       />
       <SpPageTabs tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
-      <SpPageBody>{renderComponent()}</SpPageBody>
+      <SpPageBody>
+        {activeTab.id === "weapons" ? (
+          <WeaponsTab isOpen={isWeaponsOpen} setIsOpen={setIsWeaponsOpen} />
+        ) : (
+          <EquipmentTab isOpen={isEquipmentsOpen} setIsOpen={setIsEquipmentsOpen} />
+        )}
+      </SpPageBody>
     </SpPage>
   );
 }

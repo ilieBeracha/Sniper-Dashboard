@@ -3,18 +3,26 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SessionData } from "../types";
 import { SectionHeader } from "./SectionHeader";
-import { Check, Sun, Moon, Clock, ChevronDown, ChevronUp, FileText } from "lucide-react";
+import { Check, Sun, Moon, Clock, ChevronDown, ChevronUp, FileText, Plus } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useState } from "react";
+import AddPurpleBtn from "@/components/base/buttons/AddPurpleBtn";
 
 interface SessionConfigSectionProps {
   section: any;
   sessionData: SessionData;
   updateSessionData: (field: keyof SessionData, value: any) => void;
   trainingAssignments: any[];
+  setIsAssignmentModalOpen: (open: boolean) => void;
 }
 
-export const SessionConfigSection = ({ section, sessionData, updateSessionData, trainingAssignments }: SessionConfigSectionProps) => {
+export const SessionConfigSection = ({
+  section,
+  sessionData,
+  updateSessionData,
+  trainingAssignments,
+  setIsAssignmentModalOpen,
+}: SessionConfigSectionProps) => {
   const { theme } = useTheme();
   const [showTimeField, setShowTimeField] = useState(sessionData.timeToFirstShot !== null);
   const [showNotesField, setShowNotesField] = useState(sessionData.note !== "");
@@ -27,22 +35,27 @@ export const SessionConfigSection = ({ section, sessionData, updateSessionData, 
         {/* Training Assignment */}
         <div className="space-y-2">
           <Label className="text-sm font-medium">Training Assignment</Label>
-          <select
-            value={sessionData.assignment_id}
-            onChange={(e) => updateSessionData("assignment_id", e.target.value)}
-            className={`w-full h-12 px-4 rounded-xl border-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-              theme === "dark"
-                ? "bg-zinc-900 border-zinc-800 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
-                : "bg-white border-gray-200 focus:border-indigo-500 focus:ring-indigo-500/20"
-            }`}
-          >
-            <option value="">Select assignment</option>
-            {trainingAssignments.map((assignment) => (
-              <option key={assignment.id} value={assignment.id}>
-                {assignment.assignment_name}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <select
+              value={sessionData.assignment_id}
+              onChange={(e) => updateSessionData("assignment_id", e.target.value)}
+              className={`w-full h-12 px-4 rounded-xl border-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                theme === "dark"
+                  ? "bg-zinc-900 border-zinc-800 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
+                  : "bg-white border-gray-200 focus:border-indigo-500 focus:ring-indigo-500/20"
+              }`}
+            >
+              <option value="">Select assignment</option>
+              {trainingAssignments.map((assignment) => (
+                <option key={assignment.id} value={assignment.id}>
+                  {assignment.assignment_name}
+                </option>
+              ))}
+            </select>
+            <AddPurpleBtn onClick={() => setIsAssignmentModalOpen(true)}>
+              <Plus size={14} />
+            </AddPurpleBtn>
+          </div>
         </div>
 
         {/* Day Period */}

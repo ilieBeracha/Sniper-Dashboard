@@ -24,7 +24,7 @@ export default function BaseDashboardCard({
   const { theme } = useTheme();
 
   const cardClassName = `relative h-full flex flex-col transition-all text-sm duration-300 rounded-lg border ${
-    theme === "dark" ? "bg-[#1A1AA] border-white/10 shadow-lg shadow-black/20" : "bg-white border-gray-200 shadow-sm shadow-gray-200/50"
+    theme === "dark" ? "border-white/10 shadow-lg shadow-black/20" : "bg-gray-50 border-gray-300 border-2 shadow-xl shadow-gray-200/50"
   } ${isMobile ? "" : "h-full"}`;
 
   if (!header || header === "" || header === null) {
@@ -37,7 +37,7 @@ export default function BaseDashboardCard({
 
   return (
     <Card
-      className={`flex flex-col bg-white rounded-4xl border border-gray-200 ${height} shadow-xsoverflow-hidden ${theme === "dark" ? "bg-zinc-900/50 border-neutral-700/70" : ""}`}
+      className={`flex flex-col bg-white rounded-4xl shadow-sm shadow-gray-200/50 border border-gray-200 ${height} shadow-xsoverflow-hidden ${theme === "dark" ? "bg-zinc-900/50 border-neutral-700/70" : ""}`}
     >
       <div className={`${padding} border-none transition-colors duration-200 ${theme === "dark" ? "border-white/10" : "border-gray-200"}`}>
         <div className="flex justify-between relative h-full items-center">

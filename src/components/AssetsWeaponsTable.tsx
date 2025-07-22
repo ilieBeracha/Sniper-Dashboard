@@ -74,7 +74,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
             style={{
               borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
               backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
-              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
             }}
           >
             <option value="">Select type</option>
@@ -104,7 +104,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
             style={{
               borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
               backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
-              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
             }}
           />
         ) : (
@@ -127,7 +127,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
             style={{
               borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
               backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
-              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
             }}
           />
         ) : (

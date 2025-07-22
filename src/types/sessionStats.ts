@@ -2,7 +2,6 @@ export interface CreateSessionStatsData {
   training_session_id: string;
   assignment_id: string | null;
   creator_id: string | null;
-  squad_id: string | null;
   team_id: string | null;
   day_period: string | null;
   time_to_first_shot_sec: number | null;

@@ -40,10 +40,16 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
   }
 
   const EquipmentContent = (
-    <div className={`min-w-[600px] p-4 space-y-6 transition-colors duration-200`} style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
+    <div
+      className={`p-4 space-y-6 transition-colors duration-200`}
+      style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}
+    >
       <div>
         <h2 className="text-xl font-semibold">New Equipment</h2>
-        <p className="mt-1 text-sm transition-colors duration-200" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
+        <p
+          className="mt-1 text-sm transition-colors duration-200"
+          style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}
+        >
           Add new equipment to the inventory.
         </p>
       </div>
@@ -53,7 +59,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
         style={{
           backgroundColor: theme === "dark" ? `${primitives.grey.grey800}80` : primitives.white.white,
           color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
-          borderColor: theme === "dark" ? primitives.grey.grey700 : primitives.grey.grey300
+          borderColor: theme === "dark" ? primitives.grey.grey700 : primitives.grey.grey300,
         }}
         value={equipmentForm.equipment_type}
         onChange={(e) => setEquipmentForm({ ...equipmentForm, equipment_type: e.target.value })}
@@ -84,7 +90,10 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
       />
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium transition-colors duration-200" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
+        <label
+          className="block text-sm font-medium transition-colors duration-200"
+          style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}
+        >
           Day/Night
         </label>
         <select
@@ -92,7 +101,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
           style={{
             backgroundColor: theme === "dark" ? `${primitives.grey.grey800}80` : primitives.white.white,
             color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
-            borderColor: theme === "dark" ? primitives.grey.grey700 : primitives.grey.grey300
+            borderColor: theme === "dark" ? primitives.grey.grey700 : primitives.grey.grey300,
           }}
           value={equipmentForm.day_night}
           onChange={(e) => setEquipmentForm({ ...equipmentForm, day_night: e.target.value })}
@@ -110,7 +119,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
           className="px-4 py-1.5 transition-colors rounded-md text-sm font-medium"
           style={{
             backgroundColor: theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey100,
-            color: theme === "dark" ? primitives.white.white : primitives.grey.grey700
+            color: theme === "dark" ? primitives.white.white : primitives.grey.grey700,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = theme === "dark" ? `${primitives.white.white}1A` : primitives.grey.grey200;
@@ -127,7 +136,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
           className="px-4 py-1.5 transition-colors rounded-md text-sm font-medium shadow-sm disabled:cursor-not-allowed"
           style={{
             backgroundColor: primitives.blue.blue500,
-            color: primitives.white.white
+            color: primitives.white.white,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = primitives.blue.blue400;
@@ -147,7 +156,10 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="w-1 h-6 rounded-full" style={{ backgroundColor: primitives.green.green400 }}></div>
-          <h2 className="text-lg font-semibold transition-colors duration-200" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
+          <h2
+            className="text-lg font-semibold transition-colors duration-200"
+            style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}
+          >
             Equipment Inventory
           </h2>
 
@@ -156,7 +168,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
             style={{
               backgroundColor: theme === "dark" ? `${primitives.green.green500}33` : primitives.green.green100,
               color: theme === "dark" ? primitives.green.green200 : primitives.green.green600,
-              borderColor: theme === "dark" ? `${primitives.green.green500}4D` : primitives.green.green300
+              borderColor: theme === "dark" ? `${primitives.green.green500}4D` : primitives.green.green300,
             }}
           >
             {equipments.length} items

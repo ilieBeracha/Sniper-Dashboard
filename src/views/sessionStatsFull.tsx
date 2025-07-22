@@ -8,10 +8,20 @@ import {
 } from "../components/SessionStatsFull/sections";
 import { useSessionStats } from "../components/SessionStatsFull/useSessionStats";
 import { ScrollProgress } from "@/components/magicui/scroll-progress";
+import AddAssignmentModal from "@/components/AddAssignmentModal";
+import { useStore } from "zustand";
+import { TrainingStore } from "@/store/trainingStore";
+import { useEffect } from "react";
+import { weaponsStore } from "@/store/weaponsStore";
+import { equipmentStore } from "@/store/equipmentStore";
 
 export default function ImprovedSessionStats() {
   const { theme } = useTheme();
 
+  const { getWeapons } = useStore(weaponsStore);
+  const { getEquipments } = useStore(equipmentStore);
+
+  const { training, createAssignment, loadTrainingById } = useStore(TrainingStore);
   const {
     // State
     activeSection,
@@ -40,7 +50,28 @@ export default function ImprovedSessionStats() {
     removeTarget,
     updateEngagement,
     handleSubmit,
+    isAssignmentModalOpen,
+    setIsAssignmentModalOpen,
   } = useSessionStats();
+
+  useEffect(() => {
+    (async () => {
+      if (training?.team_id) {
+        await getWeapons(training?.team_id as string);
+        await getEquipments(training?.team_id as string);
+      }
+    })();
+  }, [training?.team_id]);
+
+  async function onSuccessAddAssignment(assignmentName: string) {
+    const res = await createAssignment(assignmentName, true, training?.id as string);
+    if (res) {
+      updateSessionData("assignment_id", res?.id);
+      loadTrainingById(training?.id as string);
+      setIsAssignmentModalOpen(false);
+    }
+    setIsAssignmentModalOpen(false);
+  }
 
   return (
     <div className={`min-h-screen ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-gray-50"} relative`}>
@@ -100,7 +131,7 @@ export default function ImprovedSessionStats() {
       </div>
 
       {/* Main Content Container */}
-      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth pt-20 lg:pt-0" onScroll={handleScroll}>
+      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth lg:pt-0" onScroll={handleScroll}>
         {/* Section 1: Session Configuration */}
         <section className="min-h-screen snap-start flex items-center justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
@@ -109,6 +140,7 @@ export default function ImprovedSessionStats() {
               sessionData={sessionData}
               updateSessionData={updateSessionData}
               trainingAssignments={trainingAssignments}
+              setIsAssignmentModalOpen={setIsAssignmentModalOpen}
             />
           </div>
         </section>
@@ -158,6 +190,7 @@ export default function ImprovedSessionStats() {
           </div>
         </section>
       </div>
+      <AddAssignmentModal isOpen={isAssignmentModalOpen} onClose={() => setIsAssignmentModalOpen(false)} onSuccess={onSuccessAddAssignment} />
     </div>
   );
 }

@@ -123,26 +123,21 @@ export function SpPageTabs({
           }
           const isActive = activeTab === tab.id;
           return (
-            <button
+            <span
               key={tab.label}
               onClick={() => onChange(tab)}
-              disabled={tab.disabled}
-              className={`relative flex items-center gap-2 ${
-                isMobile ? "px-4 py-2" : "px-6 py-2.5"
-              } font-medium rounded-full transition-all duration-300 ${
+              className={`cursor-pointer relative flex items-center gap-2 ${isMobile ? "px-4 py-2" : "px-6 py-2.5"} font-medium transition-all duration-300 ${
                 isActive
                   ? theme === "dark"
-                    ? "bg-zinc-800 text-white"
-                    : "bg-gray-900 text-white"
-                  : theme === "dark"
-                    ? "text-gray-400 hover:text-gray-300"
-                    : "text-gray-600 hover:text-gray-800"
+                    ? "border-t-none border-b-2 border-white text-white"
+                    : "border-t-none border-b-2 border-gray-900 text-gray-900"
+                  : ""
               }`}
               title={tab.label}
             >
               {tab.icon && <tab.icon className="w-4 h-4" />}
               <span className={isMobile ? "text-xs" : "text-sm"}>{tab.label}</span>
-            </button>
+            </span>
           );
         })}
       </nav>

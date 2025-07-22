@@ -32,23 +32,23 @@ export default function TrainingSessionStatsCard({ trainingSessionId }: { traini
   const primaryStats = [
     {
       label: "Hit Rate",
-      value: `${stats.overall_hit_percentage}%`,
+      value: stats.overall_hit_percentage ? `${stats.overall_hit_percentage}%` : "—",
       icon: TrendingUp,
       highlight: true,
     },
     {
       label: "Total Shots",
-      value: stats.total_shots_fired,
+      value: stats.total_shots_fired ? stats.total_shots_fired : "—",
       icon: Target,
     },
     {
       label: "First Shot",
-      value: `${stats.avg_time_to_first_shot}s`,
+      value: stats.avg_time_to_first_shot ? `${stats.avg_time_to_first_shot}s` : "—",
       icon: Timer,
     },
     {
       label: "Best Grouping",
-      value: `${stats.best_cm_dispersion}cm`,
+      value: stats.best_cm_dispersion ? `${stats.best_cm_dispersion}cm` : "—",
       icon: Trophy,
       subtext: stats.best_user_first_name ? `${stats.best_user_first_name} ${stats.best_user_last_name}` : null,
     },

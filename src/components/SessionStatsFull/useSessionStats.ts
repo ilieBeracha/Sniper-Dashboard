@@ -11,6 +11,7 @@ import { userStore } from "@/store/userStore";
 import type { SessionData, Participant, Target, Section } from "./types";
 import type { SessionStatsSaveData } from "@/store/sessionStore";
 import { Target as TargetIcon, Users, Crosshair, Settings, CheckCircle2 } from "lucide-react";
+import { useModal } from "@/hooks/useModal";
 
 export const useSessionStats = () => {
   const { id } = useParams();
@@ -18,10 +19,11 @@ export const useSessionStats = () => {
   const { user } = useStore(userStore);
   const { training, loadTrainingById } = useStore(TrainingStore);
   const { weapons } = useStore(weaponsStore);
-  const { equipments } = useStore(equipmentStore);
+  const { equipments} = useStore(equipmentStore);
   const { members } = useStore(teamStore);
   const { saveSessionStats } = useStore(sessionStore);
 
+  const { isOpen: isAssignmentModalOpen, setIsOpen: setIsAssignmentModalOpen } = useModal();
   const [activeSection, setActiveSection] = useState(0);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
@@ -257,7 +259,6 @@ export const useSessionStats = () => {
   const handleSubmit = async () => {
     const errors: string[] = [];
     if (!sessionData.assignment_id) errors.push("Training Assignment is required");
-    if (!sessionData.squad_id) errors.push("Squad is required");
     if (!sessionData.dayPeriod) errors.push("Time Period is required");
 
     // Validate participants
@@ -288,7 +289,6 @@ export const useSessionStats = () => {
         sessionData: {
           training_session_id: training?.id || null,
           assignment_id: sessionData.assignment_id || null,
-          squad_id: sessionData.squad_id || null,
           team_id: user?.team_id || null,
           dayPeriod: sessionData.dayPeriod || null,
           timeToFirstShot: sessionData.timeToFirstShot,
@@ -365,5 +365,7 @@ export const useSessionStats = () => {
     removeTarget,
     updateEngagement,
     handleSubmit,
+    isAssignmentModalOpen,
+    setIsAssignmentModalOpen,
   };
 };
