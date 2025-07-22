@@ -20,6 +20,74 @@ export const getSessionStatsCountByTrainingId = async (trainingId: string) => {
   return count || 0;
 };
 
+// Get paginated assignments (groups) for a training session
+export const getAssignmentGroupsByTrainingId = async (trainingId: string, limit: number = 10, offset: number = 0) => {
+  // First get all distinct assignment IDs for this training
+  const { data: allAssignments, error } = await supabase
+    .from("session_stats")
+    .select(`
+      assignment_id,
+      assignment_session!inner ( 
+        assignment ( 
+          assignment_name 
+        ) 
+      )
+    `)
+    .eq("training_session_id", trainingId)
+    .not("assignment_id", "is", null);
+  
+  if (error) throw error;
+  
+  // Remove duplicates and sort by assignment name
+  const uniqueAssignments = Array.from(
+    new Map(
+      allAssignments?.map(item => [
+        item.assignment_id, 
+        {
+          assignment_id: item.assignment_id,
+          assignment_name: item.assignment_session?.assignment?.assignment_name || "Unknown Assignment"
+        }
+      ]) || []
+    ).values()
+  ).sort((a, b) => a.assignment_name.localeCompare(b.assignment_name));
+  
+  // Apply pagination
+  const paginatedAssignments = uniqueAssignments.slice(offset, offset + limit);
+  
+  return paginatedAssignments;
+};
+
+// Get all sessions for specific assignment IDs
+export const getSessionStatsByAssignmentIds = async (trainingId: string, assignmentIds: string[]) => {
+  const { data, error } = await supabase
+    .from("session_stats")
+    .select(
+      ` *, assignment_session ( assignment ( assignment_name ) ), users!session_stats_creator_id_fkey ( first_name, last_name, email ), squads ( squad_name ), teams ( team_name )  `,
+    )
+    .eq("training_session_id", trainingId)
+    .in("assignment_id", assignmentIds)
+    .order("assignment_id")
+    .order("created_at", { ascending: false });
+  
+  if (error) throw error;
+  return data || [];
+};
+
+// Get count of distinct assignments for a training session
+export const getAssignmentGroupsCountByTrainingId = async (trainingId: string) => {
+  const { data, error } = await supabase
+    .from("session_stats")
+    .select("assignment_id")
+    .eq("training_session_id", trainingId)
+    .not("assignment_id", "is", null);
+  
+  if (error) throw error;
+  
+  // Count unique assignment IDs
+  const uniqueAssignmentIds = new Set(data?.map(item => item.assignment_id) || []);
+  return uniqueAssignmentIds.size;
+};
+
 export const createSessionStats = async (sessionData: CreateSessionStatsData) => {
   const { data, error } = await supabase.from("session_stats").insert(sessionData).select().single();
 

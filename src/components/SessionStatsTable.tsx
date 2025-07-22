@@ -29,36 +29,57 @@ export default function SessionStatsTable({
 }: SessionStatsTableProps) {
   const { theme } = useTheme();
   const { id } = useParams();
-  const { getSessionStatsByTrainingId, getSessionStatsCountByTrainingId } = useStore(sessionStore);
+  const { 
+    getSessionStatsByTrainingId, 
+    getSessionStatsCountByTrainingId,
+    getAssignmentGroupsByTrainingId,
+    getSessionStatsByAssignmentIds,
+    getAssignmentGroupsCountByTrainingId
+  } = useStore(sessionStore);
 
-  // Pagination state
+  // Pagination state - now working with groups instead of individual sessions
   const [currentPage, setCurrentPage] = useState(0);
   const [paginatedSessionStats, setPaginatedSessionStats] = useState<any[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
-  const SESSION_LIMIT = 20;
+  const [totalGroupCount, setTotalGroupCount] = useState(0);
+  const [totalSessionCount, setTotalSessionCount] = useState(0);
+  const GROUPS_PER_PAGE = 5; // Number of assignment groups per page
 
   // Expanded groups state - initialize with all groups expanded
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load paginated session stats
+  // Load paginated session stats by groups
   const loadSessionStats = async (page: number = 0, reset: boolean = false) => {
     if (!id) return;
 
     setIsLoading(true);
     try {
-      const offset = page * SESSION_LIMIT;
-      const result = await getSessionStatsByTrainingId(id, SESSION_LIMIT, offset);
-
-      if (reset) {
-        setPaginatedSessionStats(result);
-      } else {
-        setPaginatedSessionStats((prev) => [...prev, ...result]);
+      // Get paginated assignment groups
+      const offset = page * GROUPS_PER_PAGE;
+      const assignmentGroups = await getAssignmentGroupsByTrainingId(id, GROUPS_PER_PAGE, offset);
+      
+      if (assignmentGroups.length === 0) {
+        setPaginatedSessionStats([]);
+        setHasMore(false);
+        setCurrentPage(page);
+        return;
       }
 
-      setHasMore(result.length === SESSION_LIMIT);
+      // Extract assignment IDs from the groups
+      const assignmentIds = assignmentGroups.map(group => group.assignment_id);
+      
+      // Get all sessions for these assignment groups
+      const sessions = await getSessionStatsByAssignmentIds(id, assignmentIds);
+
+      if (reset) {
+        setPaginatedSessionStats(sessions);
+      } else {
+        setPaginatedSessionStats((prev) => [...prev, ...sessions]);
+      }
+
+      setHasMore(assignmentGroups.length === GROUPS_PER_PAGE);
       setCurrentPage(page);
     } catch (error) {
       console.error("Error loading session stats:", error);
@@ -67,19 +88,22 @@ export default function SessionStatsTable({
     }
   };
 
-  // Load initial session stats and total count
+  // Load initial session stats and total counts
   useEffect(() => {
     const loadInitialData = async () => {
       if (!id) return;
 
-      // Load both session stats and total count
+      // Load group-based session stats
       await loadSessionStats(0, true);
 
       try {
-        const count = await getSessionStatsCountByTrainingId(id);
-        setTotalCount(count);
+        // Load both group count and session count for display
+        const groupCount = await getAssignmentGroupsCountByTrainingId(id);
+        const sessionCount = await getSessionStatsCountByTrainingId(id);
+        setTotalGroupCount(groupCount);
+        setTotalSessionCount(sessionCount);
       } catch (error) {
-        console.error("Error loading total count:", error);
+        console.error("Error loading total counts:", error);
       }
     };
 
@@ -303,11 +327,13 @@ export default function SessionStatsTable({
     );
   };
 
+  // Pagination now works with assignment groups instead of individual sessions
+  // This ensures that entire groups stay together on the same page
   const pagination = {
     currentPage,
-    totalPages: Math.ceil(totalCount / SESSION_LIMIT),
-    pageSize: SESSION_LIMIT,
-    totalItems: totalCount,
+    totalPages: Math.ceil(totalGroupCount / GROUPS_PER_PAGE),
+    pageSize: GROUPS_PER_PAGE, // Number of assignment groups per page
+    totalItems: totalGroupCount, // Total number of assignment groups
     onPageChange: (page: number) => loadSessionStats(page, true),
     onNextPage: nextPage,
     onPrevPage: prevPage,

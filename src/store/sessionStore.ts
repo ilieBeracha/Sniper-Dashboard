@@ -1,5 +1,11 @@
 import { create } from "zustand";
-import { getSessionStatsCountByTrainingId, saveCompleteSession } from "@/services/sessionService";
+import { 
+  getSessionStatsCountByTrainingId, 
+  saveCompleteSession,
+  getAssignmentGroupsByTrainingId,
+  getSessionStatsByAssignmentIds,
+  getAssignmentGroupsCountByTrainingId
+} from "@/services/sessionService";
 import type { CreateSessionStatsData, CreateParticipantData, CreateTargetStatsData, CreateTargetEngagementData } from "@/types/sessionStats";
 import { TrainingStore } from "./trainingStore";
 import { getSessionStatsByTrainingId } from "@/services/sessionService";
@@ -16,6 +22,9 @@ interface SessionStatsState {
   saveSessionStats: (sessionData: SessionStatsSaveData) => Promise<any>;
   getSessionStatsByTrainingId: (trainingId: string, limit?: number, offset?: number) => Promise<any[]>;
   getSessionStatsCountByTrainingId: (trainingId: string) => Promise<number>;
+  getAssignmentGroupsByTrainingId: (trainingId: string, limit?: number, offset?: number) => Promise<any[]>;
+  getSessionStatsByAssignmentIds: (trainingId: string, assignmentIds: string[]) => Promise<any[]>;
+  getAssignmentGroupsCountByTrainingId: (trainingId: string) => Promise<number>;
 }
 
 export interface SessionStatsSaveData {
@@ -74,6 +83,18 @@ export const sessionStore = create<SessionStatsState>((set) => ({
 
   getSessionStatsCountByTrainingId: async (trainingId: string) => {
     return await getSessionStatsCountByTrainingId(trainingId);
+  },
+
+  getAssignmentGroupsByTrainingId: async (trainingId: string, limit: number = 10, offset: number = 0) => {
+    return await getAssignmentGroupsByTrainingId(trainingId, limit, offset);
+  },
+
+  getSessionStatsByAssignmentIds: async (trainingId: string, assignmentIds: string[]) => {
+    return await getSessionStatsByAssignmentIds(trainingId, assignmentIds);
+  },
+
+  getAssignmentGroupsCountByTrainingId: async (trainingId: string) => {
+    return await getAssignmentGroupsCountByTrainingId(trainingId);
   },
 
   saveSessionStats: async (wizardData: SessionStatsSaveData) => {
