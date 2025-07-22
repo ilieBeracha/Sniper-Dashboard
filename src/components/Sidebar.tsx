@@ -3,8 +3,6 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { BiSolidDashboard, BiSolidLogOut, BiSolidCog, BiChevronRight, BiChevronLeft } from "react-icons/bi";
 import { BsBarChartFill } from "react-icons/bs";
-import { HiCommandLine } from "react-icons/hi2";
-import { FaFileExport } from "react-icons/fa";
 import { authStore } from "@/store/authStore";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
@@ -18,8 +16,7 @@ const navSections = [
     title: "OVERVIEW",
     items: [
       { name: "Dashboard", href: "/", icon: <BiSolidDashboard className="w-5 h-5" /> },
-      { name: "Operations", href: "/operations", icon: <HiCommandLine className="w-5 h-5" /> },
-      { name: "Training", href: "/trainings", icon: <BsBarChartFill className="w-5 h-5" /> },
+      { name: "Trainings", href: "/trainings", icon: <BsBarChartFill className="w-5 h-5" /> },
     ],
   },
   {
@@ -28,10 +25,6 @@ const navSections = [
       { name: "Assets", href: "/assets", icon: <FaCrosshairs className="w-5 h-5" /> },
       // { name: "File Vault", href: "/file-vault", icon: <FaFolderOpen className="w-5 h-5" /> },
     ],
-  },
-  {
-    title: "DATA",
-    items: [{ name: "Data Export", href: "/data-export", icon: <FaFileExport className="w-5 h-5" /> }],
   },
   {
     title: "ACCOUNT",

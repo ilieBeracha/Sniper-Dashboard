@@ -8,20 +8,20 @@ import { getUserGroupingStatsRpc } from "@/services/performance";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import InviteModal from "@/components/InviteModal";
 import Header from "@/Headers/Header";
-import { Activity, FileDown, SplinePointerIcon } from "lucide-react";
+import { Activity, SplinePointerIcon } from "lucide-react";
 import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
 import { useTabs } from "@/hooks/useTabs";
 import DashboardOverview from "@/components/DashboardOverview";
 import CommanderView from "@/components/DashboardCommanderView";
 import ActivityFeedDrawer from "@/components/ActivityFeedDrawer";
-import DashboardDataExport from "@/components/DashboardDataExport";
+import { weaponsStore } from "@/store/weaponsStore";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
   const user = useUserStore.user;
   const userRole = useUserStore.user?.user_role ?? null;
-
+  const { getWeapons } = useStore(weaponsStore);
   const { getUserHitStatsFull } = useStore(performanceStore);
   const { getSquadMetricsByRole } = useStore(squadStore);
   const { loadNextAndLastTraining } = useStore(TrainingStore);
@@ -33,6 +33,7 @@ export default function Dashboard() {
     setLoading(true);
     const load = async () => {
       if (user?.team_id) {
+        await getWeapons(user.team_id);
         await getUserGroupingStatsRpc(user.id);
         await getUserHitStatsFull(user?.id);
         await loadNextAndLastTraining(user?.team_id);

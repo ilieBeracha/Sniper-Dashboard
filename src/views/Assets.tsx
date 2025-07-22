@@ -18,15 +18,17 @@ export default function AssetsPage() {
     ],
   });
 
-  const { getWeapons } = useStore(weaponsStore);
-  const { getEquipments } = useStore(equipmentStore);
+  const { getWeapons, weapons } = useStore(weaponsStore);
+  const { getEquipments, equipments } = useStore(equipmentStore);
   const { user } = useStore(userStore);
   const [isWeaponsOpen, setIsWeaponsOpen] = useState(false);
   const [isEquipmentsOpen, setIsEquipmentsOpen] = useState(false);
 
   useEffect(() => {
-    if (user?.team_id) {
+    if (user?.team_id && weapons.length === 0) {
       getWeapons(user?.team_id as string);
+    }
+    if (user?.team_id && equipments.length === 0) {
       getEquipments(user?.team_id as string);
     }
   }, [user?.team_id]);
