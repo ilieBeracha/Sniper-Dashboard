@@ -99,73 +99,59 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
       {/* Grouping + Bar charts */}
       <div className="grid grid-cols-1 gap-6 lg:col-span-1 xl:col-span-2">
         {/* Grouping Summary Chart */}
-        <BaseDashboardCard header="Grouping Performance" tooltipContent="Shooting accuracy and grouping metrics">
-          <div className="flex flex-wrap justify-center gap-4 mb-6 px-4">
-            {/* Weapon Type Filter */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-center text-gray-600 dark:text-gray-300">Weapon</label>
-              <select
-                className="w-28 px-2.5 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200"
-                value={selectedWeaponType ?? ""}
-                onChange={(e) => setSelectedWeaponType(e.target.value || null)}
-              >
-                <option value="">All</option>
-                {weaponTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {formatEnumLabel(type)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Grouping Type Filter */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-center text-gray-600 dark:text-gray-300">Type</label>
-              <select
-                className="w-28 px-2.5 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200"
-                value={selectedGroupType ?? ""}
-                onChange={(e) => setSelectedGroupType(e.target.value || null)}
-              >
-                <option value="">All</option>
-                {groupingTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {formatEnumLabel(type)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Effort Filter */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-center text-gray-600 dark:text-gray-300">Effort</label>
-              <select
-                className="w-28 px-2.5 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200"
-                value={selectedEffort ?? ""}
-                onChange={(e) => setSelectedEffort(e.target.value || null)}
-              >
-                <option value="">All</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-              </select>
-            </div>
-
-            {/* Position Filter */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-center text-gray-600 dark:text-gray-300">Position</label>
-              <select
-                className="w-28 px-2.5 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200"
-                value={selectedPosition ?? ""}
-                onChange={(e) => setSelectedPosition(e.target.value || null)}
-              >
-                <option value="">All</option>
-                {positions.map((pos) => (
-                  <option key={pos} value={pos}>
-                    {formatEnumLabel(pos)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+        <BaseDashboardCard
+          header="My Card"
+          tooltipContent="Data grouped by filters"
+          withFilter={[
+            {
+              label: "Weapon Type",
+              value: "weapon_type",
+              onChange: (val) => {
+                setSelectedWeaponType(val);
+              },
+              options: weaponTypes.map((type) => ({ label: formatEnumLabel(type), value: type })),
+              type: "select",
+            },
+            {
+              label: "Grouping Type",
+              value: "grouping_type",
+              onChange: (val) => {
+                setSelectedGroupType(val);
+              },
+              options: groupingTypes.map((type) => ({ label: formatEnumLabel(type), value: type })),
+              type: "select",
+            },
+            {
+              label: "Effort",
+              value: "effort",
+              onChange: (val) => {
+                setSelectedEffort(val);
+              },
+              options: [
+                { label: "All Efforts", value: "" },
+                { label: "Yes", value: "true" },
+                { label: "No", value: "false" },
+              ],
+              type: "radio",
+            },
+            {
+              label: "Position",
+              value: "position",
+              onChange: (val) => {
+                setSelectedPosition(val);
+              },
+              options: positions.map((pos) => ({ label: formatEnumLabel(pos), value: pos })),
+              type: "select",
+            },
+          ]}
+          onClearFilters={() => {
+            setSelectedWeaponType("");
+            setSelectedGroupType("");
+            setSelectedEffort("");
+            setSelectedPosition("");
+          }}
+        >
+          <div className="flex flex-wrap justify-center gap-4 mb-6 px-4"></div>
           <div className="h-[240px] p-4 w-full">
             {groupingSummaryLoading ? (
               <div className="flex justify-center items-center h-full">
