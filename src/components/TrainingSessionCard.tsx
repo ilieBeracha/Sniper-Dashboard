@@ -35,7 +35,7 @@ export function TrainingSessionCard({
       className="relative p-0 border rounded-lg overflow-hidden transition-all duration-300 ease-in-out cursor-pointer text-sm hover:shadow-md group"
       style={{
         backgroundColor: theme === "dark" ? `${primitives.grey.grey900}80` : primitives.white.white,
-        borderColor: theme === "dark" ? `${primitives.white.white}1A` : primitives.grey.grey200
+        borderColor: theme === "dark" ? `${primitives.white.white}1A` : primitives.grey.grey200,
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = theme === "dark" ? `${primitives.white.white}33` : primitives.grey.grey300;
@@ -55,16 +55,8 @@ export function TrainingSessionCard({
         <span
           className="text-xs px-3 py-1.5 rounded-bl-lg font-medium"
           style={{
-            backgroundColor: isPast 
-              ? `${primitives.grey.grey500}1A` 
-              : highlight 
-                ? `${primitives.blue.blue500}33` 
-                : `${primitives.green.green500}1A`,
-            color: isPast 
-              ? primitives.grey.grey400 
-              : highlight 
-                ? primitives.blue.blue300 
-                : primitives.green.green400
+            backgroundColor: isPast ? `${primitives.grey.grey500}1A` : highlight ? `${primitives.blue.blue500}33` : `${primitives.green.green500}1A`,
+            color: isPast ? primitives.grey.grey400 : highlight ? primitives.blue.blue300 : primitives.green.green400,
           }}
         >
           {isPast ? "Finished" : highlight ? "Today" : "Upcoming"}
@@ -76,10 +68,13 @@ export function TrainingSessionCard({
         <div
           className="w-[100px] flex flex-col items-center justify-center px-4 py-5"
           style={{
-            backgroundColor: theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey100
+            backgroundColor: theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey100,
           }}
         >
-          <span className="text-2xl font-semibold leading-tight" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
+          <span
+            className="text-2xl font-semibold leading-tight"
+            style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}
+          >
             {showDate ? format(sessionDate, "d") : format(sessionDate, "h:mm")}
           </span>
           <span className="text-sm mt-0.5" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
@@ -94,7 +89,10 @@ export function TrainingSessionCard({
               <h4 className="text-base font-medium" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
                 {session.session_name}
               </h4>
-              <ChevronRight className="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-1" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }} />
+              <ChevronRight
+                className="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-1"
+                style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}
+              />
             </div>
 
             <div
@@ -117,14 +115,14 @@ export function TrainingSessionCard({
                 <UserCheck className="w-3 h-3 mr-1" />
                 {participants.length} participants
               </div>
-              
+
               {session.assignments && session.assignments.length > 0 && (
                 <div className="flex items-center">
                   <Bookmark className="w-3 h-3 mr-1" />
                   {session.assignments.length} assignments
                 </div>
               )}
-              
+
               <div className="flex items-center">
                 <MapPin className="w-3 h-3 mr-1" />
                 {session.location ? (

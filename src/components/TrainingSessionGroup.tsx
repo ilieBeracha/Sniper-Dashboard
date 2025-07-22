@@ -22,11 +22,11 @@ export default function TrainingSessionGroup({ title, color, date, children }: T
   return (
     <div>
       <div className="flex items-center gap-2 mb-4">
-        <div 
+        <div
           className="w-2 h-2 rounded-full"
-          style={{ 
+          style={{
             backgroundColor: colorMap[color],
-            boxShadow: `0 0 8px 0px ${colorMap[color]}`
+            boxShadow: `0 0 8px 0px ${colorMap[color]}`,
           }}
         ></div>
         <h4
@@ -35,12 +35,12 @@ export default function TrainingSessionGroup({ title, color, date, children }: T
         >
           {title}
         </h4>
-        <div 
+        <div
           className="h-px flex-grow transition-colors duration-200"
           style={{ backgroundColor: theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey200 }}
         ></div>
         {date && (
-          <span 
+          <span
             className="text-xs font-medium transition-colors duration-200"
             style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}
           >

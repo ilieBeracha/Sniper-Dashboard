@@ -37,7 +37,7 @@ export default function UserHitPercentage() {
           <NoDataDisplay />
         ) : (
           <>
-            <ResponsiveContainer width="100%" height={220} className="text-sm ">
+            <ResponsiveContainer width="100%" height={280} minWidth={280} className="text-sm ">
               <PieChart>
                 <Pie
                   data={gaugeData}
@@ -57,7 +57,7 @@ export default function UserHitPercentage() {
               </PieChart>
             </ResponsiveContainer>
 
-            <div className="absolute inset-0 flex flex-col mt-1">
+            <div className="absolute inset-0 flex flex-col mt-1 h-8">
               <span className={`text-2xl font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                 {percentage ? percentage.toFixed(1) : 0}%
               </span>
@@ -70,11 +70,11 @@ export default function UserHitPercentage() {
             <div className="grid grid-cols-1 gap-3 mt-2">
               <div className={`p-2 rounded-lg transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
                 <div className="flex justify-between">
-                  <span className={`text-xs transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                  <span className={`text-lg transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
                     Total Shots
                   </span>
                   <span
-                    className={`text-xs px-1.5 py-0.5 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
+                    className={`text-xs px-1.5 py-1.5 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
                   >
                     {userHitsStats.shots_fired}
                   </span>
@@ -92,7 +92,7 @@ export default function UserHitPercentage() {
                     Confirmed Hits
                   </span>
                   <span
-                    className={`text-xs px-1.5 py-0.5 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
+                    className={`text-xs px-1.5 py-1.5 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
                   >
                     {userHitsStats.confirmed_hits}
                   </span>

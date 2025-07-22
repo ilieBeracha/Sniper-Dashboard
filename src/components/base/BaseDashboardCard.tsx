@@ -2,7 +2,8 @@ import { BiAddToQueue, BiInfoCircle } from "react-icons/bi";
 import { Tooltip } from "react-tooltip";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Card } from "@heroui/react";
+import { Card, Checkbox, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
+import { FilterIcon } from "lucide-react";
 
 export default function BaseDashboardCard({
   header = "",
@@ -11,6 +12,7 @@ export default function BaseDashboardCard({
   padding = "p-4",
   tooltipContent = "",
   withBtn = false,
+  withFilter = false,
 }: {
   header?: string | React.ReactNode | null;
   children: React.ReactNode;
@@ -19,6 +21,7 @@ export default function BaseDashboardCard({
   tooltipContent?: string;
   withBg?: boolean;
   withBtn?: boolean;
+  withFilter?: boolean;
 }) {
   const isMobile = useIsMobile();
   const { theme } = useTheme();
@@ -37,7 +40,7 @@ export default function BaseDashboardCard({
 
   return (
     <Card
-      className={`flex flex-col bg-white rounded-4xl shadow-sm shadow-gray-200/50 border border-gray-200 ${height} shadow-xsoverflow-hidden ${theme === "dark" ? "bg-zinc-900/50 border-neutral-700/70" : ""}`}
+      className={`flex flex-col bg-white rounded-4xl shadow-sm border border-gray-200 ${height} shadow-xsoverflow-hidden ${theme === "dark" ? "bg-zinc-900/50 border-neutral-700/70" : ""}`}
     >
       <div className={`${padding} border-none transition-colors duration-200 ${theme === "dark" ? "border-white/10" : "border-gray-200"}`}>
         <div className="flex justify-between relative h-full items-center">
@@ -59,10 +62,23 @@ export default function BaseDashboardCard({
             <div className={`h-1.5 w-1.5 max-h-1.5 rounded-full ${typeof header === "string" ? "lg:text-lg text-sm" : ""}`}></div>
             {header}
           </h2>
-          {withBtn ?? (
+          {withBtn || withFilter ? (
             <button className={`p-1.5 rounded-lg transition-colors duration-200 ${theme === "dark" ? "hover:bg-white/5" : "hover:bg-gray-100"}`}>
               <BiAddToQueue className={`transition-colors duration-200 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} />
             </button>
+          ) : (
+            <Popover>
+              <PopoverTrigger>
+                <FilterIcon className={`transition-colors duration-200 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} />
+              </PopoverTrigger>
+              <PopoverContent>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Checkbox />
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           )}
         </div>
       </div>

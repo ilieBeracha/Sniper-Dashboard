@@ -41,7 +41,7 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
     (async () => {
       const weaponsEnums = await getEnumValues("weapon_names");
       const typesEnums = await getEnumValues("grouping_type_enum");
-      const positionsEnums = await getEnumValues("positions"); 
+      const positionsEnums = await getEnumValues("positions");
 
       setWeaponTypes(weaponsEnums);
       setGroupingTypes(typesEnums);
@@ -104,9 +104,9 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
             {/* Weapon Type Filter */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-center text-gray-600 dark:text-gray-300">Weapon</label>
-              <select 
+              <select
                 className="w-28 px-2.5 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200"
-                value={selectedWeaponType ?? ""} 
+                value={selectedWeaponType ?? ""}
                 onChange={(e) => setSelectedWeaponType(e.target.value || null)}
               >
                 <option value="">All</option>
@@ -121,9 +121,9 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
             {/* Grouping Type Filter */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-center text-gray-600 dark:text-gray-300">Type</label>
-              <select 
+              <select
                 className="w-28 px-2.5 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200"
-                value={selectedGroupType ?? ""} 
+                value={selectedGroupType ?? ""}
                 onChange={(e) => setSelectedGroupType(e.target.value || null)}
               >
                 <option value="">All</option>
@@ -138,9 +138,9 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
             {/* Effort Filter */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-center text-gray-600 dark:text-gray-300">Effort</label>
-              <select 
+              <select
                 className="w-28 px-2.5 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200"
-                value={selectedEffort ?? ""} 
+                value={selectedEffort ?? ""}
                 onChange={(e) => setSelectedEffort(e.target.value || null)}
               >
                 <option value="">All</option>
@@ -152,9 +152,9 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
             {/* Position Filter */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-center text-gray-600 dark:text-gray-300">Position</label>
-              <select 
+              <select
                 className="w-28 px-2.5 py-2 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200"
-                value={selectedPosition ?? ""} 
+                value={selectedPosition ?? ""}
                 onChange={(e) => setSelectedPosition(e.target.value || null)}
               >
                 <option value="">All</option>
@@ -263,9 +263,9 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
                         type="monotone"
                         dataKey="cm_dispersion"
                         stroke={primitives.purple.purple400}
-                        strokeWidth={2.5}
+                        strokeWidth={5.5}
                         dot={{ fill: primitives.purple.purple400, strokeWidth: 0, r: 3.5 }}
-                        activeDot={{ r: 6, strokeWidth: 0 }}
+                        activeDot={{ r: 6, strokeWidth: 10, stroke: primitives.purple.purple400 }}
                         name="Dispersion"
                         unit=" cm"
                       />
