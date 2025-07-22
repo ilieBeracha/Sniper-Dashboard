@@ -209,9 +209,9 @@ function generatePdf(report: PreparedReport): ArrayBuffer {
 
   report.trainings.forEach((tr, idx) => {
     const startY = 30 + idx * 80;
-    doc.setFont(undefined, "bold");
+    doc.setFont("helvetica", "bold");
     doc.text(`Training #${idx + 1}: ${tr.training?.session_name ?? "-"}`, 10, startY);
-    doc.setFont(undefined, "normal");
+    doc.setFont("helvetica", "normal");
 
     const details = [
       `Date: ${tr.training?.date ?? "-"}`,
