@@ -9,10 +9,13 @@ import BaseDesktopDrawer from "../BaseDrawer/BaseDesktopDrawer";
 import BaseMobileDrawer from "../BaseDrawer/BaseMobileDrawer";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useEffect } from "react";
+import { getEnumValues } from "@/services/supabaseEnums";
+import { useState } from "react";
 
 const groupScoreSchema = z.object({
   sniper_user_id: z.string().uuid(),
   weapon_id: z.string().uuid({ message: "Weapon is required" }),
+  day_period: z.string(),
   bullets_fired: z.number().min(0),
   time_seconds: z.number().min(0).optional().or(z.literal(null)),
   cm_dispersion: z
@@ -25,7 +28,8 @@ const groupScoreSchema = z.object({
     }),
   shooting_position: z.string(),
   effort: z.boolean(),
-  type: z.enum(["normal", "timed", "position_abandonment"]),
+  type: z.string(),
+  mistake: z.string().optional().or(z.literal(null)), // ← NEW
 });
 
 type GroupScoreFormValues = z.infer<typeof groupScoreSchema>;
@@ -50,11 +54,13 @@ export default function TrainingPageGroupFormModal({
       sniper_user_id: user?.id ?? "",
       weapon_id: "",
       bullets_fired: 4,
+      day_period: "Day",
       time_seconds: null,
       cm_dispersion: null,
       shooting_position: "",
       effort: false,
       type: "normal",
+      mistake: null,
     },
   });
 
@@ -66,6 +72,13 @@ export default function TrainingPageGroupFormModal({
     formState: { errors },
   } = methods;
 
+  const [mistakeOptions, setMistakeOptions] = useState<string[]>([]);
+  const [groupingTypeOptions, setGroupingTypeOptions] = useState<string[]>([]);
+  useEffect(() => {
+    getEnumValues("grouping_mistakes").then(setMistakeOptions);
+    getEnumValues("grouping_type_enum").then(setGroupingTypeOptions);
+  }, []);
+
   const bulletsFired = watch("bullets_fired");
   const isDisabled = bulletsFired < 4;
 
@@ -76,6 +89,7 @@ export default function TrainingPageGroupFormModal({
       setValue("shooting_position", "");
       setValue("effort", false);
       setValue("type", "normal");
+      setValue("mistake", null);
     }
   }, [isDisabled, setValue]);
 
@@ -105,6 +119,19 @@ export default function TrainingPageGroupFormModal({
           {errors.weapon_id && <p className="text-red-500 text-sm mt-1">{errors.weapon_id.message}</p>}
         </div>
 
+        {/* Day/Night Period */}
+        <div>
+          <label className="block text-sm mb-1">Day/Night Period</label>
+          <select
+            {...register("day_period")}
+            className={`w-full min-h-10 rounded-lg px-3 py-2 text-sm border ${
+              theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
+            }`}
+          >
+            <option value="Day">Day</option>
+            <option value="Night">Night</option>
+          </select>
+        </div>
         {/* Bullets Fired */}
         <div>
           <label className="block text-sm mb-1">Bullets Fired</label>
@@ -197,12 +224,32 @@ export default function TrainingPageGroupFormModal({
               theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
             } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            <option value="normal">Normal</option>
-            <option value="timed">Timed</option>
-            <option value="position_abandonment">Position Abandonment</option>
+            {groupingTypeOptions.map((value) => (
+              <option key={value} value={value}>
+                {value.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+              </option>
+            ))}
           </select>
           {isDisabled && message}
         </div>
+      </div>
+      {/* Mistake (Optional) */}
+      <div>
+        <label className="block text-sm mb-1">Mistake (Optional)</label>
+        <select
+          disabled={isDisabled}
+          {...register("mistake")}
+          className={`w-full min-h-10 rounded-lg px-3 py-2 text-sm border ${
+            theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
+          } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+        >
+          {mistakeOptions.map((value) => (
+            <option key={value} value={value}>
+              {value.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+            </option>
+          ))}
+        </select>
+        {isDisabled && message}
       </div>
 
       {/* Buttons */}
