@@ -20,6 +20,7 @@ import SessionStatsTable from "@/components/SessionStatsTable";
 import TrainingAnalyticsTab from "@/components/TrainingAnalyticsTab";
 import TrainingStatusTab from "@/components/TrainingStatusTab";
 import TrainingSessionStatsCard from "@/components/TrainingSessionStatsCard";
+import { prepareTrainingReport } from "@/services/reportExportService";
 
 export default function TrainingPage() {
   const navigate = useNavigate();
@@ -72,6 +73,21 @@ export default function TrainingPage() {
     }
   };
 
+  const handleExportPdf = async () => {
+    if (!id) return;
+    try {
+      setIsLoading(true);
+      await prepareTrainingReport({
+        trainingIds: id,
+        audience: "commander", // triggers download in browser
+      });
+    } catch (err) {
+      console.error("Failed to export training PDF", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSessionClick = (session: any) => {
     setSelectedSession(session);
   };
@@ -120,6 +136,10 @@ export default function TrainingPage() {
             onClick: () => {
               navigate(`/training/${id}/session-stats-full`);
             },
+          },
+          {
+            label: "Export PDF",
+            onClick: handleExportPdf,
           },
         ]}
       />
