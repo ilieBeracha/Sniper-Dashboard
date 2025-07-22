@@ -1,5 +1,6 @@
 import { supabase } from "./supabaseClient";
 import { Squad } from "@/types/squad";
+import { toastService } from "./toastService";
 
 export async function getSquadsWithUsersByTeamId(team_id: string) {
   try {
@@ -50,7 +51,10 @@ export async function getSquadUsersBySquadId(squad_id: string) {
       )
       .eq("id", squad_id);
 
-    if (error) throw error;
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to fetch squads with users");
+    }
 
     return data;
   } catch (error: any) {
@@ -70,6 +74,7 @@ export async function getSquadMetricsByRoleRpc(team_id: string) {
     return data;
   } catch (error: any) {
     console.error("Failed to fetch squad metrics:", error.message);
+    toastService.error(error.message);
     throw new Error("Could not fetch squad metrics");
   }
 }
@@ -82,12 +87,14 @@ export async function getSquadsHitsByTeamId(team_id: string) {
 
     if (error) {
       console.error("Failed to fetch squad average hit percentage:", error.message);
+      toastService.error(error.message);
       throw new Error("Could not fetch squad average hit percentage");
     }
 
     return data;
   } catch (error: any) {
     console.error("Failed to fetch squad average hit percentage:", error.message);
+    toastService.error(error.message);
     throw new Error("Could not fetch squad average hit percentage");
   }
 }
@@ -98,12 +105,14 @@ export async function getSquadById(squadId: string): Promise<Squad | null> {
 
     if (error) {
       console.error("Error fetching squad:", error.message);
+      toastService.error(error.message);
       throw new Error("Failed to fetch squad");
     }
 
     return data;
   } catch (error: any) {
     console.error("Error fetching squad:", error.message);
+    toastService.error(error.message);
     throw new Error("Failed to fetch squad");
   }
 }
@@ -116,6 +125,7 @@ export async function updateSquadName(squadId: string, squadName: string): Promi
     return data;
   } catch (error: any) {
     console.error("Error updating squad name:", error.message);
+    toastService.error(error.message);
     throw new Error("Failed to update squad name");
   }
 }

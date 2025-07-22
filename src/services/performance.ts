@@ -154,17 +154,6 @@ export async function getSquadStatByTeamId(teamId: string, position: PositionSco
   return data;
 }
 
-export async function overallAccuracyStats() {
-  const { data, error } = await supabase.rpc("overall_accuracy_stats");
-
-  if (error) {
-    console.error("Error fetching training summary stats:", error);
-    throw error;
-  }
-
-  return data[0];
-}
-
 // commander view
 export const getCommanderUserRoleBreakdown = async (teamId: string): Promise<CommanderUserRoleBreakdown[]> => {
   const { data, error } = await supabase.rpc("get_commander_user_role_breakdown", {

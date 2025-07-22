@@ -4,9 +4,7 @@ import { getTeamById } from "./teamService";
 import { getSquadById } from "./squadService";
 import { uploadFile } from "./fileService";
 import { formatForSupabaseInsert } from "./embedSniperSession";
-// jsPDF is only used in browser context – it will be tree-shaken out of SSR build
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore§
+
 import { jsPDF } from "jspdf";
 import { TrainingSession } from "@/types/training";
 import { Team } from "@/types/team";
@@ -29,23 +27,12 @@ export interface PreparedReport {
 }
 
 interface PrepareReportOptions {
-  /** Single training id or a list of trainings to batch */
   trainingIds: string | string[];
-  /** Audience that will consume the report */
   audience: ReportAudience;
-  /** Optional date range to annotate the report */
   dateRange?: { from: string; to: string };
-  /** Max session stats to pull per training (defaults to 1000)*/
   sessionLimit?: number;
 }
 
-/**
- * Collects all relevant data for a given training (or list of trainings) and prepares it
- * for downstream PDF generation, download, email send or RAG-embedding.
- *
- * The function guarantees that the sessionStatsStore (i.e. session stats table) is the
- * single source of truth for session information.
- */
 export async function prepareTrainingReport({
   trainingIds,
   audience,
@@ -101,10 +88,6 @@ export async function prepareTrainingReport({
 
 // ---- Helpers ------------------------------------------------------------- //
 
-/**
- * Placeholder for client-side PDF generation & download logic.
- * Keep implementation separate so it can be replaced with jspdf, pdf-make, etc.
- */
 async function triggerDownload(report: PreparedReport) {
   if (typeof window === "undefined") return; // only run in browser
 
@@ -124,9 +107,6 @@ async function triggerDownload(report: PreparedReport) {
   }, 0);
 }
 
-/**
- * Placeholder for emailing or uploading the report so that a superior officer can access it.
- */
 async function triggerSendToSuperior(report: PreparedReport) {
   try {
     const pdfBytes = generatePdf(report);
@@ -154,17 +134,11 @@ async function triggerSendToSuperior(report: PreparedReport) {
   }
 }
 
-/**
- * Placeholder for chunking & embedding the report so that a RAG model can consume it.
- */
 async function embedForRAG(report: PreparedReport) {
   try {
     const embeddingsPayload: any[] = [];
 
     for (const tr of report.trainings) {
-      // If we have full sessionStats wizard structure, process them.
-      // Here each sessionStat may not contain the participants/targets arrays directly.
-      // Extend logic as needed. For now we concatenate JSON strings for lightweight embedding.
       const content = JSON.stringify({
         training: tr.training,
         sessionStats: tr.sessionStats,

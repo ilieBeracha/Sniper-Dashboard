@@ -1,5 +1,6 @@
 import { Assignment } from "@/types/training";
 import { supabase } from "./supabaseClient";
+import { toast } from "react-toastify";
 
 export async function getTrainingById(trainingId: string) {
   const { data, error } = await supabase.rpc("get_training_by_id", {
@@ -28,8 +29,10 @@ export async function getTrainingCountByTeamId(teamId: string) {
     }
 
     return count || 0;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Exception when fetching training count:", error);
+    toast.error(error.message);
+    throw new Error("Failed to fetch training count");
     return 0;
   }
 }
@@ -73,6 +76,8 @@ export async function getTrainingByTeamId(teamId: string, limit: number = 0, ran
 
   if (error) {
     console.error("Error fetching trainings:", error);
+    toast.error(error.message);
+    throw new Error("Failed to fetch trainings");
     return [];
   }
 
@@ -134,6 +139,7 @@ export async function getNextAndLastTraining(team_id: string) {
     .maybeSingle();
 
   if (nextError || lastError) {
+    toast.error(nextError?.message || lastError?.message);
     throw new Error("Failed to fetch trainings");
   }
 
@@ -152,7 +158,10 @@ export async function assignParticipantsToTraining(training_id: string, particip
 
   const { error } = await supabase.from("trainings_participants").insert(participants);
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    toast.error(error.message);
+    throw new Error("Failed to assign participants to training");
+  }
 }
 
 export async function getAssignments(teamId: string): Promise<Assignment[] | []> {
@@ -160,6 +169,8 @@ export async function getAssignments(teamId: string): Promise<Assignment[] | []>
 
   if (error) {
     console.error("Failed to fetch assignments:", error.message);
+    toast.error(error.message);
+    throw new Error("Failed to fetch assignments");
     return [];
   }
 
@@ -174,8 +185,10 @@ export async function getWeeklyAssignmentsStats(team_id: string) {
 
     if (error) throw error;
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching weekly assignments stats:", error);
+    toast.error(error.message);
+    throw new Error("Failed to fetch weekly assignments stats");
     return [];
   }
 }
@@ -199,8 +212,10 @@ export async function insertAssignment(assignmentName: string, teamId: string) {
     }
 
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error inserting assignment:", error);
+    toast.error(error.message);
+    throw new Error("Failed to insert assignment");
     return null;
   }
 }
@@ -210,8 +225,10 @@ export async function getAssignmentSessions(assignmentId: string) {
     const { data, error } = await supabase.from("assignment_session").select("*").eq("assignment_id", assignmentId);
     if (error) throw error;
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching assignment sessions:", error);
+    toast.error(error.message);
+    throw new Error("Failed to fetch assignment sessions");
     return [];
   }
 }
@@ -226,8 +243,10 @@ export async function insertAssignmentSession(assignmentId: string, teamId: stri
 
     if (error) throw error;
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error inserting assignment session:", error);
+    toast.error(error.message);
+    throw new Error("Failed to insert assignment session");
     return null;
   }
 }

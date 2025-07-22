@@ -1,6 +1,7 @@
 import { User } from "@/types/user";
 import { Team } from "@/types/team";
 import { supabase } from "./supabaseClient";
+import { toastService } from "./toastService";
 
 export async function getTeamMembers(teamId: string): Promise<User[]> {
   try {
@@ -32,8 +33,11 @@ export async function getTeamMembers(teamId: string): Promise<User[]> {
 export async function getTeamById(teamId: string): Promise<Team | null> {
   try {
     const { data, error } = await supabase.from("teams").select("*").eq("id", teamId).single();
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to fetch team");
+    }
 
-    if (error) throw error;
     return data;
   } catch (error) {
     console.error("Error fetching team:", error);
@@ -44,8 +48,10 @@ export async function getTeamById(teamId: string): Promise<Team | null> {
 export async function updateTeamName(teamId: string, teamName: string): Promise<Team | null> {
   try {
     const { data, error } = await supabase.from("teams").update({ team_name: teamName }).eq("id", teamId).select().single();
-
-    if (error) throw error;
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to update team name");
+    }
     return data;
   } catch (error) {
     console.error("Error updating team name:", error);

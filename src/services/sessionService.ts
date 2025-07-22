@@ -1,5 +1,6 @@
 import { CreateParticipantData, CreateSessionStatsData, CreateTargetEngagementData, CreateTargetStatsData } from "@/types/sessionStats";
 import { supabase } from "./supabaseClient";
+import { toastService } from "./toastService";
 
 export const getSessionStatsByTrainingId = async (trainingId: string, limit: number = 20, offset: number = 0) => {
   try {
@@ -11,7 +12,10 @@ export const getSessionStatsByTrainingId = async (trainingId: string, limit: num
       .eq("training_session_id", trainingId)
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
-    if (error) throw error;
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to fetch session stats");
+    }
     return data;
   } catch (error: any) {
     console.error("Error fetching session stats:", error.message);
@@ -22,7 +26,10 @@ export const getSessionStatsByTrainingId = async (trainingId: string, limit: num
 export const getSessionStatsCountByTrainingId = async (trainingId: string) => {
   try {
     const { count, error } = await supabase.from("session_stats").select("*", { count: "exact", head: true }).eq("training_session_id", trainingId);
-    if (error) throw error;
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to fetch session stats count");
+    }
     return count || 0;
   } catch (error: any) {
     console.error("Error fetching session stats count:", error.message);
@@ -35,6 +42,7 @@ export const createSessionStats = async (sessionData: CreateSessionStatsData) =>
     const { data, error } = await supabase.from("session_stats").insert(sessionData).select().single();
 
     if (error) {
+      toastService.error(error.message);
       throw new Error(error.message);
     }
 
@@ -48,7 +56,10 @@ export const createSessionStats = async (sessionData: CreateSessionStatsData) =>
 export const createSessionParticipants = async (participantsData: CreateParticipantData[]) => {
   try {
     const { data, error } = await supabase.from("session_participants").insert(participantsData).select();
-    if (error) throw error;
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to create session participants");
+    }
     return data;
   } catch (error: any) {
     console.error("Error creating session participants:", error.message);
@@ -59,7 +70,10 @@ export const createSessionParticipants = async (participantsData: CreateParticip
 export const createTargetStats = async (targetData: CreateTargetStatsData) => {
   try {
     const { data, error } = await supabase.from("target_stats").insert(targetData).select().single();
-    if (error) throw error;
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to create target stats");
+    }
     return data;
   } catch (error: any) {
     console.error("Error creating target stats:", error.message);
@@ -73,7 +87,10 @@ export const createTargetEngagements = async (engagementsData: CreateTargetEngag
 
     const { data, error } = await supabase.from("target_engagements").insert(engagementsData).select();
 
-    if (error) throw error;
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to create target engagements");
+    }
 
     return data;
   } catch (error: any) {
@@ -125,6 +142,7 @@ export const saveCompleteSession = async (sessionData: {
     return session;
   } catch (error: any) {
     console.error("Error in saveCompleteSession:", error.message);
+    toastService.error(error.message);
     throw error;
   }
 };
