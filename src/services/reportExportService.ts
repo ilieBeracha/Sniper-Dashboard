@@ -198,7 +198,7 @@ async function embedForRAG(report: PreparedReport) {
 
 // ---------------- PDF helpers ------------------ //
 
-function generatePdf(report: PreparedReport): Uint8Array {
+function generatePdf(report: PreparedReport): ArrayBuffer {
   // Safety: jsPDF exists only in browser – callers ensure this.
   const doc = new jsPDF();
 
