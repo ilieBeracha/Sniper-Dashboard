@@ -6,6 +6,7 @@ import {
   WeaponUsageStats,
   SquadMajorityPerformance,
   CommanderUserRoleBreakdown,
+  GroupingScoreEntry
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/user";
@@ -38,6 +39,21 @@ export async function getSquadRoleHitPercentages(squadId: string, distance: stri
     throw new Error("Failed to fetch squad role hit percentages");
   }
 }
+
+
+export async function getGroupingScoresByTraining(trainingSessionId: string): Promise<GroupingScoreEntry[]> {
+  const { data, error } = await supabase.rpc("get_grouping_data_by_training", {
+    p_training_session_id: trainingSessionId,
+  });
+
+  if (error) {
+    console.error("Error fetching grouping scores:", error.message);
+    throw new Error("Failed to fetch grouping score entries");
+  }
+
+  return data || [];
+}
+
 // This function is a duplicate of the one above, so we can remove it to avoid redundancy.
 export async function getSquadHitPercentageByRole(squadId: string, distance: string | null = null) {
   try {
@@ -86,10 +102,19 @@ export async function getWeaponPerformanceBySquadAndWeapon(teamId: string): Prom
   return data || [];
 }
 
-export async function getUserGroupingStatsRpc(userId: string, weaponId: string | null = null): Promise<GroupingSummary> {
-  const { data, error } = await supabase.rpc("get_user_grouping_stats", {
+export async function getUserGroupingStatsRpc(
+  userId: string,
+  weaponType: string | null = null,
+  effort: boolean | null = null,
+  type: string | null = null,
+  position: string | null = null
+): Promise<GroupingSummary> {
+  const { data, error } = await supabase.rpc("get_user_grouping_stats_v3", {
     p_user_id: userId,
-    p_weapon_id: weaponId,
+    p_weapon_type: weaponType,
+    p_effort: effort,
+    p_type: type,
+    p_position: position,
   });
 
   if (error) {
@@ -108,11 +133,10 @@ export async function getUserGroupingStatsRpc(userId: string, weaponId: string |
     best_dispersion: result.best_dispersion,
     avg_time_to_group: result.avg_time_to_group,
     total_groupings: result.total_groupings,
-    weapon_breakdown: [],
+    weapon_breakdown: [], // You can populate this later if needed
     last_five_groups: result.last_five_groups ?? [],
   };
 }
-
 // In your service
 export async function getDayNightPerformanceByTeam(teamId: string) {
   const { data, error } = await supabase.rpc("get_day_night_performance_by_team", {

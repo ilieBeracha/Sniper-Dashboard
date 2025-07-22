@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getSessionStatsCountByTrainingId, saveCompleteSession } from "@/services/sessionService";
+import { createGroupScoreService, getSessionStatsCountByTrainingId, saveCompleteSession } from "@/services/sessionService";
 import type { CreateSessionStatsData, CreateParticipantData, CreateTargetStatsData, CreateTargetEngagementData } from "@/types/sessionStats";
 import { TrainingStore } from "./trainingStore";
 import { getSessionStatsByTrainingId } from "@/services/sessionService";
@@ -16,6 +16,8 @@ interface SessionStatsState {
   saveSessionStats: (sessionData: SessionStatsSaveData) => Promise<any>;
   getSessionStatsByTrainingId: (trainingId: string, limit?: number, offset?: number) => Promise<any[]>;
   getSessionStatsCountByTrainingId: (trainingId: string) => Promise<number>;
+  createGroupScore: (groupScore: any) => Promise<any>;
+  groupStats: any[];
 }
 
 export interface SessionStatsSaveData {
@@ -57,6 +59,7 @@ export interface SessionStatsSaveData {
 
 export const sessionStore = create<SessionStatsState>((set) => ({
   sessionStats: [],
+  groupStats: [],
   isLoading: false,
   error: null,
 
@@ -73,6 +76,15 @@ export const sessionStore = create<SessionStatsState>((set) => ({
 
   getSessionStatsCountByTrainingId: async (trainingId: string) => {
     return await getSessionStatsCountByTrainingId(trainingId);
+  },
+
+  createGroupScore: async (groupScore: any) => {
+    const trainingStore = TrainingStore.getState().training;
+    const res = await createGroupScoreService(groupScore, trainingStore?.id || "");
+    set({ groupStats: res });
+    console.log("Group score created:", res);
+
+    return res;
   },
 
   saveSessionStats: async (wizardData: SessionStatsSaveData) => {
