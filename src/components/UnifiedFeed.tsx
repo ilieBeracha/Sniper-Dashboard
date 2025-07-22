@@ -4,7 +4,18 @@ import { useStore } from "zustand";
 import { feedStore } from "@/store/feedStore";
 import { userStore } from "@/store/userStore";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Activity } from "lucide-react";
+import { 
+  Activity, 
+  Target, 
+  Calendar, 
+  BarChart3, 
+  UserPlus, 
+  Crosshair, 
+  TrendingUp, 
+  Trophy, 
+  Users, 
+  Star 
+} from "lucide-react";
 
 interface FeedItem {
   id: string;
@@ -42,67 +53,35 @@ export default function UnifiedFeed() {
     return feed.filter((item) => item.actor_id === user.id);
   }, [feed, user]);
 
-  const getActionEmoji = (actionType: string) => {
-    const emojis: Record<string, string> = {
-      score_submit: "🎯",
-      training_created: "📅",
-      session_stats_logged: "📊",
-      participant_joined: "👋",
-      target_engaged: "🔫",
-      target_stats_created: "📈",
-      achievement: "🏆",
-      team: "👥",
-      milestone: "⭐",
+  const getActionIcon = (actionType: string) => {
+    const icons: Record<string, any> = {
+      score_submit: Target,
+      training_created: Calendar,
+      session_stats_logged: BarChart3,
+      participant_joined: UserPlus,
+      target_engaged: Crosshair,
+      target_stats_created: TrendingUp,
+      achievement: Trophy,
+      team: Users,
+      milestone: Star,
     };
-    return emojis[actionType] || "📌";
+    return icons[actionType] || Activity;
   };
 
   const renderActionMessage = (item: FeedItem) => {
-    const names = ["..."];
-    const userName = names[item.actor_id.charCodeAt(0) % names.length];
-
-    const messages: Record<string, string[]> = {
-      score_submit: [
-        `${userName} achieved a perfect score!`,
-        `New personal best by ${userName}`,
-        `${userName} hit all targets successfully`,
-        `Outstanding performance from ${userName}`,
-      ],
-      training_created: [
-        `${userName} scheduled advanced training`,
-        `New tactical session by ${userName}`,
-        `${userName} initiated team practice`,
-        `Training session created by ${userName}`,
-      ],
-      session_stats_logged: [
-        `${userName} completed performance review`,
-        `Statistics updated by ${userName}`,
-        `${userName} logged training metrics`,
-        `Performance data recorded by ${userName}`,
-      ],
-      participant_joined: [
-        `${userName} joined the mission`,
-        `Welcome ${userName} to the session`,
-        `${userName} is now active`,
-        `${userName} checked in`,
-      ],
-      target_engaged: [
-        `${userName} neutralized the target`,
-        `Successful engagement by ${userName}`,
-        `${userName} completed the objective`,
-        `Target eliminated by ${userName}`,
-      ],
-      target_stats_created: [
-        `Targeting analysis complete`,
-        `New tactical data available`,
-        `Mission statistics updated`,
-        `Performance metrics logged`,
-      ],
+    const messages: Record<string, string> = {
+      score_submit: "Score submission recorded",
+      training_created: "Training session scheduled",
+      session_stats_logged: "Session statistics logged",
+      participant_joined: "Participant joined session",
+      target_engaged: "Target engagement recorded",
+      target_stats_created: "Target statistics updated",
+      achievement: "Achievement unlocked",
+      team: "Team activity updated",
+      milestone: "Milestone reached",
     };
 
-    const messageArray = messages[item.action_type] || [`${userName} completed an action`];
-    const messageIndex = item.created_at.charCodeAt(5) % messageArray.length;
-    return messageArray[messageIndex];
+    return messages[item.action_type] || "Activity recorded";
   };
 
   return (
@@ -111,12 +90,12 @@ export default function UnifiedFeed() {
       <div className="px-6 py-4 border-b border-white/10 dark:border-white/5">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Activity Timeline</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Your personal activity</p>
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Activity Feed</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Recent activity log</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></div>
-            <span className="text-xs text-gray-500 font-medium">LIVE</span>
+            <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+            <span className="text-xs text-gray-500 font-medium">Live</span>
           </div>
         </div>
       </div>
@@ -129,15 +108,15 @@ export default function UnifiedFeed() {
               <Activity className="w-12 h-12 text-gray-400/50" />
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-500 text-center font-light">
-              Timeline empty
+              No recent activity
               <br />
-              <span className="text-xs opacity-60">Waiting for activity...</span>
+              <span className="text-xs opacity-60">Activities will appear here</span>
             </p>
           </div>
         ) : (
           <div className="relative">
             {/* Elegant Timeline line with gradient */}
-            <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-blue-500/20 via-purple-500/20 to-pink-500/20"></div>
+            <div className="absolute left-5 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700"></div>
 
             {/* Timeline items */}
             <div className="space-y-4">
@@ -145,56 +124,46 @@ export default function UnifiedFeed() {
                 const avatar = getAvatar(item.actor_id);
                 const isFirst = index === 0;
                 const isNew = index < 3;
-                const emoji = getActionEmoji(item.action_type);
+                const ActionIcon = getActionIcon(item.action_type);
 
                 // Different timeline dot styles
-                const dotStyles = [
-                  "bg-gradient-to-br from-blue-400 to-blue-600",
-                  "bg-gradient-to-br from-purple-400 to-purple-600",
-                  "bg-gradient-to-br from-pink-400 to-pink-600",
-                  "bg-gradient-to-br from-emerald-400 to-emerald-600",
-                  "bg-gradient-to-br from-amber-400 to-amber-600",
-                ];
-                const dotStyle = dotStyles[index % dotStyles.length];
+                const dotStyle = isFirst ? "bg-gray-800 dark:bg-gray-200" : "bg-gray-300 dark:bg-gray-600";
 
                 return (
                   <div key={item.id} className="relative flex gap-4 group">
                     {/* Timeline dot with animation */}
                     <div className="relative z-10">
                       <div
-                        className={`w-10 h-10 rounded-full ${
-                          isFirst ? `${dotStyle} shadow-lg animate-pulse` : "bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20"
-                        } flex items-center justify-center transition-transform group-hover:scale-110`}
+                        className={`w-10 h-10 rounded-full ${dotStyle} flex items-center justify-center transition-transform group-hover:scale-105 ${isFirst ? "shadow-sm" : ""}`}
                       >
-                        <span className={`text-sm ${isFirst ? "text-white" : ""}`}>{emoji}</span>
+                        <ActionIcon className={`w-4 h-4 ${isFirst ? "text-white dark:text-gray-900" : "text-gray-600 dark:text-gray-400"}`} />
                       </div>
-                      {isNew && <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>}
+                      {isNew && <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></div>}
                     </div>
 
                     {/* Content with transparent background */}
                     <div className="flex-1 pb-2">
                       {/* Time with elegant styling */}
-                      <p className="text-[10px] uppercase tracking-wider text-gray-500/70 dark:text-gray-500/50 mb-2 font-medium">
-                        {formatDistanceToNow(new Date(item.created_at), { addSuffix: true }).toUpperCase()}
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-1.5">
+                        {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
                       </p>
 
                       {/* Transparent message card */}
                       <div
                         className={`
-                        p-4 rounded-xl backdrop-blur-md transition-all duration-300
+                        p-3 rounded-lg transition-all duration-200
                         ${
                           theme === "dark"
-                            ? "bg-white/5 hover:bg-white/10 border border-white/10"
-                            : "bg-black/5 hover:bg-black/10 border border-black/10"
+                            ? "bg-gray-800/50 hover:bg-gray-800/70 border border-gray-700/50"
+                            : "bg-gray-50 hover:bg-gray-100 border border-gray-200"
                         }
-                        ${isNew ? "shadow-lg shadow-blue-500/10" : ""}
-                        group-hover:translate-x-1
+                        ${isNew ? "shadow-sm" : ""}
                       `}
                       >
                         <div className="flex items-start gap-3">
                           {/* Elegant avatar */}
-                          <div className={`w-8 h-8 rounded-full ${avatar.color} flex items-center justify-center flex-shrink-0 shadow-md`}>
-                            <span className="text-xs font-bold text-white">{avatar.initials}</span>
+                          <div className={`w-8 h-8 rounded-full ${avatar.color} flex items-center justify-center flex-shrink-0`}>
+                            <span className="text-xs font-semibold text-white">{avatar.initials}</span>
                           </div>
 
                           {/* Message content */}
@@ -207,17 +176,17 @@ export default function UnifiedFeed() {
                             {item.context && Object.keys(item.context).length > 0 && (
                               <div className="mt-3 flex flex-wrap gap-2">
                                 {item.context.score && (
-                                  <span className="px-2 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-medium">
+                                  <span className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs">
                                     Score: {item.context.score}
                                   </span>
                                 )}
                                 {item.context.hits && (
-                                  <span className="px-2 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-medium">
+                                  <span className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs">
                                     Hits: {item.context.hits}
                                   </span>
                                 )}
                                 {item.context.accuracy && (
-                                  <span className="px-2 py-1 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs font-medium">
+                                  <span className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs">
                                     {item.context.accuracy}% accuracy
                                   </span>
                                 )}

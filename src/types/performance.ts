@@ -95,14 +95,6 @@ export type TrainingTeamAnalytics = {
   times_grouped: number;
 };
 
-export interface OverallAccuracyStats {
-  total_scores: number;
-  total_shots_fired: number;
-  total_target_hits: number;
-  accuracy_percent: number;
-}
-
-
 // commander view
 export type SquadUserPerformance = {
   first_name: string;
@@ -124,7 +116,6 @@ export type CommanderUserRoleBreakdown = {
   hits: number;
   sessions: number;
 };
-
 
 // new
 export type SquadMajorityPerformance = {

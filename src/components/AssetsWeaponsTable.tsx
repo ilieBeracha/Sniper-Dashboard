@@ -11,7 +11,7 @@ import WeaponUsageModal from "./WeaponUsageModal";
 import { primitives } from "@/styles/core";
 
 export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
-  const weaponsWithIds = weapons.filter((weapon): weapon is Weapon & { id: string } => Boolean(weapon.id));
+  const weaponsWithIds = weapons.filter((weapon): weapon is Weapon & { id: string } => Boolean(weapon?.id));
   const { theme } = useTheme();
   const { updateWeapon } = useStore(weaponsStore);
   const { getWeaponUsageStats } = useStore(performanceStore);

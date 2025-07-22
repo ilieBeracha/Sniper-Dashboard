@@ -4,7 +4,6 @@ import {
   SquadStats,
   SquadWeaponPerformance,
   TrainingEffectiveness,
-  OverallAccuracyStats,
   UserHitsData,
   TrainingTeamAnalytics,
   WeaponUsageStats,
@@ -15,7 +14,6 @@ import { GroupingSummary } from "@/types/groupingScore";
 import {
   getWeaponPerformanceBySquadAndWeapon,
   getTrainingEffectivenessByTeam,
-  overallAccuracyStats,
   // getSquadRoleHitPercentages,
   getUserGroupingStatsRpc,
   getUserHitStatsFull,
@@ -51,11 +49,6 @@ interface PerformanceStore {
   trainingEffectiveness: TrainingEffectiveness[];
   getTrainingEffectiveness: (teamId: string) => Promise<void>;
 
-  overallAccuracyStats: OverallAccuracyStats | null;
-  getOverallAccuracyStats: () => Promise<void>;
-
-  overallAccuracyStatsLoading: boolean;
-
   weaponUsageStats: WeaponUsageStats | null;
   weaponUsageStatsMap: Record<string, WeaponUsageStats>;
   getWeaponUsageStats: (weaponId: string) => Promise<void>;
@@ -74,9 +67,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   isLoading: false,
   squadStats: [],
   trainingEffectiveness: [],
-  overallAccuracyStats: null,
   userHitsStats: null,
-  overallAccuracyStatsLoading: false,
   trainingTeamAnalytics: null,
   weaponUsageStats: null,
   weaponUsageStatsMap: {},
@@ -103,33 +94,6 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       set({ isLoading: false });
     }
   },
-
-  getOverallAccuracyStats: async () => {
-    try {
-      set({ overallAccuracyStatsLoading: true });
-      const data = await overallAccuracyStats();
-      set({ overallAccuracyStats: data });
-    } catch (error) {
-      console.error("Failed to load training summary stats:", error);
-      set({ overallAccuracyStats: null });
-    } finally {
-      set({ overallAccuracyStatsLoading: false });
-    }
-  },
-
-  // getSquadStats: async (_position: PositionScore | null, distance: string | null) => {
-  //   const squadId = userStore.getState().user?.squad_id;
-  //   try {
-  //     set({ isLoading: true });
-  //     const data = await getSquadRoleHitPercentages(squadId!, distance);
-  //     set({ squadStats: data });
-  //   } catch (error) {
-  //     console.error("Failed to load squad stats:", error);
-  //     set({ squadStats: [] });
-  //   } finally {
-  //     set({ isLoading: false });
-  //   }
-  // },
 
   getSquadStatsByRole: async (_position: PositionScore | null, distance: string | null) => {
     const squadId = userStore.getState().user?.squad_id;

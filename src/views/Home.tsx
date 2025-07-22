@@ -19,6 +19,7 @@ const Assets = lazy(() => import("./Assets"));
 const ErrorPage = lazy(() => import("./404"));
 const SessionStatsFull = lazy(() => import("./sessionStatsFull"));
 const SettingsPage = lazy(() => import("./Settings"));
+const DataExport = lazy(() => import("./DataExport"));
 
 export default function AppRoutes() {
   const { token } = useStore(authStore);
@@ -85,6 +86,14 @@ export default function AppRoutes() {
             element={
               <Suspense fallback={<LoadingFallback />}>
                 <SettingsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/data-export"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <DataExport />
               </Suspense>
             }
           />

@@ -8,13 +8,14 @@ import { getUserGroupingStatsRpc } from "@/services/performance";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import InviteModal from "@/components/InviteModal";
 import Header from "@/Headers/Header";
-import { Activity, SplinePointerIcon } from "lucide-react";
+import { Activity, FileDown, SplinePointerIcon } from "lucide-react";
 import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
 import { useTabs } from "@/hooks/useTabs";
 import DashboardOverview from "@/components/DashboardOverview";
 import CommanderView from "@/components/DashboardCommanderView";
 import ActivityFeedDrawer from "@/components/ActivityFeedDrawer";
+import DashboardDataExport from "@/components/DashboardDataExport";
 
 export default function Dashboard() {
   const useUserStore = useStore(userStore);

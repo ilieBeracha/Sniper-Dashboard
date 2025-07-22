@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useStore } from "zustand";
 import { TrainingStore } from "@/store/trainingStore";
-import { performanceStore } from "@/store/performance";
 import { userStore } from "@/store/userStore";
 import { useLoadingState } from "@/hooks/useLoadingState";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
@@ -15,7 +14,6 @@ import { CalendarIcon } from "lucide-react";
 
 export default function Trainings() {
   const { loadTrainingByTeamId, getTrainingCountByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
-  const { getOverallAccuracyStats } = useStore(performanceStore);
   const user = useStore(userStore).user;
   const assignments = useStore(TrainingStore).assignments;
 
@@ -31,7 +29,6 @@ export default function Trainings() {
     if (!user?.team_id) return;
     await loadWeeklyAssignmentsStats(user.team_id);
     await loadAssignments();
-    await getOverallAccuracyStats();
   }, [user?.team_id]);
 
   useEffect(() => {
