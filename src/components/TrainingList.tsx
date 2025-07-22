@@ -10,6 +10,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
 import { filterTrainingsByDate } from "@/utils/trainingFilters";
+import { primitives } from "@/styles/core";
 
 interface TrainingListProps {
   trainings: TrainingSession[];
@@ -46,7 +47,7 @@ export default function TrainingList({ trainings }: TrainingListProps) {
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
             <div className="lg:col-span-8 space-y-6">
               {!trainings.length && (
-                <div className="text-center text-gray-500 h-80 flex flex-col items-center justify-center">
+                <div className="text-center h-80 flex flex-col items-center justify-center" style={{ color: primitives.grey.grey500 }}>
                   <p className="text-lg font-medium">No trainings found</p>
                   <p className="text-sm">You can create one</p>
                 </div>
@@ -79,11 +80,13 @@ export default function TrainingList({ trainings }: TrainingListProps) {
 
             <aside className="lg:col-span-4 hidden lg:block">
               <div
-                className={`sticky top-8 border rounded-lg p-4 transition-colors duration-200 ${
-                  theme === "dark" ? "bg-[#1A1A1A] border-white/10" : "bg-white border-gray-200"
-                }`}
+                className="sticky top-8 border rounded-lg p-4 transition-colors duration-200"
+                style={{
+                  backgroundColor: theme === "dark" ? "#1A1A1A" : primitives.white.white,
+                  borderColor: theme === "dark" ? `${primitives.white.white}1A` : primitives.grey.grey200
+                }}
               >
-                <h3 className={`text-sm font-semibold mb-4 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                <h3 className="text-sm font-semibold mb-4 transition-colors duration-200" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
                   Training Calendar
                 </h3>
                 <TrainingCalendar trainings={trainings} />

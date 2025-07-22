@@ -8,6 +8,7 @@ import { weaponsStore } from "@/store/weaponsStore";
 import { performanceStore } from "@/store/performance";
 import { SpTable, SpTableColumn } from "@/layouts/SpTable";
 import WeaponUsageModal from "./WeaponUsageModal";
+import { primitives } from "@/styles/core";
 
 export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
   const weaponsWithIds = weapons.filter((weapon): weapon is Weapon & { id: string } => Boolean(weapon.id));
@@ -69,9 +70,12 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
           <select
             value={editForm.weapon_type || ""}
             onChange={(e) => setEditForm({ ...editForm, weapon_type: e.target.value })}
-            className={`w-full px-2 py-1 rounded border text-sm ${
-              theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
-            }`}
+            className="w-full px-2 py-1 rounded border text-sm"
+            style={{
+              borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
+              backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900
+            }}
           >
             <option value="">Select type</option>
             {uniqueWeaponTypes.map((type) => (
@@ -96,9 +100,12 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
             type="text"
             value={editForm.serial_number || ""}
             onChange={(e) => setEditForm({ ...editForm, serial_number: e.target.value })}
-            className={`w-full px-2 py-1 rounded border text-sm ${
-              theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
-            }`}
+            className="w-full px-2 py-1 rounded border text-sm"
+            style={{
+              borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
+              backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900
+            }}
           />
         ) : (
           <span>{value || "N/A"}</span>
@@ -116,9 +123,12 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
             type="number"
             value={editForm.mv || ""}
             onChange={(e) => setEditForm({ ...editForm, mv: e.target.value })}
-            className={`w-full px-2 py-1 rounded border text-sm ${
-              theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
-            }`}
+            className="w-full px-2 py-1 rounded border text-sm"
+            style={{
+              borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
+              backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900
+            }}
           />
         ) : (
           <span>{value || "N/A"}</span>

@@ -11,6 +11,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { toast } from "react-toastify";
 import { BASE_EQUIPMENTS } from "@/utils/BaseData/BaseEquipments";
+import { primitives } from "@/styles/core";
 
 export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) {
   const { equipments, createEquipment } = useStore(equipmentStore);
@@ -39,18 +40,21 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
   }
 
   const EquipmentContent = (
-    <div className={`min-w-[600px] p-4 space-y-6 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+    <div className={`min-w-[600px] p-4 space-y-6 transition-colors duration-200`} style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
       <div>
         <h2 className="text-xl font-semibold">New Equipment</h2>
-        <p className={`mt-1 text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+        <p className="mt-1 text-sm transition-colors duration-200" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
           Add new equipment to the inventory.
         </p>
       </div>
 
       <select
-        className={`w-full min-h-9 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
-          theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
-        }`}
+        className="w-full min-h-9 rounded-lg px-3 py-2 text-sm border transition-colors duration-200"
+        style={{
+          backgroundColor: theme === "dark" ? `${primitives.grey.grey800}80` : primitives.white.white,
+          color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
+          borderColor: theme === "dark" ? primitives.grey.grey700 : primitives.grey.grey300
+        }}
         value={equipmentForm.equipment_type}
         onChange={(e) => setEquipmentForm({ ...equipmentForm, equipment_type: e.target.value })}
       >
@@ -75,18 +79,21 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
         value={equipmentForm.serial_number}
         onChange={(e) => setEquipmentForm({ ...equipmentForm, serial_number: e.target.value })}
         placeholder="Enter serial number"
-        leftIcon={<FileQuestion size={16} className={theme === "dark" ? "text-gray-400" : "text-gray-500"} />}
+        leftIcon={<FileQuestion size={16} style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey500 }} />}
         containerClassName="bg-transparent"
       />
 
       <div className="space-y-2">
-        <label className={`block text-sm font-medium transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+        <label className="block text-sm font-medium transition-colors duration-200" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
           Day/Night
         </label>
         <select
-          className={`w-full min-h-9 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
-            theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
-          }`}
+          className="w-full min-h-9 rounded-lg px-3 py-2 text-sm border transition-colors duration-200"
+          style={{
+            backgroundColor: theme === "dark" ? `${primitives.grey.grey800}80` : primitives.white.white,
+            color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
+            borderColor: theme === "dark" ? primitives.grey.grey700 : primitives.grey.grey300
+          }}
           value={equipmentForm.day_night}
           onChange={(e) => setEquipmentForm({ ...equipmentForm, day_night: e.target.value })}
         >
@@ -100,16 +107,34 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
         <button
           type="button"
           onClick={() => setIsOpen(false)}
-          className={`px-4 py-1.5 transition-colors rounded-md text-sm font-medium ${
-            theme === "dark" ? "bg-white/5 hover:bg-white/10 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-          }`}
+          className="px-4 py-1.5 transition-colors rounded-md text-sm font-medium"
+          style={{
+            backgroundColor: theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey100,
+            color: theme === "dark" ? primitives.white.white : primitives.grey.grey700
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = theme === "dark" ? `${primitives.white.white}1A` : primitives.grey.grey200;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey100;
+          }}
         >
           Cancel
         </button>
         <button
           onClick={handleCreateEquipment}
           type="button"
-          className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
+          className="px-4 py-1.5 transition-colors rounded-md text-sm font-medium shadow-sm disabled:cursor-not-allowed"
+          style={{
+            backgroundColor: primitives.blue.blue500,
+            color: primitives.white.white
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = primitives.blue.blue400;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = primitives.blue.blue500;
+          }}
         >
           Create
         </button>
@@ -121,15 +146,18 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
     <div>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-1 h-6 bg-emerald-400 rounded-full"></div>
-          <h2 className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+          <div className="w-1 h-6 rounded-full" style={{ backgroundColor: primitives.green.green400 }}></div>
+          <h2 className="text-lg font-semibold transition-colors duration-200" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
             Equipment Inventory
           </h2>
 
           <div
-            className={`px-3 py-1 text-sm rounded border ${
-              theme === "dark" ? "bg-emerald-500/20 text-emerald-200 border-emerald-500/30" : "bg-emerald-100 text-emerald-700 border-emerald-300"
-            }`}
+            className="px-3 py-1 text-sm rounded border"
+            style={{
+              backgroundColor: theme === "dark" ? `${primitives.green.green500}33` : primitives.green.green100,
+              color: theme === "dark" ? primitives.green.green200 : primitives.green.green600,
+              borderColor: theme === "dark" ? `${primitives.green.green500}4D` : primitives.green.green300
+            }}
           >
             {equipments.length} items
           </div>

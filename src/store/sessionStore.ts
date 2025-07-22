@@ -80,6 +80,9 @@ export const sessionStore = create<SessionStatsState>((set) => ({
     set({ isLoading: true, error: null });
     const trainingStore = TrainingStore.getState().training;
 
+    console.log("wizardData", wizardData);
+
+    console.log("trainingStore", trainingStore);
     try {
       // Transform wizard data to database format
       const sessionStatsData: CreateSessionStatsData = {

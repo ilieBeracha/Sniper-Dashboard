@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/services/supabaseClient";
 import { userStore } from "@/store/userStore";
 import BasicInfoSection from "@/components/TrainingModal/AddTrainingSessionModalBasicInfo";
@@ -12,7 +12,6 @@ import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useStore as useZustandStore } from "zustand";
 import { weaponsStore } from "@/store/weaponsStore";
 import { insertAssignment } from "@/services/trainingService";
 import { validateTrainingForm } from "@/lib/formValidation";
@@ -39,7 +38,16 @@ export default function TrainingAddTrainingSessionModal({
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { loadAssignments } = useStore(TrainingStore);
   const { user } = useStore(userStore);
-  const { weapons } = useZustandStore(weaponsStore);
+  const { weapons } = useStore(weaponsStore);
+
+  useEffect(() => {
+    if (isOpen) {
+      setAssignmentIds([]);
+      setSessionName("");
+      setLocation("");
+      setDate("");
+    }
+  }, [isOpen]);
 
   const handleSetStatus = async () => {
     if (date && date < new Date().toISOString()) {
@@ -86,7 +94,7 @@ export default function TrainingAddTrainingSessionModal({
           session_name: sessionName,
           location,
           date: new Date(date).toISOString(),
-          team_id: user.team_id,
+          team_id: user?.team_id,
         },
       ])
       .select("*")

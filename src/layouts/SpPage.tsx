@@ -11,7 +11,7 @@ export function SpPage({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
   return (
-    <div className={`w-full h-full bg-black/30 transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "bg-gray-50 text-gray-900"}`}>
+    <div className={`w-full h-full bg-black/30 transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "bg-white text-gray-900"}`}>
       <main className={`flex flex-col min-h-screen gap-3 ${isMobile ? "space-y-2" : ""}`}>{children}</main>
     </div>
   );
@@ -22,9 +22,11 @@ export function SpPageHeader({
   subtitle,
   icon,
   breadcrumbs,
+  isCommander = false,
   dropdownItems,
 }: {
   title: string;
+  isCommander?: boolean;
   subtitle?: string;
   icon: React.ComponentType<any>;
   breadcrumbs?: { label: string; link: string }[];
@@ -58,7 +60,8 @@ export function SpPageHeader({
                 )}
               </div>
             </div>
-            {dropdownItems &&
+            {!isCommander &&
+              dropdownItems &&
               dropdownItems.length > 0 &&
               (isMobile ? (
                 <Dropdown>

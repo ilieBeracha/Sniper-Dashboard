@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useStore } from "zustand";
 import { feedStore } from "@/store/feedStore";
+import { userStore } from "@/store/userStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Activity } from "lucide-react";
 
@@ -26,6 +27,7 @@ const getAvatar = (userId: string) => {
 
 export default function UnifiedFeed() {
   const { feed, fetchFeedLog } = useStore(feedStore);
+  const { user } = useStore(userStore);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -33,6 +35,12 @@ export default function UnifiedFeed() {
     const interval = setInterval(fetchFeedLog, 10000); // Update every 10s
     return () => clearInterval(interval);
   }, []);
+
+  // Filter feed to show only items related to current user
+  const userFeed = useMemo(() => {
+    if (!user?.id) return [];
+    return feed.filter(item => item.actor_id === user.id);
+  }, [feed, user]);
 
   const getActionEmoji = (actionType: string) => {
     const emojis: Record<string, string> = {
@@ -98,13 +106,13 @@ export default function UnifiedFeed() {
   };
 
   return (
-    <div className="h-full flex flex-col backdrop-blur-sm">
+    <div className="h-full flex flex-col backdrop-blur-sm bg-dark">
       {/* Elegant Header */}
       <div className="px-6 py-4 border-b border-white/10 dark:border-white/5">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Activity Timeline</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Real-time mission updates</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Your personal activity</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></div>
@@ -115,7 +123,7 @@ export default function UnifiedFeed() {
 
       {/* Timeline Content */}
       <div className="flex-1 overflow-y-auto px-6 py-8">
-        {feed.length === 0 ? (
+        {userFeed.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="p-4 rounded-full bg-gray-100/10 dark:bg-white/5 mb-4">
               <Activity className="w-12 h-12 text-gray-400/50" />
@@ -133,7 +141,7 @@ export default function UnifiedFeed() {
 
             {/* Timeline items */}
             <div className="space-y-4">
-              {feed.map((item, index) => {
+              {userFeed.map((item, index) => {
                 const avatar = getAvatar(item.actor_id);
                 const isFirst = index === 0;
                 const isNew = index < 3;

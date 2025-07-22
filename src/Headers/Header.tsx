@@ -1,10 +1,12 @@
 import { useStore } from "zustand";
 import { useSidebarStore } from "@/store/sidebarStore";
-import { List } from "lucide-react";
+import { List, Bell } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { SpPageBreadcrumbs } from "@/layouts/SpPage";
+import { useState } from "react";
+import ActivityFeedDrawer from "@/components/ActivityFeedDrawer";
 
 export default function Header({
   children,
@@ -18,6 +20,7 @@ export default function Header({
   const { toggleDrawer } = useStore(useSidebarStore);
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+  const [isActivityFeedOpen, setIsActivityFeedOpen] = useState(false);
 
   return (
     <div
@@ -29,8 +32,18 @@ export default function Header({
       </div>
       <div className="flex items-center gap-2">
         {children}
+        <button
+          onClick={() => setIsActivityFeedOpen(true)}
+          className={`p-2 rounded-lg transition-colors ${
+            theme === "dark" ? "hover:bg-gray-800 text-gray-400 hover:text-gray-200" : "hover:bg-gray-100 text-gray-600 hover:text-gray-900"
+          }`}
+          aria-label="Open activity feed"
+        >
+          <Bell className="w-5 h-5" />
+        </button>
         <ThemeToggle />
       </div>
+      <ActivityFeedDrawer isOpen={isActivityFeedOpen} onClose={() => setIsActivityFeedOpen(false)} />
     </div>
   );
 }

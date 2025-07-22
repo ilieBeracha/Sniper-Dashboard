@@ -4,6 +4,7 @@ import { format, parseISO } from "date-fns";
 import { ChevronRight, Clock, MapPin, Bookmark, UserCheck } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { primitives } from "@/styles/core";
 
 export function TrainingSessionCard({
   session,
@@ -31,42 +32,57 @@ export function TrainingSessionCard({
   return (
     <div
       onClick={handleSessionClick}
-      className={`
-        relative
-        pl-4 pr-4 py-4
-        border rounded-lg overflow-hidden
-        transition-all duration-500 ease-in-out
-        cursor-pointer
-        text-sm
-        justify-center
-        items-center
-        ${theme === "dark" ? "bg-zinc-900/50 border-white/10" : "border-gray-200 bg-white hover:bg-gray-50"}
-      `}
+      className="relative pl-4 pr-4 py-4 border rounded-lg overflow-hidden transition-all duration-500 ease-in-out cursor-pointer text-sm justify-center items-center"
+      style={{
+        backgroundColor: theme === "dark" ? `${primitives.grey.grey900}80` : primitives.white.white,
+        borderColor: theme === "dark" ? `${primitives.white.white}1A` : primitives.grey.grey200
+      }}
+      onMouseEnter={(e) => {
+        if (theme === "light") {
+          e.currentTarget.style.backgroundColor = primitives.grey.grey50;
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (theme === "light") {
+          e.currentTarget.style.backgroundColor = primitives.white.white;
+        }
+      }}
     >
       {/* Status */}
       <div className=" flex flex-col items-end gap-2 absolute top-0 right-0 text-sm ">
         <span
-          className={`text-xs  px-2 py-1 rounded-bl-lg rounded-tr-lg 
-              ${isPast ? "bg-gray-500/10 text-gray-400" : highlight ? "bg-indigo-500/20 text-indigo-300" : "bg-green-500/10 text-green-400"}
-            `}
+          className="text-xs px-2 py-1 rounded-bl-lg rounded-tr-lg"
+          style={{
+            backgroundColor: isPast 
+              ? `${primitives.grey.grey500}1A` 
+              : highlight 
+                ? `${primitives.blue.blue500}33` 
+                : `${primitives.green.green500}1A`,
+            color: isPast 
+              ? primitives.grey.grey400 
+              : highlight 
+                ? primitives.blue.blue300 
+                : primitives.green.green400
+          }}
         >
           {isPast ? "Finished" : highlight ? "Today" : "Upcoming"}
         </span>
 
-        <ChevronRight className={`w-4 h-4 transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`} />
+        <ChevronRight className="w-4 h-4 transition-colors duration-200" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }} />
       </div>
       <div className="flex items-center justify-between text-sm ">
         {/* Date */}
         <div className="w-[100px] h-full text-sm">
           <div
-            className={`flex flex-col items-center justify-center rounded-lg p-2 transition-colors duration-200 ${
-              theme === "dark" ? "bg-white/5" : "bg-gray-100"
-            }`}
+            className="flex flex-col items-center justify-center rounded-lg p-2 transition-colors duration-200"
+            style={{
+              backgroundColor: theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey100
+            }}
           >
-            <span className={`text-base font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            <span className="text-base font-semibold transition-colors duration-200" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
               {showDate ? format(sessionDate, "d") : format(sessionDate, "h:mm")}
             </span>
-            <span className={`text-xs transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+            <span className="text-xs transition-colors duration-200" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
               {showDate ? format(sessionDate, "MMM") : format(sessionDate, "a")}
             </span>
           </div>
@@ -75,13 +91,12 @@ export function TrainingSessionCard({
         {/* Main Info */}
         <div className="flex-1 ml-4">
           <div className="flex items-center gap-2">
-            <h4 className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{session.session_name}</h4>
+            <h4 className="text-sm transition-colors duration-200" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>{session.session_name}</h4>
           </div>
 
           <div
-            className={`flex flex-wrap items-center gap-x-4 mt-1 text-xs transition-colors duration-200 ${
-              theme === "dark" ? "text-gray-400" : "text-gray-600"
-            }`}
+            className="flex flex-wrap items-center gap-x-4 mt-1 text-xs transition-colors duration-200"
+            style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}
           >
             {!isMobile ? (
               <div className="flex items-center">
@@ -110,7 +125,7 @@ export function TrainingSessionCard({
               {session.location ? (
                 <span className="truncate max-w-[120px]">{session.location}</span>
               ) : (
-                <span className={`italic transition-colors duration-200 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
+                <span className="italic transition-colors duration-200" style={{ color: theme === "dark" ? primitives.grey.grey500 : primitives.grey.grey400 }}>
                   Unknown location
                 </span>
               )}

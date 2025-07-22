@@ -147,23 +147,25 @@ export const useSessionStats = () => {
   };
 
   const updateParticipant = (userId: string, field: keyof Participant, value: any) => {
-    setParticipants((prev) => prev.map((p) => {
-      if (p.userId === userId) {
-        const updatedParticipant = { ...p, [field]: value };
-        
-        // Clear conflicting fields when duty changes
-        if (field === 'userDuty') {
-          if (value === 'Sniper') {
-            updatedParticipant.equipmentId = '';
-          } else if (value === 'Spotter') {
-            updatedParticipant.weaponId = '';
+    setParticipants((prev) =>
+      prev.map((p) => {
+        if (p.userId === userId) {
+          const updatedParticipant = { ...p, [field]: value };
+
+          // Clear conflicting fields when duty changes
+          if (field === "userDuty") {
+            if (value === "Sniper") {
+              updatedParticipant.equipmentId = "";
+            } else if (value === "Spotter") {
+              updatedParticipant.weaponId = "";
+            }
           }
+
+          return updatedParticipant;
         }
-        
-        return updatedParticipant;
-      }
-      return p;
-    }));
+        return p;
+      }),
+    );
   };
 
   const addParticipant = (memberId: string) => {

@@ -6,6 +6,7 @@ import { useStore } from "zustand";
 import { equipmentStore } from "@/store/equipmentStore";
 import { SpTable, SpTableColumn } from "@/layouts/SpTable";
 import { useTheme } from "@/contexts/ThemeContext";
+import { primitives } from "@/styles/core";
 
 export default function AssetsEquipmentTable({ equipments }: { equipments: Equipment[] }) {
   const { theme } = useTheme();
@@ -55,9 +56,12 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
           <select
             value={editForm.equipment_type || ""}
             onChange={(e) => setEditForm({ ...editForm, equipment_type: e.target.value })}
-            className={`w-full px-2 py-1 rounded border text-sm ${
-              theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
-            }`}
+            className="w-full px-2 py-1 rounded border text-sm"
+            style={{
+              borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
+              backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900
+            }}
           >
             <option value="">Select type</option>
             {uniqueEquipmentTypes.map((type) => (
@@ -81,9 +85,12 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
             type="text"
             value={editForm.serial_number || ""}
             onChange={(e) => setEditForm({ ...editForm, serial_number: e.target.value })}
-            className={`w-full px-2 py-1 rounded border text-sm ${
-              theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
-            }`}
+            className="w-full px-2 py-1 rounded border text-sm"
+            style={{
+              borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
+              backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900
+            }}
           />
         ) : (
           value || "N/A"
@@ -99,9 +106,12 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
           <select
             value={editForm.day_night || ""}
             onChange={(e) => setEditForm({ ...editForm, day_night: e.target.value })}
-            className={`w-full px-2 py-1 rounded border text-sm ${
-              theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
-            }`}
+            className="w-full px-2 py-1 rounded border text-sm"
+            style={{
+              borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
+              backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900
+            }}
           >
             <option value="">Select</option>
             <option value="day">Day</option>

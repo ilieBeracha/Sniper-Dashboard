@@ -49,8 +49,8 @@ export default function ImprovedSessionStats() {
         <ScrollProgress activeSection={activeSection} totalSections={sections.length} />
       </div>
 
-      {/* Mobile Progress Bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-sm">
+      {/* Mobile Progress Bar with Navigation */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-sm shadow-md">
         <div className="flex h-1 bg-gray-200 dark:bg-gray-800">
           {sections.map((_, index) => (
             <div
@@ -61,13 +61,46 @@ export default function ImprovedSessionStats() {
             />
           ))}
         </div>
-        <div className="px-4 py-2 text-center">
-          <p className="text-xs font-medium text-gray-600 dark:text-gray-400">{sections[activeSection]?.title}</p>
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div className="flex-1">
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
+              Step {activeSection + 1} of {sections.length}
+            </p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">{sections[activeSection]?.title}</p>
+          </div>
+          <div className="flex gap-2">
+            {activeSection > 0 && (
+              <button
+                onClick={() => {
+                  const element = document.querySelectorAll("section")[activeSection - 1];
+                  element?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+            {activeSection < sections.length - 1 && (
+              <button
+                onClick={() => {
+                  const element = document.querySelectorAll("section")[activeSection + 1];
+                  element?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="p-2 rounded-lg bg-indigo-500 text-white"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Main Content Container */}
-      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth pt-12 lg:pt-0" onScroll={handleScroll}>
+      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth pt-20 lg:pt-0" onScroll={handleScroll}>
         {/* Section 1: Session Configuration */}
         <section className="min-h-screen snap-start flex items-center justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">

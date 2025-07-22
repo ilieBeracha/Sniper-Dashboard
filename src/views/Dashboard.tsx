@@ -16,7 +16,7 @@ import DashboardOverview from "@/components/DashboardOverview";
 import DashboardAI from "@/components/DashboardAI";
 import CommanderView from "@/components/DashboardCommanderView";
 import DashboardAnalytics from "@/components/DashboardAnalytics";
-
+import ActivityFeedDrawer from "@/components/ActivityFeedDrawer";
 export default function Dashboard() {
   const useUserStore = useStore(userStore);
   const user = useUserStore.user;
@@ -28,7 +28,7 @@ export default function Dashboard() {
 
   const [loading, setLoading] = useState(true);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-
+  const [isActivityFeedOpen, setIsActivityFeedOpen] = useState(false);
   useEffect(() => {
     const load = async () => {
       if (user?.team_id) {
@@ -71,6 +71,7 @@ export default function Dashboard() {
     <SpPage>
       <Header breadcrumbs={[{ label: "Dashboard", link: "/" }]} />
       <SpPageHeader
+        isCommander={isCommander(userRole as UserRole)}
         title={activeTab.label}
         subtitle={activeTab.id === "overview" ? "Team, Squad, and more" : "By Date, Squad, and more"}
         icon={activeTab.icon}
@@ -86,6 +87,7 @@ export default function Dashboard() {
       <SpPageTabs tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
       <SpPageBody>{RenderComponent()}</SpPageBody>
       {userRole !== "soldier" && user?.id && <InviteModal isOpen={isInviteModalOpen} setIsOpen={setIsInviteModalOpen} userId={user.id} />}
+      <ActivityFeedDrawer isOpen={isActivityFeedOpen} onClose={() => setIsActivityFeedOpen(false)} />
     </SpPage>
   );
 }

@@ -131,3 +131,11 @@ svg .recharts-layer .recharts-bar {
 .animate-scale-in {
   animation: scale-in 0.3s ease-out;
 }
+
+input,
+select,
+option {
+  @apply h-12;
+  @apply rounded-lg;
+  @apply border-gray-500;
+}
