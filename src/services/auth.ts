@@ -1,5 +1,5 @@
 import { LoginUserData, RegisterUserData } from "@/types/auth";
-import { axiosInstance as axios } from "./requestService";
+import axios from "axios";
 
 async function registerCommander(user: RegisterUserData) {
   user.user_role = "commander";
