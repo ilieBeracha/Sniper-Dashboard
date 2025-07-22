@@ -5,13 +5,10 @@ export async function getInviteByInviterId(userId: string): Promise<Invite | nul
   try {
     const { data, error } = await supabase.from("invitations").select("*").eq("inviter_id", userId).maybeSingle();
 
-    if (error) {
-      console.error("Error fetching invite by user ID:", error.message);
-      return null;
-    }
-
+    if (error) throw error;
     return data;
-  } catch (error) {
-    throw error;
+  } catch (error: any) {
+    console.error("Error fetching invite by user ID:", error.message);
+    throw new Error("Failed to fetch invite by user ID");
   }
 }

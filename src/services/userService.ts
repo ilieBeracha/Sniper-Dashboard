@@ -2,19 +2,23 @@ import { User } from "@/types/user";
 import { supabase } from "./supabaseClient";
 
 export const updateUser = async (id: string, user_data: Partial<User>) => {
-  const { data, error } = await supabase.from("users").update(user_data).eq("id", id).select().single();
-
-  if (error) throw new Error(error.message);
-  return data;
+  try {
+    const { data, error } = await supabase.from("users").update(user_data).eq("id", id).select().single();
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw new Error("User not found");
+  }
 };
 
 export async function getUserProfileById(userId: string) {
-  const { data, error } = await supabase.schema("public").from("users").select("*").eq("id", userId).single();
-
-  if (error || !data) {
-    console.error("User profile not found:", error?.message);
+  try {
+    const { data, error } = await supabase.schema("public").from("users").select("*").eq("id", userId).single();
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
     throw new Error("User profile not found");
   }
-
-  return data;
 }

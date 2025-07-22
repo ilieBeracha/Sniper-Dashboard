@@ -167,51 +167,67 @@ export async function getAssignments(teamId: string): Promise<Assignment[] | []>
 }
 
 export async function getWeeklyAssignmentsStats(team_id: string) {
-  const { data, error } = await supabase.rpc("get_weekly_assignment_stats", {
-    team_id_param: team_id,
-  });
+  try {
+    const { data, error } = await supabase.rpc("get_weekly_assignment_stats", {
+      team_id_param: team_id,
+    });
 
-  if (error) throw new Error(error.message);
-
-  return data;
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error fetching weekly assignments stats:", error);
+    return [];
+  }
 }
 
 export async function insertAssignment(assignmentName: string, teamId: string) {
-  const { data, error } = await supabase
-    .from("assignment")
-    .insert([
-      {
-        assignment_name: assignmentName,
-        team_id: teamId,
-      },
-    ])
-    .select()
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from("assignment")
+      .insert([
+        {
+          assignment_name: assignmentName,
+          team_id: teamId,
+        },
+      ])
+      .select()
+      .single();
 
-  if (error) {
-    console.error("Error inserting assignment:", error.message);
+    if (error) {
+      console.error("Error inserting assignment:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error inserting assignment:", error);
     return null;
   }
-
-  return data;
 }
 
 export async function getAssignmentSessions(assignmentId: string) {
-  const { data, error } = await supabase.from("assignment_session").select("*").eq("assignment_id", assignmentId);
-
-  if (error) throw new Error(error.message);
-
-  return data;
+  try {
+    const { data, error } = await supabase.from("assignment_session").select("*").eq("assignment_id", assignmentId);
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error fetching assignment sessions:", error);
+    return [];
+  }
 }
 
 export async function insertAssignmentSession(assignmentId: string, teamId: string, trainingId: string) {
-  const { data, error } = await supabase
-    .from("assignment_session")
-    .insert([{ assignment_id: assignmentId, team_id: teamId, training_id: trainingId }])
-    .select()
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from("assignment_session")
+      .insert([{ assignment_id: assignmentId, team_id: teamId, training_id: trainingId }])
+      .select()
+      .single();
 
-  if (error) throw new Error(error.message);
-
-  return data;
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error inserting assignment session:", error);
+    return null;
+  }
 }
