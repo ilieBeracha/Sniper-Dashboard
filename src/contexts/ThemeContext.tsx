@@ -39,22 +39,14 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   });
 
   useEffect(() => {
-    // Apply theme to document
-    document.documentElement.className = theme;
+    // Clear any old theme classes to ensure Tailwind dark: utilities never activate
+    document.documentElement.classList.remove("dark", "light");
+
+    // Optionally expose theme via a data attribute for CSS if needed
+    document.documentElement.setAttribute("data-theme", theme);
+
+    // Persist selection
     localStorage.setItem("theme", theme);
-    
-    // Listen for browser theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      // Only update if user hasn't manually set a theme
-      const savedTheme = localStorage.getItem("theme");
-      if (!savedTheme) {
-        setTheme(e.matches ? "light" : "dark");
-      }
-    };
-    
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme]);
 
   const toggleTheme = () => {
