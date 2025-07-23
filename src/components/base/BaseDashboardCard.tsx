@@ -14,8 +14,8 @@ export default function BaseDashboardCard({
   tooltipContent = "",
   withBtn = false,
   withFilter = [],
-  onFilterChange,
   onClearFilters,
+  currentFilterValues = {},
 }: {
   header?: string | React.ReactNode | null;
   children: React.ReactNode | React.ReactNode[];
@@ -33,8 +33,8 @@ export default function BaseDashboardCard({
     onChange: (value: string) => void;
     type: "select" | "text" | "checkbox" | "radio" | "date" | "number";
   }[];
-  onFilterChange?: (value: string) => void;
   onClearFilters?: () => void;
+  currentFilterValues?: Record<string, string>;
 }) {
   const isMobile = useIsMobile();
   const { theme } = useTheme();
@@ -57,16 +57,23 @@ export default function BaseDashboardCard({
     >
       <div className={`${padding} border-none transition-colors duration-200 ${theme === "dark" ? "border-white/10" : "border-gray-200"}`}>
         <div className="flex justify-between relative h-full items-center gap-2">
-          {tooltipContent && (
-            <BiInfoCircle
-              className={`absolute top-0 -right-1 cursor-help transition-colors duration-200 ${
-                theme === "dark" ? "text-indigo-400/80 hover:text-indigo-400" : "text-indigo-600/80 hover:text-indigo-600"
-              }`}
-              size={16}
-              data-tooltip-id={`${header}-tooltip`}
-              data-tooltip-content={tooltipContent}
-            />
-          )}
+          <div className="flex items-center gap-2 absolute top-1 right-1" style={{ zIndex: 1000 }}>
+            <div className={`flex flex-col items-center gap-4 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-100"} shadow-lg rounded-lg p-2`}>
+              {tooltipContent && (
+                <BiInfoCircle
+                  className={` cursor-help transition-colors duration-200 ${
+                    theme === "dark" ? "text-indigo-400/80 hover:text-indigo-400" : "text-indigo-600/80 hover:text-indigo-600"
+                  }`}
+                  size={16}
+                  data-tooltip-id={`${header}-tooltip`}
+                  data-tooltip-content={tooltipContent}
+                />
+              )}
+              {withFilter.length > 0 && (
+                <BaseDashboardCardFilter filters={withFilter} onClearFilters={onClearFilters || (() => {})} currentValues={currentFilterValues} />
+              )}
+            </div>
+          </div>
           <h2
             className={`font-semibold flex items-center gap-2 text-sm relative transition-colors duration-200 ${
               theme === "dark" ? "text-white" : "text-gray-900"
@@ -75,13 +82,6 @@ export default function BaseDashboardCard({
             <div className={`h-1.5 w-1.5 max-h-1.5 rounded-full ${typeof header === "string" ? "lg:text-lg text-sm" : ""}`}></div>
             {header}
           </h2>
-          {withFilter.length > 0 && (
-            <BaseDashboardCardFilter
-              filters={withFilter}
-              onFilterChange={onFilterChange || (() => {})}
-              onClearFilters={onClearFilters || (() => {})}
-            />
-          )}
           {withBtn ? (
             <button className={`p-1.5 rounded-lg transition-colors duration-200 ${theme === "dark" ? "hover:bg-white/5" : "hover:bg-gray-100"}`}>
               <BiAddToQueue className={`transition-colors duration-200 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} />
@@ -109,8 +109,8 @@ export default function BaseDashboardCard({
 
 export function BaseDashboardCardFilter({
   filters,
-  onFilterChange,
   onClearFilters,
+  currentValues = {},
 }: {
   filters: {
     label: string;
@@ -120,23 +120,23 @@ export function BaseDashboardCardFilter({
     onChange: (value: string) => void;
     type: "select" | "text" | "checkbox" | "radio" | "date" | "number" | "icon";
   }[];
-  onFilterChange?: (value: string) => void;
   onClearFilters?: () => void;
+  currentValues?: Record<string, string>;
 }) {
   const { theme } = useTheme();
   return (
-    <div className="absolute top-0 right-6">
+    <div className="">
       <Popover placement="bottom-end">
         <PopoverTrigger asChild>
           <Button
             variant="light"
-            className="p-1.5 rounded-lg border border-gray-200 dark:border-white/10   bg-zinc-900/90 hover:bg-gray-100 dark:hover:bg-zinc-700 transition"
+            className={`p-1 rounded-lg border ${theme === "dark" ? "border-white/10 hover:bg-zinc-600" : "bg-gray-50 border-gray-200 hover:bg-gray-100"} transition`}
           >
             <FilterIcon className={`h-4 w-4 ${theme === "dark" ? "text-indigo-300" : "text-indigo-600"}`} strokeWidth={2.5} />
           </Button>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[320px] rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-zinc-900/90 backdrop-blur-2xl shadow-xl p-6 space-y-2">
+        <PopoverContent className="w-[320px] rounded-xl border border-gray-200 dark:border-white/10 bg-zinc-900/90 backdrop-blur-2xl shadow-xl p-6 space-y-2">
           <div className="space-y-0.5 justify-between w-full grid grid-cols-6 items-center pb-2">
             <div className="flex justify-end gap-3 col-span-1">
               <Button variant="light" className="w-full" onPress={() => onClearFilters?.()} isIconOnly size="lg">
@@ -161,8 +161,8 @@ export function BaseDashboardCardFilter({
                     <select
                       id={filter.value}
                       className="col-span-2 h-9 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-zinc-800 text-sm text-gray-800 dark:text-gray-200"
-                      value={filter.checked ? filter.value : ""}
-                      onChange={(e) => onFilterChange?.(e.target.value)}
+                      value={currentValues[filter.value] || ""}
+                      onChange={(e) => filter.onChange(e.target.value)}
                     >
                       {filter.options?.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -173,20 +173,24 @@ export function BaseDashboardCardFilter({
                   ) : filter.type === "text" ? (
                     <Input
                       id={filter.value}
-                      value={filter.checked ? filter.value : ""}
-                      onChange={(e) => onFilterChange?.(e.target.value)}
+                      value={currentValues[filter.value] || ""}
+                      onChange={(e) => filter.onChange(e.target.value)}
                       className="col-span-2 h-9"
                     />
                   ) : filter.type === "number" ? (
                     <Input
                       type="number"
                       id={filter.value}
-                      value={filter.checked ? filter.value : ""}
-                      onChange={(e) => onFilterChange?.(e.target.value)}
+                      value={currentValues[filter.value] || ""}
+                      onChange={(e) => filter.onChange(e.target.value)}
                       className="col-span-2 h-9"
                     />
                   ) : filter.type === "checkbox" ? (
-                    <Checkbox id={filter.value} checked={filter.checked} onValueChange={(checked) => onFilterChange?.(checked.toString())} />
+                    <Checkbox
+                      id={filter.value}
+                      checked={!!currentValues[filter.value]}
+                      onValueChange={(checked) => filter.onChange(checked.toString())}
+                    />
                   ) : null}
                 </div>
               );
