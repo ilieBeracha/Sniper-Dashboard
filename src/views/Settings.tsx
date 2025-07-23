@@ -217,7 +217,7 @@ export default function Settings() {
                             searchable
                             options={availableWeapons
                               .filter((w) => w.serial_number && w.serial_number.trim() !== "")
-                              .map((w) => ({ label: `SN: ${w.serial_number}`, value: w.id, group: w.weapon_type }))}
+                              .map((w) => ({ label: `SN: ${w.serial_number}`, value: String(w.id), group: w.weapon_type }))}
                           />
                         ) : (
                           <BaseSelect
@@ -229,7 +229,7 @@ export default function Settings() {
                               .filter((e) => e.serial_number && e.serial_number.trim() !== "")
                               .map((e) => ({
                                 label: e.serial_number ? `SN: ${e.serial_number}` : "No serial number",
-                                value: e.id,
+                                value: String(e.id),
                                 group: e.equipment_type,
                               }))}
                           />
