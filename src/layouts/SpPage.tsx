@@ -72,11 +72,18 @@ export function SpPageHeader({
                       <MoreVertical className="w-5 h-5" />
                     </span>
                   </DropdownTrigger>
-                  <DropdownMenu aria-label="Static Actions" className={`${theme === "dark" ? "bg-zinc-900" : "bg-gray-100"} rounded-lg p-1`}>
+                  <DropdownMenu
+                    aria-label="Page actions"
+                    className={`rounded-lg p-1 border shadow-lg backdrop-blur-md transition-colors duration-200 ${
+                      theme === "dark" ? "bg-zinc-900/90 border-zinc-800" : "bg-white/90 border-gray-200"
+                    }`}
+                  >
                     {dropdownItems.map((item, index) => (
                       <DropdownItem
-                        className="text-sm  rounded-md bg-zinc-900 text-white"
                         key={index}
+                        className={`text-sm px-3 py-2 rounded-md cursor-pointer transition-colors duration-150 ${
+                          theme === "dark" ? "text-gray-200 hover:bg-zinc-800/60" : "text-gray-700 hover:bg-gray-100"
+                        }`}
                         onPress={() => {
                           item.onClick();
                         }}

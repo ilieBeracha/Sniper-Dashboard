@@ -1,5 +1,6 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import BaseInput from "@/components/base/BaseInput";
+import BaseSelect from "@/components/base/BaseSelect";
 import { User as UserIcon, Settings as SettingsIcon, Shield, Target, Crosshair, Users, Crown, Download } from "lucide-react";
 import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
 import Header from "@/Headers/Header";
@@ -209,77 +210,29 @@ export default function Settings() {
                           {formData.user_default_duty === UserDuty.SNIPER ? "Default Weapon" : "Default Equipment"}
                         </label>
                         {formData.user_default_duty === UserDuty.SNIPER ? (
-                          <select
+                          <BaseSelect
                             value={formData.user_default_weapon || ""}
-                            onChange={(e) => handleWeaponChange(e.target.value)}
-                            className={`w-full px-3 py-3 rounded-lg border transition-all duration-200 ${
-                              theme === "dark"
-                                ? "bg-zinc-800/50 border-zinc-700 text-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
-                                : "bg-white border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
-                            }`}
-                          >
-                            <option value="">Select a weapon</option>
-                            {(() => {
-                              const groupedWeapons = availableWeapons
-                                .filter((weapon) => weapon.serial_number && weapon.serial_number.trim() !== "")
-                                .reduce(
-                                  (acc, weapon) => {
-                                    if (!acc[weapon.weapon_type]) {
-                                      acc[weapon.weapon_type] = [];
-                                    }
-                                    acc[weapon.weapon_type].push(weapon);
-                                    return acc;
-                                  },
-                                  {} as Record<string, typeof availableWeapons>,
-                                );
-
-                              return Object.entries(groupedWeapons).map(([type, weapons]) => (
-                                <optgroup key={type} label={type}>
-                                  {weapons.map((weapon) => (
-                                    <option key={weapon.id} value={weapon.id}>
-                                      SN: {weapon.serial_number}
-                                    </option>
-                                  ))}
-                                </optgroup>
-                              ));
-                            })()}
-                          </select>
+                            onChange={handleWeaponChange}
+                            placeholder="Select a weapon"
+                            searchable
+                            options={availableWeapons
+                              .filter((w) => w.serial_number && w.serial_number.trim() !== "")
+                              .map((w) => ({ label: `SN: ${w.serial_number}`, value: w.id, group: w.weapon_type }))}
+                          />
                         ) : (
-                          <select
+                          <BaseSelect
                             value={formData.user_default_equipment || ""}
-                            onChange={(e) => handleEquipmentChange(e.target.value)}
-                            className={`w-full px-3 py-3 rounded-lg border transition-all duration-200 ${
-                              theme === "dark"
-                                ? "bg-zinc-800/50 border-zinc-700 text-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
-                                : "bg-white border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
-                            }`}
-                          >
-                            <option value="">Select equipment</option>
-                            {(() => {
-                              const groupedEquipment = availableEquipment
-                                .filter((eq) => eq.serial_number && eq.serial_number.trim() !== "")
-                                .reduce(
-                                  (acc, eq) => {
-                                    if (!acc[eq.equipment_type]) {
-                                      acc[eq.equipment_type] = [];
-                                    }
-                                    acc[eq.equipment_type].push(eq);
-                                    return acc;
-                                  },
-                                  {} as Record<string, typeof availableEquipment>,
-                                );
-
-                              return Object.entries(groupedEquipment).map(([type, equipment]) => (
-                                <optgroup key={type} label={type}>
-                                  {equipment.map((eq) => (
-                                    <option disabled={!eq.serial_number} key={eq.id} value={eq.id}>
-                                      {eq.serial_number ? `SN: ${eq.serial_number}` : "No serial number"}
-                                    </option>
-                                  ))}
-                                </optgroup>
-                              ));
-                            })()}
-                          </select>
+                            onChange={handleEquipmentChange}
+                            placeholder="Select equipment"
+                            searchable
+                            options={availableEquipment
+                              .filter((e) => e.serial_number && e.serial_number.trim() !== "")
+                              .map((e) => ({
+                                label: e.serial_number ? `SN: ${e.serial_number}` : "No serial number",
+                                value: e.id,
+                                group: e.equipment_type,
+                              }))}
+                          />
                         )}
                       </div>
                     </div>
