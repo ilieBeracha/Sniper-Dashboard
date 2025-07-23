@@ -74,14 +74,14 @@ export default function ImprovedSessionStats() {
   }
 
   return (
-    <div className={`min-h-screen ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-gray-50"} relative`}>
+    <div className={`min-h-screen ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-white"} relative`}>
       {/* Progress Indicator - Fixed on larger screens, hidden on mobile */}
       <div className="hidden lg:block">
         <ScrollProgress activeSection={activeSection} totalSections={sections.length} />
       </div>
 
       {/* Mobile Progress Bar with Navigation */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-sm shadow-md">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50  dark:bg-black/95 backdrop-blur-sm shadow-md">
         <div className="flex h-1 bg-gray-200 dark:bg-gray-800">
           {sections.map((_, index) => (
             <div
@@ -131,10 +131,10 @@ export default function ImprovedSessionStats() {
       </div>
 
       {/* Main Content Container */}
-      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth lg:pt-0" onScroll={handleScroll}>
+      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth lg:pt-0 " onScroll={handleScroll}>
         {/* Section 1: Session Configuration */}
-        <section className="min-h-screen snap-start flex items-center justify-center px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-4xl">
+        <section className="min-h-screen snap-start flex items-center justify-center px-4 sm:px-6 lg:px-8 ">
+          <div className="w-full max-w-4xl  py-8">
             <SessionConfigSection
               section={sections[0]}
               sessionData={sessionData}

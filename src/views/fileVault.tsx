@@ -61,7 +61,7 @@ export default function FileVault() {
         title="File Vault"
         subtitle="Upload and manage your files"
         icon={FileText}
-        dropdownItems={[
+        action={[
           { label: "Upload File", onClick: () => setIsOpen(true) },
           { label: "New Folder", onClick: handleNewFolder },
         ]}

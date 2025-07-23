@@ -65,11 +65,10 @@ export default function Dashboard() {
     <SpPage>
       <Header breadcrumbs={[{ label: "Dashboard", link: "/" }]} />
       <SpPageHeader
-        isCommander={isCommander(userRole as UserRole)}
         title={activeTab.label}
         subtitle={activeTab.id === "overview" ? "Team, Squad, and more" : "By Date, Squad, and more"}
         icon={activeTab.icon}
-        dropdownItems={[
+        action={[
           {
             label: "Invite",
             onClick: () => {

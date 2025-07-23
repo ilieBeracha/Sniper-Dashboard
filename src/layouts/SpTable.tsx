@@ -528,7 +528,7 @@ function SpTableFilters({
 }) {
   return (
     <div
-      className={`p-4 border-b transition-colors duration-200 rounded-t-xl ${theme === "dark" ? "border-zinc-800" : "border-gray-200 bg-gray-50"}`}
+      className={`p-4 border-b transition-colors duration-200 rounded-t-xl bg-zinc-900/50 ${theme === "dark" ? "border-zinc-800" : "border-gray-200 bg-gray-50"}`}
     >
       {selectable && selectedCount && selectedCount > 0 && (
         <div

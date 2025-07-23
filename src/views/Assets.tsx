@@ -45,7 +45,7 @@ export default function AssetsPage() {
         title="Assets"
         subtitle={`Manage ${activeTab.id === "weapons" ? "weapons" : "equipment"} inventory`}
         icon={Package}
-        dropdownItems={[
+        action={[
           activeTab.id === "weapons"
             ? { label: "Add Weapon", onClick: () => setIsWeaponsOpen(true) }
             : { label: "Add Equipment", onClick: () => setIsEquipmentsOpen(true) },

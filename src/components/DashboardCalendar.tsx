@@ -14,7 +14,7 @@ export default function DashboardCalendar() {
   const { theme } = useTheme();
 
   return (
-    <div className="h-full px-4 py-4">
+    <div className="h-full px-4 py-4 ">
       <div className="relative">
         {/* Timeline line */}
         <div
@@ -78,13 +78,7 @@ function TrainingTimelineItem({
                 ? primitives.grey.grey50
                 : primitives.purple.purple50,
           borderColor:
-            theme === "dark"
-              ? isPast
-                ? primitives.grey.grey800
-                : `${primitives.purple.purple400}20`
-              : isPast
-                ? primitives.grey.grey200
-                : primitives.purple.purple100,
+            theme === "dark" ? (isPast ? primitives.grey.grey800 : `blue-500`) : isPast ? primitives.grey.grey200 : primitives.purple.purple100,
         }}
         onClick={onClick}
       >

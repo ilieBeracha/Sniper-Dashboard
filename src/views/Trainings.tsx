@@ -83,7 +83,12 @@ export default function Trainings() {
         title="Trainings"
         subtitle={"Add, edit, and manage training sessions"}
         icon={BiCurrentLocation}
-        dropdownItems={[{ label: "Add Training", onClick: () => setIsAddTrainingOpen(true) }]}
+        action={[
+          {
+            label: "Add Training",
+            onClick: () => setIsAddTrainingOpen(true),
+          },
+        ]}
       />
       <SpPageTabs tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
 

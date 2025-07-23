@@ -79,14 +79,14 @@ export default function TrainingPage() {
   };
 
   const handleCreateGroupScore = async (groupScore: any) => {
-  try {
-    await createGroupScore(groupScore);
-    setIsOpen(false);
-    toast.success("Group score created successfully");
-    await loadTrainingById(id as string);
-  } catch (error) {
-    console.error("Error creating group score:", error);
-  }
+    try {
+      await createGroupScore(groupScore);
+      setIsOpen(false);
+      toast.success("Group score created successfully");
+      await loadTrainingById(id as string);
+    } catch (error) {
+      console.error("Error creating group score:", error);
+    }
   };
 
   const { tabs, activeTab, handleTabChange } = useTabs({
@@ -110,10 +110,7 @@ export default function TrainingPage() {
     if (activeTab.id === "group-stats") {
       return (
         <div className="grid grid-cols-1 gap-4">
-          <GroupStatsTable 
-            onGroupStatsClick={handleSessionClick} 
-            onGroupStatsEditClick={() => {}} 
-          />
+          <GroupStatsTable onGroupStatsClick={handleSessionClick} onGroupStatsEditClick={() => {}} />
         </div>
       );
     }
@@ -135,7 +132,7 @@ export default function TrainingPage() {
       <SpPageHeader
         title={"Training Session"}
         icon={BiCurrentLocation}
-        dropdownItems={[
+        action={[
           {
             label: "Add Session",
             onClick: () => {

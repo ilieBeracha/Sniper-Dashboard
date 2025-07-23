@@ -22,15 +22,13 @@ export function SpPageHeader({
   subtitle,
   icon,
   breadcrumbs,
-  isCommander = false,
-  dropdownItems,
+  action,
 }: {
   title: string;
-  isCommander?: boolean;
   subtitle?: string;
   icon: React.ComponentType<any>;
   breadcrumbs?: { label: string; link: string }[];
-  dropdownItems?: { label: string; onClick: () => void }[];
+  action?: { label: string; onClick: () => void }[];
 }) {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
@@ -60,10 +58,10 @@ export function SpPageHeader({
                 )}
               </div>
             </div>
-            {!isCommander &&
-              dropdownItems &&
-              dropdownItems.length > 0 &&
-              (isMobile ? (
+          </div>
+          {action && action.length > 0 && (
+            <div className="inline-flex rounded-lg shadow-2xs">
+              {isMobile ? (
                 <Dropdown>
                   <DropdownTrigger className="cursor-pointer">
                     <span
@@ -73,7 +71,7 @@ export function SpPageHeader({
                     </span>
                   </DropdownTrigger>
                   <DropdownMenu aria-label="Static Actions" className={`${theme === "dark" ? "bg-zinc-900" : "bg-gray-100"} rounded-lg p-1`}>
-                    {dropdownItems.map((item, index) => (
+                    {action.map((item, index) => (
                       <DropdownItem
                         className="text-sm  rounded-md bg-zinc-900 text-white"
                         key={index}
@@ -87,15 +85,29 @@ export function SpPageHeader({
                   </DropdownMenu>
                 </Dropdown>
               ) : (
-                <div className="flex items-center gap-2">
-                  {dropdownItems.map((item, index) => (
-                    <BaseButton style="purple" className="text-sm px-2 py-1 rounded-md" key={index} onClick={item.onClick}>
-                      <span className="text-sm">{item.label}</span>
-                    </BaseButton>
+                <div className="inline-flex rounded-lg  overflow-hidden shadow-sm">
+                  {action.map((item, index) => (
+                    <button
+                      key={index}
+                      onClick={item.onClick}
+                      className={`
+                        px-3 py-1.5 text-xs font-medium transition-colors duration-200
+                        ${index > 0 ? "border-l border-gray-200 dark:border-gray-700" : ""}
+                        ${
+                          theme === "dark"
+                            ? "bg-zinc-800 text-gray-200 hover:bg-zinc-700 focus:bg-zinc-700"
+                            : "bg-white text-gray-700 hover:bg-gray-50 focus:bg-gray-50"
+                        }
+                        focus:outline-none focus:z-10 disabled:opacity-50 disabled:pointer-events-none
+                      `}
+                    >
+                      {item.label}
+                    </button>
                   ))}
                 </div>
-              ))}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

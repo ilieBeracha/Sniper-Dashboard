@@ -1,21 +1,10 @@
 import { useEffect, useMemo } from "react";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format, isSameDay, startOfDay } from "date-fns";
 import { useStore } from "zustand";
 import { feedStore } from "@/store/feedStore";
 import { userStore } from "@/store/userStore";
 import { useTheme } from "@/contexts/ThemeContext";
-import { 
-  Activity, 
-  Target, 
-  Calendar, 
-  BarChart3, 
-  UserPlus, 
-  Crosshair, 
-  TrendingUp, 
-  Trophy, 
-  Users, 
-  Star 
-} from "lucide-react";
+import { Activity, Target, Calendar, BarChart3, UserPlus, Crosshair, TrendingUp, Trophy, Users, Star } from "lucide-react";
 
 interface FeedItem {
   id: string;
@@ -26,6 +15,10 @@ interface FeedItem {
   team_id: string;
   squad_id: string;
   description?: string | null;
+}
+
+interface GroupedFeedItem extends FeedItem {
+  dateGroup: string;
 }
 
 // Generate avatar initials and color
@@ -47,10 +40,35 @@ export default function UnifiedFeed() {
     return () => clearInterval(interval);
   }, []);
 
-  // Filter feed to show only items related to current user
-  const userFeed = useMemo(() => {
+  // Filter feed to show only items related to current user and group by date
+  const groupedUserFeed = useMemo(() => {
     if (!user?.id) return [];
-    return feed.filter((item) => item.actor_id === user.id);
+
+    const userFeedItems = feed
+      .filter((item) => item.actor_id === user.id)
+      .map((item) => ({
+        ...item,
+        dateGroup: format(new Date(item.created_at), "dd MMM, yyyy"),
+      }))
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    // Group by date
+    const grouped = userFeedItems.reduce(
+      (acc, item) => {
+        const dateKey = item.dateGroup;
+        if (!acc[dateKey]) {
+          acc[dateKey] = [];
+        }
+        acc[dateKey].push(item);
+        return acc;
+      },
+      {} as Record<string, GroupedFeedItem[]>,
+    );
+
+    return Object.entries(grouped).map(([date, items]) => ({
+      date,
+      items,
+    }));
   }, [feed, user]);
 
   const getActionIcon = (actionType: string) => {
@@ -85,121 +103,96 @@ export default function UnifiedFeed() {
   };
 
   return (
-    <div className="h-full flex flex-col backdrop-blur-sm bg-dark">
-      {/* Elegant Header */}
-      <div className="px-6 py-4 border-b border-white/10 dark:border-white/5">
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Activity Feed</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Activity Feed</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Recent activity log</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-            <span className="text-xs text-gray-500 font-medium">Live</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Live</span>
           </div>
         </div>
       </div>
 
       {/* Timeline Content */}
-      <div className="flex-1 overflow-y-auto px-6 py-8">
-        {userFeed.length === 0 ? (
+      <div className="flex-1 overflow-y-auto px-6 py-6">
+        {groupedUserFeed.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
-            <div className="p-4 rounded-full bg-gray-100/10 dark:bg-white/5 mb-4">
-              <Activity className="w-12 h-12 text-gray-400/50" />
+            <div className="p-4 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
+              <Activity className="w-12 h-12 text-gray-400" />
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-500 text-center font-light">
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
               No recent activity
               <br />
               <span className="text-xs opacity-60">Activities will appear here</span>
             </p>
           </div>
         ) : (
-          <div className="relative">
-            {/* Elegant Timeline line with gradient */}
-            <div className="absolute left-5 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700"></div>
+          <div className="space-y-6">
+            {groupedUserFeed.map(({ date, items }) => (
+              <div key={date}>
+                {/* Date Heading */}
+                <div className="ps-2 my-2 first:mt-0">
+                  <h3 className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">{date}</h3>
+                </div>
 
-            {/* Timeline items */}
-            <div className="space-y-4">
-              {userFeed.map((item, index) => {
-                const avatar = getAvatar(item.actor_id);
-                const isFirst = index === 0;
-                const isNew = index < 3;
-                const ActionIcon = getActionIcon(item.action_type);
+                {/* Timeline Items */}
+                {items.map((item, index) => {
+                  const avatar = getAvatar(item.actor_id);
+                  const ActionIcon = getActionIcon(item.action_type);
+                  const isLast = index === items.length - 1;
 
-                // Different timeline dot styles
-                const dotStyle = isFirst ? "bg-gray-800 dark:bg-gray-200" : "bg-gray-300 dark:bg-gray-600";
-
-                return (
-                  <div key={item.id} className="relative flex gap-4 group">
-                    {/* Timeline dot with animation */}
-                    <div className="relative z-10">
+                  return (
+                    <div key={item.id} className="flex gap-x-3">
+                      {/* Icon */}
                       <div
-                        className={`w-10 h-10 rounded-full ${dotStyle} flex items-center justify-center transition-transform group-hover:scale-105 ${isFirst ? "shadow-sm" : ""}`}
+                        className={`relative ${!isLast ? "after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-[0.5px] after:bg-gray-200 dark:after:bg-gray-700" : ""}`}
                       >
-                        <ActionIcon className={`w-4 h-4 ${isFirst ? "text-white dark:text-gray-900" : "text-gray-600 dark:text-gray-400"}`} />
-                      </div>
-                      {isNew && <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></div>}
-                    </div>
-
-                    {/* Content with transparent background */}
-                    <div className="flex-1 pb-2">
-                      {/* Time with elegant styling */}
-                      <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-1.5">
-                        {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
-                      </p>
-
-                      {/* Transparent message card */}
-                      <div
-                        className={`
-                        p-3 rounded-lg transition-all duration-200
-                        ${
-                          theme === "dark"
-                            ? "bg-gray-800/50 hover:bg-gray-800/70 border border-gray-700/50"
-                            : "bg-gray-50 hover:bg-gray-100 border border-gray-200"
-                        }
-                        ${isNew ? "shadow-sm" : ""}
-                      `}
-                      >
-                        <div className="flex items-start gap-3">
-                          {/* Elegant avatar */}
-                          <div className={`w-8 h-8 rounded-full ${avatar.color} flex items-center justify-center flex-shrink-0`}>
-                            <span className="text-xs font-semibold text-white">{avatar.initials}</span>
-                          </div>
-
-                          {/* Message content */}
-                          <div className="flex-1">
-                            <p className={`text-sm leading-relaxed ${theme === "dark" ? "text-gray-200" : "text-gray-800"}`}>
-                              {renderActionMessage(item)}
-                            </p>
-
-                            {/* Stats with glass effect */}
-                            {item.context && Object.keys(item.context).length > 0 && (
-                              <div className="mt-3 flex flex-wrap gap-2">
-                                {item.context.score && (
-                                  <span className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs">
-                                    Score: {item.context.score}
-                                  </span>
-                                )}
-                                {item.context.hits && (
-                                  <span className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs">
-                                    Hits: {item.context.hits}
-                                  </span>
-                                )}
-                                {item.context.accuracy && (
-                                  <span className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs">
-                                    {item.context.accuracy}% accuracy
-                                  </span>
-                                )}
-                              </div>
-                            )}
+                        <div className="relative z-10 size-7 flex justify-center items-center">
+                          <div className="size-6 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+                            <ActionIcon className="size-3 text-gray-600 dark:text-gray-400" />
                           </div>
                         </div>
                       </div>
+
+                      {/* Right Content */}
+                      <div className="grow pt-0.5 pb-8">
+                        <h3 className="flex gap-x-1.5 font-semibold text-gray-800 dark:text-white">
+                          <ActionIcon className="shrink-0 size-4 mt-1 text-gray-500 dark:text-gray-400" />
+                          {renderActionMessage(item)}
+                        </h3>
+
+                        {/* Context Information */}
+                        {item.context && Object.keys(item.context).length > 0 && (
+                          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                            {item.context.score && `Score: ${item.context.score}`}
+                            {item.context.hits && ` • Hits: ${item.context.hits}`}
+                            {item.context.accuracy && ` • Accuracy: ${item.context.accuracy}%`}
+                          </p>
+                        )}
+
+                        {/* User Info */}
+                        <button
+                          type="button"
+                          className="mt-2 -ms-1 p-1 inline-flex items-center gap-x-2 text-xs rounded-lg border border-transparent text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:text-gray-400 dark:hover:bg-gray-800 dark:focus:bg-gray-800"
+                        >
+                          <div className={`shrink-0 size-4 rounded-full ${avatar.color} flex items-center justify-center`}>
+                            <span className="text-[10px] font-semibold text-white">{avatar.initials}</span>
+                          </div>
+                          <span className="truncate">You</span>
+                          <span className="text-gray-400">•</span>
+                          <span className="text-gray-400">{formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         )}
       </div>
