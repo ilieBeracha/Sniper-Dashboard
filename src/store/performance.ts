@@ -18,6 +18,7 @@ import {
   // getSquadRoleHitPercentages,
   getUserGroupingStatsRpc,
   getUserHitStatsFull,
+  getUserHitStatsWithFilters,
   getSquadHitPercentageByRole,
   getTrainingTeamAnalytics,
   getWeaponUsageStats,
@@ -38,7 +39,14 @@ interface PerformanceStore {
 
   // UserHitsData is a new type that includes detailed hit statistics for a user
   userHitsStats: UserHitsData | null;
+  userHitsStatsLoading: boolean;
   getUserHitStatsFull: (userId: string) => Promise<UserHitsData>;
+  getUserHitStatsWithFilters: (
+    userId: string,
+    distance?: string | null,
+    position?: string | null,
+    weaponType?: string | null
+  ) => Promise<void>;
 
   //
   trainingTeamAnalytics: TrainingTeamAnalytics | null;
@@ -78,6 +86,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   squadStats: [],
   trainingEffectiveness: [],
   userHitsStats: null,
+  userHitsStatsLoading: false,
   trainingTeamAnalytics: null,
   weaponUsageStats: null,
   weaponUsageStatsMap: {},
@@ -167,6 +176,24 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     } catch (error) {
       console.error("Failed to load user hit stats full:", error);
       throw error;
+    }
+  },
+
+  getUserHitStatsWithFilters: async (
+    userId: string,
+    distance: string | null = null,
+    position: string | null = null,
+    weaponType: string | null = null
+  ) => {
+    try {
+      set({ userHitsStatsLoading: true });
+      const data = await getUserHitStatsWithFilters(userId, distance, position, weaponType);
+      set({ userHitsStats: data });
+    } catch (error) {
+      console.error("Failed to load user hit stats with filters:", error);
+      set({ userHitsStats: null });
+    } finally {
+      set({ userHitsStatsLoading: false });
     }
   },
   getTrainingTeamAnalytics: async (trainingSessionId: string) => {

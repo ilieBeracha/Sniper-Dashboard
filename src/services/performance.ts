@@ -24,6 +24,27 @@ export async function getUserHitStatsFull(userId: string): Promise<UserHitsData>
   }
 }
 
+export async function getUserHitStatsWithFilters(
+  userId: string,
+  distance: string | null = null,
+  position: string | null = null,
+  weaponType: string | null = null
+): Promise<UserHitsData> {
+  try {
+    const { data, error } = await supabase.rpc("get_user_hit_stats_with_filters", {
+      p_user_id: userId,
+      p_distance_category: distance,
+      p_position: position,
+      p_weapon_type: weaponType,
+    });
+    if (error) throw error;
+    return data[0];
+  } catch (error: any) {
+    console.error("Error fetching user hit stats with filters:", error.message);
+    throw new Error("Could not complete get_user_hit_stats_with_filters");
+  }
+}
+
 export async function getSquadRoleHitPercentages(squadId: string, distance: string | null = null) {
   try {
     const { data, error } = await supabase.rpc("get_squad_hit_percentages_by_role", {

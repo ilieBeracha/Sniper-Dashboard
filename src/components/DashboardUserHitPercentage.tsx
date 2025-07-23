@@ -3,12 +3,32 @@ import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
 import NoDataDisplay from "./base/BaseNoData";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useEffect } from "react";
+import { userStore } from "@/store/userStore";
 
-export default function UserHitPercentage() {
-  const { userHitsStats } = useStore(performanceStore);
+interface UserHitPercentageProps {
+  distance?: string | null;
+  position?: string | null;
+  weaponType?: string | null;
+}
+
+export default function UserHitPercentage({ 
+  distance = null, 
+  position = null, 
+  weaponType = null 
+}: UserHitPercentageProps) {
+  const { userHitsStats, userHitsStatsLoading, getUserHitStatsWithFilters } = useStore(performanceStore);
+  const { user } = useStore(userStore);
   const { theme } = useTheme();
 
-  if (!userHitsStats) {
+  // Fetch data when filters change
+  useEffect(() => {
+    if (user?.id) {
+      getUserHitStatsWithFilters(user.id, distance, position, weaponType);
+    }
+  }, [distance, position, weaponType, user?.id, getUserHitStatsWithFilters]);
+
+  if (userHitsStatsLoading || !userHitsStats) {
     return (
       <div className="h-full flex justify-center items-center w-full text-sm">
         <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-indigo-500"></div>

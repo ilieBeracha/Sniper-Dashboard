@@ -29,6 +29,11 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
   const [selectedEffort, setSelectedEffort] = useState<string | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
 
+  // UserHitPercentage filters
+  const [hitPercentageDistance, setHitPercentageDistance] = useState<string | null>(null);
+  const [hitPercentagePosition, setHitPercentagePosition] = useState<string | null>(null);
+  const [hitPercentageWeaponType, setHitPercentageWeaponType] = useState<string | null>(null);
+
   const barData = [
     { name: "Excellent", value: 85, percent: 85 },
     { name: "Good", value: 72, percent: 72 },
@@ -91,8 +96,65 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
       {/* Performance Overview */}
       <div className="w-full">
-        <BaseDashboardCard header="Performance Overview" tooltipContent="Current performance metrics">
-          <UserHitPercentage />
+        <BaseDashboardCard 
+          header="Performance Overview" 
+          tooltipContent="Current performance metrics"
+          withFilter={[
+            {
+              label: "Distance",
+              value: "distance",
+              onChange: (val) => {
+                setHitPercentageDistance(val || null);
+              },
+              options: [
+                { label: "All Distances", value: "" },
+                { label: "Short (0-300m)", value: "short" },
+                { label: "Mid (300-600m)", value: "medium" },
+                { label: "Long (600-900m)", value: "long" },
+              ],
+              type: "select",
+            },
+            {
+              label: "Position",
+              value: "position",
+              onChange: (val) => {
+                setHitPercentagePosition(val || null);
+              },
+              options: [
+                { label: "All Positions", value: "" },
+                ...positions.map((pos) => ({ label: formatEnumLabel(pos), value: pos })),
+              ],
+              type: "select",
+            },
+            {
+              label: "Weapon Type",
+              value: "weapon_type",
+              onChange: (val) => {
+                setHitPercentageWeaponType(val || null);
+              },
+              options: [
+                { label: "All Weapons", value: "" },
+                ...weaponTypes.map((type) => ({ label: formatEnumLabel(type), value: type })),
+              ],
+              type: "select",
+            },
+          ]}
+          onClearFilters={() => {
+            setHitPercentageDistance(null);
+            setHitPercentagePosition(null);
+            setHitPercentageWeaponType(null);
+          }}
+          currentFilterValues={{
+            distance: hitPercentageDistance || "",
+            position: hitPercentagePosition || "",
+            weapon_type: hitPercentageWeaponType || "",
+          }}
+        >
+          <UserHitPercentage 
+            distance={hitPercentageDistance}
+            position={hitPercentagePosition}
+            weaponType={hitPercentageWeaponType}
+          />
         </BaseDashboardCard>
       </div>
 
@@ -100,32 +162,38 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
       <div className="grid grid-cols-1 gap-6 lg:col-span-1 xl:col-span-2">
         {/* Grouping Summary Chart */}
         <BaseDashboardCard
-          header="My Card"
+          header="Grouping Summary"
           tooltipContent="Data grouped by filters"
           withFilter={[
             {
               label: "Weapon Type",
               value: "weapon_type",
               onChange: (val) => {
-                setSelectedWeaponType(val);
+                setSelectedWeaponType(val || null);
               },
-              options: weaponTypes.map((type) => ({ label: formatEnumLabel(type), value: type })),
+              options: [
+                { label: "All Weapons", value: "" },
+                ...weaponTypes.map((type) => ({ label: formatEnumLabel(type), value: type })),
+              ],
               type: "select",
             },
             {
               label: "Grouping Type",
               value: "grouping_type",
               onChange: (val) => {
-                setSelectedGroupType(val);
+                setSelectedGroupType(val || null);
               },
-              options: groupingTypes.map((type) => ({ label: formatEnumLabel(type), value: type })),
+              options: [
+                { label: "All Types", value: "" },
+                ...groupingTypes.map((type) => ({ label: formatEnumLabel(type), value: type })),
+              ],
               type: "select",
             },
             {
               label: "Effort",
               value: "effort",
               onChange: (val) => {
-                setSelectedEffort(val);
+                setSelectedEffort(val || null);
               },
               options: [
                 { label: "All Efforts", value: "" },
@@ -138,17 +206,26 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
               label: "Position",
               value: "position",
               onChange: (val) => {
-                setSelectedPosition(val);
+                setSelectedPosition(val || null);
               },
-              options: positions.map((pos) => ({ label: formatEnumLabel(pos), value: pos })),
+              options: [
+                { label: "All Positions", value: "" },
+                ...positions.map((pos) => ({ label: formatEnumLabel(pos), value: pos })),
+              ],
               type: "select",
             },
           ]}
           onClearFilters={() => {
-            setSelectedWeaponType("");
-            setSelectedGroupType("");
-            setSelectedEffort("");
-            setSelectedPosition("");
+            setSelectedWeaponType(null);
+            setSelectedGroupType(null);
+            setSelectedEffort(null);
+            setSelectedPosition(null);
+          }}
+          currentFilterValues={{
+            weapon_type: selectedWeaponType || "",
+            grouping_type: selectedGroupType || "",
+            effort: selectedEffort || "",
+            position: selectedPosition || "",
           }}
         >
           <div className="flex flex-wrap justify-center gap-4 mb-6 px-4"></div>

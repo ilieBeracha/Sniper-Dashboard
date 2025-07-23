@@ -16,6 +16,7 @@ export default function BaseDashboardCard({
   withFilter = [],
   onFilterChange,
   onClearFilters,
+  currentFilterValues = {},
 }: {
   header?: string | React.ReactNode | null;
   children: React.ReactNode | React.ReactNode[];
@@ -35,6 +36,7 @@ export default function BaseDashboardCard({
   }[];
   onFilterChange?: (value: string) => void;
   onClearFilters?: () => void;
+  currentFilterValues?: Record<string, string>;
 }) {
   const isMobile = useIsMobile();
   const { theme } = useTheme();
@@ -80,6 +82,7 @@ export default function BaseDashboardCard({
               filters={withFilter}
               onFilterChange={onFilterChange || (() => {})}
               onClearFilters={onClearFilters || (() => {})}
+              currentValues={currentFilterValues}
             />
           )}
           {withBtn ? (
@@ -111,6 +114,7 @@ export function BaseDashboardCardFilter({
   filters,
   onFilterChange,
   onClearFilters,
+  currentValues = {},
 }: {
   filters: {
     label: string;
@@ -122,6 +126,7 @@ export function BaseDashboardCardFilter({
   }[];
   onFilterChange?: (value: string) => void;
   onClearFilters?: () => void;
+  currentValues?: Record<string, string>;
 }) {
   const { theme } = useTheme();
   return (
@@ -161,8 +166,8 @@ export function BaseDashboardCardFilter({
                     <select
                       id={filter.value}
                       className="col-span-2 h-9 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-zinc-800 text-sm text-gray-800 dark:text-gray-200"
-                      value={filter.checked ? filter.value : ""}
-                      onChange={(e) => onFilterChange?.(e.target.value)}
+                      value={currentValues[filter.value] || ""}
+                      onChange={(e) => filter.onChange(e.target.value)}
                     >
                       {filter.options?.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -173,20 +178,20 @@ export function BaseDashboardCardFilter({
                   ) : filter.type === "text" ? (
                     <Input
                       id={filter.value}
-                      value={filter.checked ? filter.value : ""}
-                      onChange={(e) => onFilterChange?.(e.target.value)}
+                      value={currentValues[filter.value] || ""}
+                      onChange={(e) => filter.onChange(e.target.value)}
                       className="col-span-2 h-9"
                     />
                   ) : filter.type === "number" ? (
                     <Input
                       type="number"
                       id={filter.value}
-                      value={filter.checked ? filter.value : ""}
-                      onChange={(e) => onFilterChange?.(e.target.value)}
+                      value={currentValues[filter.value] || ""}
+                      onChange={(e) => filter.onChange(e.target.value)}
                       className="col-span-2 h-9"
                     />
                   ) : filter.type === "checkbox" ? (
-                    <Checkbox id={filter.value} checked={filter.checked} onValueChange={(checked) => onFilterChange?.(checked.toString())} />
+                    <Checkbox id={filter.value} checked={!!currentValues[filter.value]} onValueChange={(checked) => filter.onChange(checked.toString())} />
                   ) : null}
                 </div>
               );
