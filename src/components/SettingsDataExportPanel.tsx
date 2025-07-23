@@ -100,6 +100,9 @@ export default function SettingsDataExportPanel() {
       },
     };
 
+    // For now, simply log the generated mock data so that the variable is used
+    console.log("Generated training report data", mockData);
+
     setIsGenerating(false);
   };
 

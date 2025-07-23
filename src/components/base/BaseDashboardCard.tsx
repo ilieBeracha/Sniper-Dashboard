@@ -129,6 +129,8 @@ export function BaseDashboardCardFilter({
   currentValues?: Record<string, string>;
 }) {
   const { theme } = useTheme();
+  // Reference the callback so that it is not considered unused by TypeScript
+  void onFilterChange;
   return (
     <div className="absolute top-0 right-6">
       <Popover placement="bottom-end">

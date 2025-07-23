@@ -81,24 +81,30 @@ export default function GroupStatsTable({
     {
       key: "sniper_name",
       label: "Sniper",
-      render: (value: string, row: GroupingScoreEntry) => (
-        <span className="truncate max-w-[120px]">
-          {`${row.sniper_first_name} ${row.sniper_last_name}` || "N/A"}
-        </span>
-      ),
+      render: (value: string, row: GroupingScoreEntry) => {
+        void value;
+        return (
+          <span className="truncate max-w-[120px]">
+            {`${row.sniper_first_name} ${row.sniper_last_name}` || "N/A"}
+          </span>
+        );
+      },
       className: "px-4 py-3",
     },
     {
       key: "weapon_info",
       label: "Weapon",
-      render: (value: string, row: GroupingScoreEntry) => (
-        <div className="truncate max-w-[120px]">
-          <div className="font-medium">{row.weapon_type || "N/A"}</div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            {row.weapon_serial_number || ""}
+      render: (value: string, row: GroupingScoreEntry) => {
+        void value;
+        return (
+          <div className="truncate max-w-[120px]">
+            <div className="font-medium">{row.weapon_type || "N/A"}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {row.weapon_serial_number || ""}
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
       className: "px-4 py-3",
     },
     {
