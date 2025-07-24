@@ -9,6 +9,7 @@ import BaseDesktopDrawer from "../BaseDrawer/BaseDesktopDrawer";
 import BaseMobileDrawer from "../BaseDrawer/BaseMobileDrawer";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useEffect } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const groupScoreSchema = z.object({
   sniper_user_id: z.string().uuid(),
@@ -81,8 +82,16 @@ export default function TrainingPageGroupFormModal({
 
   const message = <p className="text-sm italic mt-1 text-gray-500">This field is available only when 4 or more bullets are fired</p>;
 
+  // Create a wrapper for the form submission
+  const handleFormSubmit = (data: GroupScoreFormValues) => {
+    onSubmit(data);
+  };
+
+  // Debounce the submit handler to prevent rapid form submissions
+  const [debouncedSubmit] = useDebounce(handleFormSubmit, 500, [onSubmit]);
+
   const renderForm = () => (
-    <form onSubmit={handleSubmit(onSubmit)} className={`space-y-6 ${isMobile ? "min-w-[300px]" : "min-w-[600px]"}`}>
+    <form onSubmit={handleSubmit(debouncedSubmit)} className={`space-y-6 ${isMobile ? "min-w-[300px]" : "min-w-[600px]"}`}>
       <input type="hidden" {...register("sniper_user_id")} />
 
       <div className="grid grid-cols-1 gap-4">

@@ -41,12 +41,7 @@ interface PerformanceStore {
   userHitsStats: UserHitsData | null;
   userHitsStatsLoading: boolean;
   getUserHitStatsFull: (userId: string) => Promise<UserHitsData>;
-  getUserHitStatsWithFilters: (
-    userId: string,
-    distance?: string | null,
-    position?: string | null,
-    weaponType?: string | null
-  ) => Promise<void>;
+  getUserHitStatsWithFilters: (userId: string, distance?: string | null, position?: string | null, weaponType?: string | null) => Promise<void>;
 
   //
   trainingTeamAnalytics: TrainingTeamAnalytics | null;
@@ -54,12 +49,7 @@ interface PerformanceStore {
   //
   groupingSummary: GroupingSummary | null;
   groupingSummaryLoading: boolean;
-  getGroupingSummary: (
-    weaponType?: string | null,
-    effort?: boolean | null,
-    groupType?: string | null,
-    position?: string | null,
-  ) => Promise<void>;
+  getGroupingSummary: (weaponType?: string | null, effort?: boolean | null, groupType?: string | null, position?: string | null) => Promise<void>;
 
   trainingEffectiveness: TrainingEffectiveness[];
   getTrainingEffectiveness: (teamId: string) => Promise<void>;
@@ -110,9 +100,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   getWeaponUsageStats: async (weaponId: string) => {
     try {
       set({ isLoading: true });
-      console.log("Store - fetching weapon usage for weaponId:", weaponId);
       const stats = await getWeaponUsageStats(weaponId);
-      console.log("Store - received stats:", stats);
       set((state) => ({
         weaponUsageStats: stats,
         weaponUsageStatsMap: {
@@ -183,7 +171,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     userId: string,
     distance: string | null = null,
     position: string | null = null,
-    weaponType: string | null = null
+    weaponType: string | null = null,
   ) => {
     try {
       set({ userHitsStatsLoading: true });

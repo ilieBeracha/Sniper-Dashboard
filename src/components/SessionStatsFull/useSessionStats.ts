@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useStore } from "zustand";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -19,13 +19,17 @@ export const useSessionStats = () => {
   const { user } = useStore(userStore);
   const { training, loadTrainingById } = useStore(TrainingStore);
   const { weapons } = useStore(weaponsStore);
-  const { equipments} = useStore(equipmentStore);
-  const { members } = useStore(teamStore);
+  const { equipments } = useStore(equipmentStore);
+  const { members, fetchMembers } = useStore(teamStore);
   const { saveSessionStats } = useStore(sessionStore);
 
   const { isOpen: isAssignmentModalOpen, setIsOpen: setIsAssignmentModalOpen } = useModal();
   const [activeSection, setActiveSection] = useState(0);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Debouncing ref to prevent multiple submissions
+  const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [sessionData, setSessionData] = useState<SessionData>({
     assignment_id: "",
@@ -77,10 +81,11 @@ export const useSessionStats = () => {
   useEffect(() => {
     (async () => {
       if (id) {
+        await fetchMembers(user?.team_id as string);
         await loadTrainingById(id);
       }
     })();
-  }, [id, loadTrainingById]);
+  }, [id, loadTrainingById, user?.team_id]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const container = e.currentTarget;
@@ -256,7 +261,8 @@ export const useSessionStats = () => {
     );
   };
 
-  const handleSubmit = async () => {
+  // Validation function that runs on data changes
+  const validateForm = useCallback(() => {
     const errors: string[] = [];
     if (!sessionData.assignment_id) errors.push("Training Assignment is required");
     if (!sessionData.dayPeriod) errors.push("Time Period is required");
@@ -281,59 +287,96 @@ export const useSessionStats = () => {
     }
 
     setValidationErrors(errors);
+    return errors;
+  }, [sessionData, participants, targets]);
 
-    if (errors.length === 0) {
-      // Format data exactly as SessionStatsSaveData interface
-      const saveData: SessionStatsSaveData = {
-        // Session data from wizard
-        sessionData: {
-          training_session_id: training?.id || null,
-          assignment_id: sessionData.assignment_id || null,
-          team_id: user?.team_id || null,
-          dayPeriod: sessionData.dayPeriod || null,
-          timeToFirstShot: sessionData.timeToFirstShot,
-          note: sessionData.note || null,
-        },
-        // Participants data from wizard
-        participants: participants.map((p) => ({
-          user_id: p.userId,
-          user_duty: p.userDuty as "Sniper" | "Spotter",
-          weapon_id: p.weaponId || null,
-          equipment_id: p.equipmentId || null,
-          position: p.position,
-        })),
-        // Targets data from wizard
-        targets: targets.map((t) => ({
-          distance: t.distance,
-          windStrength: t.windStrength || undefined,
-          windDirection: t.windDirection || undefined,
-          totalHits: t.engagements.reduce((sum, eng) => sum + (eng.targetHits || 0), 0),
-          mistakeCode: t.mistakeCode || undefined,
-          engagements: t.engagements.map((eng) => ({
-            user_id: eng.userId,
-            shots_fired: eng.shotsFired,
-            target_hits: eng.targetHits || undefined,
-          })),
-        })),
-        // Current user for creator_id
-        currentUser: user ? { id: user.id } : null,
-      };
+  // Run validation when data changes
+  useEffect(() => {
+    validateForm();
+  }, [validateForm]);
 
-      console.log("Submitting session data:", saveData);
+  const handleSubmit = useCallback(async () => {
+    // Prevent multiple submissions
+    if (isSubmitting) return;
 
-      try {
-        await saveSessionStats(saveData);
-        toast.success("Session statistics saved successfully!");
-        // Navigate back to training page after successful save
-        if (id) {
-          navigate(`/training/${id}`);
-        }
-      } catch (error) {
-        console.error("Error saving session:", error);
-        toast.error("Failed to save session statistics");
-      }
+    // Clear any existing timeout
+    if (submitTimeoutRef.current) {
+      clearTimeout(submitTimeoutRef.current);
     }
-  };
+
+    // Debounce the submission to prevent accidental double clicks
+    submitTimeoutRef.current = setTimeout(async () => {
+      setIsSubmitting(true);
+
+      // Re-validate before submission
+      const errors = validateForm();
+
+      setValidationErrors(errors);
+
+      if (errors.length === 0) {
+        // Format data exactly as SessionStatsSaveData interface
+        const saveData: SessionStatsSaveData = {
+          // Session data from wizard
+          sessionData: {
+            training_session_id: training?.id || null,
+            assignment_id: sessionData.assignment_id || null,
+            team_id: user?.team_id || null,
+            dayPeriod: sessionData.dayPeriod || null,
+            timeToFirstShot: sessionData.timeToFirstShot,
+            note: sessionData.note || null,
+          },
+          // Participants data from wizard
+          participants: participants.map((p) => ({
+            user_id: p.userId,
+            user_duty: p.userDuty as "Sniper" | "Spotter",
+            weapon_id: p.weaponId || null,
+            equipment_id: p.equipmentId || null,
+            position: p.position,
+          })),
+          // Targets data from wizard
+          targets: targets.map((t) => ({
+            distance: t.distance,
+            windStrength: t.windStrength || undefined,
+            windDirection: t.windDirection || undefined,
+            totalHits: t.engagements.reduce((sum, eng) => sum + (eng.targetHits || 0), 0),
+            mistakeCode: t.mistakeCode || undefined,
+            engagements: t.engagements.map((eng) => ({
+              user_id: eng.userId,
+              shots_fired: eng.shotsFired,
+              target_hits: eng.targetHits || undefined,
+            })),
+          })),
+          // Current user for creator_id
+          currentUser: user ? { id: user.id } : null,
+        };
+
+        console.log("Submitting session data:", saveData);
+
+        try {
+          await saveSessionStats(saveData);
+          toast.success("Training session submitted successfully!");
+          // Navigate back to training page after successful save
+          if (id) {
+            navigate(`/training/${id}`);
+          }
+        } catch (error) {
+          console.error("Error saving session:", error);
+          toast.error("Failed to submit training session. Please try again.");
+        }
+      }
+
+      setIsSubmitting(false);
+    }, 300); // 300ms debounce delay
+  }, [isSubmitting, validateForm, training, user, id, navigate, saveSessionStats]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (submitTimeoutRef.current) {
+        clearTimeout(submitTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return {
     // State
@@ -343,6 +386,7 @@ export const useSessionStats = () => {
     targets,
     validationErrors,
     sections,
+    isSubmitting,
 
     // Data
     user,

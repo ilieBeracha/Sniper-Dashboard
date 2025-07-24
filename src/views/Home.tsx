@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { useEffect, Suspense, lazy } from "react";
 import { useStore } from "zustand";
 import { authStore } from "@/store/authStore";
@@ -33,6 +33,7 @@ export default function AppRoutes() {
     const load = async () => {
       if (user?.team_id && user?.squad_id) {
         await fetchMembers(user.team_id);
+        await getSquadsWithUsersByTeamId(user.team_id);
         await getEquipments(user.team_id);
         await getWeapons(user.team_id);
         await getSquadsWithUsersByTeamId(user.team_id);

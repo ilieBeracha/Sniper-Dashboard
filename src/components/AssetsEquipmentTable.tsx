@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Equipment } from "@/types/equipment";
-import { Eye, Edit, Save, X } from "lucide-react";
+import { Edit, Save, X } from "lucide-react";
 import { format } from "date-fns";
 import { useStore } from "zustand";
 import { equipmentStore } from "@/store/equipmentStore";
@@ -40,10 +40,6 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
   const handleCancelEdit = () => {
     setEditingEquipment(null);
     setEditForm({});
-  };
-
-  const handleViewEquipment = (equipment: Equipment) => {
-    console.log("Viewing equipment:", equipment);
   };
 
   const columns = [
@@ -173,13 +169,6 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
           </>
         ) : (
           <>
-            <button
-              onClick={() => handleViewEquipment(equipment)}
-              className={`p-2 rounded  ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
-              title="View"
-            >
-              <Eye size={16} />
-            </button>
             <button
               onClick={() => handleEditEquipment(equipment)}
               className={`p-2 rounded  ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}

@@ -5,7 +5,6 @@ import React, { ReactNode } from "react";
 import { MoreVertical } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
-import BaseButton from "@/components/base/BaseButton";
 
 export function SpPage({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
@@ -41,7 +40,7 @@ export function SpPageHeader({
         </div>
       )}
       <div className={`${isMobile ? "px-6 py-4" : "px-6 py-4"} transition-all duration-200 relative`}>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex justify-between sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 justify-between w-full">
             <div className="flex items-center gap-3">
               <div className={`p-3 rounded-xl ${theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"}`}>
@@ -60,12 +59,12 @@ export function SpPageHeader({
             </div>
           </div>
           {action && action.length > 0 && (
-            <div className="inline-flex rounded-lg shadow-2xs">
+            <div className=" gap-2     rounded-lg shadow-2xs">
               {isMobile ? (
                 <Dropdown>
                   <DropdownTrigger className="cursor-pointer">
                     <span
-                      className={`min-w-unit-8 p-2 h-unit-8 rounded-lg ${theme === "dark" ? "bg-black/20" : "bg-gray-400/10"} backdrop-blur-sm flex items-center justify-center`}
+                      className={`min-w-unit-8  p-2 h-unit-8 rounded-lg ${theme === "dark" ? "bg-zinc-800" : "bg-gray-400/10"} backdrop-blur-sm flex items-center justify-center`}
                     >
                       <MoreVertical className="w-5 h-5" />
                     </span>
@@ -73,7 +72,7 @@ export function SpPageHeader({
                   <DropdownMenu aria-label="Static Actions" className={`${theme === "dark" ? "bg-zinc-900" : "bg-gray-100"} rounded-lg p-1`}>
                     {action.map((item, index) => (
                       <DropdownItem
-                        className="text-sm  rounded-md bg-zinc-900 text-white"
+                        className="text-sm  rounded-md bg-zinc-900 text-white col-span-1"
                         key={index}
                         onPress={() => {
                           item.onClick();
@@ -168,6 +167,7 @@ export function SpPageBody({ children }: { children: ReactNode }) {
 export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: string; link: string }[] }) {
   const { theme } = useTheme();
   const isLastItem = (index: number) => index === breadcrumbs.length - 1;
+  const isMobile = useIsMobile();
 
   return (
     <Breadcrumb>
@@ -176,13 +176,16 @@ export function SpPageBreadcrumbs({ breadcrumbs }: { breadcrumbs: { label: strin
           <React.Fragment key={breadcrumb.label}>
             <BreadcrumbItem>
               {isLastItem(index) ? (
-                <BreadcrumbLink asChild className={`${theme === "dark" ? "text-gray-300" : "text-gray-500"} text-xs font-medium cursor-default`}>
+                <BreadcrumbLink
+                  asChild
+                  className={`${theme === "dark" ? "text-gray-300" : "text-gray-500"} ${isMobile ? "text-[10px]" : "text-xs"} font-medium cursor-default`}
+                >
                   <span>{breadcrumb.label}</span>
                 </BreadcrumbLink>
               ) : (
                 <BreadcrumbLink
                   asChild
-                  className={`${theme === "dark" ? "text-gray-400 hover:text-gray-200" : "text-gray-600 hover:text-gray-900"} text-xs transition-colors`}
+                  className={`${theme === "dark" ? "text-gray-400 hover:text-gray-200" : "text-gray-600 hover:text-gray-900"} ${isMobile ? "text-[10px]" : "text-xs"} transition-colors`}
                 >
                   <Link to={breadcrumb.link}>{breadcrumb.label}</Link>
                 </BreadcrumbLink>

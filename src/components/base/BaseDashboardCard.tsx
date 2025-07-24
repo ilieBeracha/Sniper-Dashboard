@@ -57,22 +57,21 @@ export default function BaseDashboardCard({
     >
       <div className={`${padding} border-none transition-colors duration-200 ${theme === "dark" ? "border-white/10" : "border-gray-200"}`}>
         <div className="flex justify-between relative h-full items-center gap-2">
-          <div className="flex items-center gap-2 absolute top-1 right-1" style={{ zIndex: 1000 }}>
-            <div className={`flex flex-col items-center gap-4 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-100"} shadow-lg rounded-lg p-2`}>
-              {tooltipContent && (
-                <BiInfoCircle
-                  className={` cursor-help transition-colors duration-200 ${
-                    theme === "dark" ? "text-indigo-400/80 hover:text-indigo-400" : "text-indigo-600/80 hover:text-indigo-600"
-                  }`}
-                  size={16}
-                  data-tooltip-id={`${header}-tooltip`}
-                  data-tooltip-content={tooltipContent}
-                />
-              )}
-              {withFilter.length > 0 && (
-                <BaseDashboardCardFilter filters={withFilter} onClearFilters={onClearFilters || (() => {})} currentValues={currentFilterValues} />
-              )}
-            </div>
+          <div className="flex items-center gap-2 absolute top-0 right-0">
+            <div className={`flex items-center gap-4  shadow-lg rounded-lg p-2`}></div>
+            {tooltipContent && (
+              <BiInfoCircle
+                className={` cursor-help transition-colors duration-200 ${
+                  theme === "dark" ? "text-indigo-400/80 hover:text-indigo-400" : "text-indigo-600/80 hover:text-indigo-600"
+                }`}
+                size={16}
+                data-tooltip-id={`${header}-tooltip`}
+                data-tooltip-content={tooltipContent}
+              />
+            )}
+            {withFilter.length > 0 && (
+              <BaseDashboardCardFilter filters={withFilter} onClearFilters={onClearFilters || (() => {})} currentValues={currentFilterValues} />
+            )}
           </div>
           <h2
             className={`font-semibold flex items-center gap-2 text-sm relative transition-colors duration-200 ${

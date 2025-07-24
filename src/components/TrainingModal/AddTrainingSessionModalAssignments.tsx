@@ -1,4 +1,4 @@
-import { useState } from "react";
+  import { useState } from "react";
 import { Assignment } from "@/types/training";
 import SearchableCheckboxList from "@/components/SearchableCheckboxList";
 import AddAssignmentModal from "@/components/AddAssignmentModal";

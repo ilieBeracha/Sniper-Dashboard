@@ -30,7 +30,7 @@ export default function ImprovedSessionStats() {
     targets,
     validationErrors,
     sections,
-
+    isSubmitting,
     // Data
     user,
     weapons,
@@ -56,12 +56,17 @@ export default function ImprovedSessionStats() {
 
   useEffect(() => {
     (async () => {
-      if (training?.team_id) {
-        await getWeapons(training?.team_id as string);
-        await getEquipments(training?.team_id as string);
+      if (user?.team_id) {
+        await getWeapons(user?.team_id as string);
+        await getEquipments(user?.team_id as string);
       }
     })();
   }, [training?.team_id]);
+
+  useEffect(() => {
+    console.log("user", user);
+    console.log("weapons", weapons);
+  }, [user?.team_id]);
 
   async function onSuccessAddAssignment(assignmentName: string) {
     const res = await createAssignment(assignmentName, true, training?.id as string);
@@ -184,6 +189,7 @@ export default function ImprovedSessionStats() {
               section={sections[4]}
               participants={participants}
               targets={targets}
+              isSubmitting={isSubmitting}
               validationErrors={validationErrors}
               handleSubmit={handleSubmit}
             />

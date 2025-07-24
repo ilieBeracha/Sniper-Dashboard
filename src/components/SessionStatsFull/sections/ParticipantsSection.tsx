@@ -2,7 +2,6 @@ import { Users, Trash2, UserPlus } from "lucide-react";
 import { Participant } from "../types";
 import { SectionHeader } from "./SectionHeader";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useEffect } from "react";
 import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
 
@@ -32,10 +31,6 @@ export const ParticipantsSection = ({
   updateParticipant,
 }: ParticipantsSectionProps) => {
   const { theme } = useTheme();
-
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
 
   return (
     <div className="w-full max-w-2xl mx-auto" id="participants">

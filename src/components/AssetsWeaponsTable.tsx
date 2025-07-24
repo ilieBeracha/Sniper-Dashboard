@@ -47,10 +47,6 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
     setEditForm({});
   };
 
-  const handleViewWeapon = (weapon: Weapon) => {
-    console.log("Viewing weapon:", weapon);
-  };
-
   const handleViewUsage = async (weapon: Weapon) => {
     if (!weapon.id) return;
     setSelectedWeaponForUsage(weapon);
@@ -181,16 +177,6 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
           </>
         ) : (
           <>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleViewWeapon(weapon);
-              }}
-              className={`p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
-              title="View Details"
-            >
-              <Eye size={16} />
-            </button>
             <button
               onClick={(e) => {
                 e.stopPropagation();

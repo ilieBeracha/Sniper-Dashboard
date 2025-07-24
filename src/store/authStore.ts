@@ -125,7 +125,6 @@ export const authStore = create<props>((set, get) => ({
 
   login: async (user: LoginUserData) => {
     try {
-      console.log("login", user);
       authStore.getState().resetError();
       const res = await authService.login(user);
       get().supabaseLogin(res);

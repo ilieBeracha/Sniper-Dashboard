@@ -15,15 +15,15 @@ interface FeedItem {
 interface FeedStore {
   feed: FeedItem[];
   setFeed: (feed: FeedItem[]) => void;
-  fetchFeedLog: () => void;
+  fetchFeedLog: (teamId: string) => void;
 }
 
 export const feedStore = create<FeedStore>((set) => ({
   feed: [],
   setFeed: (feed) => set({ feed }),
 
-  fetchFeedLog: async () => {
-    const data = await fetchFeedLog();
+  fetchFeedLog: async (teamId: string) => {
+    const data = await fetchFeedLog(teamId);
     set({ feed: data || [] });
   },
 }));

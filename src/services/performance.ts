@@ -6,7 +6,7 @@ import {
   WeaponUsageStats,
   SquadMajorityPerformance,
   CommanderUserRoleBreakdown,
-  GroupingScoreEntry
+  GroupingScoreEntry,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/user";
@@ -28,7 +28,7 @@ export async function getUserHitStatsWithFilters(
   userId: string,
   distance: string | null = null,
   position: string | null = null,
-  weaponType: string | null = null
+  weaponType: string | null = null,
 ): Promise<UserHitsData> {
   try {
     const { data, error } = await supabase.rpc("get_user_hit_stats_with_filters", {
@@ -60,7 +60,6 @@ export async function getSquadRoleHitPercentages(squadId: string, distance: stri
     throw new Error("Failed to fetch squad role hit percentages");
   }
 }
-
 
 export async function getGroupingScoresByTraining(trainingSessionId: string): Promise<GroupingScoreEntry[]> {
   const { data, error } = await supabase.rpc("get_grouping_data_by_training", {
@@ -128,7 +127,7 @@ export async function getUserGroupingStatsRpc(
   weaponType: string | null = null,
   effort: boolean | null = null,
   type: string | null = null,
-  position: string | null = null
+  position: string | null = null,
 ): Promise<GroupingSummary> {
   const { data, error } = await supabase.rpc("get_user_grouping_stats_v3", {
     p_user_id: userId,
@@ -216,7 +215,6 @@ export const getCommanderUserRoleBreakdown = async (teamId: string): Promise<Com
 // new
 export const getSquadMajoritySessionsPerformance = async (teamId: string): Promise<SquadMajorityPerformance[]> => {
   const { data, error } = await supabase.rpc("get_squad_majority_sessions_performance", { p_team_id: teamId });
-  console.log(data, "Data from getSquadMajoritySessionsPerformance");
   if (error) {
     console.error("Error fetching squad majority performance:", error);
     throw error;
@@ -226,25 +224,15 @@ export const getSquadMajoritySessionsPerformance = async (teamId: string): Promi
 };
 
 export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsageStats> {
-  console.log("Service - getWeaponUsageStats called with weaponId:", weaponId);
-
   const { data, error } = await supabase.rpc("get_weapon_usage_stats", {
     p_weapon_id: weaponId,
   });
-
-  if (data && data.length > 0) {
-    console.log("Service - First data item:", data[0]);
-    console.log("Service - Data item keys:", Object.keys(data[0]));
-    console.log("Service - total_shots_fired value:", data[0].total_shots_fired, "type:", typeof data[0].total_shots_fired);
-    console.log("Service - total_hits value:", data[0].total_hits, "type:", typeof data[0].total_hits);
-  }
 
   if (error) {
     console.error("Error fetching weapon usage stats:", error.message);
     throw error;
   }
 
-  // Handle case where data exists but might have different field names or null values
   const rawResult = data?.[0];
   const result = rawResult
     ? {

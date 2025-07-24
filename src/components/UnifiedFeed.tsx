@@ -1,9 +1,9 @@
 import { useEffect, useMemo } from "react";
-import { formatDistanceToNow, format, isSameDay, startOfDay } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 import { useStore } from "zustand";
 import { feedStore } from "@/store/feedStore";
 import { userStore } from "@/store/userStore";
-import { useTheme } from "@/contexts/ThemeContext";
+
 import { Activity, Target, Calendar, BarChart3, UserPlus, Crosshair, TrendingUp, Trophy, Users, Star } from "lucide-react";
 
 interface FeedItem {
@@ -32,13 +32,10 @@ const getAvatar = (userId: string) => {
 export default function UnifiedFeed() {
   const { feed, fetchFeedLog } = useStore(feedStore);
   const { user } = useStore(userStore);
-  const { theme } = useTheme();
 
   useEffect(() => {
-    fetchFeedLog();
-    const interval = setInterval(fetchFeedLog, 10000); // Update every 10s
-    return () => clearInterval(interval);
-  }, []);
+    fetchFeedLog(user?.team_id as string);
+  }, [user?.team_id]);
 
   // Filter feed to show only items related to current user and group by date
   const groupedUserFeed = useMemo(() => {
@@ -103,29 +100,15 @@ export default function UnifiedFeed() {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Activity Feed</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Recent activity log</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Live</span>
-          </div>
-        </div>
-      </div>
-
+    <div className="flex flex-col h-full z-[1000]">
       {/* Timeline Content */}
       <div className="flex-1 overflow-y-auto px-6 py-6">
         {groupedUserFeed.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
-            <div className="p-4 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
+            <div className="p-4 rounded-full  mb-4">
               <Activity className="w-12 h-12 text-gray-400" />
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+            <p className="text-sm  text-center">
               No recent activity
               <br />
               <span className="text-xs opacity-60">Activities will appear here</span>
@@ -137,7 +120,7 @@ export default function UnifiedFeed() {
               <div key={date}>
                 {/* Date Heading */}
                 <div className="ps-2 my-2 first:mt-0">
-                  <h3 className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">{date}</h3>
+                  <h3 className="text-xs font-medium uppercase ">{date}</h3>
                 </div>
 
                 {/* Timeline Items */}
@@ -153,7 +136,7 @@ export default function UnifiedFeed() {
                         className={`relative ${!isLast ? "after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-[0.5px] after:bg-gray-200 dark:after:bg-gray-700" : ""}`}
                       >
                         <div className="relative z-10 size-7 flex justify-center items-center">
-                          <div className="size-6 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+                          <div className="size-6 rounded-full  border border-gray-200 0 flex items-center justify-center">
                             <ActionIcon className="size-3 text-gray-600 dark:text-gray-400" />
                           </div>
                         </div>
@@ -161,8 +144,8 @@ export default function UnifiedFeed() {
 
                       {/* Right Content */}
                       <div className="grow pt-0.5 pb-8">
-                        <h3 className="flex gap-x-1.5 font-semibold text-gray-800 dark:text-white">
-                          <ActionIcon className="shrink-0 size-4 mt-1 text-gray-500 dark:text-gray-400" />
+                        <h3 className="flex gap-x-1.5 font-semibold ">
+                          <ActionIcon className="shrink-0 size-4 mt-1 " />
                           {renderActionMessage(item)}
                         </h3>
 

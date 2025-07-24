@@ -44,7 +44,6 @@ export default function DashboardTeamTable() {
       key: "first_name",
       label: "Operative",
       render: (_value: string, row: User) => {
-        console.log("Row data:", row);
         const initials = (row?.first_name?.charAt(0) || "?").toUpperCase() + (row?.last_name?.charAt(0) || "?").toUpperCase();
         return (
           <div className="flex items-center gap-3">
@@ -129,7 +128,6 @@ export default function DashboardTeamTable() {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            console.log("Edit member:", member);
           }}
           className={`p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
           title="Edit"
@@ -139,7 +137,6 @@ export default function DashboardTeamTable() {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            console.log("Delete member:", member);
           }}
           className={`p-2 rounded hover:bg-red-100 dark:hover:bg-red-800/40 ${theme === "dark" ? "text-red-400" : "text-red-600"}`}
           title="Delete"
@@ -149,7 +146,6 @@ export default function DashboardTeamTable() {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            console.log("More options for member:", member);
           }}
           className={`p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800/40 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
           title="More Options"

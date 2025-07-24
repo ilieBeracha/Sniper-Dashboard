@@ -82,7 +82,6 @@ export const sessionStore = create<SessionStatsState>((set) => ({
     const trainingStore = TrainingStore.getState().training;
     const res = await createGroupScoreService(groupScore, trainingStore?.id || "");
     set({ groupStats: res });
-    console.log("Group score created:", res);
 
     return res;
   },
@@ -148,6 +147,7 @@ export const sessionStore = create<SessionStatsState>((set) => ({
 
           const supabaseRecords = formatForSupabaseInsert(processedData);
           console.log("supabaseRecords", supabaseRecords);
+          console.log("participantsData", processedData);
 
           return {
             targetStats,
@@ -155,8 +155,6 @@ export const sessionStore = create<SessionStatsState>((set) => ({
           };
         }),
       );
-
-      console.log("wizardData", wizardData);
 
       // Call service to save everything
       const savedSession = await saveCompleteSession({
