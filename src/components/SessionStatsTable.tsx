@@ -226,6 +226,7 @@ export default function SessionStatsTable({
       key: "creator",
       label: "Creator",
       render: (_value: any, row: any) => {
+        void _value; // Mark as used to satisfy TypeScript
         if (row.isGroup) return null;
         const creator = row.users;
         return (

@@ -119,6 +119,7 @@ export default function DashboardTeamTable() {
   ];
 
   const actions = (member: User) => {
+    void member; // Mark parameter as used to satisfy TypeScript's noUnusedParameters rule
     if (!isCommander(user?.user_role as UserRole)) {
       return null;
     }

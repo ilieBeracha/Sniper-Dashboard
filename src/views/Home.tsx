@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { useEffect, Suspense, lazy } from "react";
 import { useStore } from "zustand";
 import { authStore } from "@/store/authStore";
