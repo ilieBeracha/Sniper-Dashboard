@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import BaseInput from "./base/BaseInput";
 import BaseButton from "./base/BaseButton";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type ListItem = {
   id: string;
@@ -36,7 +37,7 @@ export default function SearchableCheckboxList({
 }: SearchableCheckboxListProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const { theme } = useTheme();
   const filteredItems = items.filter(
     (item) =>
       item.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -63,7 +64,7 @@ export default function SearchableCheckboxList({
       <BaseButton
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-3 bg-white/5 text-white text-sm border border-white/10 rounded-md hover:bg-white/10 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        className={`w-full flex items-center justify-between px-3 py-3 text-sm border border-white/10 rounded-md hover:bg-white/10 focus:outline-none focus:ring-1 focus:ring-indigo-500 ${theme === "dark" ? "bg-white/5 text-white" : "bg-black/5 text-black"}`}
       >
         <div className="flex items-center gap-2 min-w-0">
           {selectedItems.length > 0 ? (
@@ -78,14 +79,16 @@ export default function SearchableCheckboxList({
       </BaseButton>
 
       {isOpen && (
-        <div className="absolute z-10 w-full mt-1 bg-[#151515] rounded-lg border border-white/10 shadow-lg">
+        <div
+          className={`absolute z-10 w-full mt-1 rounded-lg border border-white/10 shadow-lg ${theme === "dark" ? "bg-[#151515]" : "bg-gray-50 text-black"}`}
+        >
           <div className="px-3 py-2 border-b border-white/5">
             <BaseInput
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={searchPlaceholder}
-              leftIcon={<Search size={16} className="text-gray-400" />}
+              leftIcon={<Search size={16} className={`text-gray -400 ${theme === "dark" ? "text-white" : "text-black"}`} />}
               containerClassName="bg-transparent"
               onClick={(e) => e.stopPropagation()}
             />
@@ -94,25 +97,31 @@ export default function SearchableCheckboxList({
           {/* Items list */}
           <div className="overflow-y-auto custom-scrollbar" style={{ maxHeight: `${maxHeight}px` }}>
             {filteredItems.length === 0 ? (
-              <div className="px-4 py-6 text-center text-sm text-gray-400">{emptyMessage}</div>
+              <div className={`px-4 py-6 text-center text-sm ${theme === "dark" ? "text-white" : "text-black"}`}>{emptyMessage}</div>
             ) : (
               <ul className="divide-y divide-white/5">
                 {filteredItems.map((item) => (
                   <li key={item.id} className="group">
-                    <label className="flex items-center px-4 py-2.5 cursor-pointer hover:bg-white/5 transition-all">
+                    <label
+                      className={`flex items-center px-4 py-2.5 cursor-pointer hover:bg-white/5 transition-all ${theme === "dark" ? "text-white" : "text-black"}`}
+                    >
                       <input
                         type="checkbox"
                         value={item.id}
                         checked={selectedIds.includes(item.id)}
                         onChange={() => toggleSelection(item.id)}
-                        className="h-4 w-4 text-indigo-600 bg-transparent border-white/20 rounded focus:ring-indigo-500"
+                        className={`h-4 w-4 text-indigo-600 bg-transparent border-white/20 rounded focus:ring-indigo-500 ${theme === "dark" ? "text-white" : "text-black"}`}
                         onClick={(e) => e.stopPropagation()}
                       />
                       <div className="ml-3 flex-grow min-w-0">
                         <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium text-white truncate">{item.label}</p>
+                          <p className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-black"} truncate`}>{item.label}</p>
                           {showBadges && item.badge && (
-                            <div className="text-xs px-2 py-0.5 rounded bg-white/5 text-gray-400 ml-2 flex-shrink-0">{item.badge}</div>
+                            <div
+                              className={`text-xs px-2 py-0.5 rounded bg-white/5 ${theme === "dark" ? "text-white" : "text-black"} ml-2 flex-shrink-0`}
+                            >
+                              {item.badge}
+                            </div>
                           )}
                         </div>
                         {item.description && <p className="text-xs text-white/60 mt-0.5 truncate">{item.description}</p>}

@@ -4,29 +4,30 @@ import {
   SquadStats,
   SquadWeaponPerformance,
   TrainingEffectiveness,
-  OverallAccuracyStats,
   UserHitsData,
   TrainingTeamAnalytics,
   WeaponUsageStats,
   SquadMajorityPerformance,
   CommanderUserRoleBreakdown,
+  GroupingScoreEntry,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
   getWeaponPerformanceBySquadAndWeapon,
   getTrainingEffectivenessByTeam,
-  overallAccuracyStats,
   // getSquadRoleHitPercentages,
   getUserGroupingStatsRpc,
   getUserHitStatsFull,
+  getUserHitStatsWithFilters,
   getSquadHitPercentageByRole,
   getTrainingTeamAnalytics,
   getWeaponUsageStats,
   getCommanderUserRoleBreakdown,
   getSquadMajoritySessionsPerformance,
+  getGroupingScoresByTraining,
 } from "@/services/performance";
 import { userStore } from "./userStore";
-import { PositionScore } from "@/types/score";
+import { PositionScore } from "@/types/user";
 
 interface PerformanceStore {
   squadWeaponPerformance: SquadWeaponPerformance[];
@@ -38,7 +39,9 @@ interface PerformanceStore {
 
   // UserHitsData is a new type that includes detailed hit statistics for a user
   userHitsStats: UserHitsData | null;
+  userHitsStatsLoading: boolean;
   getUserHitStatsFull: (userId: string) => Promise<UserHitsData>;
+  getUserHitStatsWithFilters: (userId: string, distance?: string | null, position?: string | null, weaponType?: string | null) => Promise<void>;
 
   //
   trainingTeamAnalytics: TrainingTeamAnalytics | null;
@@ -46,15 +49,10 @@ interface PerformanceStore {
   //
   groupingSummary: GroupingSummary | null;
   groupingSummaryLoading: boolean;
-  getGroupingSummary: () => Promise<void>;
+  getGroupingSummary: (weaponType?: string | null, effort?: boolean | null, groupType?: string | null, position?: string | null) => Promise<void>;
 
   trainingEffectiveness: TrainingEffectiveness[];
   getTrainingEffectiveness: (teamId: string) => Promise<void>;
-
-  overallAccuracyStats: OverallAccuracyStats | null;
-  getOverallAccuracyStats: () => Promise<void>;
-
-  overallAccuracyStatsLoading: boolean;
 
   weaponUsageStats: WeaponUsageStats | null;
   weaponUsageStatsMap: Record<string, WeaponUsageStats>;
@@ -67,6 +65,9 @@ interface PerformanceStore {
   // new
   squadMajorityPerformance: SquadMajorityPerformance[] | null;
   fetchSquadMajorityPerformance: (teamId: string) => Promise<void>;
+
+  groupingScores: GroupingScoreEntry[] | null;
+  fetchGroupingScores: (trainingSessionId: string) => Promise<void>;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
@@ -74,21 +75,32 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   isLoading: false,
   squadStats: [],
   trainingEffectiveness: [],
-  overallAccuracyStats: null,
   userHitsStats: null,
-  overallAccuracyStatsLoading: false,
+  userHitsStatsLoading: false,
   trainingTeamAnalytics: null,
   weaponUsageStats: null,
   weaponUsageStatsMap: {},
   commanderUserRoleBreakdown: null,
   squadMajorityPerformance: null,
+  groupingScores: null,
+
+  fetchGroupingScores: async (trainingSessionId: string) => {
+    try {
+      set({ isLoading: true });
+      const data = await getGroupingScoresByTraining(trainingSessionId);
+      set({ groupingScores: data });
+    } catch (error) {
+      console.error("Failed to load grouping scores:", error);
+      set({ groupingScores: null });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 
   getWeaponUsageStats: async (weaponId: string) => {
     try {
       set({ isLoading: true });
-      console.log("Store - fetching weapon usage for weaponId:", weaponId);
       const stats = await getWeaponUsageStats(weaponId);
-      console.log("Store - received stats:", stats);
       set((state) => ({
         weaponUsageStats: stats,
         weaponUsageStatsMap: {
@@ -103,33 +115,6 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       set({ isLoading: false });
     }
   },
-
-  getOverallAccuracyStats: async () => {
-    try {
-      set({ overallAccuracyStatsLoading: true });
-      const data = await overallAccuracyStats();
-      set({ overallAccuracyStats: data });
-    } catch (error) {
-      console.error("Failed to load training summary stats:", error);
-      set({ overallAccuracyStats: null });
-    } finally {
-      set({ overallAccuracyStatsLoading: false });
-    }
-  },
-
-  // getSquadStats: async (_position: PositionScore | null, distance: string | null) => {
-  //   const squadId = userStore.getState().user?.squad_id;
-  //   try {
-  //     set({ isLoading: true });
-  //     const data = await getSquadRoleHitPercentages(squadId!, distance);
-  //     set({ squadStats: data });
-  //   } catch (error) {
-  //     console.error("Failed to load squad stats:", error);
-  //     set({ squadStats: [] });
-  //   } finally {
-  //     set({ isLoading: false });
-  //   }
-  // },
 
   getSquadStatsByRole: async (_position: PositionScore | null, distance: string | null) => {
     const squadId = userStore.getState().user?.squad_id;
@@ -181,6 +166,24 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       throw error;
     }
   },
+
+  getUserHitStatsWithFilters: async (
+    userId: string,
+    distance: string | null = null,
+    position: string | null = null,
+    weaponType: string | null = null,
+  ) => {
+    try {
+      set({ userHitsStatsLoading: true });
+      const data = await getUserHitStatsWithFilters(userId, distance, position, weaponType);
+      set({ userHitsStats: data });
+    } catch (error) {
+      console.error("Failed to load user hit stats with filters:", error);
+      set({ userHitsStats: null });
+    } finally {
+      set({ userHitsStatsLoading: false });
+    }
+  },
   getTrainingTeamAnalytics: async (trainingSessionId: string) => {
     try {
       set({ isLoading: true });
@@ -196,7 +199,12 @@ export const performanceStore = create<PerformanceStore>((set) => ({
 
   groupingSummary: null,
   groupingSummaryLoading: false,
-  getGroupingSummary: async () => {
+  getGroupingSummary: async (
+    weaponType: string | null = null,
+    effort: boolean | null = null,
+    groupType: string | null = null,
+    position: string | null = null,
+  ) => {
     try {
       set({ groupingSummaryLoading: true });
       const userId = userStore.getState().user?.id;
@@ -205,7 +213,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
         return;
       }
 
-      const data = await getUserGroupingStatsRpc(userId);
+      const data = await getUserGroupingStatsRpc(userId, weaponType, effort, groupType, position);
       set({ groupingSummary: data });
     } catch (error) {
       console.error("Failed to load grouping summary:", error);

@@ -8,10 +8,20 @@ import {
 } from "../components/SessionStatsFull/sections";
 import { useSessionStats } from "../components/SessionStatsFull/useSessionStats";
 import { ScrollProgress } from "@/components/magicui/scroll-progress";
+import AddAssignmentModal from "@/components/AddAssignmentModal";
+import { useStore } from "zustand";
+import { TrainingStore } from "@/store/trainingStore";
+import { useEffect } from "react";
+import { weaponsStore } from "@/store/weaponsStore";
+import { equipmentStore } from "@/store/equipmentStore";
 
 export default function ImprovedSessionStats() {
   const { theme } = useTheme();
 
+  const { getWeapons } = useStore(weaponsStore);
+  const { getEquipments } = useStore(equipmentStore);
+
+  const { training, createAssignment, loadTrainingById } = useStore(TrainingStore);
   const {
     // State
     activeSection,
@@ -20,7 +30,7 @@ export default function ImprovedSessionStats() {
     targets,
     validationErrors,
     sections,
-
+    isSubmitting,
     // Data
     user,
     weapons,
@@ -40,17 +50,43 @@ export default function ImprovedSessionStats() {
     removeTarget,
     updateEngagement,
     handleSubmit,
+    isAssignmentModalOpen,
+    setIsAssignmentModalOpen,
   } = useSessionStats();
 
+  useEffect(() => {
+    (async () => {
+      if (user?.team_id) {
+        await getWeapons(user?.team_id as string);
+        await getEquipments(user?.team_id as string);
+      }
+    })();
+  }, [training?.team_id]);
+
+  useEffect(() => {
+    console.log("user", user);
+    console.log("weapons", weapons);
+  }, [user?.team_id]);
+
+  async function onSuccessAddAssignment(assignmentName: string) {
+    const res = await createAssignment(assignmentName, true, training?.id as string);
+    if (res) {
+      updateSessionData("assignment_id", res?.id);
+      loadTrainingById(training?.id as string);
+      setIsAssignmentModalOpen(false);
+    }
+    setIsAssignmentModalOpen(false);
+  }
+
   return (
-    <div className={`min-h-screen ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-gray-50"} relative`}>
+    <div className={`min-h-screen ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-white"} relative`}>
       {/* Progress Indicator - Fixed on larger screens, hidden on mobile */}
       <div className="hidden lg:block">
         <ScrollProgress activeSection={activeSection} totalSections={sections.length} />
       </div>
 
-      {/* Mobile Progress Bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-sm">
+      {/* Mobile Progress Bar with Navigation */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50  dark:bg-black/95 backdrop-blur-sm shadow-md">
         <div className="flex h-1 bg-gray-200 dark:bg-gray-800">
           {sections.map((_, index) => (
             <div
@@ -61,21 +97,55 @@ export default function ImprovedSessionStats() {
             />
           ))}
         </div>
-        <div className="px-4 py-2 text-center">
-          <p className="text-xs font-medium text-gray-600 dark:text-gray-400">{sections[activeSection]?.title}</p>
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div className="flex-1">
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
+              Step {activeSection + 1} of {sections.length}
+            </p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">{sections[activeSection]?.title}</p>
+          </div>
+          <div className="flex gap-2">
+            {activeSection > 0 && (
+              <button
+                onClick={() => {
+                  const element = document.querySelectorAll("section")[activeSection - 1];
+                  element?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+            {activeSection < sections.length - 1 && (
+              <button
+                onClick={() => {
+                  const element = document.querySelectorAll("section")[activeSection + 1];
+                  element?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="p-2 rounded-lg bg-indigo-500 text-white"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Main Content Container */}
-      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth pt-12 lg:pt-0" onScroll={handleScroll}>
+      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth lg:pt-0 " onScroll={handleScroll}>
         {/* Section 1: Session Configuration */}
-        <section className="min-h-screen snap-start flex items-center justify-center px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-4xl">
+        <section className="min-h-screen snap-start flex items-center justify-center px-4 sm:px-6 lg:px-8 ">
+          <div className="w-full max-w-4xl  py-8">
             <SessionConfigSection
               section={sections[0]}
               sessionData={sessionData}
               updateSessionData={updateSessionData}
               trainingAssignments={trainingAssignments}
+              setIsAssignmentModalOpen={setIsAssignmentModalOpen}
             />
           </div>
         </section>
@@ -119,12 +189,14 @@ export default function ImprovedSessionStats() {
               section={sections[4]}
               participants={participants}
               targets={targets}
+              isSubmitting={isSubmitting}
               validationErrors={validationErrors}
               handleSubmit={handleSubmit}
             />
           </div>
         </section>
       </div>
+      <AddAssignmentModal isOpen={isAssignmentModalOpen} onClose={() => setIsAssignmentModalOpen(false)} onSuccess={onSuccessAddAssignment} />
     </div>
   );
 }

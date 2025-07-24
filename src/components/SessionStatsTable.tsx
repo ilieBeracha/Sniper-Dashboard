@@ -1,7 +1,7 @@
-import { Eye, Edit, FileText } from "lucide-react";
+import { Eye, Edit, FileText, ChevronRight, ChevronDown } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { format } from "date-fns";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useStore } from "zustand";
 import { sessionStore } from "@/store/sessionStore";
 import { useParams } from "react-router-dom";
@@ -12,6 +12,13 @@ interface SessionStatsTableProps {
   onSessionStatsClick: (session: any) => void;
   onSessionStatsEditClick: (session: any) => void;
   newlyAddedSessionId?: string | null;
+}
+
+interface GroupedAssignment {
+  assignmentId: string;
+  assignmentName: string;
+  sessions: any[];
+  expanded: boolean;
 }
 
 export default function SessionStatsTable({
@@ -31,6 +38,10 @@ export default function SessionStatsTable({
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const SESSION_LIMIT = 20;
+
+  // Expanded groups state - initialize with all groups expanded
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Load paginated session stats
   const loadSessionStats = async (page: number = 0, reset: boolean = false) => {
@@ -87,16 +98,85 @@ export default function SessionStatsTable({
     }
   }, [newlyAddedSessionId]);
 
-  // Get unique values for filters
-  // const uniqueDayPeriods = useMemo(() => {
-  //   const periods = sessionStats?.map((stat) => stat.day_period).filter(Boolean);
-  //   return [...new Set(periods)];
-  // }, [sessionStats]);
+  // Initialize expanded groups when data loads
+  useEffect(() => {
+    if (paginatedSessionStats.length > 0 && !isInitialized) {
+      const assignmentIds = new Set<string>();
+      paginatedSessionStats.forEach((session) => {
+        if (session.assignment_id) {
+          assignmentIds.add(session.assignment_id);
+        }
+      });
+      setExpandedGroups(assignmentIds);
+      setIsInitialized(true);
+    }
+  }, [paginatedSessionStats, isInitialized]);
 
-  // const uniqueSquads = useMemo(() => {
-  //   const squads = sessionStats?.map((stat) => stat.squads?.squad_name).filter(Boolean);
-  //   return [...new Set(squads)];
-  // }, [sessionStats]);
+  // Group sessions by assignment
+  const groupedData = useMemo(() => {
+    const groups: Record<string, GroupedAssignment> = {};
+
+    paginatedSessionStats.forEach((session) => {
+      const assignmentId = session.assignment_id;
+      const assignmentName = session.assignment_session?.assignment?.assignment_name || "Unknown Assignment";
+
+      if (!groups[assignmentId]) {
+        groups[assignmentId] = {
+          assignmentId,
+          assignmentName,
+          sessions: [],
+          expanded: expandedGroups.has(assignmentId),
+        };
+      }
+
+      groups[assignmentId].sessions.push(session);
+    });
+
+    // Convert to array and sort by assignment name
+    return Object.values(groups).sort((a, b) => a.assignmentName.localeCompare(b.assignmentName));
+  }, [paginatedSessionStats, expandedGroups]);
+
+  // Flatten grouped data for table display
+  const flattenedData = useMemo(() => {
+    const flattened: any[] = [];
+
+    groupedData.forEach((group) => {
+      // Add group header
+      flattened.push({
+        id: `group-${group.assignmentId}`,
+        isGroup: true,
+        assignmentId: group.assignmentId,
+        assignmentName: group.assignmentName,
+        sessionCount: group.sessions.length,
+        expanded: group.expanded,
+      });
+
+      // Add sessions if expanded
+      if (group.expanded) {
+        group.sessions.forEach((session) => {
+          flattened.push({
+            ...session,
+            isGroup: false,
+            isChild: true,
+          });
+        });
+      }
+    });
+
+    return flattened;
+  }, [groupedData]);
+
+  const toggleGroup = (assignmentId: string) => {
+    setExpandedGroups((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(assignmentId)) {
+        newSet.delete(assignmentId);
+      } else {
+        newSet.add(assignmentId);
+      }
+      return newSet;
+    });
+  };
 
   // Pagination handlers
   const nextPage = () => {
@@ -114,16 +194,40 @@ export default function SessionStatsTable({
   const columns = [
     {
       key: "assignment",
-      label: "Assignment",
-      render: (_value: any, row: any) => (
-        <span className="font-medium truncate max-w-[100px] sm:max-w-[150px]">{row.assignment_session?.assignment?.assignment_name || "N/A"}</span>
-      ),
+      label: "Assignment / Session",
+      render: (_value: any, row: any) => {
+        if (row.isGroup) {
+          return (
+            <div className="flex items-center gap-2 font-semibold">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleGroup(row.assignmentId);
+                }}
+                className="p-1 equipments rounded transition-colors"
+              >
+                {row.expanded ? <ChevronDown className="w-4 h-4 text-gray-900" /> : <ChevronRight className="w-4 h-4 text-gray-900" />}
+              </button>
+              <span>{row.assignmentName}</span>
+              <span className="text-sm text-gray-900">({row.sessionCount})</span>
+            </div>
+          );
+        }
+        return (
+          <div className={`${row.isChild ? "pl-8" : ""} flex items-center gap-2`}>
+            <span className="text-sm text-gray-900">•</span>
+            <span className="truncate max-w-[150px]">Session {format(new Date(row.created_at), "MMM dd, HH:mm")}</span>
+          </div>
+        );
+      },
       className: "px-4 sm:px-4 py-3",
     },
     {
       key: "creator",
       label: "Creator",
       render: (_value: any, row: any) => {
+        void _value; // Mark as used to satisfy TypeScript
+        if (row.isGroup) return null;
         const creator = row.users;
         return (
           <span className="truncate max-w-[80px] sm:max-w-none">
@@ -136,67 +240,69 @@ export default function SessionStatsTable({
     {
       key: "day_period",
       label: "Day/Night",
-      render: (value: string) => <span className="capitalize">{value || "N/A"}</span>,
+      render: (value: string, row: any) => {
+        if (row.isGroup) return null;
+        return <span className="capitalize">{value || "N/A"}</span>;
+      },
       className: "px-2 sm:px-4 py-3 hidden lg:table-cell",
       hideOnMobile: true,
     },
     {
       key: "time_to_first_shot_sec",
       label: "Time to First Shot",
-      render: (value: number | null) => {
+      render: (value: number | null, row: any) => {
+        if (row.isGroup) return null;
         return value !== null ? `${value}s` : "N/A";
       },
       className: "px-2 sm:px-4 py-3 hidden lg:table-cell",
       hideOnMobile: true,
     },
     {
-      key: "created_at",
-      label: "Created",
-      render: (value: string) => format(new Date(value), "yyyy-MM-dd HH:mm"),
+      key: "note",
+      label: "Note",
+      render: (value: string, row: any) => {
+        if (row.isGroup) return null;
+        return value ? (
+          <span className="truncate max-w-[100px]" title={value}>
+            {value}
+          </span>
+        ) : (
+          <span className="text-gray-800">-</span>
+        );
+      },
       className: "px-2 sm:px-4 py-3 hidden md:table-cell",
       hideOnMobile: true,
     },
   ];
 
-  // const filters = [
-  //   {
-  //     key: "day_period",
-  //     label: "All Times",
-  //     type: "select" as const,
-  //     options: uniqueDayPeriods.map((period) => ({ value: period, label: period })),
-  //   },
-  //   {
-  //     key: "squads.squad_name",
-  //     label: "All Squads",
-  //     type: "select" as const,
-  //     options: uniqueSquads.map((squad) => ({ value: squad, label: squad })),
-  //   },
-  // ];
+  const actions = (row: any) => {
+    if (row.isGroup) return null;
 
-  const actions = (session: any) => (
-    <div className="inline-flex gap-1 sm:gap-2">
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onSessionStatsClick(session);
-        }}
-        className={`p-1.5 sm:p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
-        title="View"
-      >
-        <Eye size={14} className="sm:w-4 sm:h-4" />
-      </button>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onSessionStatsEditClick(session);
-        }}
-        className={`p-1.5 sm:p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
-        title="Edit"
-      >
-        <Edit size={14} className="sm:w-4 sm:h-4" />
-      </button>
-    </div>
-  );
+    return (
+      <div className="inline-flex gap-1 sm:gap-2">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onSessionStatsClick(row);
+          }}
+          className={`p-1.5 sm:p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
+          title="View"
+        >
+          <Eye size={14} className="sm:w-4 sm:h-4" />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onSessionStatsEditClick(row);
+          }}
+          className={`p-1.5 sm:p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
+          title="Edit"
+        >
+          <Edit size={14} className="sm:w-4 sm:h-4" />
+        </button>
+      </div>
+    );
+  };
 
   const pagination = {
     currentPage,
@@ -211,7 +317,7 @@ export default function SessionStatsTable({
 
   if (sessionStats?.length === 0) {
     return (
-      <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+      <div className={`text-center py-12 ${theme === "dark" ? "text-gray-800" : "text-gray-900"}`}>
         <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
         <h3 className="text-lg font-medium mb-2">No session stats yet</h3>
         <p className="text-sm">Add your first session stats to get started</p>
@@ -221,17 +327,21 @@ export default function SessionStatsTable({
 
   return (
     <SpTable
-      data={paginatedSessionStats}
+      data={flattenedData}
       columns={columns}
       filters={[]}
       searchPlaceholder="Search..."
-      onRowClick={onSessionStatsClick}
+      onRowClick={(row) => {
+        if (!row.isGroup) {
+          onSessionStatsClick(row);
+        }
+      }}
       actions={actions}
       loading={isLoading}
       pagination={pagination}
-      highlightRow={(row) => row.id === newlyAddedSessionId}
+      highlightRow={(row) => !row.isGroup && row.id === newlyAddedSessionId}
       emptyState={
-        <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+        <div className={`text-center py-12 ${theme === "dark" ? "text-gray-800" : "text-gray-900"}`}>
           <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
           <h3 className="text-lg font-medium mb-2">No session stats yet</h3>
           <p className="text-sm">Add your first session stats to get started</p>

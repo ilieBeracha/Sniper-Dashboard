@@ -8,6 +8,7 @@ import BaseInput from "./base/BaseInput";
 import { FileQuestion } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { validateAssignmentForm } from "@/lib/formValidation";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function AddAssignmentModal({
   isOpen,
@@ -36,6 +37,9 @@ export default function AddAssignmentModal({
     onSuccess(assignmentName.trim());
     setAssignmentName("");
   };
+
+  // Debounce the submit handler to prevent rapid clicks
+  const [debouncedSubmit] = useDebounce(handleSubmit, 500, [assignmentName, onSuccess]);
 
   const Content = (
     <div className={`w-full p-4 space-y-6 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
@@ -79,7 +83,7 @@ export default function AddAssignmentModal({
         <button
           disabled={isLoading}
           type="button"
-          onClick={handleSubmit}
+          onClick={debouncedSubmit}
           className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
         >
           Create

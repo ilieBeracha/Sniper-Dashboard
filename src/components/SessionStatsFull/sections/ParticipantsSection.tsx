@@ -2,6 +2,8 @@ import { Users, Trash2, UserPlus } from "lucide-react";
 import { Participant } from "../types";
 import { SectionHeader } from "./SectionHeader";
 import { useTheme } from "@/contexts/ThemeContext";
+import { isCommander } from "@/utils/permissions";
+import { UserRole } from "@/types/user";
 
 interface ParticipantsSectionProps {
   section: any;
@@ -35,10 +37,12 @@ export const ParticipantsSection = ({
       <SectionHeader section={section} />
 
       {/* Add Controls */}
-      <div className=" flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 mt-6">
         <select
-          className={`flex-1  py-2 px-4 rounded-xl border-2 transition-all ${
-            theme === "dark" ? "bg-zinc-900 border-zinc-800 text-white focus:border-indigo-500" : "bg-white border-gray-200 focus:border-indigo-500"
+          className={`flex-1 py-2 h-12 px-4 rounded-xl border-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+            theme === "dark"
+              ? "bg-zinc-900 border-zinc-800 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
+              : "bg-white border-gray-200 focus:border-indigo-500 focus:ring-indigo-500/20"
           }`}
           onChange={(e) => {
             if (e.target.value) {
@@ -58,27 +62,148 @@ export const ParticipantsSection = ({
         </select>
         <button
           onClick={addSquad}
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors"
+          disabled={isCommander(user?.user_role as UserRole)}
+          className="flex items-center justify-center gap-2 px-6 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Users className="w-4 h-4" />
-          <span>Add Squad</span>
+          <span className="sm:inline">Add Squad</span>
         </button>
       </div>
 
-      {/* Participants List - Single Card */}
-      <div className={`mt-8 rounded-2xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}>
+      {/* Mobile Participants List */}
+      <div className="md:hidden mt-6 space-y-3">
+        {participants.length > 0 ? (
+          participants.map((participant, index) => (
+            <div
+              key={participant.userId}
+              className={`rounded-xl border-2 overflow-hidden transition-all ${
+                theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"
+              }`}
+            >
+              <div className={`px-4 py-3 border-b ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-200"}`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                        theme === "dark" ? "bg-indigo-500/20 text-indigo-400" : "bg-indigo-100 text-indigo-600"
+                      }`}
+                    >
+                      {index + 1}
+                    </div>
+                    <div>
+                      <div className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{participant.name}</div>
+                      {participant.userId === user?.id && (
+                        <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>You</span>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => removeParticipant(participant.userId)}
+                    className={`p-2 rounded-lg transition-colors ${
+                      theme === "dark" ? "hover:bg-zinc-700 text-zinc-400 hover:text-red-400" : "hover:bg-gray-100 text-gray-400 hover:text-red-600"
+                    }`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-4 space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Role</label>
+                    <select
+                      value={participant.userDuty}
+                      onChange={(e) => updateParticipant(participant.userId, "userDuty", e.target.value)}
+                      className={`w-full mt-1 h-10 px-3 rounded-lg text-sm border transition-all ${
+                        theme === "dark"
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500"
+                          : "bg-gray-50 border-gray-200 focus:border-indigo-500"
+                      }`}
+                    >
+                      <option value=""></option>
+                      <option value="Sniper">Sniper</option>
+                      <option value="Spotter">Spotter</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Position</label>
+                    <select
+                      value={participant.position}
+                      onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
+                      className={`w-full mt-1 h-10 px-3 rounded-lg text-sm border transition-all ${
+                        theme === "dark"
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500"
+                          : "bg-gray-50 border-gray-200 focus:border-indigo-500"
+                      }`}
+                    >
+                      <option value="Lying">Lying</option>
+                      <option value="Standing">Standing</option>
+                      <option value="Sitting">Sitting</option>
+                      <option value="Operational">Operational</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                    {participant.userDuty === "Sniper" ? "Weapon" : "Equipment"}
+                  </label>
+                  <select
+                    value={participant.userDuty === "Sniper" ? participant.weaponId || "" : participant.equipmentId || ""}
+                    onChange={(e) =>
+                      updateParticipant(participant.userId, participant.userDuty === "Sniper" ? "weaponId" : "equipmentId", e.target.value)
+                    }
+                    className={`w-full mt-1 h-10 px-3 rounded-lg text-sm border transition-all ${
+                      theme === "dark"
+                        ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500"
+                        : "bg-gray-50 border-gray-200 focus:border-indigo-500"
+                    }`}
+                  >
+                    <option value="">Select {participant.userDuty === "Sniper" ? "weapon" : "equipment"}</option>
+                    {participant.userDuty === "Sniper"
+                      ? weapons.map((w: any) => (
+                          <option key={w.id} value={w.id}>
+                            {w.weapon_type} - {w.serial_number}
+                          </option>
+                        ))
+                      : equipments.map((e: any) => (
+                          <option key={e.id} value={e.id}>
+                            {e.equipment_type} - {e.serial_number}
+                          </option>
+                        ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className={`rounded-xl border-2 p-8 text-center ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}>
+            <UserPlus className={`w-12 h-12 mx-auto mb-4 ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`} />
+            <h3 className={`text-lg font-medium ${theme === "dark" ? "text-white" : "text-gray-900"} mb-2`}>No participants yet</h3>
+            <p className={`text-sm ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Add team members to start the training session</p>
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Participants List */}
+      <div
+        className={`hidden md:block mt-8 rounded-2xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}
+      >
         {participants.length > 0 ? (
           <>
             {/* Table Header */}
             <div
-              className={`grid grid-cols-4 gap-2 px-4 py-3 text-xs font-medium border-b ${
+              className={`grid grid-cols-5 gap-2 px-4 py-3 text-xs font-medium border-b ${
                 theme === "dark" ? "bg-zinc-800/50 border-zinc-700 text-zinc-400" : "bg-gray-50 border-gray-200 text-gray-600"
               }`}
             >
               <div className="col-span-1">Name</div>
               <div className="col-span-1">Role</div>
               <div className="col-span-1">Position</div>
-              <div className="col-span-1">Equipment</div>
+              <div className="col-span-1">Weapon/Equipment</div>
+              <div className="col-span-1 text-right">Actions</div>
             </div>
 
             {/* Participants Rows */}
@@ -86,14 +211,14 @@ export const ParticipantsSection = ({
               {participants.map((participant, index) => (
                 <div
                   key={participant.userId}
-                  className={`grid grid-cols-4 gap-2 px-4 py-3 items-center transition-colors ${
+                  className={`grid grid-cols-5 gap-2 px-4 py-3 items-center transition-colors ${
                     theme === "dark" ? "hover:bg-zinc-800/30" : "hover:bg-gray-50"
                   }`}
                 >
                   {/* Name */}
                   <div className="col-span-1 flex items-center gap-2">
                     <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                         theme === "dark" ? "bg-indigo-500/20 text-indigo-400" : "bg-indigo-100 text-indigo-600"
                       }`}
                     >
@@ -112,10 +237,13 @@ export const ParticipantsSection = ({
                     <select
                       value={participant.userDuty}
                       onChange={(e) => updateParticipant(participant.userId, "userDuty", e.target.value)}
-                      className={`w-full h-8 px-2 rounded text-sm border ${
-                        theme === "dark" ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-gray-200"
+                      className={`w-full h-9 px-2 rounded-lg text-sm border transition-all ${
+                        theme === "dark"
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:bg-zinc-700"
+                          : "bg-gray-50 border-gray-200 focus:border-indigo-500 focus:bg-white"
                       }`}
                     >
+                      <option value=""></option>
                       <option value="Sniper">Sniper</option>
                       <option value="Spotter">Spotter</option>
                     </select>
@@ -126,11 +254,13 @@ export const ParticipantsSection = ({
                     <select
                       value={participant.position}
                       onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
-                      className={`w-full h-8 px-2 rounded text-sm border ${
-                        theme === "dark" ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-gray-200"
+                      className={`w-full h-9 px-2 rounded-lg text-sm border transition-all ${
+                        theme === "dark"
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:bg-zinc-700"
+                          : "bg-gray-50 border-gray-200 focus:border-indigo-500 focus:bg-white"
                       }`}
                     >
-                      <option value="Lying">Prone</option>
+                      <option value="Lying">Lying</option>
                       <option value="Standing">Standing</option>
                       <option value="Sitting">Sitting</option>
                       <option value="Operational">Operational</option>
@@ -140,24 +270,26 @@ export const ParticipantsSection = ({
                   {/* Weapon/Equipment */}
                   <div className="col-span-1">
                     <select
-                      value={participant.userDuty === "Sniper" ? participant.weaponId : participant.equipmentId}
+                      value={participant.userDuty === "Sniper" ? participant.weaponId || "" : participant.equipmentId || ""}
                       onChange={(e) =>
                         updateParticipant(participant.userId, participant.userDuty === "Sniper" ? "weaponId" : "equipmentId", e.target.value)
                       }
-                      className={`w-full h-8 px-2 rounded text-sm border ${
-                        theme === "dark" ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-gray-200"
+                      className={`w-full h-9 px-2 rounded-lg text-sm border transition-all ${
+                        theme === "dark"
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500 focus:bg-zinc-700"
+                          : "bg-gray-50 border-gray-200 focus:border-indigo-500 focus:bg-white"
                       }`}
                     >
-                      <option value="">Select</option>
+                      <option value=""></option>
                       {participant.userDuty === "Sniper"
                         ? weapons.map((weapon: any) => (
                             <option key={weapon.id} value={weapon.id || ""}>
-                              {weapon.weapon_type}
+                              {weapon.weapon_type} - SN: {weapon.serial_number}
                             </option>
                           ))
                         : equipments.map((equipment: any) => (
                             <option key={equipment.id} value={equipment.id || ""}>
-                              {equipment.equipment_type}
+                              {equipment.equipment_type} - SN: {equipment.serial_number}
                             </option>
                           ))}
                     </select>

@@ -1,11 +1,22 @@
-import { UserDuty } from "./score";
 import { Squad } from "./squad";
 import { Team } from "./team";
+
+export enum UserDuty {
+  SNIPER = "Sniper",
+  SPOTTER = "Spotter",
+}
 
 export enum UserRole {
   Commander = "commander",
   SquadCommander = "squad_commander",
   Soldier = "soldier",
+}
+
+export enum PositionScore {
+  Lying = "Lying",
+  Sitting = "Sitting",
+  Standing = "Standing",
+  Crouching = "Crouching",
 }
 
 export interface User {

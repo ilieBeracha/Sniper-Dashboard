@@ -1,103 +1,102 @@
+import { CreateParticipantData, CreateSessionStatsData, CreateTargetEngagementData, CreateTargetStatsData } from "@/types/sessionStats";
 import { supabase } from "./supabaseClient";
-
-export interface CreateSessionStatsData {
-  training_session_id: string;
-  assignment_id: string | null;
-  creator_id: string | null;
-  squad_id: string | null;
-  team_id: string | null;
-  day_period: string | null;
-  time_to_first_shot_sec: number | null;
-  note?: string | null;
-}
-
-export interface CreateParticipantData {
-  session_stats_id: string;
-  user_id: string;
-  user_duty: "Sniper" | "Spotter";
-  weapon_id?: string | null;
-  equipment_id?: string | null;
-  position: string;
-}
-
-export interface CreateTargetStatsData {
-  session_stats_id: string;
-  distance_m: number;
-  wind_strength?: number | null;
-  wind_direction_deg?: number | null;
-  total_hits: number;
-  target_eliminated: boolean;
-  mistake_code?: string | null;
-}
-
-export interface CreateTargetEngagementData {
-  target_stats_id: string;
-  user_id: string;
-  shots_fired: number;
-  target_hits: number;
-  is_estimated: boolean;
-  estimated_method?: string | null;
-}
+import { toastService } from "./toastService";
 
 export const getSessionStatsByTrainingId = async (trainingId: string, limit: number = 20, offset: number = 0) => {
-  const { data, error } = await supabase
-    .from("session_stats")
-    .select(
-      ` *, assignment_session ( assignment ( assignment_name ) ), users!session_stats_creator_id_fkey ( first_name, last_name, email ), squads ( squad_name ), teams ( team_name )  `,
-    )
-    .eq("training_session_id", trainingId)
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1);
-  if (error) throw error;
-  return data;
+  try {
+    const { data, error } = await supabase
+      .from("session_stats")
+      .select(
+        ` *, assignment_session ( assignment ( assignment_name ) ), users!session_stats_creator_id_fkey ( first_name, last_name, email ), teams ( team_name )  `,
+      )
+      .eq("training_session_id", trainingId)
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1);
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to fetch session stats");
+    }
+    return data;
+  } catch (error: any) {
+    console.error("Error fetching session stats:", error.message);
+    throw new Error("Failed to fetch session stats");
+  }
 };
 
 export const getSessionStatsCountByTrainingId = async (trainingId: string) => {
-  const { count, error } = await supabase.from("session_stats").select("*", { count: "exact", head: true }).eq("training_session_id", trainingId);
-  if (error) throw error;
-  return count || 0;
+  try {
+    const { count, error } = await supabase.from("session_stats").select("*", { count: "exact", head: true }).eq("training_session_id", trainingId);
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to fetch session stats count");
+    }
+    return count || 0;
+  } catch (error: any) {
+    console.error("Error fetching session stats count:", error.message);
+    throw new Error("Failed to fetch session stats count");
+  }
 };
 
 export const createSessionStats = async (sessionData: CreateSessionStatsData) => {
-  const { data, error } = await supabase.from("session_stats").insert(sessionData).select().single();
+  try {
+    const { data, error } = await supabase.from("session_stats").insert(sessionData).select().single();
 
-  if (error) {
-    throw new Error(error.message);
+    if (error) {
+      toastService.error(error.message);
+      throw new Error(error.message);
+    }
+
+    return data;
+  } catch (error: any) {
+    console.error("Error creating session stats:", error.message);
+    throw new Error("Failed to create session stats");
   }
-
-  return data;
 };
 
 export const createSessionParticipants = async (participantsData: CreateParticipantData[]) => {
-  const { data, error } = await supabase.from("session_participants").insert(participantsData).select();
-
-  if (error) {
-    throw new Error(error.message);
+  try {
+    const { data, error } = await supabase.from("session_participants").insert(participantsData).select();
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to create session participants");
+    }
+    return data;
+  } catch (error: any) {
+    console.error("Error creating session participants:", error.message);
+    throw new Error("Failed to create session participants");
   }
-
-  return data;
 };
 
 export const createTargetStats = async (targetData: CreateTargetStatsData) => {
-  const { data, error } = await supabase.from("target_stats").insert(targetData).select().single();
-
-  if (error) {
-    throw new Error(error.message);
+  try {
+    const { data, error } = await supabase.from("target_stats").insert(targetData).select().single();
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to create target stats");
+    }
+    return data;
+  } catch (error: any) {
+    console.error("Error creating target stats:", error.message);
+    throw new Error("Failed to create target stats");
   }
-
-  return data;
 };
 
 export const createTargetEngagements = async (engagementsData: CreateTargetEngagementData[]) => {
-  if (engagementsData.length === 0) return [];
+  try {
+    if (engagementsData.length === 0) return [];
 
-  const { data, error } = await supabase.from("target_engagements").insert(engagementsData).select();
+    const { data, error } = await supabase.from("target_engagements").insert(engagementsData).select();
 
-  if (error) {
-    throw new Error(error.message);
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to create target engagements");
+    }
+
+    return data;
+  } catch (error: any) {
+    console.error("Error creating target engagements:", error.message);
+    throw new Error("Failed to create target engagements");
   }
-
-  return data;
 };
 
 // Complete session save - coordinates all database operations
@@ -141,8 +140,17 @@ export const saveCompleteSession = async (sessionData: {
     }
 
     return session;
-  } catch (error) {
-    console.error("Error in saveCompleteSession:", error);
+  } catch (error: any) {
+    console.error("Error in saveCompleteSession:", error.message);
+    toastService.error(error.message);
     throw error;
   }
 };
+export async function createGroupScoreService(groupScoreData: any, trainingSessionId: string): Promise<any> {
+  const { data, error } = await supabase
+    .from("group_scores")
+    .insert({ ...groupScoreData, training_session_id: trainingSessionId })
+    .select("*");
+  if (error) throw error;
+  return data;
+}

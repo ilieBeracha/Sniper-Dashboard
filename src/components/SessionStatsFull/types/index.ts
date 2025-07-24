@@ -13,6 +13,9 @@ export interface Participant {
   position: string;
   weaponId: string;
   equipmentId: string;
+  user_default_duty?: string;
+  user_default_weapon?: string;
+  user_default_equipment?: string;
 }
 
 export interface TargetEngagement {

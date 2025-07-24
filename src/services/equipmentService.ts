@@ -1,29 +1,45 @@
 import { Equipment } from "@/types/equipment";
 import { supabase } from "./supabaseClient";
+import { toastService } from "./toastService";
 
 export async function getEquipmentsByTeamId(teamId: string) {
-  const { data, error } = await supabase.from("equipment").select("*").eq("team_id", teamId);
-  if (error) {
-    console.error("Error fetching equipment:", error);
-    return [];
+  try {
+    const { data, error } = await supabase.from("equipment").select("*").eq("team_id", teamId);
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to fetch equipment");
+    }
+    return data as any;
+  } catch (error: any) {
+    console.error("Error fetching equipment:", error.message);
+    throw new Error("Failed to fetch equipment");
   }
-  return data as any;
 }
 
 export async function createEquipment(equipment: Equipment) {
-  const { data, error } = await supabase.from("equipment").insert(equipment).select().single();
-  if (error) {
-    console.error("Error creating equipment:", error);
-    return null;
+  try {
+    const { data, error } = await supabase.from("equipment").insert(equipment).select().single();
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to create equipment");
+    }
+    return data;
+  } catch (error: any) {
+    console.error("Error creating equipment:", error.message);
+    throw new Error("Failed to create equipment");
   }
-  return data;
 }
 
 export async function updateEquipment(id: string, equipment: Partial<Equipment>) {
-  const { data, error } = await supabase.from("equipment").update(equipment).eq("id", id).select().single();
-  if (error) {
-    console.error("Error updating equipment:", error);
-    return null;
+  try {
+    const { data, error } = await supabase.from("equipment").update(equipment).eq("id", id).select().single();
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to update equipment");
+    }
+    return data;
+  } catch (error: any) {
+    console.error("Error updating equipment:", error.message);
+    throw new Error("Failed to update equipment");
   }
-  return data;
 }

@@ -4,6 +4,7 @@ import { format, parseISO } from "date-fns";
 import { ChevronRight, Clock, MapPin, Bookmark, UserCheck } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { primitives } from "@/styles/core";
 
 export function TrainingSessionCard({
   session,
@@ -31,89 +32,107 @@ export function TrainingSessionCard({
   return (
     <div
       onClick={handleSessionClick}
-      className={`
-        relative
-        pl-4 pr-4 py-4
-        border rounded-lg overflow-hidden
-        transition-all duration-500 ease-in-out
-        cursor-pointer
-        text-sm
-        justify-center
-        items-center
-        ${theme === "dark" ? "bg-zinc-900/50 border-white/10" : "border-gray-200 bg-white hover:bg-gray-50"}
-      `}
+      className="relative p-0 border rounded-lg overflow-hidden transition-all duration-300 ease-in-out cursor-pointer text-sm hover:shadow-md group"
+      style={{
+        backgroundColor: theme === "dark" ? `${primitives.grey.grey900}80` : primitives.white.white,
+        borderColor: theme === "dark" ? `${primitives.white.white}1A` : primitives.grey.grey200,
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = theme === "dark" ? `${primitives.white.white}33` : primitives.grey.grey300;
+        if (theme === "light") {
+          e.currentTarget.style.backgroundColor = primitives.grey.grey50;
+        }
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = theme === "dark" ? `${primitives.white.white}1A` : primitives.grey.grey200;
+        if (theme === "light") {
+          e.currentTarget.style.backgroundColor = primitives.white.white;
+        }
+      }}
     >
-      {/* Status */}
-      <div className=" flex flex-col items-end gap-2 absolute top-0 right-0 text-sm ">
+      {/* Status Badge - Absolute positioned */}
+      <div className="absolute top-0 right-0 z-10">
         <span
-          className={`text-xs  px-2 py-1 rounded-bl-lg rounded-tr-lg 
-              ${isPast ? "bg-gray-500/10 text-gray-400" : highlight ? "bg-indigo-500/20 text-indigo-300" : "bg-green-500/10 text-green-400"}
-            `}
+          className="text-xs px-3 py-1.5 rounded-bl-lg font-medium"
+          style={{
+            backgroundColor: isPast ? `${primitives.grey.grey500}1A` : highlight ? `${primitives.blue.blue500}33` : `${primitives.green.green500}1A`,
+            color: isPast ? primitives.grey.grey400 : highlight ? primitives.blue.blue300 : primitives.green.green400,
+          }}
         >
           {isPast ? "Finished" : highlight ? "Today" : "Upcoming"}
         </span>
-
-        <ChevronRight className={`w-4 h-4 transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`} />
       </div>
-      <div className="flex items-center justify-between text-sm ">
-        {/* Date */}
-        <div className="w-[100px] h-full text-sm">
-          <div
-            className={`flex flex-col items-center justify-center rounded-lg p-2 transition-colors duration-200 ${
-              theme === "dark" ? "bg-white/5" : "bg-gray-100"
-            }`}
+
+      <div className="flex items-stretch">
+        {/* Date Section - No gaps */}
+        <div
+          className="w-[100px] flex flex-col items-center justify-center px-4 py-5"
+          style={{
+            backgroundColor: theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey100,
+          }}
+        >
+          <span
+            className="text-2xl font-semibold leading-tight"
+            style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}
           >
-            <span className={`text-base font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-              {showDate ? format(sessionDate, "d") : format(sessionDate, "h:mm")}
-            </span>
-            <span className={`text-xs transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-              {showDate ? format(sessionDate, "MMM") : format(sessionDate, "a")}
-            </span>
-          </div>
+            {showDate ? format(sessionDate, "d") : format(sessionDate, "h:mm")}
+          </span>
+          <span className="text-sm mt-0.5" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
+            {showDate ? format(sessionDate, "MMM") : format(sessionDate, "a")}
+          </span>
         </div>
 
-        {/* Main Info */}
-        <div className="flex-1 ml-4">
-          <div className="flex items-center gap-2">
-            <h4 className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{session.session_name}</h4>
-          </div>
-
-          <div
-            className={`flex flex-wrap items-center gap-x-4 mt-1 text-xs transition-colors duration-200 ${
-              theme === "dark" ? "text-gray-400" : "text-gray-600"
-            }`}
-          >
-            {!isMobile ? (
-              <div className="flex items-center">
-                <Clock className="w-3 h-3 mr-1.5" />
-                {format(sessionDate, "h:mm a MMM d")}
-              </div>
-            ) : (
-              <div className="flex items-center">
-                <Clock className="w-3 h-3 mr-1.5" />
-                {format(sessionDate, "h:mm a")}
-              </div>
-            )}
-
-            <div className="flex items-center">
-              <UserCheck className="w-3 h-3 mr-1.5" />
-              {participants.length} participants
+        {/* Main Info - Seamless connection */}
+        <div className="flex-1 px-4 py-3 flex items-center">
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-base font-medium" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
+                {session.session_name}
+              </h4>
+              <ChevronRight
+                className="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-1"
+                style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}
+              />
             </div>
-            {session.assignments && session.assignments.length > 0 && (
-              <div className="flex items-center">
-                <Bookmark className="w-3 h-3 mr-1.5" />
-                {session.assignments.length} assignments
-              </div>
-            )}
-            <div className="flex items-center mt-1 *:text-xs">
-              <MapPin className="w-3 h-3 mr-1.5" />
-              {session.location ? (
-                <span className="truncate max-w-[120px]">{session.location}</span>
+
+            <div
+              className="flex flex-wrap items-center gap-x-3 text-xs"
+              style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}
+            >
+              {!isMobile ? (
+                <div className="flex items-center">
+                  <Clock className="w-3 h-3 mr-1" />
+                  {format(sessionDate, "h:mm a MMM d")}
+                </div>
               ) : (
-                <span className={`italic transition-colors duration-200 ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
-                  Unknown location
-                </span>
+                <div className="flex items-center">
+                  <Clock className="w-3 h-3 mr-1" />
+                  {format(sessionDate, "h:mm a")}
+                </div>
               )}
+
+              <div className="flex items-center">
+                <UserCheck className="w-3 h-3 mr-1" />
+                {participants.length} participants
+              </div>
+
+              {session.assignments && session.assignments.length > 0 && (
+                <div className="flex items-center">
+                  <Bookmark className="w-3 h-3 mr-1" />
+                  {session.assignments.length} assignments
+                </div>
+              )}
+
+              <div className="flex items-center">
+                <MapPin className="w-3 h-3 mr-1" />
+                {session.location ? (
+                  <span className="truncate max-w-[150px]">{session.location}</span>
+                ) : (
+                  <span className="italic" style={{ color: theme === "dark" ? primitives.grey.grey500 : primitives.grey.grey400 }}>
+                    No location
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>

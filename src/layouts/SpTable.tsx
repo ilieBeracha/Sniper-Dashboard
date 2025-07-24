@@ -360,10 +360,10 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
         />
 
         <div className="overflow-x-auto sm:mx-0">
-          <table className={`min-w-full text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+          <table className={`min-w-full text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : " text-gray-700"}`}>
             <thead
               className={`text-xs uppercase border-b transition-colors duration-200 sticky top-0 z-10 ${
-                theme === "dark" ? "border-zinc-800 bg-zinc-900" : "border-gray-200 bg-white"
+                theme === "dark" ? "border-zinc-800 bg-zinc-900" : "border-gray-200 bg-gray-100"
               }`}
             >
               <tr>
@@ -527,7 +527,9 @@ function SpTableFilters({
   selectable?: boolean;
 }) {
   return (
-    <div className={`p-4 border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+    <div
+      className={`p-4 border-b transition-colors duration-200 rounded-t-xl  ${theme === "dark" ? "border-zinc-800 bg-zinc-900/50" : "border-gray-200 bg-gray-50"}`}
+    >
       {selectable && selectedCount && selectedCount > 0 && (
         <div
           className={`mb-4 p-3 rounded-lg flex items-center justify-between ${

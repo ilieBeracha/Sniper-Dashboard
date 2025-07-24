@@ -1,47 +1,49 @@
 import { useStore } from "zustand";
 import { useSidebarStore } from "@/store/sidebarStore";
-import { List } from "lucide-react";
+import { List, Bell } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { SpPageBreadcrumbs } from "@/layouts/SpPage";
+import { useState } from "react";
+import ActivityFeedDrawer from "@/components/ActivityFeedDrawer";
 
-export default function Header({ children, isFixed }: { children?: React.ReactNode; isFixed?: boolean }) {
+export default function Header({
+  children,
+  isFixed,
+  breadcrumbs,
+}: {
+  children?: React.ReactNode;
+  isFixed?: boolean;
+  breadcrumbs?: { label: string; link: string }[];
+}) {
   const { toggleDrawer } = useStore(useSidebarStore);
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+  const [isActivityFeedOpen, setIsActivityFeedOpen] = useState(false);
 
   return (
     <div
-      className={`flex  items-center justify-between px-4 py-4 h-12 border-b relative z-[50] transition-colors duration-200 ${isFixed ? "fixed top-0 left-0 right-0" : ""} ${
-        theme === "dark" ? "border-white/5" : "border-gray-200"
-      }`}
+      className={`flex  items-center justify-between px-4 h-12  relative z-[50] transition-colors duration-200 ${isFixed ? "fixed top-0 left-0 right-0" : ""} `}
     >
-      {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className={` absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl ${
-            theme === "dark" ? "bg-gradient-to-br from-purple-500/10 to-blue-500/10" : "bg-gradient-to-br from-purple-200/20 to-blue-200/20"
-          }`}
-        />
-        <div
-          className={`absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full blur-3xl ${
-            theme === "dark" ? "bg-gradient-to-tl from-blue-500/10" : "bg-gradient-to-tl from-blue-200/20"
-          }`}
-        />
-      </div> */}
       <div className="flex items-center">
         {isMobile && <List className={`w-5 h-5 mr-3 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} onClick={toggleDrawer} />}
-        {/* <span
-          className={`${isMobile ? "text-lg" : "text-xl"} font-bold transition-colors duration-200 ${
-            theme === "dark" ? "text-white" : "text-gray-900"
-          }`}
-        >
-          {title}
-        </span> */}
+        {breadcrumbs && <SpPageBreadcrumbs breadcrumbs={breadcrumbs} />}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center">
         {children}
+        <button
+          onClick={() => setIsActivityFeedOpen(true)}
+          className={`p-2 rounded-lg transition-colors ${
+            theme === "dark" ? "hover:bg-gray-800 text-gray-400 hover:text-gray-200" : "hover:bg-gray-100 text-gray-600 hover:text-gray-900"
+          }`}
+          aria-label="Open activity feed"
+        >
+          <Bell className="w-5 h-5" />
+        </button>
         <ThemeToggle />
       </div>
+      <ActivityFeedDrawer isOpen={isActivityFeedOpen} onClose={() => setIsActivityFeedOpen(false)} />
     </div>
   );
 }

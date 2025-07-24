@@ -93,7 +93,7 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                           max="900"
                           step="25"
                         />
-                        <span className={`text-sm font-medium min-w-[4rem] text-right ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>
+                        <span className={`text-sm font-medium min-w-[4rem]  ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>
                           {target.distance}m
                         </span>
                       </div>
@@ -143,7 +143,7 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                             placeholder="0"
                             value={target.windStrength || ""}
                             onChange={(e) => updateTarget(target.id, "windStrength", e.target.value ? parseInt(e.target.value) : null)}
-                            className={`h-8 text-sm rounded ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}`}
+                            className={`h-8 py-4 text-sm rounded ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}`}
                           />
                         </div>
 

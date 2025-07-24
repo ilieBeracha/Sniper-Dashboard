@@ -19,7 +19,7 @@ export default function BaseMobileDrawer({
   return (
     <Dialog open={isOpen} onClose={setIsOpen} className="relative z-50 sm:hidden">
       {/* Backdrop */}
-      <div className={`fixed inset-0 backdrop-blur-sm transition-opacity ${theme === "dark" ? "bg-black/50" : "bg-white/50"}`} />
+      <div className={`fixed inset-0 backdrop-blur-sm transition-opacity ${theme === "dark" ? "bg-black/50" : "bg-gray-50"}`} />
 
       <div className="fixed inset-0 overflow-hidden z-50" style={{ zIndex: 1000 }}>
         <div className="absolute inset-0 overflow-hidden">

@@ -27,7 +27,7 @@ export default function TrainingSection({
 
   const colorMap = {
     green: "bg-green-400",
-    blue: "bg-blue-600", 
+    blue: "bg-blue-600",
     gray: "bg-gray-600",
   };
 
@@ -38,15 +38,9 @@ export default function TrainingSection({
         {title}
         {showCount && <span className="text-xs">{trainings.length}</span>}
       </h3>
-      
+
       {trainings.map((session) => (
-        <TrainingSessionCard
-          key={session.id}
-          session={session}
-          highlight={highlight}
-          showDate={showDate}
-          isPast={isPast}
-        />
+        <TrainingSessionCard key={session.id} session={session} highlight={highlight} showDate={showDate} isPast={isPast} />
       ))}
     </div>
   );

@@ -24,7 +24,7 @@ function AppContent() {
   }
 
   return (
-    <div className={`w-screen min-h-screen transition-colors duration-200`}>
+    <div className={`w-screen max-h-screen overflow-hidden transition-colors duration-200`}>
       <Routes>{token ? <Route path={"*"} element={<Home />} /> : <Route path={"*"} element={<Auth />} />}</Routes>
     </div>
   );

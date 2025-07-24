@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { useTheme } from "@/contexts/ThemeContext";
+import { primitives } from "@/styles/core";
 
 type TrainingSessionGroupProps = {
   title: string;
@@ -11,27 +12,38 @@ type TrainingSessionGroupProps = {
 export default function TrainingSessionGroup({ title, color, date, children }: TrainingSessionGroupProps) {
   const { theme } = useTheme();
   const colorMap = {
-    indigo: "bg-indigo-500",
-    green: "bg-green-500",
-    blue: "bg-blue-500",
-    gray: "bg-gray-500",
-    red: "bg-red-500",
+    indigo: primitives.lavender.lavender400,
+    green: primitives.green.green500,
+    blue: primitives.blue.blue500,
+    gray: primitives.grey.grey500,
+    red: primitives.red.red500,
   };
 
   return (
     <div>
       <div className="flex items-center gap-2 mb-4">
-        <div className={`w-2 h-2 rounded-full ${colorMap[color]} shadow-[0_0_8px_0px_${colorMap[color]}]`}></div>
+        <div
+          className="w-2 h-2 rounded-full"
+          style={{
+            backgroundColor: colorMap[color],
+            boxShadow: `0 0 8px 0px ${colorMap[color]}`,
+          }}
+        ></div>
         <h4
-          className={`text-sm font-medium uppercase tracking-wider transition-colors duration-200 ${
-            theme === "dark" ? "text-white" : "text-gray-900"
-          }`}
+          className="text-sm font-medium uppercase tracking-wider transition-colors duration-200"
+          style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}
         >
           {title}
         </h4>
-        <div className={`h-px flex-grow transition-colors duration-200 ${theme === "dark" ? "bg-white/5" : "bg-gray-200"}`}></div>
+        <div
+          className="h-px flex-grow transition-colors duration-200"
+          style={{ backgroundColor: theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey200 }}
+        ></div>
         {date && (
-          <span className={`text-xs font-medium transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+          <span
+            className="text-xs font-medium transition-colors duration-200"
+            style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}
+          >
             {format(date, "EEEE, MMMM d")}
           </span>
         )}

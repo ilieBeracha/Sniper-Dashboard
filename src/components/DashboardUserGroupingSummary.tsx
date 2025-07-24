@@ -59,6 +59,7 @@ const UserGroupingSummary = () => {
       return {
         label: `#${groupingSummary.last_five_groups.length - index}`, // #1 = latest
         cm_dispersion: item.cm_dispersion,
+        avg_dispersion: groupingSummary.avg_dispersion,
         formattedDate,
       };
     }) ?? [];
@@ -105,7 +106,12 @@ const UserGroupingSummary = () => {
             <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#333" : "#e5e7eb"} />
             <XAxis dataKey="label" stroke={theme === "dark" ? "#9ca3af" : "#4b5563"} />
             <Tooltip
-              formatter={(value: number) => [`${value} cm`, "Dispersion"]}
+              formatter={(value: number, name: string) => {
+                if (name === "avg_dispersion") {
+                  return [`${value} cm`, "Average"];
+                }
+                return [`${value} cm`, "Dispersion"];
+              }}
               labelFormatter={(_, payload) => {
                 const point = payload?.[0]?.payload;
                 return point?.formattedDate ? `Date: ${point.formattedDate}` : "";
@@ -128,6 +134,15 @@ const UserGroupingSummary = () => {
               strokeWidth={3}
               dot={{ r: 5, strokeWidth: 2, fill: theme === "dark" ? "#161616" : "#ffffff", stroke: "#8B5CF6" }}
               activeDot={{ r: 7, fill: "#8B5CF6", stroke: "#8B5CF6" }}
+            />
+            <Line
+              type="monotone"
+              dataKey="avg_dispersion"
+              stroke="#6366f1"
+              strokeWidth={2}
+              strokeDasharray="5 5"
+              dot={false}
+              activeDot={{ r: 5, fill: "#6366f1", stroke: "#6366f1" }}
             />
           </LineChart>
         </ResponsiveContainer>

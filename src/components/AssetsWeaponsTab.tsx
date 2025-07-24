@@ -11,14 +11,14 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { isMobile } from "react-device-detect";
 import { toast } from "react-toastify";
 import { BASE_WEAPONS } from "@/utils/BaseData/BaseWeapons";
+import { primitives } from "@/styles/core";
 
 export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) {
   const { weapons, createWeapon } = useStore(weaponsStore);
   const { user } = useStore(userStore);
   const { theme } = useTheme();
 
-  const weaponsTypes = new Set(weapons.map((weapon) => weapon.weapon_type));
-  const baseWeapons = BASE_WEAPONS.map((weapon) => ({ ...weapon, team_id: user?.team_id }));
+  const weaponsTypes = new Set(BASE_WEAPONS.map((weapon) => weapon.weapon_type));
   const teamId = user?.team_id;
 
   const [weaponForm, setWeaponForm] = useState({
@@ -37,33 +37,32 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
     setIsOpen(false);
   }
 
-
   const WeaponsContent = (
     <div
-      className={` ${isMobile ? "w-full" : "w-[600px]"} p-4 space-y-6 transition-colors duration-200 ${
-        theme === "dark" ? "text-white" : "text-gray-900"
-      }`}
+      className={` ${isMobile ? "w-full" : "w-[600px]"} p-4 space-y-6 transition-colors duration-200`}
+      style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}
     >
       <div>
         <h2 className="text-xl font-semibold">New Weapon</h2>
-        <p className={`mt-1 text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+        <p
+          className="mt-1 text-sm transition-colors duration-200"
+          style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}
+        >
           Add a new weapon to the inventory.
         </p>
       </div>
 
       <select
-        className={`w-full min-h-9 rounded-lg px-3 py-2 text-sm border transition-colors duration-200 ${
-          theme === "dark" ? "bg-zinc-800/50 text-white border-zinc-700" : "bg-white text-gray-900 border-gray-300"
-        }`}
+        className="min-h-9 rounded-lg px-3 text-sm border transition-colors duration-200 h-full"
+        style={{
+          backgroundColor: theme === "dark" ? `${primitives.grey.grey800}80` : primitives.white.white,
+          color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
+          borderColor: theme === "dark" ? primitives.grey.grey700 : primitives.grey.grey300,
+        }}
         value={weaponForm.weapon_type}
         onChange={(e) => setWeaponForm({ ...weaponForm, weapon_type: e.target.value })}
       >
         <option value="">Select weapon</option>
-        {baseWeapons.map((weapon) => (
-          <option key={weapon.id} value={weapon.weapon_type}>
-            {weapon.weapon_type}
-          </option>
-        ))}
         {Array.from(weaponsTypes)?.map((weaponType, index) => (
           <option key={index} value={weaponType}>
             {weaponType}
@@ -77,8 +76,9 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
         value={weaponForm.serial_number}
         onChange={(e) => setWeaponForm({ ...weaponForm, serial_number: e.target.value })}
         placeholder="Enter serial number"
-        leftIcon={<FileQuestion size={16} className={theme === "dark" ? "text-gray-400" : "text-gray-500"} />}
+        leftIcon={<FileQuestion size={16} style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey500 }} />}
         containerClassName="bg-transparent"
+        className="h-full"
       />
 
       <BaseInput
@@ -87,24 +87,43 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
         value={weaponForm.mv}
         onChange={(e) => setWeaponForm({ ...weaponForm, mv: e.target.value })}
         placeholder="Enter MV"
-        leftIcon={<FileQuestion size={16} className={theme === "dark" ? "text-gray-400" : "text-gray-500"} />}
+        leftIcon={<FileQuestion size={16} style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey500 }} />}
         containerClassName="bg-transparent"
+        className="h-full"
       />
 
       <div className="flex items-center justify-end gap-x-4">
         <button
           type="button"
           onClick={() => setIsOpen(false)}
-          className={`px-4 py-1.5 transition-colors rounded-md text-sm font-medium ${
-            theme === "dark" ? "bg-white/5 hover:bg-white/10 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-          }`}
+          className="px-4 py-1.5 transition-colors rounded-md text-sm font-medium"
+          style={{
+            backgroundColor: theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey100,
+            color: theme === "dark" ? primitives.white.white : primitives.grey.grey700,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = theme === "dark" ? `${primitives.white.white}1A` : primitives.grey.grey200;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey100;
+          }}
         >
           Cancel
         </button>
         <button
           type="button"
           onClick={handleCreateWeapon}
-          className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
+          className="px-4 py-1.5 transition-colors rounded-md text-sm font-medium shadow-sm disabled:cursor-not-allowed"
+          style={{
+            backgroundColor: primitives.blue.blue500,
+            color: primitives.white.white,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = primitives.blue.blue400;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = primitives.blue.blue500;
+          }}
         >
           Create
         </button>
@@ -116,14 +135,20 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
     <div>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-1 h-6 bg-blue-400 rounded-full"></div>
-          <h2 className={`text-lg font-semibold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+          <div className="w-1 h-6 rounded-full" style={{ backgroundColor: primitives.blue.blue400 }}></div>
+          <h2
+            className="text-lg font-semibold transition-colors duration-200"
+            style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}
+          >
             Weapons Inventory
           </h2>
           <div
-            className={`px-3 py-1 text-sm rounded border ${
-              theme === "dark" ? "bg-blue-500/20 text-blue-200 border-blue-500/30" : "bg-blue-100 text-blue-700 border-blue-300"
-            }`}
+            className="px-3 py-1 text-sm rounded border"
+            style={{
+              backgroundColor: theme === "dark" ? `${primitives.blue.blue500}33` : primitives.blue.blue100,
+              color: theme === "dark" ? primitives.blue.blue200 : primitives.blue.blue600,
+              borderColor: theme === "dark" ? `${primitives.blue.blue500}4D` : primitives.blue.blue300,
+            }}
           >
             {weapons.length} items
           </div>

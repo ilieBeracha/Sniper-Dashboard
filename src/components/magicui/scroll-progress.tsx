@@ -1,3 +1,4 @@
+import Header from "@/Headers/Header";
 import { cn } from "@/lib/utils";
 import { motion, MotionProps } from "framer-motion"; // ← use framer‑motion
 import React from "react";
@@ -17,13 +18,16 @@ export const ScrollProgress = React.forwardRef<HTMLDivElement, ScrollProgressPro
   const progress = getProgress(activeSection, totalSections);
 
   return (
-    <motion.div
-      ref={ref}
-      className={cn("fixed inset-x-0 top-0 z-50 h-1 origin-left", "bg-gradient-to-r from-[#A97CF8] via-[#F38CB8] to-[#FDCC92]", className)}
-      initial={{ scaleX: 1 }}
-      animate={{ scaleX: progress }}
-      {...props}
-    />
+    <div className="hidden lg:block">
+      <Header />
+      <motion.div
+        ref={ref}
+        className={cn("fixed inset-x-0 top-0 z-50 h-1 origin-left", "bg-gradient-to-r from-[#A97CF8] via-[#F38CB8] to-[#FDCC92]", className)}
+        initial={{ scaleX: 1 }}
+        animate={{ scaleX: progress }}
+        {...props}
+      />
+    </div>
   );
 });
 

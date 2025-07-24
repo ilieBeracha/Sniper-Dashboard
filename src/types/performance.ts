@@ -6,6 +6,24 @@ export interface SquadWeaponPerformance {
   accuracy: number;
 }
 
+export type GroupingScoreEntry = {
+  id: string;
+  sniper_user_id: string;
+  sniper_first_name: string;
+  sniper_last_name: string;
+  weapon_id: string;
+  weapon_serial_number: string;
+  weapon_type: string; // weapon_names enum as string
+  bullets_fired: number;
+  time_seconds: number;
+  cm_dispersion: number;
+  shooting_position: string;
+  effort: boolean;
+  created_at: string; // ISO date
+  type: string; // grouping_type_enum as string
+};
+
+
 export interface HitPercentageData {
   hit_percentage: number;
   total_shots: number;
@@ -95,14 +113,6 @@ export type TrainingTeamAnalytics = {
   times_grouped: number;
 };
 
-export interface OverallAccuracyStats {
-  total_scores: number;
-  total_shots_fired: number;
-  total_target_hits: number;
-  accuracy_percent: number;
-}
-
-
 // commander view
 export type SquadUserPerformance = {
   first_name: string;
@@ -124,7 +134,6 @@ export type CommanderUserRoleBreakdown = {
   hits: number;
   sessions: number;
 };
-
 
 // new
 export type SquadMajorityPerformance = {

@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
 import { Equipment } from "@/types/equipment";
-import { Eye, Edit, Save, X } from "lucide-react";
+import { Edit, Save, X } from "lucide-react";
 import { format } from "date-fns";
 import { useStore } from "zustand";
 import { equipmentStore } from "@/store/equipmentStore";
 import { SpTable, SpTableColumn } from "@/layouts/SpTable";
 import { useTheme } from "@/contexts/ThemeContext";
+import { primitives } from "@/styles/core";
 
 export default function AssetsEquipmentTable({ equipments }: { equipments: Equipment[] }) {
   const { theme } = useTheme();
@@ -41,10 +42,6 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
     setEditForm({});
   };
 
-  const handleViewEquipment = (equipment: Equipment) => {
-    console.log("Viewing equipment:", equipment);
-  };
-
   const columns = [
     {
       key: "equipment_type",
@@ -55,9 +52,12 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
           <select
             value={editForm.equipment_type || ""}
             onChange={(e) => setEditForm({ ...editForm, equipment_type: e.target.value })}
-            className={`w-full px-2 py-1 rounded border text-sm ${
-              theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
-            }`}
+            className="w-full px-2 py-2 h-9 rounded border text-sm"
+            style={{
+              borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
+              backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
+            }}
           >
             <option value="">Select type</option>
             {uniqueEquipmentTypes.map((type) => (
@@ -81,9 +81,12 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
             type="text"
             value={editForm.serial_number || ""}
             onChange={(e) => setEditForm({ ...editForm, serial_number: e.target.value })}
-            className={`w-full px-2 py-1 rounded border text-sm ${
-              theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
-            }`}
+            className="w-full px-2 py-2 h-9 rounded border text-sm"
+            style={{
+              borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
+              backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
+            }}
           />
         ) : (
           value || "N/A"
@@ -99,9 +102,12 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
           <select
             value={editForm.day_night || ""}
             onChange={(e) => setEditForm({ ...editForm, day_night: e.target.value })}
-            className={`w-full px-2 py-1 rounded border text-sm ${
-              theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
-            }`}
+            className="w-full px-2 py-2 h-9 rounded border text-sm"
+            style={{
+              borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
+              backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
+            }}
           >
             <option value="">Select</option>
             <option value="day">Day</option>
@@ -154,33 +160,18 @@ export default function AssetsEquipmentTable({ equipments }: { equipments: Equip
       <div className="inline-flex gap-2">
         {isEditing ? (
           <>
-            <button
-              onClick={handleSaveEquipment}
-              className={`p-2 rounded hover:bg-green-100 dark:hover:bg-green-800/40 ${theme === "dark" ? "text-green-400" : "text-green-600"}`}
-              title="Save"
-            >
+            <button onClick={handleSaveEquipment} className={`p-2 rounded  ${theme === "dark" ? "text-green-400" : "text-green-600"}`} title="Save">
               <Save size={16} />
             </button>
-            <button
-              onClick={handleCancelEdit}
-              className={`p-2 rounded hover:bg-red-100 dark:hover:bg-red-800/40 ${theme === "dark" ? "text-red-400" : "text-red-600"}`}
-              title="Cancel"
-            >
+            <button onClick={handleCancelEdit} className={`p-2 rounded ${theme === "dark" ? "text-red-400" : "text-red-600"}`} title="Cancel">
               <X size={16} />
             </button>
           </>
         ) : (
           <>
             <button
-              onClick={() => handleViewEquipment(equipment)}
-              className={`p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
-              title="View"
-            >
-              <Eye size={16} />
-            </button>
-            <button
               onClick={() => handleEditEquipment(equipment)}
-              className={`p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
+              className={`p-2 rounded  ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
               title="Edit"
             >
               <Edit size={16} />

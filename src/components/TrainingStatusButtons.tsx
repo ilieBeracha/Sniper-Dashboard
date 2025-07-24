@@ -6,6 +6,7 @@ import { userStore } from "@/store/userStore";
 import { Clock, CheckCircle, XCircle, PlayCircle, Shield } from "lucide-react";
 import { isMobile } from "react-device-detect";
 import { UserRole } from "@/types/user";
+import { primitives } from "@/styles/core";
 
 type TrainingStatusButtonsProps = {
   currentStatus: TrainingStatus;
@@ -43,16 +44,21 @@ export default function TrainingStatusButtons({ currentStatus, onStatusChange }:
 
   return (
     <div
-      className={`rounded-2xl p-6 shadow-sm transition-all duration-200 mb-4 ${
-        theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-white border border-gray-100"
-      }`}
+      className="rounded-2xl p-6 shadow-sm transition-all duration-200 mb-4 border"
+      style={{
+        backgroundColor: theme === "dark" ? `${primitives.grey.grey900}80` : primitives.white.white,
+        borderColor: theme === "dark" ? primitives.grey.grey800 : primitives.grey.grey100
+      }}
     >
       {/* Card Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-white/5" : "bg-gray-100"}`}>
-          <Shield className={`w-5 h-5 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`} />
+        <div 
+          className="p-2 rounded-lg"
+          style={{ backgroundColor: theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey100 }}
+        >
+          <Shield className="w-5 h-5" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }} />
         </div>
-        <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>Session Control</h3>
+        <h3 className="text-lg font-semibold" style={{ color: theme === "dark" ? primitives.grey.grey100 : primitives.grey.grey900 }}>Session Control</h3>
       </div>
 
       {/* Status Buttons Container */}
@@ -70,20 +76,31 @@ export default function TrainingStatusButtons({ currentStatus, onStatusChange }:
                 type="button"
                 onClick={() => onStatusChange(status)}
                 disabled={isActive}
-                className={`
-                  ${isMobile ? "w-full" : "flex-1"}
-                  px-4 py-3 flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200
-                  ${
-                    isActive
-                      ? theme === "dark"
-                        ? "bg-white/10 text-white border border-white/20 cursor-not-allowed"
-                        : "bg-gray-900 text-white border border-gray-900 cursor-not-allowed"
-                      : theme === "dark"
-                        ? "bg-transparent text-gray-400 border border-zinc-700 hover:bg-white/5 hover:text-gray-200"
-                        : "bg-transparent text-gray-600 border border-gray-200 hover:bg-gray-50 hover:text-gray-900"
+                className={`${isMobile ? "w-full" : "flex-1"} px-4 py-3 flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 text-sm border`}
+                style={{
+                  backgroundColor: isActive
+                    ? theme === "dark" ? `${primitives.white.white}1A` : primitives.grey.grey900
+                    : "transparent",
+                  color: isActive
+                    ? theme === "dark" ? primitives.white.white : primitives.white.white
+                    : theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600,
+                  borderColor: isActive
+                    ? theme === "dark" ? `${primitives.white.white}33` : primitives.grey.grey900
+                    : theme === "dark" ? primitives.grey.grey700 : primitives.grey.grey200,
+                  cursor: isActive ? "not-allowed" : "pointer"
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey50;
+                    e.currentTarget.style.color = theme === "dark" ? primitives.grey.grey200 : primitives.grey.grey900;
                   }
-                  text-sm
-                `}
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.color = theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600;
+                  }
+                }}
               >
                 <Icon className="w-4 h-4" />
                 <span>{config.displayName}</span>
@@ -93,7 +110,7 @@ export default function TrainingStatusButtons({ currentStatus, onStatusChange }:
         </div>
 
         {/* Divider */}
-        <div className={`border-t ${theme === "dark" ? "border-zinc-700/50" : "border-gray-200"}`} />
+        <div className="border-t" style={{ borderColor: theme === "dark" ? `${primitives.grey.grey700}80` : primitives.grey.grey200 }} />
 
         {/* Cancel Button */}
         <div className={`${isMobile ? "w-full" : "flex justify-end"}`}>

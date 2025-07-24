@@ -6,60 +6,107 @@ import {
   WeaponUsageStats,
   SquadMajorityPerformance,
   CommanderUserRoleBreakdown,
+  GroupingScoreEntry,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
-import { PositionScore } from "@/types/score";
+import { PositionScore } from "@/types/user";
 
 export async function getUserHitStatsFull(userId: string): Promise<UserHitsData> {
-  const { data, error } = await supabase.rpc("get_user_hit_stats_full", {
-    p_user_id: userId,
-  });
-  if (error) {
-    console.error("SQL function failed:", error.message);
+  try {
+    const { data, error } = await supabase.rpc("get_user_hit_stats_full", {
+      p_user_id: userId,
+    });
+    if (error) throw error;
+    return data[0];
+  } catch (error: any) {
+    console.error("Error fetching user hit stats:", error.message);
     throw new Error("Could not complete get_user_hit_stats_full");
   }
-  return data[0];
+}
+
+export async function getUserHitStatsWithFilters(
+  userId: string,
+  distance: string | null = null,
+  position: string | null = null,
+  weaponType: string | null = null,
+): Promise<UserHitsData> {
+  try {
+    const { data, error } = await supabase.rpc("get_user_hit_stats_with_filters", {
+      p_user_id: userId,
+      p_distance_category: distance,
+      p_position: position,
+      p_weapon_type: weaponType,
+    });
+    if (error) throw error;
+    return data[0];
+  } catch (error: any) {
+    console.error("Error fetching user hit stats with filters:", error.message);
+    throw new Error("Could not complete get_user_hit_stats_with_filters");
+  }
 }
 
 export async function getSquadRoleHitPercentages(squadId: string, distance: string | null = null) {
-  const { data, error } = await supabase.rpc("get_squad_hit_percentages_by_role", {
-    p_squad_id: squadId,
-    p_distance_category: distance,
-  });
+  try {
+    const { data, error } = await supabase.rpc("get_squad_hit_percentages_by_role", {
+      p_squad_id: squadId,
+      p_distance_category: distance,
+    });
 
-  if (error) {
+    if (error) throw error;
+
+    return data || [];
+  } catch (error: any) {
     console.error("Error fetching squad role hit percentages:", error.message);
-    throw error;
+    throw new Error("Failed to fetch squad role hit percentages");
   }
-
-  return data || [];
-}
-// This function is a duplicate of the one above, so we can remove it to avoid redundancy.
-export async function getSquadHitPercentageByRole(squadId: string, distance: string | null = null) {
-  const { data, error } = await supabase.rpc("get_squad_hit_percentages_by_role_v3", {
-    p_squad_id: squadId,
-    p_distance_category: distance,
-  });
-
-  if (error) {
-    console.error("Error fetching session-based role stats:", error.message);
-    throw error;
-  }
-
-  return data || [];
 }
 
-export async function getTrainingTeamAnalytics(trainingSessionId: string): Promise<TrainingTeamAnalytics | null> {
-  const { data, error } = await supabase.rpc("get_training_team_analytics", {
+export async function getGroupingScoresByTraining(trainingSessionId: string): Promise<GroupingScoreEntry[]> {
+  const { data, error } = await supabase.rpc("get_grouping_data_by_training", {
     p_training_session_id: trainingSessionId,
   });
 
   if (error) {
-    console.error("Error fetching training analytics:", error.message);
-    return null;
+    console.error("Error fetching grouping scores:", error.message);
+    throw new Error("Failed to fetch grouping score entries");
   }
 
-  return data?.[0] ?? null;
+  return data || [];
+}
+
+// This function is a duplicate of the one above, so we can remove it to avoid redundancy.
+export async function getSquadHitPercentageByRole(squadId: string, distance: string | null = null) {
+  try {
+    const { data, error } = await supabase.rpc("get_squad_hit_percentages_by_role_v3", {
+      p_squad_id: squadId,
+      p_distance_category: distance,
+    });
+
+    if (error) throw error;
+
+    return data || [];
+  } catch (error: any) {
+    console.error("Error fetching session-based role stats:", error.message);
+    throw new Error("Failed to fetch session-based role stats");
+  }
+}
+
+export async function getTrainingTeamAnalytics(trainingSessionId: string): Promise<TrainingTeamAnalytics | null> {
+  try {
+    const { data, error } = await supabase.rpc("get_training_team_analytics", {
+      p_training_session_id: trainingSessionId,
+    });
+
+    if (error) {
+      console.error("Error fetching training analytics:", error.message);
+      return null;
+    }
+
+    return data?.[0] ?? null;
+  } catch (error: any) {
+    console.error("Error fetching training analytics:", error.message);
+    throw new Error("Failed to fetch training analytics");
+  }
 }
 
 export async function getWeaponPerformanceBySquadAndWeapon(teamId: string): Promise<SquadWeaponPerformance[]> {
@@ -75,10 +122,19 @@ export async function getWeaponPerformanceBySquadAndWeapon(teamId: string): Prom
   return data || [];
 }
 
-export async function getUserGroupingStatsRpc(userId: string, weaponId: string | null = null): Promise<GroupingSummary> {
-  const { data, error } = await supabase.rpc("get_user_grouping_stats", {
+export async function getUserGroupingStatsRpc(
+  userId: string,
+  weaponType: string | null = null,
+  effort: boolean | null = null,
+  type: string | null = null,
+  position: string | null = null,
+): Promise<GroupingSummary> {
+  const { data, error } = await supabase.rpc("get_user_grouping_stats_v3", {
     p_user_id: userId,
-    p_weapon_id: weaponId,
+    p_weapon_type: weaponType,
+    p_effort: effort,
+    p_type: type,
+    p_position: position,
   });
 
   if (error) {
@@ -97,11 +153,10 @@ export async function getUserGroupingStatsRpc(userId: string, weaponId: string |
     best_dispersion: result.best_dispersion,
     avg_time_to_group: result.avg_time_to_group,
     total_groupings: result.total_groupings,
-    weapon_breakdown: [],
+    weapon_breakdown: [], // You can populate this later if needed
     last_five_groups: result.last_five_groups ?? [],
   };
 }
-
 // In your service
 export async function getDayNightPerformanceByTeam(teamId: string) {
   const { data, error } = await supabase.rpc("get_day_night_performance_by_team", {
@@ -143,21 +198,8 @@ export async function getSquadStatByTeamId(teamId: string, position: PositionSco
   return data;
 }
 
-export async function overallAccuracyStats() {
-  const { data, error } = await supabase.rpc("overall_accuracy_stats");
-
-  if (error) {
-    console.error("Error fetching training summary stats:", error);
-    throw error;
-  }
-
-  return data[0];
-}
-
 // commander view
-export const getCommanderUserRoleBreakdown = async (
-  teamId: string
-): Promise<CommanderUserRoleBreakdown[]> => {
+export const getCommanderUserRoleBreakdown = async (teamId: string): Promise<CommanderUserRoleBreakdown[]> => {
   const { data, error } = await supabase.rpc("get_commander_user_role_breakdown", {
     p_team_id: teamId,
   });
@@ -170,17 +212,9 @@ export const getCommanderUserRoleBreakdown = async (
   return data ?? [];
 };
 
-
-
 // new
-export const getSquadMajoritySessionsPerformance = async (
-  teamId: string
-): Promise<SquadMajorityPerformance[]> => {
-  const { data, error } = await supabase.rpc(
-    "get_squad_majority_sessions_performance",
-    { p_team_id: teamId }
-  );
-console.log(data, "Data from getSquadMajoritySessionsPerformance");
+export const getSquadMajoritySessionsPerformance = async (teamId: string): Promise<SquadMajorityPerformance[]> => {
+  const { data, error } = await supabase.rpc("get_squad_majority_sessions_performance", { p_team_id: teamId });
   if (error) {
     console.error("Error fetching squad majority performance:", error);
     throw error;
@@ -190,25 +224,15 @@ console.log(data, "Data from getSquadMajoritySessionsPerformance");
 };
 
 export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsageStats> {
-  console.log("Service - getWeaponUsageStats called with weaponId:", weaponId);
-
   const { data, error } = await supabase.rpc("get_weapon_usage_stats", {
     p_weapon_id: weaponId,
   });
-
-  if (data && data.length > 0) {
-    console.log("Service - First data item:", data[0]);
-    console.log("Service - Data item keys:", Object.keys(data[0]));
-    console.log("Service - total_shots_fired value:", data[0].total_shots_fired, "type:", typeof data[0].total_shots_fired);
-    console.log("Service - total_hits value:", data[0].total_hits, "type:", typeof data[0].total_hits);
-  }
 
   if (error) {
     console.error("Error fetching weapon usage stats:", error.message);
     throw error;
   }
 
-  // Handle case where data exists but might have different field names or null values
   const rawResult = data?.[0];
   const result = rawResult
     ? {

@@ -1,17 +1,17 @@
 import { useState, useMemo } from "react";
 import { Weapon } from "@/types/weapon";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Eye, Edit, Search, X, Save, BarChart3 } from "lucide-react";
+import { Edit, Search, X, Save, BarChart3 } from "lucide-react";
 import { format } from "date-fns";
 import { useStore } from "zustand";
 import { weaponsStore } from "@/store/weaponsStore";
 import { performanceStore } from "@/store/performance";
 import { SpTable, SpTableColumn } from "@/layouts/SpTable";
 import WeaponUsageModal from "./WeaponUsageModal";
+import { primitives } from "@/styles/core";
 
 export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
-  // Filter out weapons without IDs for SpTable compatibility
-  const weaponsWithIds = weapons.filter((weapon): weapon is Weapon & { id: string } => Boolean(weapon.id));
+  const weaponsWithIds = weapons.filter((weapon): weapon is Weapon & { id: string } => Boolean(weapon?.id));
   const { theme } = useTheme();
   const { updateWeapon } = useStore(weaponsStore);
   const { getWeaponUsageStats } = useStore(performanceStore);
@@ -20,7 +20,6 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
   const [usageModalOpen, setUsageModalOpen] = useState(false);
   const [selectedWeaponForUsage, setSelectedWeaponForUsage] = useState<Weapon | null>(null);
 
-  // Get unique weapon types for filter
   const uniqueWeaponTypes = useMemo(() => {
     const types = weaponsWithIds.map((weapon) => weapon.weapon_type).filter(Boolean);
     return [...new Set(types)];
@@ -48,14 +47,8 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
     setEditForm({});
   };
 
-  const handleViewWeapon = (weapon: Weapon) => {
-    console.log("Viewing weapon:", weapon);
-  };
-
   const handleViewUsage = async (weapon: Weapon) => {
     if (!weapon.id) return;
-    console.log("AssetsWeaponsTable - handleViewUsage called with weapon:", weapon);
-    console.log("AssetsWeaponsTable - weapon.id:", weapon.id);
     setSelectedWeaponForUsage(weapon);
     setUsageModalOpen(true);
     await getWeaponUsageStats(weapon.id);
@@ -71,9 +64,12 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
           <select
             value={editForm.weapon_type || ""}
             onChange={(e) => setEditForm({ ...editForm, weapon_type: e.target.value })}
-            className={`w-full px-2 py-1 rounded border text-sm ${
-              theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
-            }`}
+            className="w-full px-2 py-1 rounded border text-sm"
+            style={{
+              borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
+              backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
+            }}
           >
             <option value="">Select type</option>
             {uniqueWeaponTypes.map((type) => (
@@ -98,9 +94,12 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
             type="text"
             value={editForm.serial_number || ""}
             onChange={(e) => setEditForm({ ...editForm, serial_number: e.target.value })}
-            className={`w-full px-2 py-1 rounded border text-sm ${
-              theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
-            }`}
+            className="w-full px-2 py-1 rounded border text-sm"
+            style={{
+              borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
+              backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
+            }}
           />
         ) : (
           <span>{value || "N/A"}</span>
@@ -118,9 +117,12 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
             type="number"
             value={editForm.mv || ""}
             onChange={(e) => setEditForm({ ...editForm, mv: e.target.value })}
-            className={`w-full px-2 py-1 rounded border text-sm ${
-              theme === "dark" ? "border-zinc-600 bg-zinc-700 text-white" : "border-gray-300 bg-white text-gray-900"
-            }`}
+            className="w-full px-2 py-1 rounded border text-sm"
+            style={{
+              borderColor: theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey300,
+              backgroundColor: theme === "dark" ? primitives.grey.grey700 : primitives.white.white,
+              color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
+            }}
           />
         ) : (
           <span>{value || "N/A"}</span>
@@ -178,16 +180,6 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleViewWeapon(weapon);
-              }}
-              className={`p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
-              title="View Details"
-            >
-              <Eye size={16} />
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
                 handleViewUsage(weapon);
               }}
               className={`p-2 rounded hover:bg-green-100 dark:hover:bg-green-800/40 ${theme === "dark" ? "text-green-400" : "text-green-600"}`}
@@ -238,7 +230,7 @@ export default function AssetsWeaponsTable({ weapons }: { weapons: Weapon[] }) {
           </div>
         }
       />
-      
+
       <WeaponUsageModal
         isOpen={usageModalOpen}
         onClose={() => {

@@ -1,9 +1,10 @@
-import { useState } from "react";
+  import { useState } from "react";
 import { Assignment } from "@/types/training";
 import SearchableCheckboxList from "@/components/SearchableCheckboxList";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
 import { Plus } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import AddPurpleBtn from "../base/buttons/AddPurpleBtn";
 
 type AssignmentsSectionProps = {
   assignments: Assignment[];
@@ -42,21 +43,18 @@ export default function AssignmentsSection({
           <div className="flex items-center justify-center gap-2">
             <span className="text-sm font-medium">Assignments</span>
             {assignmentIds.length > 0 && (
-              <div className={`px-2 shrink-0 py-0.5 rounded text-xs ${
-                theme === "dark" ? "bg-indigo-500/20 text-indigo-400" : "bg-indigo-500/10 text-indigo-600"
-              }`}>{assignmentIds.length} selected</div>
+              <div
+                className={`px-2 shrink-0 py-0.5 rounded text-xs ${
+                  theme === "dark" ? "bg-indigo-500/20 text-indigo-400" : "bg-indigo-500/10 text-indigo-600"
+                }`}
+              >
+                {assignmentIds.length} selected
+              </div>
             )}
           </div>
-          <button
-            onClick={() => setIsAddAssignmentOpen(true)}
-            className={`flex items-center gap-1.5 sm:text-xs text-xs rounded-lg border px-3 py-1.5 transition-colors duration-200 ${
-              theme === "dark"
-                ? "text-indigo-400 hover:text-indigo-300 bg-indigo-900/30 border-indigo-700/50 hover:bg-indigo-900/40"
-                : "text-indigo-600 hover:text-indigo-700 bg-indigo-50 border-indigo-200 hover:bg-indigo-100"
-            }`}
-          >
+          <AddPurpleBtn onClick={() => setIsAddAssignmentOpen(true)}>
             <Plus size={14} />
-          </button>
+          </AddPurpleBtn>
         </div>
       </div>
 

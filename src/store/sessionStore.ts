@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { getSessionStatsCountByTrainingId, saveCompleteSession } from "@/services/sessionService";
-import type { CreateSessionStatsData, CreateParticipantData, CreateTargetStatsData, CreateTargetEngagementData } from "@/services/sessionService";
+import { createGroupScoreService, getSessionStatsCountByTrainingId, saveCompleteSession } from "@/services/sessionService";
+import type { CreateSessionStatsData, CreateParticipantData, CreateTargetStatsData, CreateTargetEngagementData } from "@/types/sessionStats";
 import { TrainingStore } from "./trainingStore";
 import { getSessionStatsByTrainingId } from "@/services/sessionService";
 import { formatForSupabaseInsert, processTrainingSessionToEmbeddings } from "@/services/embedSniperSession";
@@ -16,6 +16,8 @@ interface SessionStatsState {
   saveSessionStats: (sessionData: SessionStatsSaveData) => Promise<any>;
   getSessionStatsByTrainingId: (trainingId: string, limit?: number, offset?: number) => Promise<any[]>;
   getSessionStatsCountByTrainingId: (trainingId: string) => Promise<number>;
+  createGroupScore: (groupScore: any) => Promise<any>;
+  groupStats: any[];
 }
 
 export interface SessionStatsSaveData {
@@ -23,7 +25,6 @@ export interface SessionStatsSaveData {
   sessionData: {
     training_session_id: string | null;
     assignment_id: string | null;
-    squad_id: string | null;
     team_id: string | null;
     dayPeriod: string | null;
     timeToFirstShot: number | null;
@@ -58,6 +59,7 @@ export interface SessionStatsSaveData {
 
 export const sessionStore = create<SessionStatsState>((set) => ({
   sessionStats: [],
+  groupStats: [],
   isLoading: false,
   error: null,
 
@@ -76,6 +78,14 @@ export const sessionStore = create<SessionStatsState>((set) => ({
     return await getSessionStatsCountByTrainingId(trainingId);
   },
 
+  createGroupScore: async (groupScore: any) => {
+    const trainingStore = TrainingStore.getState().training;
+    const res = await createGroupScoreService(groupScore, trainingStore?.id || "");
+    set({ groupStats: res });
+
+    return res;
+  },
+
   saveSessionStats: async (wizardData: SessionStatsSaveData) => {
     set({ isLoading: true, error: null });
     const trainingStore = TrainingStore.getState().training;
@@ -86,7 +96,6 @@ export const sessionStore = create<SessionStatsState>((set) => ({
         training_session_id: wizardData.sessionData.training_session_id || trainingStore?.id || "",
         assignment_id: wizardData.sessionData.assignment_id,
         creator_id: wizardData.currentUser?.id || null,
-        squad_id: wizardData.sessionData.squad_id,
         team_id: wizardData.sessionData.team_id,
         day_period: wizardData.sessionData.dayPeriod,
         time_to_first_shot_sec: wizardData.sessionData.timeToFirstShot,
@@ -120,7 +129,6 @@ export const sessionStore = create<SessionStatsState>((set) => ({
             mistake_code: target.mistakeCode || null,
           };
 
-          // Target engagements (without target_id - service will add it)
           const engagements: Omit<CreateTargetEngagementData, "target_stats_id">[] = target.engagements.map((eng) => {
             return {
               user_id: eng.user_id,
@@ -139,6 +147,7 @@ export const sessionStore = create<SessionStatsState>((set) => ({
 
           const supabaseRecords = formatForSupabaseInsert(processedData);
           console.log("supabaseRecords", supabaseRecords);
+          console.log("participantsData", processedData);
 
           return {
             targetStats,
@@ -146,8 +155,6 @@ export const sessionStore = create<SessionStatsState>((set) => ({
           };
         }),
       );
-
-      console.log("wizardData", wizardData);
 
       // Call service to save everything
       const savedSession = await saveCompleteSession({
