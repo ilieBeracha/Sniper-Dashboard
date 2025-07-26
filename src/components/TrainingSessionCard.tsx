@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { ChevronRight, Clock, MapPin, Bookmark } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useIsMobile } from "@/hooks/useIsMobile";
 import { primitives } from "@/styles/core";
 
 export function TrainingSessionCard({
@@ -21,7 +20,6 @@ export function TrainingSessionCard({
   const navigate = useNavigate();
   const { theme } = useTheme();
   const sessionDate = parseISO(session.date);
-  const isMobile = useIsMobile();
 
   const handleSessionClick = () => {
     navigate(`/training/${session.id}`);
