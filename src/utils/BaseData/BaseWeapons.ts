@@ -16,4 +16,11 @@ export const BASE_WEAPONS = [
     team_id: "",
     mv: null,
   },
+  {
+    id: uuidv4(),
+    weapon_type: "M24",
+    serial_number: "",
+    team_id: "",
+    mv: null,
+  },
 ];

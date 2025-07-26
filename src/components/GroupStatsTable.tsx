@@ -1,4 +1,4 @@
-import { Eye, Edit, Target } from "lucide-react";
+import { Edit, Target } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
@@ -146,16 +146,6 @@ export default function GroupStatsTable({ onGroupStatsClick = () => {}, onGroupS
 
   const actions = (row: GroupingScoreEntry) => (
     <div className="inline-flex gap-1 sm:gap-2">
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onGroupStatsClick(row);
-        }}
-        className={`p-1.5 sm:p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
-        title="View"
-      >
-        <Eye size={14} className="sm:w-4 sm:h-4" />
-      </button>
       <button
         onClick={(e) => {
           e.stopPropagation();
