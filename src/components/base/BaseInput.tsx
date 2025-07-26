@@ -17,9 +17,13 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
     return (
       <div className={cn("w-full", containerClassName)}>
         {label && (
-          <label htmlFor={props.id} className={cn(`block text-sm font-medium text-left mb-1.5 transition-colors duration-200 ${
-            theme === 'dark' ? 'text-white' : 'text-gray-900'
-          }`, labelClassName)}>
+          <label
+            htmlFor={props.id}
+            className={cn(
+              `block text-sm font-medium text-left mb-1.5 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`,
+              labelClassName,
+            )}
+          >
             {label}
           </label>
         )}
@@ -29,8 +33,8 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
             ref={ref}
             className={cn(
               "w-full appearance-none px-4 py-2 text-sm shadow-theme-xs focus:outline-hidden focus:ring-3 transition-all duration-200 border rounded-lg bg-transparent",
-              theme === 'dark' 
-                ? "text-gray-300 placeholder:text-gray-400 border-gray-700 focus:border-gray-500 focus:ring-gray-500/20" 
+              theme === "dark"
+                ? "text-gray-300 placeholder:text-gray-400 border-gray-700 focus:border-gray-500 focus:ring-gray-500/20"
                 : "text-gray-900 placeholder:text-gray-500 border-gray-300 focus:border-gray-500 focus:ring-gray-500/20 bg-white",
               leftIcon && "pl-10",
               rightIcon && "pr-10",
