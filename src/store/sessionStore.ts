@@ -4,6 +4,7 @@ import type { CreateSessionStatsData, CreateParticipantData, CreateTargetStatsDa
 import { TrainingStore } from "./trainingStore";
 import { getSessionStatsByTrainingId } from "@/services/sessionService";
 import { formatForSupabaseInsert, processTrainingSessionToEmbeddings } from "@/services/embedSniperSession";
+import { userStore } from "./userStore";
 
 interface SessionStatsState {
   sessionStats: any[];
@@ -100,6 +101,7 @@ export const sessionStore = create<SessionStatsState>((set) => ({
         day_period: wizardData.sessionData.dayPeriod,
         time_to_first_shot_sec: wizardData.sessionData.timeToFirstShot,
         note: wizardData.sessionData.note || null,
+        squad_id: userStore.getState().user?.squad_id || null,
       };
 
       // Transform participants data (without session_id - service will add it)

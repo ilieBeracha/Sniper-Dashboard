@@ -67,7 +67,7 @@ interface PerformanceStore {
   fetchSquadMajorityPerformance: (teamId: string) => Promise<void>;
 
   groupingScores: GroupingScoreEntry[] | null;
-  fetchGroupingScores: (trainingSessionId: string) => Promise<void>;
+  fetchGroupingScores: (trainingSessionId: string, limit?: number, offset?: number) => Promise<void>;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
@@ -84,10 +84,10 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   squadMajorityPerformance: null,
   groupingScores: null,
 
-  fetchGroupingScores: async (trainingSessionId: string) => {
+  fetchGroupingScores: async (trainingSessionId: string, limit: number = 20, offset: number = 0) => {
     try {
       set({ isLoading: true });
-      const data = await getGroupingScoresByTraining(trainingSessionId);
+      const data = await getGroupingScoresByTraining(trainingSessionId, limit, offset);
       set({ groupingScores: data });
     } catch (error) {
       console.error("Failed to load grouping scores:", error);

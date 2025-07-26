@@ -14,10 +14,12 @@ import { TrainingStore } from "@/store/trainingStore";
 import { useEffect } from "react";
 import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function ImprovedSessionStats() {
   const { theme } = useTheme();
-
+  const navigate = useNavigate();
   const { getWeapons } = useStore(weaponsStore);
   const { getEquipments } = useStore(equipmentStore);
 
@@ -63,11 +65,6 @@ export default function ImprovedSessionStats() {
     })();
   }, [training?.team_id]);
 
-  useEffect(() => {
-    console.log("user", user);
-    console.log("weapons", weapons);
-  }, [user?.team_id]);
-
   async function onSuccessAddAssignment(assignmentName: string) {
     const res = await createAssignment(assignmentName, true, training?.id as string);
     if (res) {
@@ -97,40 +94,15 @@ export default function ImprovedSessionStats() {
             />
           ))}
         </div>
-        <div className="px-4 py-3 flex items-center justify-between">
+        <div className="px-4 py-3 flex items-center justify-between gap-4" onClick={() => navigate(`/training/${training?.id}`)}>
+          <div className="flex items-center gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Back to training</p>
+          </div>
           <div className="flex-1">
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
               Step {activeSection + 1} of {sections.length}
             </p>
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">{sections[activeSection]?.title}</p>
-          </div>
-          <div className="flex gap-2">
-            {activeSection > 0 && (
-              <button
-                onClick={() => {
-                  const element = document.querySelectorAll("section")[activeSection - 1];
-                  element?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-            )}
-            {activeSection < sections.length - 1 && (
-              <button
-                onClick={() => {
-                  const element = document.querySelectorAll("section")[activeSection + 1];
-                  element?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="p-2 rounded-lg bg-indigo-500 text-white"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            )}
           </div>
         </div>
       </div>

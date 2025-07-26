@@ -61,17 +61,48 @@ export async function getSquadRoleHitPercentages(squadId: string, distance: stri
   }
 }
 
-export async function getGroupingScoresByTraining(trainingSessionId: string): Promise<GroupingScoreEntry[]> {
-  const { data, error } = await supabase.rpc("get_grouping_data_by_training", {
-    p_training_session_id: trainingSessionId,
-  });
+export async function getGroupingScoresByTraining(trainingSessionId: string, limit = 50, offset = 0): Promise<GroupingScoreEntry[]> {
+  const { data, error } = await supabase
+    .from("group_scores")
+    .select(
+      `
+      id,
+      sniper_user_id,
+      users!sniper_user_id (
+        first_name,
+        last_name
+      ),
+      weapon_id,
+      weapons!weapon_id (
+        serial_number,
+        weapon_type
+      ),
+      bullets_fired,
+      time_seconds,
+      cm_dispersion,
+      shooting_position,
+      effort,
+      created_at,
+      day_period,
+      type
+    `,
+    )
+    .eq("training_session_id", trainingSessionId)
+    .range(offset, offset + limit - 1)
+    .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Error fetching grouping scores:", error.message);
     throw new Error("Failed to fetch grouping score entries");
   }
 
-  return data || [];
+  return (data || []).map((entry: any) => ({
+    ...entry,
+    sniper_first_name: entry.users?.first_name ?? null,
+    sniper_last_name: entry.users?.last_name ?? null,
+    weapon_serial_number: entry.weapons?.serial_number ?? null,
+    weapon_type: entry.weapons?.weapon_type ?? null,
+  }));
 }
 
 // This function is a duplicate of the one above, so we can remove it to avoid redundancy.

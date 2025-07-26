@@ -1,5 +1,6 @@
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { createEquipment, getEquipmentsByTeamId, updateEquipment } from "@/services/equipmentService";
-import { createStore } from "zustand";
 import { Equipment } from "@/types/equipment";
 
 interface EquipmentStore {
@@ -9,27 +10,32 @@ interface EquipmentStore {
   updateEquipment: (id: string, equipment: Partial<Equipment>) => Promise<void>;
 }
 
-export const equipmentStore = createStore<EquipmentStore>((set) => ({
-  equipments: [],
+export const equipmentStore = create(
+  persist<EquipmentStore>(
+    (set, get) => ({
+      equipments: [],
 
-  getEquipments: async (teamId: string) => {
-    const equipment = await getEquipmentsByTeamId(teamId);
-    set({ equipments: equipment as Equipment[] });
-  },
+      getEquipments: async (teamId: string) => {
+        const equipment = await getEquipmentsByTeamId(teamId);
+        set({ equipments: equipment as Equipment[] });
+      },
 
-  createEquipment: async (equipment: Equipment) => {
-    const newEquipment = await createEquipment(equipment);
-    set({ equipments: [...equipmentStore.getState().equipments, newEquipment as Equipment] });
-  },
+      createEquipment: async (equipment: Equipment) => {
+        const newEquipment = await createEquipment(equipment);
+        set({ equipments: [...get().equipments, newEquipment as Equipment] });
+      },
 
-  updateEquipment: async (id: string, equipment: Partial<Equipment>) => {
-    const updatedEquipment = await updateEquipment(id, equipment);
-    if (updatedEquipment) {
-      set({
-        equipments: equipmentStore.getState().equipments.map(e => 
-          e.id === id ? { ...e, ...updatedEquipment } : e
-        )
-      });
-    }
-  },
-}));
+      updateEquipment: async (id: string, equipment: Partial<Equipment>) => {
+        const updatedEquipment = await updateEquipment(id, equipment);
+        if (updatedEquipment) {
+          set({
+            equipments: get().equipments.map((e) => (e.id === id ? { ...e, ...updatedEquipment } : e)),
+          });
+        }
+      },
+    }),
+    {
+      name: "equipments-storage",
+    },
+  ),
+);

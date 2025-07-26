@@ -17,20 +17,7 @@ export default function SettingsDataExportPanel() {
     setIsGenerating(true);
     setReport(null);
 
-    const mockData = {
-      startDate,
-      endDate,
-      sections: ["basicSummary", "performanceStats", "targetEngagements", "equipmentWeapons", "teamSquadComparison"],
-      squads: ["squad1", "squad2", "squad3"],
-      participants: ["participant1", "participant2", "participant3"],
-      sessions: ["session1", "session2", "se  ssion3"],
-      targets: ["target1", "target2", "target3"],
-      equipment: ["equipment1", "equipment2", "e  quipment3"],
-      weapons: ["weapon1", "weapon2", "weapon3"],
-      teamSquadComparison: ["team1", "team2", "team3"],
-    };
-
-    generateReport(mockData);
+    generateReport({ startDate, endDate });
 
     setIsGenerating(false);
   };

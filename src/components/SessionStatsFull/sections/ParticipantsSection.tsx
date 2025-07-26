@@ -4,6 +4,7 @@ import { SectionHeader } from "./SectionHeader";
 import { useTheme } from "@/contexts/ThemeContext";
 import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
+import { BaseLabelRequired } from "@/components/base/BaseLabelRequired";
 
 interface ParticipantsSectionProps {
   section: any;
@@ -111,7 +112,7 @@ export const ParticipantsSection = ({
               <div className="p-4 space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Role</label>
+                    <BaseLabelRequired>Role</BaseLabelRequired>
                     <select
                       value={participant.userDuty}
                       onChange={(e) => updateParticipant(participant.userId, "userDuty", e.target.value)}
@@ -128,7 +129,7 @@ export const ParticipantsSection = ({
                   </div>
 
                   <div>
-                    <label className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Position</label>
+                    <BaseLabelRequired>Position</BaseLabelRequired>
                     <select
                       value={participant.position}
                       onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
@@ -147,9 +148,7 @@ export const ParticipantsSection = ({
                 </div>
 
                 <div>
-                  <label className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-                    {participant.userDuty === "Sniper" ? "Weapon" : "Equipment"}
-                  </label>
+                  <BaseLabelRequired>{participant.userDuty === "Sniper" ? "Weapon" : "Equipment"}</BaseLabelRequired>
                   <select
                     value={participant.userDuty === "Sniper" ? participant.weaponId || "" : participant.equipmentId || ""}
                     onChange={(e) =>
