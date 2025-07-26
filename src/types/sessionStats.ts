@@ -6,6 +6,7 @@ export interface CreateSessionStatsData {
   day_period: string | null;
   time_to_first_shot_sec: number | null;
   note?: string | null;
+  squad_id: string | null;
 }
 
 export interface CreateParticipantData {

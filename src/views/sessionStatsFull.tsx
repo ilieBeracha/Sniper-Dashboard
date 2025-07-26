@@ -65,11 +65,6 @@ export default function ImprovedSessionStats() {
     })();
   }, [training?.team_id]);
 
-  useEffect(() => {
-    console.log("user", user);
-    console.log("weapons", weapons);
-  }, [user?.team_id]);
-
   async function onSuccessAddAssignment(assignmentName: string) {
     const res = await createAssignment(assignmentName, true, training?.id as string);
     if (res) {

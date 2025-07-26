@@ -61,6 +61,13 @@ export default function Dashboard() {
     }
   };
 
+  const action = (): { label: string; onClick: () => void }[] => {
+    if (isCommander(userRole as UserRole)) {
+      return [{ label: "Invite", onClick: () => setIsInviteModalOpen(true) }];
+    }
+    return [];
+  };
+
   return (
     <SpPage>
       <Header breadcrumbs={[{ label: "Dashboard", link: "/" }]} />
@@ -68,14 +75,7 @@ export default function Dashboard() {
         title={activeTab.label}
         subtitle={activeTab.id === "overview" ? "Team, Squad, and more" : "By Date, Squad, and more"}
         icon={activeTab.icon}
-        action={[
-          {
-            label: "Invite",
-            onClick: () => {
-              setIsInviteModalOpen(true);
-            },
-          },
-        ]}
+        action={action()}
       />
       <SpPageTabs tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
       <SpPageBody>{RenderComponent()}</SpPageBody>

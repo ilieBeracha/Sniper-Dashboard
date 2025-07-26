@@ -12,6 +12,8 @@ import Header from "@/Headers/Header";
 import { useTabs } from "@/hooks/useTabs";
 import { CalendarIcon } from "lucide-react";
 import { weaponsStore } from "@/store/weaponsStore";
+import { isCommander } from "@/utils/permissions";
+import { UserRole } from "@/types/user";
 
 export default function Trainings() {
   const { loadTrainingByTeamId, getTrainingCountByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
@@ -74,6 +76,13 @@ export default function Trainings() {
   };
 
   const { tabs, activeTab, handleTabChange } = useTabs({ tabs: [{ id: "active", label: "Active", icon: CalendarIcon }] });
+
+  const action = (): { label: string; onClick: () => void }[] => {
+    if (isCommander(user?.user_role as UserRole)) {
+      return [{ label: "Add Training", onClick: () => setIsAddTrainingOpen(true) }];
+    }
+    return [];
+  };
   return (
     <SpPage>
       <Header
@@ -82,17 +91,7 @@ export default function Trainings() {
           { label: "Trainings", link: "/trainings" },
         ]}
       />
-      <SpPageHeader
-        title="Trainings"
-        subtitle={"Add, edit, and manage training sessions"}
-        icon={BiCurrentLocation}
-        action={[
-          {
-            label: "Add Training",
-            onClick: () => setIsAddTrainingOpen(true),
-          },
-        ]}
-      />
+      <SpPageHeader title="Trainings" subtitle={"Add, edit, and manage training sessions"} icon={BiCurrentLocation} action={action()} />
       <SpPageTabs tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
 
       <SpPageBody>

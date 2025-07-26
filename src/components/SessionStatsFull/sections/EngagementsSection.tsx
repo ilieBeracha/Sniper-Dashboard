@@ -1,9 +1,10 @@
-import { Input } from "@/components/ui/input";
 import { Target as TargetIcon, Crosshair } from "lucide-react";
 import { Target, Participant } from "../types";
 import { SectionHeader } from "./SectionHeader";
 import { useTheme } from "@/contexts/ThemeContext";
 import React from "react";
+import { OTPInput } from "./OTPInput";
+import { Input } from "@/components/ui/input";
 
 interface EngagementsSectionProps {
   section: any;
@@ -53,16 +54,10 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
         {snipers.map((participant, pIndex) => (
           <div
             key={participant.userId}
-            className={`rounded-xl border-2 overflow-hidden ${
-              theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"
-            }`}
+            className={`rounded-xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}
           >
             {/* Participant Header */}
-            <div
-              className={`px-4 py-3 border-b ${
-                theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-200"
-              }`}
-            >
+            <div className={`px-4 py-3 border-b ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-200"}`}>
               <div className="flex items-center gap-2">
                 <div
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
@@ -72,12 +67,8 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
                   {pIndex + 1}
                 </div>
                 <div>
-                  <div className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                    {participant.name}
-                  </div>
-                  <div className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
-                    {participant.position}
-                  </div>
+                  <div className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{participant.name}</div>
+                  <div className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{participant.position}</div>
                 </div>
               </div>
             </div>
@@ -91,21 +82,24 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
                 const accuracy = shots > 0 ? Math.round((hits / shots) * 100) : 0;
 
                 return (
-                  <div key={target.id} className="space-y-2">
+                  <div key={target.id} className="space-y-4">
                     <div className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
                       Target {tIndex + 1} • {target.distance}m
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
-                          Shots Fired
-                        </label>
+                    <div className="grid grid-cols-2 gap-8 justify-self-center">
+                      <div className="flex flex-col gap-2">
+                        <label className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Shots Fired</label>
                         <Input
-                          type="number"
-                          min="0"
-                          placeholder="0"
-                          value={engagement?.shotsFired || ""}
-                          onChange={(e) => updateEngagement(target.id, participant.userId, "shotsFired", parseInt(e.target.value) || 0)}
+                          value={engagement?.shotsFired || 0}
+                          onChange={(e) => {
+                            const newShotsFired = parseInt(e.target.value) || 0;
+                            updateEngagement(target.id, participant.userId, "shotsFired", newShotsFired);
+                            // If hits exceed new shots fired, reduce hits to match
+                            const currentHits = engagement?.targetHits || 0;
+                            if (currentHits > newShotsFired) {
+                              updateEngagement(target.id, participant.userId, "targetHits", newShotsFired);
+                            }
+                          }}
                           className={`h-10 text-center text-sm font-medium rounded-lg ${
                             theme === "dark"
                               ? "bg-zinc-800 border-zinc-700 focus:border-indigo-500"
@@ -113,38 +107,35 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
                           }`}
                         />
                       </div>
-                      <div>
-                        <label className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
-                          Target Hits
-                        </label>
-                        <div className="relative">
-                          <Input
-                            type="number"
-                            min="0"
-                            max={engagement?.shotsFired || 999}
-                            placeholder="0"
-                            value={engagement?.targetHits || ""}
-                            onChange={(e) => updateEngagement(target.id, participant.userId, "targetHits", parseInt(e.target.value) || 0)}
-                            className={`h-10 text-center text-sm font-medium rounded-lg ${
-                              theme === "dark"
-                                ? "bg-zinc-800 border-zinc-700 focus:border-indigo-500"
-                                : "bg-gray-50 border-gray-200 focus:border-indigo-500"
+                      <div className="flex flex-col gap-2">
+                        <label className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Target Hits</label>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          value={engagement?.targetHits || ""}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value) || 0;
+                            const maxValue = engagement?.shotsFired || 0;
+                            if (value <= maxValue) {
+                              updateEngagement(target.id, participant.userId, "targetHits", value);
+                            }
+                          }}
+                          className={`h-10 text-center text-sm font-medium rounded-lg ${
+                            theme === "dark"
+                              ? "bg-zinc-800 border-zinc-700 focus:border-indigo-500"
+                              : "bg-gray-50 border-gray-200 focus:border-indigo-500"
+                          }`}
+                        />
+                        {shots > 0 && (
+                          <div
+                            className={`mt-1 text-center text-xs font-bold ${
+                              accuracy >= 80 ? "text-green-500" : accuracy >= 60 ? "text-yellow-500" : "text-red-500"
                             }`}
-                          />
-                          {shots > 0 && (
-                            <div
-                              className={`absolute -top-2 -right-2 text-xs font-bold px-2 py-0.5 rounded-full ${
-                                accuracy >= 80
-                                  ? "bg-green-500/20 text-green-500"
-                                  : accuracy >= 60
-                                    ? "bg-yellow-500/20 text-yellow-500"
-                                    : "bg-red-500/20 text-red-500"
-                              }`}
-                            >
-                              {accuracy}%
-                            </div>
-                          )}
-                        </div>
+                          >
+                            {accuracy}%
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -156,15 +147,17 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
       </div>
 
       {/* Desktop View */}
-      <div className={`hidden md:block mt-8 rounded-2xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}>
+      <div
+        className={`hidden md:block mt-8 rounded-2xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}
+      >
         <div className="overflow-x-auto">
-          <div style={{ minWidth: `${200 + targets.length * 160}px` }}>
+          <div style={{ minWidth: `${200 + targets.length * 200}px` }}>
             {/* Table Header */}
             <div
               className={`grid gap-2 px-4 py-3 text-xs font-medium border-b ${
                 theme === "dark" ? "bg-zinc-800/50 border-zinc-700 text-zinc-400" : "bg-gray-50 border-gray-200 text-gray-600"
               }`}
-              style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 80px)` }}
+              style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 100px)` }}
             >
               <div>Participant</div>
               {targets.map((target, index) => (
@@ -181,7 +174,7 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
               className={`grid gap-2 px-4 py-2 text-xs border-b ${
                 theme === "dark" ? "bg-zinc-900/50 border-zinc-700 text-zinc-500" : "bg-gray-100 border-gray-200 text-gray-500"
               }`}
-              style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 80px)` }}
+              style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 100px)` }}
             >
               <div></div>
               {targets.map((target) => (
@@ -199,7 +192,7 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
                   <div
                     key={participant.userId}
                     className={`grid gap-2 px-4 py-3 items-center ${theme === "dark" ? "hover:bg-zinc-800/30" : "hover:bg-gray-50"}`}
-                    style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 80px)` }}
+                    style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 100px)` }}
                   >
                     {/* Participant Info */}
                     <div className="flex items-center gap-2">
@@ -219,53 +212,46 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
                     {/* Engagement Inputs */}
                     {targets.map((target) => {
                       const engagement = target.engagements.find((e) => e.userId === participant.userId);
-                      const shots = engagement?.shotsFired || 0;
-                      const hits = engagement?.targetHits || 0;
-                      const accuracy = shots > 0 ? Math.round((hits / shots) * 100) : 0;
 
                       return (
                         <React.Fragment key={`${participant.userId}-${target.id}`}>
-                          <div className="px-1">
-                            <Input
-                              type="number"
-                              min="0"
-                              placeholder="0"
-                              value={engagement?.shotsFired || ""}
-                              onChange={(e) => updateEngagement(target.id, participant.userId, "shotsFired", parseInt(e.target.value) || 0)}
-                              className={`h-9 text-center text-sm font-medium rounded-lg transition-all ${
-                                theme === "dark"
-                                  ? "bg-zinc-800 border-zinc-700 focus:border-indigo-500 focus:bg-zinc-700"
-                                  : "bg-gray-50 border-gray-200 focus:border-indigo-500 focus:bg-white"
-                              }`}
+                          <div className="px-1 flex justify-center">
+                            <OTPInput
+                              value={engagement?.shotsFired || 0}
+                              onChange={(newShotsFired) => {
+                                updateEngagement(target.id, participant.userId, "shotsFired", newShotsFired);
+                                // If hits exceed new shots fired, reduce hits to match
+                                const currentHits = engagement?.targetHits || 0;
+                                if (currentHits > newShotsFired) {
+                                  updateEngagement(target.id, participant.userId, "targetHits", newShotsFired);
+                                }
+                              }}
+                              size="sm"
                             />
                           </div>
-                          <div className="px-1 relative">
-                            <Input
-                              type="number"
-                              min="0"
-                              max={engagement?.shotsFired || 999}
-                              placeholder="0"
-                              value={engagement?.targetHits || ""}
-                              onChange={(e) => updateEngagement(target.id, participant.userId, "targetHits", parseInt(e.target.value) || 0)}
-                              className={`h-9 text-center text-sm font-medium rounded-lg transition-all ${
-                                theme === "dark"
-                                  ? "bg-zinc-800 border-zinc-700 focus:border-indigo-500 focus:bg-zinc-700"
-                                  : "bg-gray-50 border-gray-200 focus:border-indigo-500 focus:bg-white"
-                              }`}
-                            />
-                            {shots > 0 && (
-                              <div
-                                className={`absolute -top-2 -right-2 text-xs font-bold px-2 py-0.5 rounded-full ${
-                                  accuracy >= 80
-                                    ? "bg-green-500/20 text-green-500 border border-green-500/30"
-                                    : accuracy >= 60
-                                      ? "bg-yellow-500/20 text-yellow-500 border border-yellow-500/30"
-                                      : "bg-red-500/20 text-red-500 border border-red-500/30"
-                                }`}
-                              >
-                                {accuracy}%
-                              </div>
-                            )}
+                          <div className="px-1">
+                            <div className="flex flex-col items-center">
+                              <OTPInput
+                                value={engagement?.targetHits || 0}
+                                onChange={(value) => {
+                                  const maxValue = engagement?.shotsFired || 0;
+                                  if (value <= maxValue) {
+                                    updateEngagement(target.id, participant.userId, "targetHits", value);
+                                  }
+                                }}
+                                max={engagement?.shotsFired || 0}
+                                size="sm"
+                              />
+                              {/* {shots > 0 && (
+                                <div
+                                  className={`mt-1 text-xs font-bold ${
+                                    accuracy >= 80 ? "text-green-500" : accuracy >= 60 ? "text-yellow-500" : "text-red-500"
+                                  }`}
+                                >
+                                  {accuracy}%
+                                </div>
+                              )} */}
+                            </div>
                           </div>
                         </React.Fragment>
                       );
@@ -280,7 +266,7 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
               className={`grid gap-2 px-4 py-3 border-t font-medium ${
                 theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-200"
               }`}
-              style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 80px)` }}
+              style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 100px)` }}
             >
               <div className={`text-sm ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>Total</div>
               {targets.map((target) => {

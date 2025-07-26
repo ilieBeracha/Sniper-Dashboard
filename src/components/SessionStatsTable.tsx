@@ -206,16 +206,16 @@ export default function SessionStatsTable({
                 }}
                 className="p-1 equipments rounded transition-colors"
               >
-                {row.expanded ? <ChevronDown className="w-4 h-4 text-gray-900" /> : <ChevronRight className="w-4 h-4 text-gray-900" />}
+                {row.expanded ? <ChevronDown className="w-4 h-4 " /> : <ChevronRight className="w-4 h-4 " />}
               </button>
               <span>{row.assignmentName}</span>
-              <span className="text-sm text-gray-900">({row.sessionCount})</span>
+              <span className="text-sm ">({row.sessionCount})</span>
             </div>
           );
         }
         return (
           <div className={`${row.isChild ? "pl-8" : ""} flex items-center gap-2`}>
-            <span className="text-sm text-gray-900">•</span>
+            <span className="text-sm ">•</span>
             <span className="truncate max-w-[150px]">Session {format(new Date(row.created_at), "MMM dd, HH:mm")}</span>
           </div>
         );
@@ -317,7 +317,7 @@ export default function SessionStatsTable({
 
   if (sessionStats?.length === 0) {
     return (
-      <div className={`text-center py-12 ${theme === "dark" ? "text-gray-800" : "text-gray-900"}`}>
+      <div className={`text-center py-12 `}>
         <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
         <h3 className="text-lg font-medium mb-2">No session stats yet</h3>
         <p className="text-sm">Add your first session stats to get started</p>
@@ -341,7 +341,7 @@ export default function SessionStatsTable({
       pagination={pagination}
       highlightRow={(row) => !row.isGroup && row.id === newlyAddedSessionId}
       emptyState={
-        <div className={`text-center py-12 ${theme === "dark" ? "text-gray-800" : "text-gray-900"}`}>
+        <div className={`text-center py-12 `}>
           <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
           <h3 className="text-lg font-medium mb-2">No session stats yet</h3>
           <p className="text-sm">Add your first session stats to get started</p>

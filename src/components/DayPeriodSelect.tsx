@@ -1,13 +1,13 @@
-import { Label } from "./ui/label";
 import { Sun, Moon, Check } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { BaseLabelRequired } from "./base/BaseLabelRequired";
 
 export default function DayPeriodSelect({ dayPeriod, onDayPeriodChange }: { dayPeriod: string; onDayPeriodChange: (dayPeriod: string) => void }) {
   const { theme } = useTheme();
 
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-medium">Time Period</Label>
+      <BaseLabelRequired>Time Period</BaseLabelRequired>
       <div className="grid grid-cols-2 gap-3">
         <button
           type="button"

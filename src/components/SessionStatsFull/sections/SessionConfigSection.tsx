@@ -1,5 +1,4 @@
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SessionData } from "../types";
 import { SectionHeader } from "./SectionHeader";
@@ -8,6 +7,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useState } from "react";
 import AddPurpleBtn from "@/components/base/buttons/AddPurpleBtn";
 import DayPeriodSelect from "@/components/DayPeriodSelect";
+import { BaseLabelRequired } from "@/components/base/BaseLabelRequired";
 
 interface SessionConfigSectionProps {
   section: any;
@@ -35,7 +35,8 @@ export const SessionConfigSection = ({
       <div className="mt-8 space-y-6">
         {/* Training Assignment */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Training Assignment</Label>
+          <BaseLabelRequired>Training Assignment</BaseLabelRequired>
+
           <div className="flex items-center gap-2">
             <select
               value={sessionData.assignment_id}
