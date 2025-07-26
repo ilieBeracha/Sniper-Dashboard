@@ -21,6 +21,7 @@ import TrainingStatusTab from "@/components/TrainingStatusTab";
 import TrainingSessionStatsCard from "@/components/TrainingSessionStatsCard";
 import TrainingPageGroupFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageGroupFormModal";
 import { toast } from "react-toastify";
+import { performanceStore } from "@/store/performance";
 
 export default function TrainingPage() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function TrainingPage() {
   const { training } = useStore(TrainingStore);
   const { getSessionStatsByTrainingId } = useStore(sessionStore);
   const { createGroupScore } = useStore(sessionStore);
-
+  const { fetchGroupingScores } = useStore(performanceStore);
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { isOpen: isOpen, setIsOpen: setIsOpen } = useModal();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -83,7 +84,7 @@ export default function TrainingPage() {
       await createGroupScore(groupScore);
       setIsOpen(false);
       toast.success("Group score created successfully");
-      await loadTrainingById(id as string);
+      await fetchGroupingScores(id as string  );
     } catch (error) {
       console.error("Error creating group score:", error);
     }

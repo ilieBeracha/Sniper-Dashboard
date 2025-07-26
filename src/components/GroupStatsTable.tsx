@@ -37,7 +37,7 @@ export default function GroupStatsTable({
     if (!id) return;
 
     try {
-      await fetchGroupingScores(id);
+      await fetchGroupingScores(id, GROUP_LIMIT, currentPage * GROUP_LIMIT);
     } catch (error) {
       console.error("Error loading group stats:", error);
       setPaginatedGroupStats([]);

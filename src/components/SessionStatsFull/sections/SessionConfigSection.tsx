@@ -3,10 +3,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SessionData } from "../types";
 import { SectionHeader } from "./SectionHeader";
-import { Check, Sun, Moon, Clock, ChevronDown, ChevronUp, FileText, Plus } from "lucide-react";
+import { Clock, ChevronDown, ChevronUp, FileText, Plus } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useState } from "react";
 import AddPurpleBtn from "@/components/base/buttons/AddPurpleBtn";
+import DayPeriodSelect from "@/components/DayPeriodSelect";
 
 interface SessionConfigSectionProps {
   section: any;
@@ -58,55 +59,7 @@ export const SessionConfigSection = ({
           </div>
         </div>
 
-        {/* Day Period */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Time Period</Label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => updateSessionData("dayPeriod", "day")}
-              className={`relative p-4 rounded-xl border-2 transition-all ${
-                sessionData.dayPeriod === "day"
-                  ? theme === "dark"
-                    ? "border-indigo-500 bg-indigo-500/10"
-                    : "border-indigo-500 bg-indigo-50"
-                  : theme === "dark"
-                    ? "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
-                    : "border-gray-200 bg-white hover:border-gray-300"
-              }`}
-            >
-              <Sun
-                className={`w-8 h-8 mx-auto mb-2 ${
-                  sessionData.dayPeriod === "day" ? "text-indigo-500" : theme === "dark" ? "text-zinc-500" : "text-gray-400"
-                }`}
-              />
-              <span className="text-sm font-medium">Day</span>
-              {sessionData.dayPeriod === "day" && <Check className="absolute top-2 right-2 w-4 h-4 text-indigo-500" />}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => updateSessionData("dayPeriod", "night")}
-              className={`relative p-4 rounded-xl border-2 transition-all ${
-                sessionData.dayPeriod === "night"
-                  ? theme === "dark"
-                    ? "border-indigo-500 bg-indigo-500/10"
-                    : "border-indigo-500 bg-indigo-50"
-                  : theme === "dark"
-                    ? "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
-                    : "border-gray-200 bg-white hover:border-gray-300"
-              }`}
-            >
-              <Moon
-                className={`w-8 h-8 mx-auto mb-2 ${
-                  sessionData.dayPeriod === "night" ? "text-indigo-500" : theme === "dark" ? "text-zinc-500" : "text-gray-400"
-                }`}
-              />
-              <span className="text-sm font-medium">Night</span>
-              {sessionData.dayPeriod === "night" && <Check className="absolute top-2 right-2 w-4 h-4 text-indigo-500" />}
-            </button>
-          </div>
-        </div>
+        <DayPeriodSelect dayPeriod={sessionData.dayPeriod} onDayPeriodChange={(dayPeriod) => updateSessionData("dayPeriod", dayPeriod)} />
 
         {/* Optional Fields */}
         <div className="space-y-3">

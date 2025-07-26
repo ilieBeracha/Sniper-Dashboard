@@ -10,6 +10,8 @@ import BaseMobileDrawer from "../BaseDrawer/BaseMobileDrawer";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useEffect } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
+import DayPeriodSelect from "../DayPeriodSelect";
+import { DayNight } from "@/types/equipment";
 
 const groupScoreSchema = z.object({
   sniper_user_id: z.string().uuid(),
@@ -26,6 +28,7 @@ const groupScoreSchema = z.object({
     }),
   shooting_position: z.string(),
   effort: z.boolean(),
+  day_period: z.enum(["day", "night"]),
   type: z.enum(["normal", "timed", "position_abandonment"]),
 });
 
@@ -55,6 +58,7 @@ export default function TrainingPageGroupFormModal({
       cm_dispersion: null,
       shooting_position: "",
       effort: false,
+      day_period: "day",
       type: "normal",
     },
   });
@@ -76,6 +80,7 @@ export default function TrainingPageGroupFormModal({
       setValue("cm_dispersion", null);
       setValue("shooting_position", "");
       setValue("effort", false);
+      setValue("day_period", "day");
       setValue("type", "normal");
     }
   }, [isDisabled, setValue]);
@@ -194,6 +199,9 @@ export default function TrainingPageGroupFormModal({
             Effort Given
           </label>
         </div>
+
+        <DayPeriodSelect dayPeriod={watch("day_period")} onDayPeriodChange={(dayPeriod) => setValue("day_period", dayPeriod as DayNight)} />
+
         {isDisabled && message}
 
         {/* Type */}
