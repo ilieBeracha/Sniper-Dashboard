@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Weapon } from "@/types/weapon";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Eye, Edit, Search, X, Save, BarChart3 } from "lucide-react";
+import { Edit, Search, X, Save, BarChart3 } from "lucide-react";
 import { format } from "date-fns";
 import { useStore } from "zustand";
 import { weaponsStore } from "@/store/weaponsStore";
