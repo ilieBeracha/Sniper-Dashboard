@@ -99,6 +99,12 @@ export const createTargetEngagements = async (engagementsData: CreateTargetEngag
   }
 };
 
+export const updateGroupScoreService = async (id: string, groupScore: any) => {
+  const { data, error } = await supabase.from("group_scores").update(groupScore).eq("id", id).select();
+  if (error) throw error;
+  return data;
+};
+
 // Complete session save - coordinates all database operations
 export const saveCompleteSession = async (sessionData: {
   sessionStats: CreateSessionStatsData;

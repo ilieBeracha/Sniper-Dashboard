@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { createGroupScoreService, getSessionStatsCountByTrainingId, saveCompleteSession } from "@/services/sessionService";
+import { createGroupScoreService, getSessionStatsCountByTrainingId, saveCompleteSession, updateGroupScoreService } from "@/services/sessionService";
 import type { CreateSessionStatsData, CreateParticipantData, CreateTargetStatsData, CreateTargetEngagementData } from "@/types/sessionStats";
 import { TrainingStore } from "./trainingStore";
 import { getSessionStatsByTrainingId } from "@/services/sessionService";
@@ -18,6 +18,7 @@ interface SessionStatsState {
   getSessionStatsByTrainingId: (trainingId: string, limit?: number, offset?: number) => Promise<any[]>;
   getSessionStatsCountByTrainingId: (trainingId: string) => Promise<number>;
   createGroupScore: (groupScore: any) => Promise<any>;
+  updateGroupScore: (id: string, groupScore: any) => Promise<any>;
   groupStats: any[];
 }
 
@@ -183,5 +184,10 @@ export const sessionStore = create<SessionStatsState>((set) => ({
       });
       throw error;
     }
+  },
+  updateGroupScore: async (id: string, groupScore: any) => {
+    const res = await updateGroupScoreService(id, groupScore);
+    set({ groupStats: res });
+    return res;
   },
 }));

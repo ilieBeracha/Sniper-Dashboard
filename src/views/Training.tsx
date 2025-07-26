@@ -27,16 +27,17 @@ export default function TrainingPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { loadTrainingById, loadAssignments, createAssignment } = useStore(TrainingStore);
-  const { setIsLoading } = useStore(loaderStore);
+  const { isLoading, setIsLoading } = useStore(loaderStore);
   const { training } = useStore(TrainingStore);
   const { getSessionStatsByTrainingId } = useStore(sessionStore);
-  const { createGroupScore } = useStore(sessionStore);
+  const { createGroupScore, updateGroupScore } = useStore(sessionStore);
   const { fetchGroupingScores } = useStore(performanceStore);
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { isOpen: isOpen, setIsOpen: setIsOpen } = useModal();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [selectedSession, setSelectedSession] = useState<any>(null);
+  const [editingGroupScore, setEditingGroupScore] = useState<any>(null);
 
   useLoadingState(async () => {
     if (!id) return;
@@ -81,13 +82,37 @@ export default function TrainingPage() {
 
   const handleCreateGroupScore = async (groupScore: any) => {
     try {
-      await createGroupScore(groupScore);
+      setIsLoading(true);
+
+      if (editingGroupScore) {
+        // Update existing group score
+        await updateGroupScore(editingGroupScore.id, groupScore);
+        toast.success("Group score updated successfully");
+      } else {
+        // Create new group score
+        await createGroupScore(groupScore);
+        toast.success("Group score created successfully");
+      }
+
+      await fetchGroupingScores(id as string);
       setIsOpen(false);
-      toast.success("Group score created successfully");
-      await fetchGroupingScores(id as string  );
+      setEditingGroupScore(null);
     } catch (error) {
-      console.error("Error creating group score:", error);
+      console.error("Error saving group score:", error);
+      toast.error("Failed to save group score");
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleEditGroupScore = (group: any) => {
+    setEditingGroupScore(group);
+    setIsOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsOpen(false);
+    setEditingGroupScore(null);
   };
 
   const { tabs, activeTab, handleTabChange } = useTabs({
@@ -111,7 +136,7 @@ export default function TrainingPage() {
     if (activeTab.id === "group-stats") {
       return (
         <div className="grid grid-cols-1 gap-4">
-          <GroupStatsTable onGroupStatsClick={handleSessionClick} onGroupStatsEditClick={() => {}} />
+          <GroupStatsTable onGroupStatsClick={handleSessionClick} onGroupStatsEditClick={handleEditGroupScore} />
         </div>
       );
     }
@@ -157,7 +182,13 @@ export default function TrainingPage() {
         onConfirm={handleConfirmStatusChange}
         newStatus={pendingStatus!}
       />
-      <TrainingPageGroupFormModal isOpen={isOpen} onClose={() => setIsOpen(false)} onSubmit={handleCreateGroupScore} />
+      <TrainingPageGroupFormModal
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        isLoading={isLoading}
+        onSubmit={handleCreateGroupScore}
+        initialData={editingGroupScore}
+      />
     </SpPage>
   );
 }
