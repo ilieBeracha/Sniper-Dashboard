@@ -11,11 +11,13 @@ import { BiCurrentLocation } from "react-icons/bi";
 import Header from "@/Headers/Header";
 import { useTabs } from "@/hooks/useTabs";
 import { CalendarIcon } from "lucide-react";
+import { weaponsStore } from "@/store/weaponsStore";
 
 export default function Trainings() {
   const { loadTrainingByTeamId, getTrainingCountByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
   const user = useStore(userStore).user;
   const assignments = useStore(TrainingStore).assignments;
+  const { getWeapons } = useStore(weaponsStore);
 
   const LIMIT = 20;
   const [currentPage] = useState(0);
@@ -29,6 +31,7 @@ export default function Trainings() {
     if (!user?.team_id) return;
     await loadWeeklyAssignmentsStats(user.team_id);
     await loadAssignments();
+    await getWeapons(user.team_id as string);
   }, [user?.team_id]);
 
   useEffect(() => {

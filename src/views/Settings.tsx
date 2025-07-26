@@ -64,10 +64,10 @@ export default function Settings() {
         {activeTab.id === "account" && (
           <div className="max-w-4xl mx-auto">
             <BaseDashboardCard>
-              <div className="px-8 py-4">
+              <div className="">
                 <div className="space-y-6">
                   {/* Profile & Team Information Combined */}
-                  <div className={`rounded-xl border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : " border-none"}`}>
+                  <div className={`rounded-xl p-6 ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : " border-none"}`}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       {/* Profile Information */}
                       <div className="space-y-4">
