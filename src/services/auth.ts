@@ -1,6 +1,7 @@
 import { LoginUserData, RegisterUserData } from "@/types/auth";
 import { toastService } from "./toastService";
 import { axiosInstance } from "./requestService";
+import { supabase } from "./supabaseClient";
 
 async function registerCommander(user: RegisterUserData) {
   user.user_role = "commander";
@@ -37,6 +38,22 @@ async function registerSoldier(user: RegisterUserData) {
 }
 
 async function login(user: LoginUserData) {
+  if (user.email && !user.password) {
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email: user.email,
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: "https://www.scope-stats.com",
+      },
+    });
+    if (error) {
+      console.error("Error signing in with email:", error.message);
+      toastService.error(error.message);
+      throw new Error("Failed to sign in with email");
+    }
+    return data;
+  }
+
   try {
     const res = await axiosInstance.post(`auth/login`, user);
     return res.data;
