@@ -5,6 +5,7 @@ import NoDataDisplay from "./base/BaseNoData";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useEffect } from "react";
 import { userStore } from "@/store/userStore";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface UserHitPercentageProps {
   distance?: string | null;
@@ -12,14 +13,11 @@ interface UserHitPercentageProps {
   weaponType?: string | null;
 }
 
-export default function UserHitPercentage({ 
-  distance = null, 
-  position = null, 
-  weaponType = null 
-}: UserHitPercentageProps) {
+export default function UserHitPercentage({ distance = null, position = null, weaponType = null }: UserHitPercentageProps) {
   const { userHitsStats, userHitsStatsLoading, getUserHitStatsWithFilters } = useStore(performanceStore);
   const { user } = useStore(userStore);
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
 
   // Fetch data when filters change
   useEffect(() => {
@@ -51,13 +49,13 @@ export default function UserHitPercentage({
   const hitColor = getColor(percentage);
 
   return (
-    <div className="flex w-full flex-col h-full justify-evenly col-auto text-sm p-4">
+    <div className="flex w-full flex-col h-full justify-evenly col-auto text-sm p-4  rounded-lg shadow-sm ">
       <div className=" relative justify-between flex h-full flex-col gap-2">
         {!userHitsStats.hit_percentage && userHitsStats.shots_fired === 0 ? (
           <NoDataDisplay />
         ) : (
           <>
-            <ResponsiveContainer width="100%" height={280} minWidth={280} className="text-sm ">
+            <ResponsiveContainer width="100%" height={isMobile ? 200 : 280} minWidth={isMobile ? 200 : 280} className="text-sm ">
               <PieChart>
                 <Pie
                   data={gaugeData}

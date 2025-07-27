@@ -129,3 +129,17 @@ export async function updateSquadName(squadId: string, squadName: string): Promi
     throw new Error("Failed to update squad name");
   }
 }
+
+export async function getSquads(team_id: string) {
+  try {
+    const { data, error } = await supabase.from("squads").select("*").eq("team_id", team_id);
+
+    if (error) throw error;
+
+    return data;
+  } catch (error: any) {
+    console.error("Error fetching squads:", error.message);
+    toastService.error(error.message);
+    throw new Error("Failed to fetch squads");
+  }
+}

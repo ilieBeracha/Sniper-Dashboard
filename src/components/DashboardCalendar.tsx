@@ -6,15 +6,16 @@ import { CalendarDays, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
 import { primitives } from "@/styles/core";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function DashboardCalendar() {
   const useTrainingCalendar = useStore(TrainingStore);
   const { last, next } = useTrainingCalendar.trainingsChartDisplay;
   const navigate = useNavigate();
   const { theme } = useTheme();
-
+  const isMobile = useIsMobile();
   return (
-    <div className="h-full px-4 py-4 ">
+    <div className={`h-full ${isMobile ? "py-6" : "p-4"}`}>
       <div className="relative">
         {/* Timeline line */}
         <div
@@ -22,7 +23,7 @@ export default function DashboardCalendar() {
           style={{ backgroundColor: theme === "dark" ? primitives.grey.grey800 : primitives.grey.grey300 }}
         />
 
-        <div className="space-y-4">
+        <div className="space-y-4  rounded-lg shadow-sm py-4">
           {last ? (
             <TrainingTimelineItem onClick={() => navigate(`/training/${last.id}`)} session={last} label="Last Training" isPast={true} />
           ) : (
@@ -67,7 +68,7 @@ function TrainingTimelineItem({
       </div>
 
       <div
-        className="group relative p-4 rounded-xl border cursor-pointer transition-all duration-200 hover:shadow-lg"
+        className="group relative p-4 rounded-2xl border border-[#333] cursor-pointer transition-all duration-200 hover:shadow-lg"
         style={{
           backgroundColor:
             theme === "dark"
@@ -138,7 +139,7 @@ function PlaceholderTimelineItem({ title }: { title: string }) {
     <div className="relative pl-8">
       {/* Timeline dot */}
       <div
-        className="absolute left-0 w-6 h-6 rounded-full border-2 flex items-center justify-center"
+        className="absolute left-0 w-6 h-6 rounded-full border-2  flex items-center justify-center"
         style={{
           backgroundColor: theme === "dark" ? primitives.grey.grey900 : primitives.white.white,
           borderColor: theme === "dark" ? primitives.grey.grey700 : primitives.grey.grey300,
@@ -148,7 +149,7 @@ function PlaceholderTimelineItem({ title }: { title: string }) {
       </div>
 
       <div
-        className="p-4 rounded-xl border border-dashed"
+        className="p-4 rounded-xl border border-dashed "
         style={{
           backgroundColor: theme === "dark" ? `${primitives.grey.grey900}40` : primitives.grey.grey50,
           borderColor: theme === "dark" ? primitives.grey.grey800 : primitives.grey.grey300,

@@ -43,13 +43,7 @@ interface TrainingPageGroupFormModalProps {
   initialData?: any;
 }
 
-export default function TrainingPageGroupFormModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  isLoading,
-  initialData,
-}: TrainingPageGroupFormModalProps) {
+export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, isLoading, initialData }: TrainingPageGroupFormModalProps) {
   const { user } = useStore(userStore);
   const { weapons } = useStore(weaponsStore);
   const { theme } = useTheme();
@@ -116,7 +110,7 @@ export default function TrainingPageGroupFormModal({
           type: "normal",
         });
       }
-      
+
       if (firstInputRef.current) {
         setTimeout(() => firstInputRef.current?.focus(), 100);
       }
@@ -158,22 +152,18 @@ export default function TrainingPageGroupFormModal({
   };
 
   const inputClasses = (isError?: boolean, isDisabled?: boolean) =>
-    `w-full rounded-lg px-3 py-2 text-sm border transition-all duration-200 ${
+    `w-full rounded-lg px-3 py-2 min-h-10 text-sm border transition-all duration-200 ${
       theme === "dark"
         ? `bg-zinc-800/50 text-white border-zinc-700 ${
             isError ? "border-red-500 focus:border-red-500" : "hover:border-zinc-600 focus:border-blue-500"
           }`
-        : `bg-white text-gray-900 border-gray-300 ${
-            isError ? "border-red-500 focus:border-red-500" : "hover:border-gray-400 focus:border-blue-500"
-          }`
+        : `bg-white text-gray-900 border-gray-300 ${isError ? "border-red-500 focus:border-red-500" : "hover:border-gray-400 focus:border-blue-500"}`
     } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""} focus:outline-none focus:ring-2 focus:ring-blue-500/20`;
 
   const buttonClasses = (variant: "primary" | "secondary") => {
     if (variant === "primary") {
       return `px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-blue-500 to-indigo-700 rounded-md transition-all duration-200 ${
-        isSubmitting || isLoading
-          ? "opacity-50 cursor-not-allowed"
-          : "hover:from-blue-600 hover:to-indigo-800 active:scale-95"
+        isSubmitting || isLoading ? "opacity-50 cursor-not-allowed" : "hover:from-blue-600 hover:to-indigo-800 active:scale-95"
       }`;
     }
     return `px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
@@ -207,9 +197,7 @@ export default function TrainingPageGroupFormModal({
               </option>
             ))}
           </select>
-          {errors.weapon_id && (
-            <p className="text-red-500 text-xs mt-1 animate-fadeIn">{errors.weapon_id.message}</p>
-          )}
+          {errors.weapon_id && <p className="text-red-500 text-xs mt-1 animate-fadeIn">{errors.weapon_id.message}</p>}
         </div>
 
         {/* Bullets Fired */}
@@ -222,14 +210,8 @@ export default function TrainingPageGroupFormModal({
             className={inputClasses(!!errors.bullets_fired)}
             disabled={isSubmitting}
           />
-          {errors.bullets_fired && (
-            <p className="text-red-500 text-xs mt-1 animate-fadeIn">{errors.bullets_fired.message}</p>
-          )}
-          {bulletsFired < 4 && (
-            <p className="text-amber-600 text-xs mt-1 animate-fadeIn">
-              ⚠️ Advanced fields require 4+ bullets
-            </p>
-          )}
+          {errors.bullets_fired && <p className="text-red-500 text-xs mt-1 animate-fadeIn">{errors.bullets_fired.message}</p>}
+          {bulletsFired < 4 && <p className="text-amber-600 text-xs mt-1 animate-fadeIn">⚠️ Advanced fields require 4+ bullets</p>}
         </div>
 
         {/* Time (Seconds) */}
@@ -263,9 +245,7 @@ export default function TrainingPageGroupFormModal({
             className={inputClasses(!!errors.cm_dispersion, isRestrictedMode)}
             placeholder={isRestrictedMode ? "Requires 4+ bullets" : "e.g., 0.1, 0.2, 0.3"}
           />
-          {errors.cm_dispersion && !isRestrictedMode && (
-            <p className="text-red-500 text-xs mt-1 animate-fadeIn">{errors.cm_dispersion.message}</p>
-          )}
+          {errors.cm_dispersion && !isRestrictedMode && <p className="text-red-500 text-xs mt-1 animate-fadeIn">{errors.cm_dispersion.message}</p>}
         </div>
 
         {/* Shooting Position */}
@@ -298,32 +278,20 @@ export default function TrainingPageGroupFormModal({
               isRestrictedMode ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
             }`}
           />
-          <label 
-            htmlFor="effort" 
-            className={`text-sm select-none ${
-              isRestrictedMode ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-            }`}
-          >
+          <label htmlFor="effort" className={`text-sm select-none ${isRestrictedMode ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
             Effort Given
           </label>
         </div>
 
         {/* Day/Night Period */}
         <div className={isRestrictedMode ? "opacity-50 pointer-events-none" : ""}>
-          <DayPeriodSelect 
-            dayPeriod={watch("day_period")} 
-            onDayPeriodChange={(dayPeriod) => setValue("day_period", dayPeriod as DayNight)}
-          />
+          <DayPeriodSelect dayPeriod={watch("day_period")} onDayPeriodChange={(dayPeriod) => setValue("day_period", dayPeriod as DayNight)} />
         </div>
 
         {/* Type Selection */}
         <div>
           <label className="block text-sm mb-1">Type</label>
-          <select
-            disabled={isRestrictedMode || isSubmitting}
-            {...register("type")}
-            className={inputClasses(false, isRestrictedMode)}
-          >
+          <select disabled={isRestrictedMode || isSubmitting} {...register("type")} className={inputClasses(false, isRestrictedMode)}>
             <option value="normal">Normal</option>
             <option value="timed">Timed</option>
             <option value="position_abandonment">Position Abandonment</option>
@@ -333,37 +301,26 @@ export default function TrainingPageGroupFormModal({
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-2 pt-6 border-t border-gray-200 dark:border-zinc-700">
-        <button
-          type="button"
-          onClick={handleClose}
-          disabled={isSubmitting}
-          className={buttonClasses("secondary")}
-        >
+        <button type="button" onClick={handleClose} disabled={isSubmitting} className={buttonClasses("secondary")}>
           Cancel
         </button>
-        <button
-          type="submit"
-          disabled={isSubmitting || isLoading || !isDirty}
-          className={buttonClasses("primary")}
-        >
+        <button type="submit" disabled={isSubmitting || isLoading || !isDirty} className={buttonClasses("primary")}>
           {isSubmitting || isLoading ? (
             <span className="flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
               Saving...
             </span>
+          ) : initialData ? (
+            "Update"
           ) : (
-            initialData ? "Update" : "Save"
+            "Save"
           )}
         </button>
       </div>
     </form>
   );
 
-  const content = (
-    <div className={`transition-opacity duration-200 ${isSubmitting || isLoading ? "opacity-75" : ""}`}>
-      {renderForm()}
-    </div>
-  );
+  const content = <div className={`transition-opacity duration-200 ${isSubmitting || isLoading ? "opacity-75" : ""}`}>{renderForm()}</div>;
 
   return (
     <FormProvider {...methods}>
