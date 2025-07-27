@@ -21,28 +21,33 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
   const { theme } = useTheme();
   const { id } = useParams();
 
-  const { groupingScores, isLoading, fetchGroupingScores } = useStore(performanceStore);
+  const { groupingScores, isLoading, fetchGroupingScores, getGroupingScoresCount, groupingScoresTotalCount } = useStore(performanceStore);
   const { getGroupingScoreComparisonById } = useStore(sessionStore);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
-  const [paginatedGroupStats, setPaginatedGroupStats] = useState<GroupingScoreEntry[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [totalCount, setTotalCount] = useState(0);
   const GROUP_LIMIT = 20;
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Load paginated group stats
-  const loadGroupStats = async () => {
+  const loadGroupStats = async (page: number = currentPage) => {
     if (!id) return;
 
     try {
-      await fetchGroupingScores(id, GROUP_LIMIT, currentPage * GROUP_LIMIT);
+      await fetchGroupingScores(id, GROUP_LIMIT, page * GROUP_LIMIT);
     } catch (error) {
       console.error("Error loading group stats:", error);
-      setPaginatedGroupStats([]);
-      setTotalCount(0);
+    }
+  };
+
+  // Load total count
+  const loadTotalCount = async () => {
+    if (!id) return;
+    try {
+      await getGroupingScoresCount(id);
+    } catch (error) {
+      console.error("Error loading group stats count:", error);
     }
   };
 
@@ -51,29 +56,21 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
     setIsModalOpen(true);
   };
 
-  // Update paginated data when groupingScores changes
+  // Load initial data when component mounts or id changes
   useEffect(() => {
-    if (groupingScores) {
-      const offset = currentPage * GROUP_LIMIT;
-      const paginatedData = groupingScores.slice(offset, offset + GROUP_LIMIT);
-
-      setPaginatedGroupStats(paginatedData);
-      setHasMore(offset + GROUP_LIMIT < groupingScores.length);
-      setTotalCount(groupingScores.length);
-    } else {
-      setPaginatedGroupStats([]);
-      setTotalCount(0);
-      setHasMore(false);
-    }
-  }, [groupingScores, currentPage]);
-
-  // Load initial group stats - only if data is not already loaded
-  useEffect(() => {
-    if (id && !groupingScores) {
+    if (id) {
       setCurrentPage(0);
-      loadGroupStats();
+      loadTotalCount();
+      loadGroupStats(0);
     }
   }, [id]);
+
+  // Reload data when page changes
+  useEffect(() => {
+    if (id) {
+      loadGroupStats(currentPage);
+    }
+  }, [currentPage]);
 
   const columns = [
     {
@@ -206,11 +203,13 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
     </div>
   );
 
+  const hasMore = (currentPage + 1) * GROUP_LIMIT < groupingScoresTotalCount;
+
   const pagination = {
     currentPage,
-    totalPages: Math.ceil(totalCount / GROUP_LIMIT),
+    totalPages: Math.ceil(groupingScoresTotalCount / GROUP_LIMIT),
     pageSize: GROUP_LIMIT,
-    totalItems: totalCount,
+    totalItems: groupingScoresTotalCount,
     onPageChange: (page: number) => setCurrentPage(page),
     onNextPage: () => {
       if (hasMore && !isLoading) {
@@ -225,7 +224,7 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
     hasMore,
   };
 
-  if (paginatedGroupStats?.length === 0 && !isLoading) {
+  if (groupingScores?.length === 0 && !isLoading) {
     return (
       <div className={`text-center py-12 `}>
         <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -238,7 +237,7 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
   return (
     <>
       <SpTable
-        data={paginatedGroupStats}
+        data={groupingScores || []}
         columns={columns as any}
         filters={[]}
         searchPlaceholder="Search groups..."

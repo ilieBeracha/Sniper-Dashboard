@@ -105,6 +105,20 @@ export async function getGroupingScoresByTraining(trainingSessionId: string, lim
   }));
 }
 
+export async function getGroupingScoresCountByTraining(trainingSessionId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from("group_scores")
+    .select("*", { count: "exact", head: true })
+    .eq("training_session_id", trainingSessionId);
+
+  if (error) {
+    console.error("Error fetching grouping scores count:", error.message);
+    throw new Error("Failed to fetch grouping scores count");
+  }
+
+  return count || 0;
+}
+
 // This function is a duplicate of the one above, so we can remove it to avoid redundancy.
 export async function getSquadHitPercentageByRole(squadId: string, distance: string | null = null) {
   try {

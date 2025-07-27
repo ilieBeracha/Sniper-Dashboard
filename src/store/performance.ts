@@ -25,6 +25,7 @@ import {
   getCommanderUserRoleBreakdown,
   getSquadMajoritySessionsPerformance,
   getGroupingScoresByTraining,
+  getGroupingScoresCountByTraining,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/user";
@@ -67,7 +68,9 @@ interface PerformanceStore {
   fetchSquadMajorityPerformance: (teamId: string) => Promise<void>;
 
   groupingScores: GroupingScoreEntry[] | null;
+  groupingScoresTotalCount: number;
   fetchGroupingScores: (trainingSessionId: string, limit?: number, offset?: number) => Promise<void>;
+  getGroupingScoresCount: (trainingSessionId: string) => Promise<number>;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
@@ -83,6 +86,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   commanderUserRoleBreakdown: null,
   squadMajorityPerformance: null,
   groupingScores: null,
+  groupingScoresTotalCount: 0,
 
   fetchGroupingScores: async (trainingSessionId: string, limit: number = 20, offset: number = 0) => {
     try {
@@ -94,6 +98,18 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       set({ groupingScores: null });
     } finally {
       set({ isLoading: false });
+    }
+  },
+
+  getGroupingScoresCount: async (trainingSessionId: string) => {
+    try {
+      const count = await getGroupingScoresCountByTraining(trainingSessionId);
+      set({ groupingScoresTotalCount: count });
+      return count;
+    } catch (error) {
+      console.error("Failed to load grouping scores count:", error);
+      set({ groupingScoresTotalCount: 0 });
+      return 0;
     }
   },
 

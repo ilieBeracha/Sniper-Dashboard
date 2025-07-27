@@ -122,10 +122,6 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
     if (isRestrictedMode) {
       setValue("time_seconds", null);
       setValue("cm_dispersion", null);
-      setValue("shooting_position", "");
-      setValue("effort", false);
-      setValue("day_period", "day");
-      setValue("type", "normal");
     }
   }, [isRestrictedMode, setValue]);
 
@@ -197,7 +193,7 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
               {...field}
               label="Shooting Position"
               isRequired
-              error={errors.shooting_position && !isRestrictedMode ? errors.shooting_position.message : undefined}
+              error={errors.shooting_position?.message}
               options={[
                 { value: "Lying", label: "Lying" },
                 { value: "Standing", label: "Standing" },
@@ -205,12 +201,12 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
                 { value: "Operational", label: "Operational" },
               ]}
               placeholder="Select position"
-              disabled={isRestrictedMode || isSubmitting}
+              disabled={isSubmitting}
             />
           )}
         />
         {/* Day/Night Period */}
-        <div className={isRestrictedMode ? "opacity-50 pointer-events-none" : ""}>
+        <div>
           <DayPeriodSelect dayPeriod={watch("day_period")} onDayPeriodChange={(dayPeriod) => setValue("day_period", dayPeriod as DayNight)} />
         </div>
         {/* Bullets Fired */}
@@ -269,7 +265,7 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
                 { value: "timed", label: "Timed" },
                 { value: "position_abandonment", label: "Position Abandonment" },
               ]}
-              disabled={isRestrictedMode || isSubmitting}
+              disabled={isSubmitting}
             />
           )}
         />
@@ -279,14 +275,12 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
-          disabled={isRestrictedMode || isSubmitting}
+          disabled={isSubmitting}
           {...register("effort")}
           id="effort"
-          className={`h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500/20 ${
-            isRestrictedMode ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-          }`}
+          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
         />
-        <label htmlFor="effort" className={`text-sm select-none ${isRestrictedMode ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
+        <label htmlFor="effort" className="text-sm select-none cursor-pointer">
           Effort Given
         </label>
       </div>
