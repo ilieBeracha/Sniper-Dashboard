@@ -1,4 +1,3 @@
-// GroupScoreModal.tsx (Updated + Mobile Compact)
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useTheme } from "@/contexts/ThemeContext";
 import { sessionStore } from "@/store/sessionStore";
@@ -119,8 +118,8 @@ export default function GroupScoreModal({ isOpen, onClose }: GroupScoreModalProp
             <h3 className="text-sm font-medium mb-2">Performance Analysis</h3>
             <p className="text-sm text-gray-600 dark:text-zinc-400">
               {groupStatsComparison.this_score?.cm_dispersion < groupStatsComparison.user_comparison?.user_avg
-                ? `You're ${Math.abs(groupStatsComparison.user_comparison?.user_avg - groupStatsComparison.this_score?.cm_dispersion).toFixed(1)} cm better than your average.`
-                : `You're ${Math.abs(groupStatsComparison.this_score?.cm_dispersion - groupStatsComparison.user_comparison?.user_avg).toFixed(1)} cm above your average.`}
+                ? `${Math.abs(groupStatsComparison.user_comparison?.user_avg - groupStatsComparison.this_score?.cm_dispersion).toFixed(1)} cm below your average.`
+                : `${Math.abs(groupStatsComparison.this_score?.cm_dispersion - groupStatsComparison.user_comparison?.user_avg).toFixed(1)} cm above your average.`}
               {groupStatsComparison.user_comparison?.is_best_score && " 🎯 New personal best!"}
             </p>
           </div>
