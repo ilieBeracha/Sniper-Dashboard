@@ -236,7 +236,6 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
 
   // Calculate stats for header
   const totalGroups = groupingScoresTotalCount;
-  const currentPageGroups = groupingScores?.length || 0;
   const avgDispersion = groupingScores?.length
     ? (
         groupingScores.reduce((sum, score) => sum + (score.cm_dispersion || 0), 0) / groupingScores.filter((score) => score.cm_dispersion).length
