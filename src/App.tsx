@@ -5,12 +5,12 @@ import Auth from "./views/Auth";
 import { useStore } from "zustand";
 import { authStore } from "./store/authStore";
 import { useEffect } from "react";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { WaveLoader } from "./components/ui/loader";
 
 function AppContent() {
   const { checkAuth, token, isLoadingAuth } = useStore(authStore);
-
+  const { theme } = useTheme();
   useEffect(() => {
     checkAuth();
   }, []);
@@ -24,7 +24,7 @@ function AppContent() {
   }
 
   return (
-    <div className={`w-screen min-h-screen transition-colors duration-200`}>
+    <div className={`w-screen min-h-screen transition-colors duration-200 ${theme === "dark" ? "bg-black" : "bg-white"}`}>
       <Routes>{token ? <Route path={"*"} element={<Home />} /> : <Route path={"*"} element={<Auth />} />}</Routes>
     </div>
   );

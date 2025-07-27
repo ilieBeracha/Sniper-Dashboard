@@ -86,10 +86,6 @@ export function TrainingSessionCard({
               <h4 className="text-base font-medium" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
                 {session.session_name}
               </h4>
-              <ChevronRight
-                className="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-1"
-                style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}
-              />
             </div>
 
             <div
@@ -120,6 +116,10 @@ export function TrainingSessionCard({
               </div>
             </div>
           </div>
+          <ChevronRight
+            className="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-1"
+            style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}
+          />
         </div>
       </div>
     </div>

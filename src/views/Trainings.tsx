@@ -3,14 +3,12 @@ import { useStore } from "zustand";
 import { TrainingStore } from "@/store/trainingStore";
 import { userStore } from "@/store/userStore";
 import { useLoadingState } from "@/hooks/useLoadingState";
-import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
+import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
 import TrainingList from "@/components/TrainingList";
 import SpPagination from "@/layouts/SpPagination";
 import TrainingAddTrainingSessionModal from "@/components/TrainingModal/AddTrainingSessionModal";
 import { BiCurrentLocation } from "react-icons/bi";
 import Header from "@/Headers/Header";
-import { useTabs } from "@/hooks/useTabs";
-import { CalendarIcon } from "lucide-react";
 import { weaponsStore } from "@/store/weaponsStore";
 import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
@@ -75,8 +73,6 @@ export default function Trainings() {
     if (user?.team_id) await loadAssignments();
   };
 
-  const { tabs, activeTab, handleTabChange } = useTabs({ tabs: [{ id: "active", label: "Active", icon: CalendarIcon }] });
-
   const action = (): { label: string; onClick: () => void }[] => {
     if (isCommander(user?.user_role as UserRole)) {
       return [{ label: "Add Training", onClick: () => setIsAddTrainingOpen(true) }];
@@ -92,7 +88,6 @@ export default function Trainings() {
         ]}
       />
       <SpPageHeader title="Trainings" subtitle={"Add, edit, and manage training sessions"} icon={BiCurrentLocation} action={action()} />
-      <SpPageTabs tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
 
       <SpPageBody>
         <TrainingList trainings={trainings} />
@@ -103,13 +98,11 @@ export default function Trainings() {
           prevPageWithScroll={() => {
             if (currentPage > 0) {
               setIsPageChanging(true);
-              handleTabChange(tabs[0]);
             }
           }}
           nextPageWithScroll={() => {
             if (hasMore) {
               setIsPageChanging(true);
-              handleTabChange(tabs[0]);
             }
           }}
         />

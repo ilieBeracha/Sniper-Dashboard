@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { getEnumValues } from "@/services/supabaseEnums";
 import DashboardMembersTable from "./DashboardMembersTable";
 import DashboardGroupingChart from "./DashboardGroupingChart";
-import DashboardWeather from "./DashboardWeather";
+import DashboardCalendar from "./DashboardCalendar";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const formatEnumLabel = (value: string) =>
   value
@@ -17,7 +18,7 @@ const formatEnumLabel = (value: string) =>
 export default function DashboardSquadProgress({ loading }: { loading: boolean }) {
   const [weaponTypes, setWeaponTypes] = useState<string[]>([]);
   const [positions, setPositions] = useState<string[]>([]);
-
+  const isMobile = useIsMobile();
   // UserHitPercentage filters
   const [hitPercentageDistance, setHitPercentageDistance] = useState<string | null>(null);
   const [hitPercentagePosition, setHitPercentagePosition] = useState<string | null>(null);
@@ -45,6 +46,15 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
       {/* Performance Overview */}
+      {isMobile && (
+        <div className="w-full row-span-1 grid col-span-1 xl:col-span-2 sm:col-span-1">
+          <DashboardCalendar />
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 gap-6 lg:col-span-1 xl:col-span-2">
+        <DashboardGroupingChart />
+      </div>
       <div className="w-full ">
         <BaseDashboardCard
           header="Performance Overview"
@@ -97,16 +107,14 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
           <UserHitPercentage distance={hitPercentageDistance} position={hitPercentagePosition} weaponType={hitPercentageWeaponType} />
         </BaseDashboardCard>
       </div>
-      <div className="w-full row-span-1 grid col-span-1 xl:col-span-2 sm:col-span-1">
+      <div className="w-full row-span-1 sm:col-span-1  lg:grid col-span-1 xl:col-span-1">
         <DashboardMembersTable />
       </div>
       {/* Grouping Chart */}
-      <div className="grid grid-cols-1 gap-6 lg:col-span-1 xl:col-span-2">
-        <DashboardGroupingChart />
-      </div>
 
       <div className="w-full row-span-1 grid col-span-1 xl:col-span-1">
-        <DashboardWeather />
+        {/* <DashboardWeather /> */}
+        {/* <DashboardSquadStats /> */}
       </div>
     </div>
   );

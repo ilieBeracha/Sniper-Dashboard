@@ -1,4 +1,3 @@
-import { useIsMobile } from "@/hooks/useIsMobile";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function BaseButton({
@@ -9,7 +8,6 @@ export default function BaseButton({
   padding = "px-4 py-1.5",
   style = "default",
   type = "button",
-  isMenu = false,
 }: {
   children: React.ReactNode;
   onClick: () => void;
@@ -18,9 +16,7 @@ export default function BaseButton({
   padding?: string;
   type?: "button" | "submit" | "reset";
   style?: "default" | "purple" | "white" | "gradient";
-  isMenu?: boolean;
 }) {
-  const isMobile = useIsMobile();
   const { theme } = useTheme();
 
   const getStyleClasses = () => {
@@ -41,20 +37,18 @@ export default function BaseButton({
         return `${baseClasses} ${theme === "dark" ? "bg-white/5 hover:bg-white/10 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-900"}`;
     }
   };
-  if (isMobile || isMenu) {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        disabled={disabled}
-        className={`${isMenu ? "w-full" : ""} text-xs rounded-2xl px-4 py-1 cursor-pointer transition-colors duration-200 ${
-          isMobile && isMenu ? getStyleClasses() : ""
-        }`}
-      >
-        {children}
-      </button>
-    );
-  }
+  // if (isMobile) {
+  //   return (
+  //     <button
+  //       type={type}
+  //       onClick={onClick}
+  //       disabled={disabled}
+  //       className={`${isMenu ? "w-full" : ""} flex items-center justify-between w-full  gap-2 ${isMobile && isMenu ? getStyleClasses() : ""} ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+  //     >
+  //       {children}
+  //     </button>
+  //   );
+  // }
   return (
     <button
       disabled={disabled}
