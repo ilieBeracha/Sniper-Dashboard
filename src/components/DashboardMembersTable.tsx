@@ -5,7 +5,7 @@ import { userStore } from "@/store/userStore";
 import { teamStore } from "@/store/teamStore";
 import { UserRole } from "@/types/user";
 import { isCommander } from "@/utils/permissions";
-import { User, Shield, Users, Mail } from "lucide-react";
+import { User, Users, Mail } from "lucide-react";
 
 export default function DashboardMembersTable() {
   const { theme } = useTheme();
@@ -53,7 +53,6 @@ export default function DashboardMembersTable() {
       label: "Role",
       render: (value: string) => (
         <div className="flex items-center gap-2">
-          <Shield size={14} className={theme === "dark" ? "text-blue-400" : "text-blue-600"} />
           <span
             className={`px-2 py-1 rounded-full text-xs font-medium ${
               value === "Commander"

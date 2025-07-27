@@ -173,7 +173,7 @@ export default function TrainingPage() {
           },
         ]}
       />
-      <SpPageTabs tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
+      <SpPageTabs className="justify-center items-center" tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
       <SpPageBody>{renderComponent()}</SpPageBody>
       <AddAssignmentModal isOpen={isAddAssignmentOpen} onClose={() => setIsAddAssignmentOpen(false)} onSuccess={handleAddAssignment} />
       <ConfirmStatusChangeModal

@@ -360,15 +360,15 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
         />
 
         <div className="overflow-x-auto sm:mx-0">
-          <table className={`min-w-full text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : " text-gray-700"}`}>
+          <table className={`min-w-full ${isMobile ? "text-xs" : "text-sm"} transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : " text-gray-700"}`}>
             <thead
-              className={`text-xs uppercase border-b transition-colors duration-200 sticky top-0 z-10 ${
+              className={`${isMobile ? "text-[10px]" : "text-xs"} uppercase border-b transition-colors duration-200 sticky top-0 z-10 ${
                 theme === "dark" ? "border-zinc-800 bg-zinc-900" : "border-gray-200 bg-gray-100"
               }`}
             >
               <tr>
                 {selectable && (
-                  <th className="px-4 py-3 w-12">
+                  <th className={`${isMobile ? "px-2 py-2" : "px-4 py-3"} w-12`}>
                     <Checkbox
                       checked={selectedRows.size === sortedData.length && sortedData.length > 0}
                       onCheckedChange={(checked) => handleSelectAll(checked as boolean, sortedData)}
@@ -378,7 +378,7 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                 {columns.map((col, idx) => (
                   <th
                     key={idx}
-                    className={`px-4 py-3 text-left ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""} ${
+                    className={`${isMobile ? "px-2 py-2" : "px-4 py-3"} text-left ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""} ${
                       col.sortable ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800" : ""
                     }`}
                     style={col.width ? { width: col.width } : undefined}
@@ -411,7 +411,7 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                     </div>
                   </th>
                 ))}
-                {(actions || onView || onEdit || onDelete) && <th className="px-4 py-3 text-right">Actions</th>}
+                {(actions || onView || onEdit || onDelete) && <th className={`${isMobile ? "px-2 py-2" : "px-4 py-3"} text-right`}>{isMobile ? "" : "Actions"}</th>}
               </tr>
             </thead>
             <tbody>
@@ -420,17 +420,17 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                   Array.from({ length: 5 }).map((_, idx) => (
                     <tr key={`skeleton-${idx}`} className="animate-pulse">
                       {selectable && (
-                        <td className="px-4 py-2 w-12">
+                        <td className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} w-12`}>
                           <div className="w-4 h-4 bg-gray-200 dark:bg-zinc-700 rounded" />
                         </td>
                       )}
                       {columns.map((col, colIdx) => (
-                        <td key={colIdx} className={`px-4 py-2 ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
+                        <td key={colIdx} className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
                           <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-full" />
                         </td>
                       ))}
                       {(actions || onView || onEdit || onDelete) && (
-                        <td className="px-4 py-2 text-right">
+                        <td className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} text-right`}>
                           <div className="inline-flex gap-2">
                             <div className="w-8 h-8 bg-gray-200 dark:bg-zinc-700 rounded" />
                             <div className="w-8 h-8 bg-gray-200 dark:bg-zinc-700 rounded" />
@@ -460,17 +460,17 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                         }`}
                       >
                         {selectable && (
-                          <td className="px-4 py-2 w-12" onClick={(e) => e.stopPropagation()}>
+                          <td className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} w-12`} onClick={(e) => e.stopPropagation()}>
                             <Checkbox checked={isSelected} onCheckedChange={(checked) => handleSelectRow(row.id, checked as boolean)} />
                           </td>
                         )}
                         {columns.map((col, idx) => (
-                          <td key={idx} className={`px-4 py-2 ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
+                          <td key={idx} className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
                             {col.render ? col.render(row[col.key as keyof T], row) : ((row as any)[col.key] ?? "N/A")}
                           </td>
                         ))}
                         {(actions || onView || onEdit || onDelete) && (
-                          <td className="px-4 py-2 text-right">
+                          <td className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} text-right`}>
                             <SpTableActions row={row} onView={onView} onEdit={onEdit} onDelete={onDelete} actions={actions} theme={theme} />
                           </td>
                         )}
@@ -528,11 +528,11 @@ function SpTableFilters({
 }) {
   return (
     <div
-      className={`p-4 border-b transition-colors duration-200 rounded-t-xl  ${theme === "dark" ? "border-zinc-800 bg-zinc-900/50" : "border-gray-200 bg-gray-50"}`}
+      className={`${isMobile ? "p-3" : "p-4"} border-b transition-colors duration-200 rounded-t-xl  ${theme === "dark" ? "border-zinc-800 bg-zinc-900/50" : "border-gray-200 bg-gray-50"}`}
     >
       {selectable && selectedCount && selectedCount > 0 && (
         <div
-          className={`mb-4 p-3 rounded-lg flex items-center justify-between ${
+          className={`${isMobile ? "mb-3 p-2" : "mb-4 p-3"} rounded-lg flex items-center justify-between ${
             theme === "dark" ? "bg-blue-900/20 border border-blue-800" : "bg-blue-50 border border-blue-200"
           }`}
         >
@@ -548,11 +548,11 @@ function SpTableFilters({
             {isMobile ? (
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center gap-2 px-2 py-1 rounded-lg text-sm transition-colors duration-200 ${
+                className={`flex items-center gap-2 px-2 py-1 rounded-lg ${isMobile ? "text-xs" : "text-sm"} transition-colors duration-200 ${
                   theme === "dark" ? "bg-zinc-800 text-gray-300 hover:bg-zinc-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
-                <Filter className="w-4 h-4" />
+                <Filter className={`${isMobile ? "w-3 h-3" : "w-4 h-4"}`} />
                 {showFilters ? "Hide" : "Show"} Filters
               </button>
             ) : (
@@ -581,7 +581,7 @@ function SpTableFilters({
                 placeholder={searchPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-4 py-1.5 rounded-lg border transition-colors duration-200 text-sm ${
+                className={`w-full pl-10 pr-4 ${isMobile ? "py-1 text-xs" : "py-1.5 text-sm"} rounded-lg border transition-colors duration-200 ${
                   theme === "dark"
                     ? "border-zinc-700 bg-zinc-800 text-white placeholder-gray-400 focus:border-purple-400"
                     : "border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:border-purple-500"
@@ -594,7 +594,7 @@ function SpTableFilters({
                   <select
                     value={filterValues[f.key] || ""}
                     onChange={(e) => onFilterChange(f.key, e.target.value)}
-                    className={`w-full px-3 py-2 rounded-lg border text-sm transition-colors duration-200 ${
+                    className={`w-full ${isMobile ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm"} rounded-lg border transition-colors duration-200 ${
                       theme === "dark"
                         ? "border-zinc-700 bg-zinc-800 text-white focus:border-purple-400"
                         : "border-gray-300 bg-white text-gray-900 focus:border-purple-500"
@@ -613,7 +613,7 @@ function SpTableFilters({
                     placeholder={f.placeholder || f.label}
                     value={filterValues[f.key] || ""}
                     onChange={(e) => onFilterChange(f.key, e.target.value)}
-                    className={`w-full px-3 py-2 rounded-lg border text-sm transition-colors duration-200 ${
+                    className={`w-full ${isMobile ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm"} rounded-lg border transition-colors duration-200 ${
                       theme === "dark"
                         ? "border-zinc-700 bg-zinc-800 text-white placeholder-gray-400 focus:border-purple-400"
                         : "border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:border-purple-500"
@@ -625,12 +625,12 @@ function SpTableFilters({
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
+                className={`flex items-center gap-2 ${isMobile ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm"} rounded-lg transition-colors duration-200 ${
                   theme === "dark" ? "bg-zinc-700 text-gray-300 hover:bg-zinc-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
-                <X className="w-4 h-4" />
-                Clear
+                <X className={`${isMobile ? "w-3 h-3" : "w-4 h-4"}`} />
+                {isMobile ? "" : "Clear"}
               </button>
             )}
           </div>
@@ -656,8 +656,9 @@ function SpTableActions({
   actions?: (r: any) => ReactNode;
   theme: string;
 }) {
+  const isMobile = useIsMobile();
   return (
-    <div className="inline-flex gap-2">
+    <div className={`inline-flex ${isMobile ? "gap-1" : "gap-2"}`}>
       {actions ? (
         actions(row)
       ) : (
@@ -668,10 +669,10 @@ function SpTableActions({
                 e.stopPropagation();
                 onView(row);
               }}
-              className={`p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
+              className={`${isMobile ? "p-1" : "p-2"} rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
               title="View"
             >
-              <Eye size={16} />
+              <Eye size={isMobile ? 14 : 16} />
             </button>
           )}
           {onEdit && (
@@ -680,10 +681,10 @@ function SpTableActions({
                 e.stopPropagation();
                 onEdit(row);
               }}
-              className={`p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
+              className={`${isMobile ? "p-1" : "p-2"} rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
               title="Edit"
             >
-              <Edit size={16} />
+              <Edit size={isMobile ? 14 : 16} />
             </button>
           )}
           {onDelete && (
@@ -692,10 +693,10 @@ function SpTableActions({
                 e.stopPropagation();
                 onDelete(row);
               }}
-              className={`p-2 rounded hover:bg-red-100 dark:hover:bg-red-800/40 ${theme === "dark" ? "text-red-400" : "text-red-600"}`}
+              className={`${isMobile ? "p-1" : "p-2"} rounded hover:bg-red-100 dark:hover:bg-red-800/40 ${theme === "dark" ? "text-red-400" : "text-red-600"}`}
               title="Delete"
             >
-              <Trash2 size={16} />
+              <Trash2 size={isMobile ? 14 : 16} />
             </button>
           )}
         </>
@@ -705,10 +706,11 @@ function SpTableActions({
 }
 
 function SpTablePagination({ pagination, loading, theme }: { pagination: SpTablePaginationProps; loading: boolean; theme: string }) {
+  const isMobile = useIsMobile();
   if (!pagination) return null;
   return (
     <div
-      className={`flex items-center justify-between p-4 border-t transition-colors duration-200 ${
+      className={`flex items-center justify-between ${isMobile ? "p-3" : "p-4"} border-t transition-colors duration-200 ${
         theme === "dark" ? "border-zinc-800" : "border-gray-200"
       }`}
     >
@@ -724,7 +726,7 @@ function SpTablePagination({ pagination, loading, theme }: { pagination: SpTable
         <button
           onClick={pagination.onPrevPage}
           disabled={pagination.currentPage === 0 || loading}
-          className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
+          className={`flex items-center gap-1 sm:gap-2 ${isMobile ? "px-2 py-1 text-xs" : "px-2 sm:px-3 py-2 text-sm"} rounded-lg transition-colors duration-200 ${
             pagination.currentPage === 0 || loading
               ? "opacity-50 cursor-not-allowed"
               : theme === "dark"
@@ -738,7 +740,7 @@ function SpTablePagination({ pagination, loading, theme }: { pagination: SpTable
         <button
           onClick={pagination.onNextPage}
           disabled={!pagination.hasMore || loading}
-          className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
+          className={`flex items-center gap-1 sm:gap-2 ${isMobile ? "px-2 py-1 text-xs" : "px-2 sm:px-3 py-2 text-sm"} rounded-lg transition-colors duration-200 ${
             !pagination.hasMore || loading
               ? "opacity-50 cursor-not-allowed"
               : theme === "dark"

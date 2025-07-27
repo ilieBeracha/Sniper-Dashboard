@@ -1,4 +1,4 @@
-import { Edit, Target } from "lucide-react";
+import { Edit, Target, MoreVertical, BarChart } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
@@ -7,6 +7,9 @@ import { performanceStore } from "@/store/performance";
 import { useParams } from "react-router-dom";
 import { SpTable } from "@/layouts/SpTable";
 import { GroupingScoreEntry } from "@/types/performance";
+import GroupScoreModal from "./GroupScoreModal";
+import { sessionStore } from "@/store/sessionStore";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
 
 interface GroupStatsTableProps {
   onGroupStatsClick?: (group: GroupingScoreEntry) => void;
@@ -14,18 +17,21 @@ interface GroupStatsTableProps {
   newlyAddedGroupId?: string | null;
 }
 
-export default function GroupStatsTable({ onGroupStatsClick = () => {}, onGroupStatsEditClick = () => {}, newlyAddedGroupId }: GroupStatsTableProps) {
+export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newlyAddedGroupId }: GroupStatsTableProps) {
   const { theme } = useTheme();
   const { id } = useParams();
 
   const { groupingScores, isLoading, fetchGroupingScores } = useStore(performanceStore);
-
+  const { getGroupingScoreComparisonById } = useStore(sessionStore);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
   const [paginatedGroupStats, setPaginatedGroupStats] = useState<GroupingScoreEntry[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
   const GROUP_LIMIT = 20;
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Load paginated group stats
   const loadGroupStats = async () => {
@@ -38,6 +44,11 @@ export default function GroupStatsTable({ onGroupStatsClick = () => {}, onGroupS
       setPaginatedGroupStats([]);
       setTotalCount(0);
     }
+  };
+
+  const handleGroupStatsClick = async (group: GroupingScoreEntry) => {
+    await getGroupingScoreComparisonById(group.id);
+    setIsModalOpen(true);
   };
 
   // Update paginated data when groupingScores changes
@@ -108,7 +119,18 @@ export default function GroupStatsTable({ onGroupStatsClick = () => {}, onGroupS
     {
       key: "cm_dispersion",
       label: "CM Dispersion",
-      render: (value: number) => <span className="font-mono font-semibold text-blue-600 dark:text-blue-400">{value ? `${value} cm` : "N/A"}</span>,
+      render: (value: number, row: GroupingScoreEntry) => (
+        <span
+          className="font-mono font-semibold text-blue-600 dark:text-blue-400 cursor-pointer hover:underline"
+          onClick={async (e) => {
+            e.stopPropagation();
+            setIsModalOpen(true);
+            await getGroupingScoreComparisonById(row.id);
+          }}
+        >
+          {value ? `${value} cm` : "N/A"}
+        </span>
+      ),
       className: "px-4 py-3",
     },
     {
@@ -146,16 +168,41 @@ export default function GroupStatsTable({ onGroupStatsClick = () => {}, onGroupS
 
   const actions = (row: GroupingScoreEntry) => (
     <div className="inline-flex gap-1 sm:gap-2">
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onGroupStatsEditClick(row);
-        }}
-        className={`p-1.5 sm:p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
-        title="Edit"
-      >
-        <Edit size={14} className="sm:w-4 sm:h-4" />
-      </button>
+      <Dropdown>
+        <DropdownTrigger>
+          <button
+            onClick={(e) => e.stopPropagation()}
+            className={`p-1.5 sm:p-2 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+            title="More options"
+          >
+            <MoreVertical size={16} />
+          </button>
+        </DropdownTrigger>
+        <DropdownMenu
+          aria-label="Group actions"
+          className={`${theme === "dark" ? "bg-zinc-900" : "bg-white"} rounded-lg shadow-lg border ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}
+        >
+          <DropdownItem
+            key="stats"
+            className={`text-sm ${theme === "dark" ? "text-gray-200 hover:bg-zinc-800" : "text-gray-700 hover:bg-gray-50"}`}
+            onPress={async () => {
+              await getGroupingScoreComparisonById(row.id);
+              setIsModalOpen(true);
+            }}
+            startContent={<BarChart size={14} />}
+          >
+            Show Stats
+          </DropdownItem>
+          <DropdownItem
+            key="edit"
+            className={`text-sm ${theme === "dark" ? "text-gray-200 hover:bg-zinc-800" : "text-gray-700 hover:bg-gray-50"}`}
+            onPress={() => onGroupStatsEditClick(row)}
+            startContent={<Edit size={14} />}
+          >
+            Edit
+          </DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
     </div>
   );
 
@@ -189,23 +236,26 @@ export default function GroupStatsTable({ onGroupStatsClick = () => {}, onGroupS
   }
 
   return (
-    <SpTable
-      data={paginatedGroupStats}
-      columns={columns as any}
-      filters={[]}
-      searchPlaceholder="Search groups..."
-      onRowClick={(row) => onGroupStatsClick(row)}
-      actions={actions}
-      loading={isLoading}
-      pagination={pagination}
-      highlightRow={(row) => row.id === newlyAddedGroupId}
-      emptyState={
-        <div className={`text-center py-12 ${theme === "dark" ? "text-gray-800" : "text-gray-900"}`}>
-          <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <h3 className="text-lg font-medium mb-2">No group stats yet</h3>
-          <p className="text-sm">Add your first group stats to get started</p>
-        </div>
-      }
-    />
+    <>
+      <SpTable
+        data={paginatedGroupStats}
+        columns={columns as any}
+        filters={[]}
+        searchPlaceholder="Search groups..."
+        onRowClick={(row) => handleGroupStatsClick(row)}
+        actions={actions}
+        loading={isLoading}
+        pagination={pagination}
+        highlightRow={(row) => row.id === newlyAddedGroupId}
+        emptyState={
+          <div className={`text-center py-12 ${theme === "dark" ? "text-gray-800" : "text-gray-900"}`}>
+            <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <h3 className="text-lg font-medium mb-2">No group stats yet</h3>
+            <p className="text-sm">Add your first group stats to get started</p>
+          </div>
+        }
+      />
+      <GroupScoreModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    </>
   );
 }

@@ -1,4 +1,4 @@
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -11,7 +11,8 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { useEffect, useRef, useState } from "react";
 import DayPeriodSelect from "../DayPeriodSelect";
 import { DayNight } from "@/types/equipment";
-import { BaseLabelRequired } from "../base/BaseLabelRequired";
+import BaseSelect from "../base/BaseSelect";
+import BaseInput from "../base/BaseInput";
 import { Loader2 } from "lucide-react";
 
 const groupScoreSchema = z.object({
@@ -43,13 +44,7 @@ interface TrainingPageGroupFormModalProps {
   initialData?: any;
 }
 
-export default function TrainingPageGroupFormModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  isLoading,
-  initialData,
-}: TrainingPageGroupFormModalProps) {
+export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, isLoading, initialData }: TrainingPageGroupFormModalProps) {
   const { user } = useStore(userStore);
   const { weapons } = useStore(weaponsStore);
   const { theme } = useTheme();
@@ -78,10 +73,9 @@ export default function TrainingPageGroupFormModal({
     watch,
     setValue,
     reset,
+    control,
     formState: { errors, isDirty },
   } = methods;
-
-  const { ref: weaponRef, ...weaponRegister } = register("weapon_id");
 
   const bulletsFired = watch("bullets_fired");
   const isRestrictedMode = bulletsFired < 4;
@@ -116,7 +110,7 @@ export default function TrainingPageGroupFormModal({
           type: "normal",
         });
       }
-      
+
       if (firstInputRef.current) {
         setTimeout(() => firstInputRef.current?.focus(), 100);
       }
@@ -157,23 +151,10 @@ export default function TrainingPageGroupFormModal({
     }
   };
 
-  const inputClasses = (isError?: boolean, isDisabled?: boolean) =>
-    `w-full rounded-lg px-3 py-2 text-sm border transition-all duration-200 ${
-      theme === "dark"
-        ? `bg-zinc-800/50 text-white border-zinc-700 ${
-            isError ? "border-red-500 focus:border-red-500" : "hover:border-zinc-600 focus:border-blue-500"
-          }`
-        : `bg-white text-gray-900 border-gray-300 ${
-            isError ? "border-red-500 focus:border-red-500" : "hover:border-gray-400 focus:border-blue-500"
-          }`
-    } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""} focus:outline-none focus:ring-2 focus:ring-blue-500/20`;
-
   const buttonClasses = (variant: "primary" | "secondary") => {
     if (variant === "primary") {
       return `px-4 py-2 text-sm font-medium text-white bg-gradient-to-br from-blue-500 to-indigo-700 rounded-md transition-all duration-200 ${
-        isSubmitting || isLoading
-          ? "opacity-50 cursor-not-allowed"
-          : "hover:from-blue-600 hover:to-indigo-800 active:scale-95"
+        isSubmitting || isLoading ? "opacity-50 cursor-not-allowed" : "hover:from-blue-600 hover:to-indigo-800 active:scale-95"
       }`;
     }
     return `px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
@@ -189,181 +170,149 @@ export default function TrainingPageGroupFormModal({
 
       <div className="grid grid-cols-1 gap-4">
         {/* Weapon Selection */}
-        <div>
-          <BaseLabelRequired>Weapon</BaseLabelRequired>
-          <select
-            ref={(e) => {
-              weaponRef(e);
-              firstInputRef.current = e;
-            }}
-            {...weaponRegister}
-            className={inputClasses(!!errors.weapon_id)}
-            disabled={isSubmitting}
-          >
-            <option value="">Select weapon</option>
-            {weapons.map((weapon: any) => (
-              <option key={weapon.id} value={weapon.id}>
-                {weapon.weapon_type} — {weapon.serial_number}
-              </option>
-            ))}
-          </select>
-          {errors.weapon_id && (
-            <p className="text-red-500 text-xs mt-1 animate-fadeIn">{errors.weapon_id.message}</p>
+        <Controller
+          name="weapon_id"
+          control={control}
+          render={({ field }) => (
+            <BaseSelect
+              {...field}
+              ref={firstInputRef}
+              label="Weapon"
+              isRequired
+              error={errors.weapon_id?.message}
+              options={weapons.map((weapon: any) => ({
+                value: weapon.id,
+                label: `${weapon.weapon_type} — ${weapon.serial_number}`,
+              }))}
+              placeholder="Select weapon"
+              disabled={isSubmitting}
+            />
           )}
+        />
+        <Controller
+          name="shooting_position"
+          control={control}
+          render={({ field }) => (
+            <BaseSelect
+              {...field}
+              label="Shooting Position"
+              isRequired
+              error={errors.shooting_position && !isRestrictedMode ? errors.shooting_position.message : undefined}
+              options={[
+                { value: "Lying", label: "Lying" },
+                { value: "Standing", label: "Standing" },
+                { value: "Sitting", label: "Sitting" },
+                { value: "Operational", label: "Operational" },
+              ]}
+              placeholder="Select position"
+              disabled={isRestrictedMode || isSubmitting}
+            />
+          )}
+        />
+        {/* Day/Night Period */}
+        <div className={isRestrictedMode ? "opacity-50 pointer-events-none" : ""}>
+          <DayPeriodSelect dayPeriod={watch("day_period")} onDayPeriodChange={(dayPeriod) => setValue("day_period", dayPeriod as DayNight)} />
         </div>
-
         {/* Bullets Fired */}
         <div>
-          <BaseLabelRequired>Bullets Fired</BaseLabelRequired>
-          <input
+          <BaseInput
             type="number"
             min="1"
+            label="Bullets Fired"
+            isRequired
             {...register("bullets_fired", { valueAsNumber: true })}
-            className={inputClasses(!!errors.bullets_fired)}
+            error={errors.bullets_fired?.message}
             disabled={isSubmitting}
           />
-          {errors.bullets_fired && (
-            <p className="text-red-500 text-xs mt-1 animate-fadeIn">{errors.bullets_fired.message}</p>
-          )}
-          {bulletsFired < 4 && (
-            <p className="text-amber-600 text-xs mt-1 animate-fadeIn">
-              ⚠️ Advanced fields require 4+ bullets
-            </p>
-          )}
+          {bulletsFired < 4 && <p className="text-amber-600 text-xs mt-1 animate-fadeIn">⚠️ Advanced fields require 4+ bullets</p>}
         </div>
 
         {/* Time (Seconds) */}
-        <div>
-          <label className="block text-sm mb-1">Time (Seconds)</label>
-          <input
-            type="number"
-            min="0"
-            disabled={isRestrictedMode || isSubmitting}
-            {...register("time_seconds", {
-              valueAsNumber: true,
-              setValueAs: (v) => (v === "" ? null : Number(v)),
-            })}
-            className={inputClasses(!!errors.time_seconds, isRestrictedMode)}
-            placeholder={isRestrictedMode ? "Requires 4+ bullets" : "Enter time in seconds"}
-          />
-        </div>
+        <BaseInput
+          type="number"
+          min="0"
+          label="Time (Seconds)"
+          disabled={isRestrictedMode || isSubmitting}
+          {...register("time_seconds", {
+            valueAsNumber: true,
+            setValueAs: (v) => (v === "" ? null : Number(v)),
+          })}
+          error={errors.time_seconds?.message}
+          placeholder={isRestrictedMode ? "Requires 4+ bullets" : "Enter time in seconds"}
+        />
 
         {/* Dispersion */}
-        <div>
-          <label className="block text-sm mb-1">Dispersion (cm)</label>
-          <input
-            type="number"
-            step="0.1"
-            min="0"
-            disabled={isRestrictedMode || isSubmitting}
-            {...register("cm_dispersion", {
-              valueAsNumber: true,
-              setValueAs: (v) => (v === "" ? null : Number(v)),
-            })}
-            className={inputClasses(!!errors.cm_dispersion, isRestrictedMode)}
-            placeholder={isRestrictedMode ? "Requires 4+ bullets" : "e.g., 0.1, 0.2, 0.3"}
-          />
-          {errors.cm_dispersion && !isRestrictedMode && (
-            <p className="text-red-500 text-xs mt-1 animate-fadeIn">{errors.cm_dispersion.message}</p>
-          )}
-        </div>
-
-        {/* Shooting Position */}
-        <div>
-          <BaseLabelRequired>Shooting Position</BaseLabelRequired>
-          <select
-            disabled={isRestrictedMode || isSubmitting}
-            {...register("shooting_position")}
-            className={inputClasses(!!errors.shooting_position, isRestrictedMode)}
-          >
-            <option value="">Select position</option>
-            <option value="Lying">Lying</option>
-            <option value="Standing">Standing</option>
-            <option value="Sitting">Sitting</option>
-            <option value="Operational">Operational</option>
-          </select>
-          {errors.shooting_position && !isRestrictedMode && (
-            <p className="text-red-500 text-xs mt-1 animate-fadeIn">{errors.shooting_position.message}</p>
-          )}
-        </div>
-
-        {/* Effort Checkbox */}
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            disabled={isRestrictedMode || isSubmitting}
-            {...register("effort")}
-            id="effort"
-            className={`h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500/20 ${
-              isRestrictedMode ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-            }`}
-          />
-          <label 
-            htmlFor="effort" 
-            className={`text-sm select-none ${
-              isRestrictedMode ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-            }`}
-          >
-            Effort Given
-          </label>
-        </div>
-
-        {/* Day/Night Period */}
-        <div className={isRestrictedMode ? "opacity-50 pointer-events-none" : ""}>
-          <DayPeriodSelect 
-            dayPeriod={watch("day_period")} 
-            onDayPeriodChange={(dayPeriod) => setValue("day_period", dayPeriod as DayNight)}
-          />
-        </div>
+        <BaseInput
+          type="number"
+          step="0.1"
+          min="0"
+          label="Dispersion (cm)"
+          disabled={isRestrictedMode || isSubmitting}
+          {...register("cm_dispersion", {
+            valueAsNumber: true,
+            setValueAs: (v) => (v === "" ? null : Number(v)),
+          })}
+          error={errors.cm_dispersion && !isRestrictedMode ? errors.cm_dispersion.message : undefined}
+          placeholder={isRestrictedMode ? "Requires 4+ bullets" : "e.g., 0.1, 0.2, 0.3"}
+        />
 
         {/* Type Selection */}
-        <div>
-          <label className="block text-sm mb-1">Type</label>
-          <select
-            disabled={isRestrictedMode || isSubmitting}
-            {...register("type")}
-            className={inputClasses(false, isRestrictedMode)}
-          >
-            <option value="normal">Normal</option>
-            <option value="timed">Timed</option>
-            <option value="position_abandonment">Position Abandonment</option>
-          </select>
-        </div>
+        <Controller
+          name="type"
+          control={control}
+          render={({ field }) => (
+            <BaseSelect
+              {...field}
+              label="Type"
+              options={[
+                { value: "normal", label: "Normal" },
+                { value: "timed", label: "Timed" },
+                { value: "position_abandonment", label: "Position Abandonment" },
+              ]}
+              disabled={isRestrictedMode || isSubmitting}
+            />
+          )}
+        />
+      </div>
+
+      {/* Effort Checkbox */}
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          disabled={isRestrictedMode || isSubmitting}
+          {...register("effort")}
+          id="effort"
+          className={`h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500/20 ${
+            isRestrictedMode ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+          }`}
+        />
+        <label htmlFor="effort" className={`text-sm select-none ${isRestrictedMode ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
+          Effort Given
+        </label>
       </div>
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-2 pt-6 border-t border-gray-200 dark:border-zinc-700">
-        <button
-          type="button"
-          onClick={handleClose}
-          disabled={isSubmitting}
-          className={buttonClasses("secondary")}
-        >
+        <button type="button" onClick={handleClose} disabled={isSubmitting} className={buttonClasses("secondary")}>
           Cancel
         </button>
-        <button
-          type="submit"
-          disabled={isSubmitting || isLoading || !isDirty}
-          className={buttonClasses("primary")}
-        >
+        <button type="submit" disabled={isSubmitting || isLoading || !isDirty} className={buttonClasses("primary")}>
           {isSubmitting || isLoading ? (
             <span className="flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
               Saving...
             </span>
+          ) : initialData ? (
+            "Update"
           ) : (
-            initialData ? "Update" : "Save"
+            "Save"
           )}
         </button>
       </div>
     </form>
   );
 
-  const content = (
-    <div className={`transition-opacity duration-200 ${isSubmitting || isLoading ? "opacity-75" : ""}`}>
-      {renderForm()}
-    </div>
-  );
+  const content = <div className={`transition-opacity duration-200 ${isSubmitting || isLoading ? "opacity-75" : ""}`}>{renderForm()}</div>;
 
   return (
     <FormProvider {...methods}>

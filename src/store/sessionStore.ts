@@ -1,5 +1,11 @@
 import { create } from "zustand";
-import { createGroupScoreService, getSessionStatsCountByTrainingId, saveCompleteSession, updateGroupScoreService } from "@/services/sessionService";
+import {
+  createGroupScoreService,
+  getGroupingScoreComparisonById,
+  getSessionStatsCountByTrainingId,
+  saveCompleteSession,
+  updateGroupScoreService,
+} from "@/services/sessionService";
 import type { CreateSessionStatsData, CreateParticipantData, CreateTargetStatsData, CreateTargetEngagementData } from "@/types/sessionStats";
 import { TrainingStore } from "./trainingStore";
 import { getSessionStatsByTrainingId } from "@/services/sessionService";
@@ -19,7 +25,28 @@ interface SessionStatsState {
   getSessionStatsCountByTrainingId: (trainingId: string) => Promise<number>;
   createGroupScore: (groupScore: any) => Promise<any>;
   updateGroupScore: (id: string, groupScore: any) => Promise<any>;
+  getGroupingScoreComparisonById: (groupScoreId: string) => Promise<any>;
   groupStats: any[];
+  groupStatsComparison: GroupStatsComparison | null | undefined;
+}
+
+export interface GroupStatsComparison {
+  this_score: {
+    cm_dispersion: number;
+    weapon_type: string;
+    position: string;
+    type: string;
+  };
+  user_comparison: {
+    user_avg: number;
+    user_best: number;
+    is_best_score: boolean;
+  };
+  team_comparison: {
+    avg_for_weapon: number;
+    avg_for_position: number;
+    avg_for_type: number;
+  };
 }
 
 export interface SessionStatsSaveData {
@@ -62,6 +89,7 @@ export interface SessionStatsSaveData {
 export const sessionStore = create<SessionStatsState>((set) => ({
   sessionStats: [],
   groupStats: [],
+  groupStatsComparison: null,
   isLoading: false,
   error: null,
 
@@ -85,6 +113,12 @@ export const sessionStore = create<SessionStatsState>((set) => ({
     const res = await createGroupScoreService(groupScore, trainingStore?.id || "");
     set({ groupStats: res });
 
+    return res;
+  },
+
+  getGroupingScoreComparisonById: async (groupScoreId: string) => {
+    const res = await getGroupingScoreComparisonById(groupScoreId);
+    set({ groupStatsComparison: res });
     return res;
   },
 

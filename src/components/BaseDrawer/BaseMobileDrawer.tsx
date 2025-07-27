@@ -32,7 +32,7 @@ export default function BaseMobileDrawer({
               >
                 {/* Header */}
                 <div
-                  className={`sticky top-0 z-10 px-4 sm:px-6 pt-6 pb-4 ${
+                  className={`sticky top-0 z-10 px-4 sm:px-6 py-4 ${
                     theme === "dark" ? "bg-[#161616] border-b border-zinc-800" : "bg-white border-b border-gray-200"
                   }`}
                 >
