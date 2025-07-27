@@ -49,7 +49,7 @@ export default function UserHitPercentage({ distance = null, position = null, we
   const hitColor = getColor(percentage);
 
   return (
-    <div className="flex w-full flex-col h-full justify-evenly col-auto text-sm p-4  rounded-lg shadow-sm ">
+    <div className="flex w-full flex-col h-full justify-evenly col-auto text-sm p-4 rounded-lg shadow-sm ">
       <div className=" relative justify-between flex h-full flex-col gap-2">
         {!userHitsStats.hit_percentage && userHitsStats.shots_fired === 0 ? (
           <NoDataDisplay />

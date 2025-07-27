@@ -42,7 +42,7 @@ export default function DashboardProfileCard() {
   };
 
   return (
-    <div className={`w-full h-full relative flex justify-between overflow-hidden ${isMobile ? "px-4 pt-6 pb-4 " : "p-4"}`}>
+    <div className={`w-full h-full relative flex justify-between overflow-hidden ${isMobile ? "px-4 pt-6 pb-4 " : ""}`}>
       <div className="relative z-10 h-full flex flex-col justify-between sm:p-5 lg:p-6 gap-4  rounded-lg">
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -51,11 +51,14 @@ export default function DashboardProfileCard() {
           <p
             className={`text-xl gap-2 flex items-center sm:text-3xl lg:text-5xl font-bold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
           >
-            <Badge variant="outline" className={`text-xs ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-              {user?.user_role?.replace("_", " ").toUpperCase()}
-            </Badge>
             {user?.first_name} {user?.last_name}
           </p>
+          <Badge variant="outline" className={`text-xs ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            {user?.user_role?.replace("_", " ").toUpperCase()}
+          </Badge>
+
+          <Badge>{user?.team_name}</Badge>
+          {user?.squad_name && <Badge className="bg-zinc-800 text-white">{user?.squad_name}</Badge>}
         </div>
 
         {/* Team stats and info */}

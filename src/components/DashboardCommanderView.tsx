@@ -3,21 +3,17 @@ import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
 import { performanceStore } from "@/store/performance";
 import { Card } from "@heroui/react";
-import BaseDashboardCard from "./base/BaseDashboardCard";
-import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { ResponsiveContainer, RadialBarChart, RadialBar } from "recharts";
 import NoDataDisplay from "./base/BaseNoData";
 import { useTheme } from "@/contexts/ThemeContext";
 import UserRoleAccuracyTable from "./UserRoleAccuracyTable";
+import { Target, Clock, TrendingUp, Users, Activity, Award } from "lucide-react";
 
 const CommanderView = () => {
   const { theme } = useTheme();
   const { user } = useStore(userStore);
-  const {
-    squadMajorityPerformance,
-    fetchSquadMajorityPerformance,
-    commanderUserRoleBreakdown,
-    fetchCommanderUserRoleBreakdown,
-  } = useStore(performanceStore);
+  const { squadMajorityPerformance, fetchSquadMajorityPerformance, commanderUserRoleBreakdown, fetchCommanderUserRoleBreakdown } =
+    useStore(performanceStore);
 
   const [loading, setLoading] = useState(true);
 
@@ -32,80 +28,128 @@ const CommanderView = () => {
   }, [user?.team_id]);
 
   const getColor = (pct: number) => {
-    if (pct >= 75) return "#2CB67D";
-    if (pct >= 50) return "#FF8906";
-    return "#F25F4C";
+    if (pct >= 75) return "#10b981"; // Green
+    if (pct >= 50) return "#f59e0b"; // Amber
+    return "#ef4444"; // Red
   };
+
+  const LoadingSkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className={`rounded-2xl p-6 animate-pulse ${theme === "dark" ? "bg-zinc-800" : "bg-gray-100"}`}>
+          <div className={`h-4 w-32 rounded mb-4 ${theme === "dark" ? "bg-zinc-700" : "bg-gray-200"}`} />
+          <div className={`h-32 w-full rounded-lg mb-4 ${theme === "dark" ? "bg-zinc-700" : "bg-gray-200"}`} />
+          <div className="space-y-2">
+            <div className={`h-12 w-full rounded-lg ${theme === "dark" ? "bg-zinc-700" : "bg-gray-200"}`} />
+            <div className={`h-12 w-full rounded-lg ${theme === "dark" ? "bg-zinc-700" : "bg-gray-200"}`} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Header Section */}
+      <div className="mb-6">
+        <h1 className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Commander Dashboard</h1>
+        <p className={`mt-1 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Monitor squad performance and team metrics</p>
+      </div>
+
       {/* Squad Metrics */}
-      <BaseDashboardCard
-        header="Squad Metrics (Majority Sessions)"
-        tooltipContent="Only includes sessions where the squad was the majority."
-      >
-        {loading || !squadMajorityPerformance ? (
-          <div className="py-10 text-center text-sm text-gray-500">Loading performance...</div>
-        ) : squadMajorityPerformance.length === 0 ? (
-          <NoDataDisplay />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {squadMajorityPerformance.map((squad, idx) => {
+      {loading ? (
+        <LoadingSkeleton />
+      ) : squadMajorityPerformance?.length === 0 ? (
+        <NoDataDisplay />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {squadMajorityPerformance
+            ?.filter((squad) => squad.squad_name)
+            .map((squad, idx) => {
+              if (!squad) return null;
               const percentage = squad.hit_percentage || 0;
-              const gaugeData = [
-                { name: "Hit", value: percentage },
-                { name: "Miss", value: 100 - percentage },
-              ];
+
               const hitColor = getColor(percentage);
 
               return (
                 <Card
                   key={idx}
-                  className={`rounded-xl p-4 transition-colors duration-200 ${
-                    theme === "dark" ? "bg-zinc-900 text-white" : "bg-white text-gray-900"
+                  className={`group rounded-2xl p-6 transition-all duration-300 hover:shadow-xl border ${
+                    theme === "dark"
+                      ? "bg-zinc-900 hover:bg-zinc-800 border-zinc-800 hover:border-zinc-700"
+                      : "bg-white hover:bg-gray-50 border-gray-200 hover:border-gray-300"
                   }`}
                 >
-                  <h3 className="text-lg font-semibold mb-3 text-center">{squad.squad_name}</h3>
-                  <div className="flex flex-col items-center">
-                    <div className="relative w-32 h-20">
+                  {/* Squad Header */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800" : "bg-gray-100"}`}>
+                        <Users className="w-5 h-5" style={{ color: hitColor }} />
+                      </div>
+                      <div>
+                        <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{squad.squad_name}</h3>
+                        <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>{squad.total_sessions} sessions</p>
+                      </div>
+                    </div>
+                    <Award className="w-5 h-5" style={{ color: percentage >= 75 ? hitColor : theme === "dark" ? "#4b5563" : "#d1d5db" }} />
+                  </div>
+
+                  {/* Accuracy Chart */}
+                  <div className="flex flex-col items-center mb-6">
+                    <div className="relative w-40 h-40">
                       <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={gaugeData}
-                            cx="50%"
-                            cy="80%"
-                            startAngle={180}
-                            endAngle={0}
-                            innerRadius="60%"
-                            outerRadius="90%"
-                            paddingAngle={0}
+                        <RadialBarChart
+                          cx="50%"
+                          cy="50%"
+                          innerRadius="60%"
+                          outerRadius="90%"
+                          data={[{ value: percentage, fill: hitColor }]}
+                          startAngle={90}
+                          endAngle={-270}
+                        >
+                          <RadialBar
                             dataKey="value"
-                            cornerRadius={6}
-                          >
-                            <Cell fill={hitColor} />
-                            <Cell fill={theme === "dark" ? "#333" : "#e5e7eb"} />
-                          </Pie>
-                        </PieChart>
+                            cornerRadius={10}
+                            fill={hitColor}
+                            background={{ fill: theme === "dark" ? "#27272a" : "#f3f4f6" }}
+                          />
+                        </RadialBarChart>
                       </ResponsiveContainer>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center mt-2">
-                        <span className="text-xl font-bold">{percentage.toFixed(1)}%</span>
-                        <span className="text-xs uppercase tracking-wider text-gray-500">Accuracy</span>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className={`text-3xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{percentage.toFixed(0)}%</span>
+                        <span className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Accuracy</span>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-2 mt-3 w-full text-xs">
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 gap-3 w-full">
                       {[
-                        { label: "Shots", value: squad.total_shots },
-                        { label: "Hits", value: squad.total_hits },
-                        { label: "Sessions", value: squad.total_sessions },
-                        { label: "Time to 1st Shot", value: `${squad.avg_time_to_first_shot?.toFixed(2)}s` },
-                        { label: "Elimination Rate", value: `${squad.elimination_rate?.toFixed(1)}%` },
+                        { icon: Target, label: "Total Shots", value: squad.total_shots.toLocaleString(), color: "blue" },
+                        { icon: Activity, label: "Total Hits", value: squad.total_hits.toLocaleString(), color: "green" },
+                        { icon: Clock, label: "Avg Time", value: `${squad.avg_time_to_first_shot?.toFixed(1)}s`, color: "purple" },
+                        { icon: TrendingUp, label: "Elim Rate", value: `${squad.elimination_rate?.toFixed(0)}%`, color: "amber" },
                       ].map((item, i) => (
-                        <div key={i} className={`p-2 rounded-lg ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
-                          <div className="flex justify-between">
-                            <span className={theme === "dark" ? "text-gray-400" : "text-gray-600"}>{item.label}</span>
-                            <span>{item.value}</span>
+                        <div
+                          key={i}
+                          className={`p-3 rounded-xl transition-colors ${
+                            theme === "dark" ? "bg-zinc-800 hover:bg-zinc-700" : "bg-gray-50 hover:bg-gray-100"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <item.icon
+                              className={`w-4 h-4 ${
+                                item.color === "blue"
+                                  ? "text-blue-500"
+                                  : item.color === "green"
+                                    ? "text-green-500"
+                                    : item.color === "purple"
+                                      ? "text-purple-500"
+                                      : "text-amber-500"
+                              }`}
+                            />
                           </div>
+                          <div className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{item.value}</div>
+                          <div className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>{item.label}</div>
                         </div>
                       ))}
                     </div>
@@ -113,16 +157,11 @@ const CommanderView = () => {
                 </Card>
               );
             })}
-          </div>
-        )}
-      </BaseDashboardCard>
+        </div>
+      )}
 
       {/* User Accuracy by Role */}
-      <UserRoleAccuracyTable 
-        loading={loading}
-        commanderUserRoleBreakdown={commanderUserRoleBreakdown}
-        theme={theme}
-      />
+      <UserRoleAccuracyTable loading={loading} commanderUserRoleBreakdown={commanderUserRoleBreakdown} theme={theme} />
     </div>
   );
 };

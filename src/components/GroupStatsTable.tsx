@@ -67,9 +67,9 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
     }
   }, [groupingScores, currentPage]);
 
-  // Load initial group stats
+  // Load initial group stats - only if data is not already loaded
   useEffect(() => {
-    if (id) {
+    if (id && !groupingScores) {
       setCurrentPage(0);
       loadGroupStats();
     }

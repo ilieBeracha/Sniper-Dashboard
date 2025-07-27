@@ -6,12 +6,14 @@ import { teamStore } from "@/store/teamStore";
 import { UserRole } from "@/types/user";
 import { isCommander } from "@/utils/permissions";
 import { User, Users, Mail } from "lucide-react";
+import { squadStore } from "@/store/squadStore";
 
 export default function DashboardMembersTable() {
   const { theme } = useTheme();
   const { user } = useStore(userStore);
   const { members } = useStore(teamStore);
-
+  const { squadsWithMembers } = useStore(squadStore);
+  console.log(squadsWithMembers);
   // Filter members based on user permissions
   const dataByPermission = members.filter((member) => {
     if (isCommander(user?.user_role as UserRole)) {
@@ -46,6 +48,28 @@ export default function DashboardMembersTable() {
           <span className="text-sm">{value || "N/A"}</span>
         </div>
       ),
+      className: "hidden md:table-cell",
+    },
+    {
+      key: "squad_id",
+      label: "Squad",
+      render: (value: string) => {
+        const squad = squadsWithMembers?.find((squad) => squad.id === value);
+        if (!squad) return <span className="text-sm text-gray-400">N/A</span>;
+        
+        return (
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+              theme === "dark" 
+                ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30" 
+                : "bg-indigo-100 text-indigo-700 border border-indigo-200"
+            }`}>
+              <Users size={12} />
+              {squad.squad_name}
+            </span>
+          </div>
+        );
+      },
       className: "hidden md:table-cell",
     },
     {
