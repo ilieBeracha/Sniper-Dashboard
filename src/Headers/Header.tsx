@@ -133,16 +133,16 @@ export default function Header({
                 <hr className={`my-1 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`} />
 
                 {/* Profile Link */}
-                <a
-                  href="/profile"
+                <button
+                  disabled={true}
                   className={`w-full flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
-                    theme === "dark" ? "hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100" : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
+                    theme === "dark" ? "hover:bg-zinc-800 text-zinc-700 hover:text-zinc-100" : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
                   }`}
                   role="menuitem"
                 >
                   <User className="w-4 h-4" />
                   <span>Profile</span>
-                </a>
+                </button>
               </div>
             </div>
           )}

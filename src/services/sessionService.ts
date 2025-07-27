@@ -160,3 +160,9 @@ export async function createGroupScoreService(groupScoreData: any, trainingSessi
   if (error) throw error;
   return data;
 }
+
+export async function getGroupingScoreComparisonById(groupScoreId: string): Promise<any> {
+  const { data, error } = await supabase.rpc("get_grouping_comparison_by_id", { p_group_score_id: groupScoreId }).select("*");
+  if (error) throw error;
+  return data;
+}

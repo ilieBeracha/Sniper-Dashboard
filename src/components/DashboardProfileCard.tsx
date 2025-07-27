@@ -42,8 +42,8 @@ export default function DashboardProfileCard() {
   };
 
   return (
-    <div className={`w-full h-full relative flex justify-between overflow-hidden ${isMobile ? "px-4 " : "p-4"}`}>
-      <div className="relative z-10 h-full flex flex-col justify-between sm:p-5 lg:p-6 gap-4  rounded-lg shadow-sm">
+    <div className={`w-full h-full relative flex justify-between overflow-hidden ${isMobile ? "px-4 pt-6 pb-4 " : "p-4"}`}>
+      <div className="relative z-10 h-full flex flex-col justify-between sm:p-5 lg:p-6 gap-4  rounded-lg">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <h1 className={`text-sm font-light ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{getWelcomeMessage()},</h1>

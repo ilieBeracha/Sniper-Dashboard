@@ -34,7 +34,9 @@ export default function DashboardOverview({ loading }: { loading: boolean }) {
           <DashboardCalendar />
         </div>
       )}
-      <CyCharts loading={loading} />
+      <div className="w-full row-span-1 grid col-span-1 xl:col-span-2 sm:col-span-10 rounded-lg">
+        <CyCharts loading={loading} />
+      </div>
     </>
   );
 }

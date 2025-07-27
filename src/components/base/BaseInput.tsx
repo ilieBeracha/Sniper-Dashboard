@@ -9,10 +9,11 @@ export interface BaseInputProps extends InputHTMLAttributes<HTMLInputElement> {
   containerClassName?: string;
   labelClassName?: string;
   errorClassName?: string;
+  isRequired?: boolean;
 }
 
 const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
-  ({ label, error, leftIcon, rightIcon, className, containerClassName, labelClassName, errorClassName, disabled, ...props }, ref) => {
+  ({ label, error, leftIcon, rightIcon, className, containerClassName, labelClassName, errorClassName, disabled, isRequired, ...props }, ref) => {
     const { theme } = useTheme();
     return (
       <div className={cn("w-full", containerClassName)}>
@@ -25,6 +26,7 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
             )}
           >
             {label}
+            {isRequired && <span className="text-red-500 ml-1">*</span>}
           </label>
         )}
         <div className="relative">

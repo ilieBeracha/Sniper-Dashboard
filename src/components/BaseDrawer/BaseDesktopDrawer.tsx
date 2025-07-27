@@ -18,7 +18,7 @@ export default function BaseDesktopDrawer({
   const { theme } = useTheme();
 
   return (
-    <Dialog open={isOpen} onClose={setIsOpen} className="relative z-50 hidden sm:block w-screen min-w-[600px">
+    <Dialog open={isOpen} onClose={setIsOpen} className="relative z-50 hidden sm:block w-screen min-w-[600px]">
       <div className={`fixed inset-0 backdrop-blur-sm transition-opacity ${theme === "dark" ? "bg-black/50" : "bg-gray-50/10"}`} />
       <div className="fixed inset-0 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">

@@ -12,18 +12,14 @@ export default function DashboardCalendar() {
   const useTrainingCalendar = useStore(TrainingStore);
   const { last, next } = useTrainingCalendar.trainingsChartDisplay;
   const navigate = useNavigate();
-  const { theme } = useTheme();
   const isMobile = useIsMobile();
   return (
     <div className={`h-full ${isMobile ? "py-6" : "p-4"}`}>
       <div className="relative">
         {/* Timeline line */}
-        <div
-          className="absolute left-3 top-0 bottom-0 w-0.5"
-          style={{ backgroundColor: theme === "dark" ? primitives.grey.grey800 : primitives.grey.grey300 }}
-        />
+        <div className="absolute left-3 top-0 bottom-0 w-0.5" />
 
-        <div className="space-y-4  rounded-lg shadow-sm py-4">
+        <div className="space-y-4  rounded-lg py-4">
           {last ? (
             <TrainingTimelineItem onClick={() => navigate(`/training/${last.id}`)} session={last} label="Last Training" isPast={true} />
           ) : (

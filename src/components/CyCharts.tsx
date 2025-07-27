@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { getEnumValues } from "@/services/supabaseEnums";
 import DashboardMembersTable from "./DashboardMembersTable";
 import DashboardGroupingChart from "./DashboardGroupingChart";
-import DashboardWeather from "./DashboardWeather";
 
 const formatEnumLabel = (value: string) =>
   value
@@ -42,7 +41,7 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
   }
 
   return (
-    <div className="flex flex-col gap-4 bg-zinc-900/50 rounded-lg shadow-sm p-4">
+    <div className="flex flex-col gap-4 rounded-lg shadow-sm">
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         <div className="w-full row-span-1">
           <BaseDashboardCard
@@ -103,11 +102,6 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
           <DashboardMembersTable />
         </div>
         {/* Grouping Chart */}
-
-        <div className="w-full row-span-1 grid col-span-1 xl:col-span-1">
-          <DashboardWeather />
-          {/* <DashboardSquadStats /> */}
-        </div>
       </div>
     </div>
   );
