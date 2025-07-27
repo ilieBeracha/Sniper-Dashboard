@@ -234,8 +234,55 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
     );
   }
 
+  // Calculate stats for header
+  const totalGroups = groupingScoresTotalCount;
+  const currentPageGroups = groupingScores?.length || 0;
+  const avgDispersion = groupingScores?.length
+    ? (
+        groupingScores.reduce((sum, score) => sum + (score.cm_dispersion || 0), 0) / groupingScores.filter((score) => score.cm_dispersion).length
+      ).toFixed(1)
+    : "0";
+  const bestDispersion = groupingScores?.length
+    ? Math.min(...groupingScores.filter((score) => score.cm_dispersion).map((score) => score.cm_dispersion || Infinity))
+    : 0;
+
   return (
     <>
+      {/* Stats Header */}
+      <div className={`p-4 rounded-lg border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-gray-50 border-gray-200"}`}>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Target className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
+            <h3 className="text-lg font-semibold">Group Statistics</h3>
+          </div>
+
+          <div className="flex flex-wrap gap-6 text-sm">
+            <div className="flex flex-col items-center">
+              <span className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Total Groups</span>
+              <span className="font-semibold text-lg">{totalGroups}</span>
+            </div>
+
+            {totalGroups > 0 && (
+              <>
+                <div className="flex flex-col items-center">
+                  <span className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Avg Dispersion</span>
+                  <span className={`font-semibold text-lg ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
+                    {avgDispersion !== "NaN" ? `${avgDispersion} cm` : "N/A"}
+                  </span>
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <span className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Best Group</span>
+                  <span className={`font-semibold text-lg ${theme === "dark" ? "text-green-400" : "text-green-600"}`}>
+                    {bestDispersion !== Infinity ? `${bestDispersion} cm` : "N/A"}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
       <SpTable
         data={groupingScores || []}
         columns={columns as any}
