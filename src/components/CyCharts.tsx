@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 import { getEnumValues } from "@/services/supabaseEnums";
 import DashboardMembersTable from "./DashboardMembersTable";
 import DashboardGroupingChart from "./DashboardGroupingChart";
+import { isSquadCommander } from "@/utils/permissions";
+import { userStore } from "@/store/userStore";
+import { useStore } from "zustand";
+import { UserRole } from "@/types/user";
 
 const formatEnumLabel = (value: string) =>
   value
@@ -14,6 +18,7 @@ const formatEnumLabel = (value: string) =>
     .replace(/\b\w/g, (c) => c.toUpperCase()); // Capitalize first letters
 
 export default function DashboardSquadProgress({ loading }: { loading: boolean }) {
+  const { user } = useStore(userStore);
   const [weaponTypes, setWeaponTypes] = useState<string[]>([]);
   const [positions, setPositions] = useState<string[]>([]);
   // UserHitPercentage filters
@@ -41,7 +46,8 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg shadow-sm">
+    <div className="flex flex-col gap-4 rounded-lg ">
+      <div className="flex flex-col gap-4 text-2xl pt-4 pb-2">Overall Performance</div>
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         <div className="w-full row-span-1">
           <BaseDashboardCard
@@ -98,7 +104,14 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
         <div className="grid grid-cols-1 gap-6 lg:col-span-1 xl:col-span-2">
           <DashboardGroupingChart />
         </div>
-        <div className="w-full   sm:col-span-1">
+        <div className="grid grid-cols-1 gap-6 lg:col-span-1 xl:col-span-2">
+          {isSquadCommander(user?.user_role as UserRole) ? (
+            <div className="flex flex-col gap-4 text-2xl">Team Members</div>
+          ) : (
+            <div className="flex flex-col gap-4 text-2xl ">Squad Members</div>
+          )}
+        </div>
+        <div className="w-full grid col-span-full">
           <DashboardMembersTable />
         </div>
         {/* Grouping Chart */}

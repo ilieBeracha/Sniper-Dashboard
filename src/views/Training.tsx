@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useStore } from "zustand";
 import { TrainingSession, TrainingStatus } from "@/types/training";
 import { supabase } from "@/services/supabaseClient";
@@ -38,12 +38,15 @@ export default function TrainingPage() {
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [editingGroupScore, setEditingGroupScore] = useState<any>(null);
+  const hasLoadedData = useRef(false);
 
   useLoadingState(async () => {
-    if (!id) return;
+    if (!id || hasLoadedData.current) return;
     await loadAssignments();
     await loadTrainingById(id);
     await getSessionStatsByTrainingId(id);
+    await fetchGroupingScores(id);
+    hasLoadedData.current = true;
   }, [id]);
 
   const handleStatusChange = (newStatus: TrainingStatus) => {

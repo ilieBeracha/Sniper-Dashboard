@@ -14,7 +14,7 @@ export default function DashboardCalendar() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   return (
-    <div className={`h-full ${isMobile ? "py-6" : "p-4"}`}>
+    <div className={`h-full ${isMobile ? "" : ""}`}>
       <div className="relative">
         {/* Timeline line */}
         <div className="absolute left-3 top-0 bottom-0 w-0.5" />
@@ -64,7 +64,7 @@ function TrainingTimelineItem({
       </div>
 
       <div
-        className="group relative p-4 rounded-2xl border border-[#333] cursor-pointer transition-all duration-200 hover:shadow-lg"
+        className="group relative p-4 rounded-2xl border border-[#333] cursor-pointer transition-all duration-200 hover:shadow-lg min-h-40"
         style={{
           backgroundColor:
             theme === "dark"

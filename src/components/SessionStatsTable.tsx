@@ -42,6 +42,7 @@ export default function SessionStatsTable({
   // Expanded groups state - initialize with all groups expanded
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [isInitialized, setIsInitialized] = useState(false);
+  const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false);
 
   // Load paginated session stats
   const loadSessionStats = async (page: number = 0, reset: boolean = false) => {
@@ -70,7 +71,7 @@ export default function SessionStatsTable({
   // Load initial session stats and total count
   useEffect(() => {
     const loadInitialData = async () => {
-      if (!id) return;
+      if (!id || hasLoadedInitialData) return;
 
       // Load both session stats and total count
       await loadSessionStats(0, true);
@@ -78,6 +79,7 @@ export default function SessionStatsTable({
       try {
         const count = await getSessionStatsCountByTrainingId(id);
         setTotalCount(count);
+        setHasLoadedInitialData(true);
       } catch (error) {
         console.error("Error loading total count:", error);
       }
@@ -86,11 +88,8 @@ export default function SessionStatsTable({
     loadInitialData();
   }, [id]);
 
-  useEffect(() => {
-    if (sessionStats?.length > 0 && currentPage === 0) {
-      loadSessionStats(0, true);
-    }
-  }, [sessionStats?.length]);
+  // Removed this effect to prevent reloading when switching tabs
+  // Data is already loaded from the Training page
 
   useEffect(() => {
     if (newlyAddedSessionId) {
