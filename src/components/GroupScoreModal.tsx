@@ -57,7 +57,7 @@ export default function GroupScoreModal({ isOpen, onClose }: GroupScoreModalProp
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className={`max-w-md md:max-w-2xl max-h-[70vh] overflow-y-auto ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}
+        className={`max-w-md md:max-w-2xl max-h-[75vh] overflow-y-auto ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}
       >
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">Group Score Details</DialogTitle>
