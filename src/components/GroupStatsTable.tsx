@@ -21,28 +21,33 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
   const { theme } = useTheme();
   const { id } = useParams();
 
-  const { groupingScores, isLoading, fetchGroupingScores } = useStore(performanceStore);
+  const { groupingScores, isLoading, fetchGroupingScores, getGroupingScoresCount, groupingScoresTotalCount } = useStore(performanceStore);
   const { getGroupingScoreComparisonById } = useStore(sessionStore);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
-  const [paginatedGroupStats, setPaginatedGroupStats] = useState<GroupingScoreEntry[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [totalCount, setTotalCount] = useState(0);
   const GROUP_LIMIT = 20;
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Load paginated group stats
-  const loadGroupStats = async () => {
+  const loadGroupStats = async (page: number = currentPage) => {
     if (!id) return;
 
     try {
-      await fetchGroupingScores(id, GROUP_LIMIT, currentPage * GROUP_LIMIT);
+      await fetchGroupingScores(id, GROUP_LIMIT, page * GROUP_LIMIT);
     } catch (error) {
       console.error("Error loading group stats:", error);
-      setPaginatedGroupStats([]);
-      setTotalCount(0);
+    }
+  };
+
+  // Load total count
+  const loadTotalCount = async () => {
+    if (!id) return;
+    try {
+      await getGroupingScoresCount(id);
+    } catch (error) {
+      console.error("Error loading group stats count:", error);
     }
   };
 
@@ -51,29 +56,21 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
     setIsModalOpen(true);
   };
 
-  // Update paginated data when groupingScores changes
+  // Load initial data when component mounts or id changes
   useEffect(() => {
-    if (groupingScores) {
-      const offset = currentPage * GROUP_LIMIT;
-      const paginatedData = groupingScores.slice(offset, offset + GROUP_LIMIT);
-
-      setPaginatedGroupStats(paginatedData);
-      setHasMore(offset + GROUP_LIMIT < groupingScores.length);
-      setTotalCount(groupingScores.length);
-    } else {
-      setPaginatedGroupStats([]);
-      setTotalCount(0);
-      setHasMore(false);
-    }
-  }, [groupingScores, currentPage]);
-
-  // Load initial group stats - only if data is not already loaded
-  useEffect(() => {
-    if (id && !groupingScores) {
+    if (id) {
       setCurrentPage(0);
-      loadGroupStats();
+      loadTotalCount();
+      loadGroupStats(0);
     }
   }, [id]);
+
+  // Reload data when page changes
+  useEffect(() => {
+    if (id) {
+      loadGroupStats(currentPage);
+    }
+  }, [currentPage]);
 
   const columns = [
     {
@@ -206,11 +203,13 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
     </div>
   );
 
+  const hasMore = (currentPage + 1) * GROUP_LIMIT < groupingScoresTotalCount;
+
   const pagination = {
     currentPage,
-    totalPages: Math.ceil(totalCount / GROUP_LIMIT),
+    totalPages: Math.ceil(groupingScoresTotalCount / GROUP_LIMIT),
     pageSize: GROUP_LIMIT,
-    totalItems: totalCount,
+    totalItems: groupingScoresTotalCount,
     onPageChange: (page: number) => setCurrentPage(page),
     onNextPage: () => {
       if (hasMore && !isLoading) {
@@ -225,7 +224,7 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
     hasMore,
   };
 
-  if (paginatedGroupStats?.length === 0 && !isLoading) {
+  if (groupingScores?.length === 0 && !isLoading) {
     return (
       <div className={`text-center py-12 `}>
         <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -235,10 +234,56 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
     );
   }
 
+  // Calculate stats for header
+  const totalGroups = groupingScoresTotalCount;
+  const avgDispersion = groupingScores?.length
+    ? (
+        groupingScores.reduce((sum, score) => sum + (score.cm_dispersion || 0), 0) / groupingScores.filter((score) => score.cm_dispersion).length
+      ).toFixed(1)
+    : "0";
+  const bestDispersion = groupingScores?.length
+    ? Math.min(...groupingScores.filter((score) => score.cm_dispersion).map((score) => score.cm_dispersion || Infinity))
+    : 0;
+
   return (
     <>
+      {/* Stats Header */}
+      <div className={`p-4 rounded-lg border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-gray-50 border-gray-200"}`}>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Target className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
+            <h3 className="text-lg font-semibold">Group Statistics</h3>
+          </div>
+
+          <div className="flex flex-wrap gap-6 text-sm">
+            <div className="flex flex-col items-center">
+              <span className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Total Groups</span>
+              <span className="font-semibold text-lg">{totalGroups}</span>
+            </div>
+
+            {totalGroups > 0 && (
+              <>
+                <div className="flex flex-col items-center">
+                  <span className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Avg Dispersion</span>
+                  <span className={`font-semibold text-lg ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
+                    {avgDispersion !== "NaN" ? `${avgDispersion} cm` : "N/A"}
+                  </span>
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <span className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Best Group</span>
+                  <span className={`font-semibold text-lg ${theme === "dark" ? "text-green-400" : "text-green-600"}`}>
+                    {bestDispersion !== Infinity ? `${bestDispersion} cm` : "N/A"}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
       <SpTable
-        data={paginatedGroupStats}
+        data={groupingScores || []}
         columns={columns as any}
         filters={[]}
         searchPlaceholder="Search groups..."

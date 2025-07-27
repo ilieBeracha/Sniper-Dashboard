@@ -10,7 +10,7 @@ export function SpPage({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
   return (
-    <div className={`w-full bg-black/30 pt-12 transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "bg-white text-gray-900"}`}>
+    <div className={`w-full bg-black/30 transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "bg-white text-gray-900"}`}>
       <main className={`flex flex-col gap-3 ${isMobile ? "space-y-2" : ""}`}>{children}</main>
     </div>
   );
@@ -39,7 +39,7 @@ export function SpPageHeader({
           <SpPageBreadcrumbs breadcrumbs={breadcrumbs} />
         </div>
       )}
-      <div className={`${isMobile ? "px-6 py-8" : "px-6 py-4"} transition-all duration-200 relative`}>
+      <div className={`${isMobile ? "px-6" : "px-6 py-4"} transition-all duration-200 relative`}>
         <div className="flex flex justify-between sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 justify-between w-full">
             <div className="flex items-center gap-3">

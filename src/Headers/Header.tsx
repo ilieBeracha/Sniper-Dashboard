@@ -43,7 +43,7 @@ export default function Header({
 
   return (
     <div
-      className={`flex fixed top-0 left-0 right-0 items-center justify-between px-4 h-12 z-[50] transition-colors duration-200 ${isFixed ? "fixed top-0 left-0 right-0" : ""} `}
+      className={`flex  items-center justify-between px-4 h-12 z-[50] transition-colors duration-200 ${isFixed ? "fixed top-0 left-0 right-0" : ""} `}
     >
       <div className="flex items-center">
         {isMobile && <List className={`w-5 h-5 mr-3 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} onClick={toggleDrawer} />}
