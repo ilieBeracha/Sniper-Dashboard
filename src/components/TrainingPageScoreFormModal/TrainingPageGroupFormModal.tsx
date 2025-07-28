@@ -17,9 +17,6 @@ import { Loader2 } from "lucide-react";
 
 import { z } from "zod";
 
-// ✅ TrainingPageGroupFormModal.tsx
-import { z } from "zod";
-
 export const groupScoreSchema = z.object({
   sniper_user_id: z.string().uuid(),
   weapon_id: z.string().uuid({ message: "Weapon is required" }),
