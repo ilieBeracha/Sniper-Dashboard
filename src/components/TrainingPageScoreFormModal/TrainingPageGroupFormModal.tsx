@@ -17,18 +17,21 @@ import { Loader2 } from "lucide-react";
 
 import { z } from "zod";
 
+// ✅ TrainingPageGroupFormModal.tsx
+import { z } from "zod";
+
 export const groupScoreSchema = z.object({
   sniper_user_id: z.string().uuid(),
   weapon_id: z.string().uuid({ message: "Weapon is required" }),
   bullets_fired: z.number().min(1, "Bullets fired must be at least 1"),
 
   time_seconds: z.preprocess(
-    (val) => (val === "" || val === undefined) ? null : Number(val),
+    (val) => val === "" || val === undefined ? null : Number(val),
     z.number().min(0).nullable()
   ),
 
   cm_dispersion: z.preprocess(
-    (val) => (val === "" || val === undefined) ? null : Number(val),
+    (val) => val === "" || val === undefined ? null : Number(val),
     z.number().min(0).nullable()
   ).refine((val) => val == null || Number.isInteger(val * 10), {
     message: "Dispersion must be in 0.1 steps (e.g., 0.1, 0.2, 0.3)",
@@ -41,8 +44,6 @@ export const groupScoreSchema = z.object({
 });
 
 export type GroupScoreFormValues = z.infer<typeof groupScoreSchema>;
-
-type GroupScoreFormValues = z.infer<typeof groupScoreSchema>;
 
 interface TrainingPageGroupFormModalProps {
   isOpen: boolean;
