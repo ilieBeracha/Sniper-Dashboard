@@ -31,7 +31,7 @@ const groupScoreSchema = z.object({
   shooting_position: z.string().min(1, "Shooting position is required"),
   effort: z.boolean(),
   day_period: z.enum(["day", "night"]),
-  type: z.enum(["normal", "timed", "position_abandonment"]),
+  type: z.enum(["normal", "timed", "complex","position_abandonment"]),
 });
 
 type GroupScoreFormValues = z.infer<typeof groupScoreSchema>;
