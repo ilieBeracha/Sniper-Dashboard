@@ -20,11 +20,9 @@ const groupScoreSchema = z.object({
   weapon_id: z.string().uuid({ message: "Weapon is required" }),
   bullets_fired: z.number().min(1, "Bullets fired must be at least 1"),
   time_seconds: z
-    .preprocess((val) => (val === "" ? null : val), z.number().min(0).nullable())
-    .optional(), // Fix: enforce correct output type
+    .preprocess((val) => val === "" ? null : val, z.union([z.number().min(0), z.null()])),
   cm_dispersion: z
-    .preprocess((val) => (val === "" ? null : val), z.number().min(0).nullable())
-    .optional()
+    .preprocess((val) => val === "" ? null : val, z.union([z.number().min(0), z.null()]))
     .refine((val) => val == null || Number.isInteger(val * 10), {
       message: "Dispersion must be in 0.1 steps (e.g., 0.1, 0.2, 0.3)",
     }),
