@@ -61,8 +61,8 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
     sniper_user_id: user?.id ?? "",
     weapon_id: user?.user_default_weapon ?? "",
     bullets_fired: 4,
-    time_seconds: null,
-    cm_dispersion: null,
+    time_seconds: undefined,
+    cm_dispersion: undefined,
     shooting_position: "",
     effort: false,
     day_period: "day",
@@ -232,7 +232,7 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
           min="0"
           label="Time (Seconds)"
           disabled={isRestrictedMode || isSubmitting}
-          {...register("time_seconds")}
+{...register("time_seconds", { valueAsNumber: true })}
           error={errors.time_seconds?.message}
           placeholder={isRestrictedMode ? "Requires 4+ bullets" : "Enter time in seconds"}
         />
