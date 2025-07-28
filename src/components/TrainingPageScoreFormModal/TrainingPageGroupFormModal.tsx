@@ -20,11 +20,10 @@ export const groupScoreSchema = z.object({
   sniper_user_id: z.string().uuid(),
   weapon_id: z.string().uuid({ message: "Weapon is required" }),
   bullets_fired: z.number().min(1, "Bullets fired must be at least 1"),
-  time_seconds: z.preprocess((val) => val === "" ? undefined : Number(val), z.number().min(0).optional()),
-  cm_dispersion: z.preprocess((val) => val === "" ? undefined : Number(val), z.number().min(0).optional())
-    .refine((val) => val === undefined || Number.isInteger(val * 10), {
-      message: "Dispersion must be in 0.1 steps",
-    }),
+  time_seconds: z.coerce.number().min(0).optional(),
+  cm_dispersion: z.coerce.number().min(0).optional().refine((val) => val === undefined || Number.isInteger(val * 10), {
+    message: "Dispersion must be in 0.1 steps",
+  }),
   shooting_position: z.string().min(1, "Required"),
   effort: z.boolean(),
   day_period: z.enum(["day", "night"]),
@@ -79,7 +78,8 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
 
   useEffect(() => {
     if (isOpen) {
-      const baseValues = {
+      // Base default values when opening the modal
+      const baseValues: GroupScoreFormValues = {
         sniper_user_id: user?.id ?? "",
         weapon_id: user?.user_default_weapon ?? "",
         bullets_fired: 4,
@@ -89,21 +89,17 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
         effort: false,
         day_period: "day",
         type: "normal",
-      };
+      } as const;
 
-      reset({
-  sniper_user_id: user?.id ?? "",
-  weapon_id: user?.user_default_weapon ?? "",
-  bullets_fired: 4,
-  time_seconds: initialData?.time_seconds ?? undefined,
-  cm_dispersion: initialData?.cm_dispersion ?? undefined,
-  shooting_position: initialData?.shooting_position ?? "",
-  effort: initialData?.effort ?? false,
-  day_period: initialData?.day_period ?? "day", // must be one of the enums
-  type: initialData?.type ?? "normal",         // must be one of the enums
-});
-      } : baseValues);
+      // If we have initial data (editing mode) merge it on top of the base values
+      const valuesToSet: GroupScoreFormValues = {
+        ...baseValues,
+        ...initialData,
+      } as GroupScoreFormValues;
 
+      reset(valuesToSet);
+
+      // Focus the first input after the drawer animation completes
       setTimeout(() => firstInputRef.current?.focus(), 100);
     }
   }, [isOpen, initialData, reset, user]);
@@ -213,7 +209,6 @@ const handleFormSubmit: SubmitHandler<GroupScoreFormValues> = async (data) => {
           disabled={isRestrictedMode || isSubmitting}
           {...register("time_seconds", {
             valueAsNumber: true,
-setValue("time_seconds", undefined);
           })}
           error={errors.time_seconds?.message}
           placeholder={isRestrictedMode ? "Requires 4+ bullets" : "Enter time in seconds"}
@@ -228,7 +223,6 @@ setValue("time_seconds", undefined);
           disabled={isRestrictedMode || isSubmitting}
           {...register("cm_dispersion", {
             valueAsNumber: true,
-setValue("cm_dispersion", undefined);
           })}
           error={errors.cm_dispersion && !isRestrictedMode ? errors.cm_dispersion.message : undefined}
           placeholder={isRestrictedMode ? "Requires 4+ bullets" : "e.g., 0.1, 0.2, 0.3"}
