@@ -264,6 +264,7 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
                 { value: "normal", label: "Normal" },
                 { value: "timed", label: "Timed" },
                 { value: "position_abandonment", label: "Position Abandonment" },
+                { value: "complex", label: "Complex"}
               ]}
               disabled={isSubmitting}
             />
