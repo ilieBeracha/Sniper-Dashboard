@@ -20,11 +20,10 @@ export const groupScoreSchema = z.object({
   sniper_user_id: z.string().uuid(),
   weapon_id: z.string().uuid({ message: "Weapon is required" }),
   bullets_fired: z.number().min(1, "Bullets fired must be at least 1"),
-  time_seconds: z.preprocess((val) => val === "" ? undefined : Number(val), z.number().min(0).optional()),
-  cm_dispersion: z.preprocess((val) => val === "" ? undefined : Number(val), z.number().min(0).optional())
-    .refine((val) => val === undefined || Number.isInteger(val * 10), {
-      message: "Dispersion must be in 0.1 steps",
-    }),
+  time_seconds: z.coerce.number().min(0).optional(),
+  cm_dispersion: z.coerce.number().min(0).optional().refine((val) => val === undefined || Number.isInteger(val * 10), {
+    message: "Dispersion must be in 0.1 steps",
+  }),
   shooting_position: z.string().min(1, "Required"),
   effort: z.boolean(),
   day_period: z.enum(["day", "night"]),
