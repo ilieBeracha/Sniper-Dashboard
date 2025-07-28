@@ -15,17 +15,25 @@ import BaseSelect from "../base/BaseSelect";
 import BaseInput from "../base/BaseInput";
 import { Loader2 } from "lucide-react";
 
-const groupScoreSchema = z.object({
+import { z } from "zod";
+
+export const groupScoreSchema = z.object({
   sniper_user_id: z.string().uuid(),
   weapon_id: z.string().uuid({ message: "Weapon is required" }),
   bullets_fired: z.number().min(1, "Bullets fired must be at least 1"),
-  time_seconds: z
-    .preprocess((val) => val === "" ? null : val, z.union([z.number().min(0), z.null()])),
-  cm_dispersion: z
-    .preprocess((val) => val === "" ? null : val, z.union([z.number().min(0), z.null()]))
-    .refine((val) => val == null || Number.isInteger(val * 10), {
-      message: "Dispersion must be in 0.1 steps (e.g., 0.1, 0.2, 0.3)",
-    }),
+
+  time_seconds: z.preprocess(
+    (val) => val === "" ? null : val,
+    z.union([z.number().min(0), z.literal(null)])
+  ),
+
+  cm_dispersion: z.preprocess(
+    (val) => val === "" ? null : val,
+    z.union([z.number().min(0), z.literal(null)])
+  ).refine((val) => val == null || Number.isInteger(val * 10), {
+    message: "Dispersion must be in 0.1 steps (e.g., 0.1, 0.2, 0.3)",
+  }),
+
   shooting_position: z.string().min(1, "Shooting position is required"),
   effort: z.boolean(),
   day_period: z.enum(["day", "night"]),
