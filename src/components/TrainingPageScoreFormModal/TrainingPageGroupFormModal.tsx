@@ -1,6 +1,6 @@
 import { useForm, FormProvider, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+
 import { useTheme } from "@/contexts/ThemeContext";
 import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
@@ -23,13 +23,13 @@ export const groupScoreSchema = z.object({
   bullets_fired: z.number().min(1, "Bullets fired must be at least 1"),
 
   time_seconds: z.preprocess(
-    (val) => val === "" ? null : val,
-    z.union([z.number().min(0), z.literal(null)])
+    (val) => (val === "" || val === undefined) ? null : Number(val),
+    z.number().min(0).nullable()
   ),
 
   cm_dispersion: z.preprocess(
-    (val) => val === "" ? null : val,
-    z.union([z.number().min(0), z.literal(null)])
+    (val) => (val === "" || val === undefined) ? null : Number(val),
+    z.number().min(0).nullable()
   ).refine((val) => val == null || Number.isInteger(val * 10), {
     message: "Dispersion must be in 0.1 steps (e.g., 0.1, 0.2, 0.3)",
   }),
@@ -39,6 +39,8 @@ export const groupScoreSchema = z.object({
   day_period: z.enum(["day", "night"]),
   type: z.enum(["normal", "timed", "complex", "position_abandonment"]),
 });
+
+export type GroupScoreFormValues = z.infer<typeof groupScoreSchema>;
 
 type GroupScoreFormValues = z.infer<typeof groupScoreSchema>;
 
@@ -59,19 +61,19 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
   const firstInputRef = useRef<HTMLSelectElement>(null);
 
   const methods = useForm<GroupScoreFormValues>({
-    resolver: zodResolver(groupScoreSchema),
-    defaultValues: {
-      sniper_user_id: user?.id ?? "",
-      weapon_id: user?.user_default_weapon ?? "",
-      bullets_fired: 4,
-      time_seconds: null,
-      cm_dispersion: null,
-      shooting_position: "",
-      effort: false,
-      day_period: "day",
-      type: "normal",
-    },
-  });
+  resolver: zodResolver(groupScoreSchema),
+  defaultValues: {
+    sniper_user_id: user?.id ?? "",
+    weapon_id: user?.user_default_weapon ?? "",
+    bullets_fired: 4,
+    time_seconds: null,
+    cm_dispersion: null,
+    shooting_position: "",
+    effort: false,
+    day_period: "day",
+    type: "normal",
+  },
+});
 
   const {
     register,
