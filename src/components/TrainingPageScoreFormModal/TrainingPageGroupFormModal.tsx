@@ -20,20 +20,18 @@ const groupScoreSchema = z.object({
   weapon_id: z.string().uuid({ message: "Weapon is required" }),
   bullets_fired: z.number().min(1, "Bullets fired must be at least 1"),
   time_seconds: z
-  .preprocess((val) => (val === "" ? null : val), z.number().min(0).nullable())
-  .optional(),
+    .preprocess((val) => (val === "" ? null : val), z.number().min(0).nullable())
+    .optional(), // Fix: enforce correct output type
   cm_dispersion: z
-    .number()
-    .min(0)
+    .preprocess((val) => (val === "" ? null : val), z.number().min(0).nullable())
     .optional()
-    .or(z.literal(null))
     .refine((val) => val == null || Number.isInteger(val * 10), {
       message: "Dispersion must be in 0.1 steps (e.g., 0.1, 0.2, 0.3)",
     }),
   shooting_position: z.string().min(1, "Shooting position is required"),
   effort: z.boolean(),
   day_period: z.enum(["day", "night"]),
-  type: z.enum(["normal", "timed", "complex","position_abandonment"]),
+  type: z.enum(["normal", "timed", "complex", "position_abandonment"]),
 });
 
 type GroupScoreFormValues = z.infer<typeof groupScoreSchema>;
@@ -226,15 +224,12 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
         </div>
 
         {/* Time (Seconds) */}
-        <BaseInput
+              <BaseInput
           type="number"
           min="0"
           label="Time (Seconds)"
           disabled={isRestrictedMode || isSubmitting}
-          {...register("time_seconds", {
-            valueAsNumber: true,
-            setValueAs: (v) => (v === "" ? null : Number(v)),
-          })}
+          {...register("time_seconds")}
           error={errors.time_seconds?.message}
           placeholder={isRestrictedMode ? "Requires 4+ bullets" : "Enter time in seconds"}
         />
