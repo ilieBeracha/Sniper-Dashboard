@@ -1,6 +1,5 @@
-import { useForm, FormProvider, Controller } from "react-hook-form";
+import { useForm, FormProvider, Controller, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useTheme } from "@/contexts/ThemeContext";
 import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
@@ -14,23 +13,20 @@ import { DayNight } from "@/types/equipment";
 import BaseSelect from "../base/BaseSelect";
 import BaseInput from "../base/BaseInput";
 import { Loader2 } from "lucide-react";
-
 import { z } from "zod";
 
+// ✅ Schema
 export const groupScoreSchema = z.object({
   sniper_user_id: z.string().uuid(),
   weapon_id: z.string().uuid({ message: "Weapon is required" }),
   bullets_fired: z.number().min(1, "Bullets fired must be at least 1"),
-
   time_seconds: z
-  .preprocess((val) => val === "" ? undefined : Number(val), z.number().min(0).optional()),
-
-cm_dispersion: z
-  .preprocess((val) => val === "" ? undefined : Number(val), z.number().min(0).optional())
-  .refine((val) => val === undefined || Number.isInteger(val * 10), {
-    message: "Dispersion must be in 0.1 steps (e.g., 0.1, 0.2, 0.3)",
-  }),
-
+    .preprocess((val) => val === "" ? undefined : Number(val), z.number().min(0).optional()),
+  cm_dispersion: z
+    .preprocess((val) => val === "" ? undefined : Number(val), z.number().min(0).optional())
+    .refine((val) => val === undefined || Number.isInteger(val * 10), {
+      message: "Dispersion must be in 0.1 steps (e.g., 0.1, 0.2, 0.3)",
+    }),
   shooting_position: z.string().min(1, "Shooting position is required"),
   effort: z.boolean(),
   day_period: z.enum(["day", "night"]),
@@ -44,7 +40,7 @@ interface TrainingPageGroupFormModalProps {
   onClose: () => void;
   onSubmit: (data: GroupScoreFormValues) => Promise<void>;
   isLoading: boolean;
-  initialData?: any;
+  initialData?: Partial<GroupScoreFormValues>;
 }
 
 export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, isLoading, initialData }: TrainingPageGroupFormModalProps) {
@@ -56,19 +52,19 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
   const firstInputRef = useRef<HTMLSelectElement>(null);
 
   const methods = useForm<GroupScoreFormValues>({
-  resolver: zodResolver(groupScoreSchema),
-  defaultValues: {
-    sniper_user_id: user?.id ?? "",
-    weapon_id: user?.user_default_weapon ?? "",
-    bullets_fired: 4,
-    time_seconds: undefined,
-    cm_dispersion: undefined,
-    shooting_position: "",
-    effort: false,
-    day_period: "day",
-    type: "normal",
-  },
-});
+    resolver: zodResolver(groupScoreSchema),
+    defaultValues: {
+      sniper_user_id: user?.id ?? "",
+      weapon_id: user?.user_default_weapon ?? "",
+      bullets_fired: 4,
+      time_seconds: undefined,
+      cm_dispersion: undefined,
+      shooting_position: "",
+      effort: false,
+      day_period: "day",
+      type: "normal",
+    },
+  });
 
   const {
     register,
@@ -83,59 +79,44 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
   const bulletsFired = watch("bullets_fired");
   const isRestrictedMode = bulletsFired < 4;
 
-  // Focus first input when modal opens and populate form if editing
   useEffect(() => {
     if (isOpen) {
-      if (initialData) {
-        // Populate form with initial data for editing
-        reset({
-          sniper_user_id: initialData.sniper_user_id || user?.id || "",
-          weapon_id: initialData.weapon_id || "",
-          bullets_fired: initialData.bullets_fired || 4,
-          time_seconds: initialData.time_seconds || null,
-          cm_dispersion: initialData.cm_dispersion || null,
-          shooting_position: initialData.shooting_position || "",
-          effort: initialData.effort || false,
-          day_period: initialData.day_period || "day",
-          type: initialData.type || "normal",
-        });
-      } else {
-        // Reset to default values for new entry
-        reset({
-          sniper_user_id: user?.id ?? "",
-          weapon_id: user?.user_default_weapon ?? "",
-          bullets_fired: 4,
-          time_seconds: null,
-          cm_dispersion: null,
-          shooting_position: "",
-          effort: false,
-          day_period: "day",
-          type: "normal",
-        });
-      }
+      const baseValues = {
+        sniper_user_id: user?.id ?? "",
+        weapon_id: user?.user_default_weapon ?? "",
+        bullets_fired: 4,
+        time_seconds: undefined,
+        cm_dispersion: undefined,
+        shooting_position: "",
+        effort: false,
+        day_period: "day",
+        type: "normal",
+      };
 
-      if (firstInputRef.current) {
-        setTimeout(() => firstInputRef.current?.focus(), 100);
-      }
+      reset(initialData ? {
+        ...baseValues,
+        ...initialData,
+        time_seconds: initialData.time_seconds ?? undefined,
+        cm_dispersion: initialData.cm_dispersion ?? undefined,
+      } : baseValues);
+
+      setTimeout(() => firstInputRef.current?.focus(), 100);
     }
   }, [isOpen, initialData, reset, user]);
 
-  // Clear restricted fields when bullets fired < 4
   useEffect(() => {
     if (isRestrictedMode) {
-      setValue("time_seconds", null);
-      setValue("cm_dispersion", null);
+      setValue("time_seconds", undefined);
+      setValue("cm_dispersion", undefined);
     }
   }, [isRestrictedMode, setValue]);
 
-  // Handle form submission
-  const handleFormSubmit = async (data: GroupScoreFormValues) => {
+  const handleFormSubmit: SubmitHandler<GroupScoreFormValues> = async (data) => {
     if (isSubmitting) return;
-
     setIsSubmitting(true);
     try {
       await onSubmit(data);
-      reset(); // Reset form on success
+      reset();
     } catch (error) {
       console.error("Form submission error:", error);
     } finally {
@@ -168,7 +149,6 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
       <input type="hidden" {...register("sniper_user_id")} />
 
       <div className="grid grid-cols-1 gap-4">
-        {/* Weapon Selection */}
         <Controller
           name="weapon_id"
           control={control}
@@ -208,36 +188,33 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
             />
           )}
         />
-        {/* Day/Night Period */}
         <div>
-          <DayPeriodSelect dayPeriod={watch("day_period")} onDayPeriodChange={(dayPeriod) => setValue("day_period", dayPeriod as DayNight)} />
+          <DayPeriodSelect dayPeriod={watch("day_period")} onDayPeriodChange={(dp) => setValue("day_period", dp as DayNight)} />
         </div>
-        {/* Bullets Fired */}
-        <div>
-          <BaseInput
-            type="number"
-            min="1"
-            label="Bullets Fired"
-            isRequired
-            {...register("bullets_fired", { valueAsNumber: true })}
-            error={errors.bullets_fired?.message}
-            disabled={isSubmitting}
-          />
-          {bulletsFired < 4 && <p className="text-amber-600 text-xs mt-1 animate-fadeIn">⚠️ Advanced fields require 4+ bullets</p>}
-        </div>
+        <BaseInput
+          type="number"
+          min="1"
+          label="Bullets Fired"
+          isRequired
+          {...register("bullets_fired", { valueAsNumber: true })}
+          error={errors.bullets_fired?.message}
+          disabled={isSubmitting}
+        />
+        {bulletsFired < 4 && <p className="text-amber-600 text-xs mt-1 animate-fadeIn">⚠️ Advanced fields require 4+ bullets</p>}
 
-        {/* Time (Seconds) */}
-              <BaseInput
+        <BaseInput
           type="number"
           min="0"
           label="Time (Seconds)"
           disabled={isRestrictedMode || isSubmitting}
-{...register("time_seconds", { valueAsNumber: true })}
+          {...register("time_seconds", {
+            valueAsNumber: true,
+            setValueAs: (v) => (v === "" ? undefined : Number(v)),
+          })}
           error={errors.time_seconds?.message}
           placeholder={isRestrictedMode ? "Requires 4+ bullets" : "Enter time in seconds"}
         />
 
-        {/* Dispersion */}
         <BaseInput
           type="number"
           step="0.1"
@@ -246,13 +223,12 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
           disabled={isRestrictedMode || isSubmitting}
           {...register("cm_dispersion", {
             valueAsNumber: true,
-            setValueAs: (v) => (v === "" ? null : Number(v)),
+            setValueAs: (v) => (v === "" ? undefined : Number(v)),
           })}
           error={errors.cm_dispersion && !isRestrictedMode ? errors.cm_dispersion.message : undefined}
           placeholder={isRestrictedMode ? "Requires 4+ bullets" : "e.g., 0.1, 0.2, 0.3"}
         />
 
-        {/* Type Selection */}
         <Controller
           name="type"
           control={control}
@@ -264,7 +240,7 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
                 { value: "normal", label: "Normal" },
                 { value: "timed", label: "Timed" },
                 { value: "position_abandonment", label: "Position Abandonment" },
-                { value: "complex", label: "Complex"}
+                { value: "complex", label: "Complex" },
               ]}
               disabled={isSubmitting}
             />
@@ -272,7 +248,6 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
         />
       </div>
 
-      {/* Effort Checkbox */}
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
@@ -286,7 +261,6 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
         </label>
       </div>
 
-      {/* Action Buttons */}
       <div className="flex justify-end gap-2 pt-6 border-t border-gray-200 dark:border-zinc-700">
         <button type="button" onClick={handleClose} disabled={isSubmitting} className={buttonClasses("secondary")}>
           Cancel
@@ -297,11 +271,7 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
               <Loader2 className="h-4 w-4 animate-spin" />
               Saving...
             </span>
-          ) : initialData ? (
-            "Update"
-          ) : (
-            "Save"
-          )}
+          ) : initialData ? "Update" : "Save"}
         </button>
       </div>
     </form>
