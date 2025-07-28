@@ -19,7 +19,9 @@ const groupScoreSchema = z.object({
   sniper_user_id: z.string().uuid(),
   weapon_id: z.string().uuid({ message: "Weapon is required" }),
   bullets_fired: z.number().min(1, "Bullets fired must be at least 1"),
-  time_seconds: z.number().min(0).optional().or(z.literal(null)),
+  time_seconds: z
+  .preprocess((val) => (val === "" ? null : val), z.number().min(0).nullable())
+  .optional(),
   cm_dispersion: z
     .number()
     .min(0)
