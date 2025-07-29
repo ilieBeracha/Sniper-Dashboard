@@ -19,10 +19,11 @@ const groupScoreSchema = z.object({
   sniper_user_id: z.string().uuid(),
   weapon_id: z.string().uuid({ message: "Weapon is required" }),
   bullets_fired: z.number().min(1, "Bullets fired must be at least 1"),
-  time_seconds: z.number().min(0).optional().or(z.literal(null)),
+  time_seconds: z.number().min(0).nullable().optional().or(z.literal(null)),
   cm_dispersion: z
     .number()
     .min(0)
+    .nullable()
     .optional()
     .or(z.literal(null))
     .refine((val) => val == null || Number.isInteger(val * 10), {
@@ -31,7 +32,7 @@ const groupScoreSchema = z.object({
   shooting_position: z.string().min(1, "Shooting position is required"),
   effort: z.boolean(),
   day_period: z.enum(["day", "night"]),
-  type: z.enum(["normal", "timed", "complex","position_abandonment"]),
+  type: z.enum(["normal", "timed", "position_abandonment"]),
 });
 
 type GroupScoreFormValues = z.infer<typeof groupScoreSchema>;
@@ -230,8 +231,7 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
           label="Time (Seconds)"
           disabled={isRestrictedMode || isSubmitting}
           {...register("time_seconds", {
-            valueAsNumber: true,
-            setValueAs: (v) => (v === "" ? null : Number(v)),
+            setValueAs: (v) => (v === "" || v == null || v === undefined ? null : Number(v)),
           })}
           error={errors.time_seconds?.message}
           placeholder={isRestrictedMode ? "Requires 4+ bullets" : "Enter time in seconds"}
@@ -245,8 +245,7 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
           label="Dispersion (cm)"
           disabled={isRestrictedMode || isSubmitting}
           {...register("cm_dispersion", {
-            valueAsNumber: true,
-            setValueAs: (v) => (v === "" ? null : Number(v)),
+            setValueAs: (v) => (v === "" || v == null || v === undefined ? null : Number(v)),
           })}
           error={errors.cm_dispersion && !isRestrictedMode ? errors.cm_dispersion.message : undefined}
           placeholder={isRestrictedMode ? "Requires 4+ bullets" : "e.g., 0.1, 0.2, 0.3"}
@@ -264,7 +263,6 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
                 { value: "normal", label: "Normal" },
                 { value: "timed", label: "Timed" },
                 { value: "position_abandonment", label: "Position Abandonment" },
-                { value: "complex", label: "Complex"}
               ]}
               disabled={isSubmitting}
             />

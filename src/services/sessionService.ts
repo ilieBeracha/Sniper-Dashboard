@@ -166,3 +166,9 @@ export async function getGroupingScoreComparisonById(groupScoreId: string): Prom
   if (error) throw error;
   return data;
 }
+
+export async function deleteGroupScoreService(id: string): Promise<any> {
+  const { data, error } = await supabase.from("group_scores").delete().eq("id", id).select();
+  if (error) throw error;
+  return data;
+}

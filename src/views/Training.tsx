@@ -22,6 +22,7 @@ import TrainingSessionStatsCard from "@/components/TrainingSessionStatsCard";
 import TrainingPageGroupFormModal from "@/components/TrainingPageScoreFormModal/TrainingPageGroupFormModal";
 import { toast } from "react-toastify";
 import { performanceStore } from "@/store/performance";
+import BaseConfirmDeleteModal from "@/components/BaseConfirmDeleteModal";
 
 export default function TrainingPage() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function TrainingPage() {
   const { isLoading, setIsLoading } = useStore(loaderStore);
   const { training } = useStore(TrainingStore);
   const { getSessionStatsByTrainingId } = useStore(sessionStore);
-  const { createGroupScore, updateGroupScore } = useStore(sessionStore);
+  const { createGroupScore, updateGroupScore, deleteGroupScore } = useStore(sessionStore);
   const { fetchGroupingScores } = useStore(performanceStore);
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { isOpen: isOpen, setIsOpen: setIsOpen } = useModal();
@@ -38,7 +39,11 @@ export default function TrainingPage() {
   const [pendingStatus, setPendingStatus] = useState<TrainingStatus | null>(null);
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [editingGroupScore, setEditingGroupScore] = useState<any>(null);
+  const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] = useState(false);
+  const [deletingGroupScore, setDeletingGroupScore] = useState<any>(null);
   const hasLoadedData = useRef(false);
+
+  const trainingStatus = training?.status as TrainingStatus;
 
   useLoadingState(async () => {
     if (!id || hasLoadedData.current) return;
@@ -113,6 +118,27 @@ export default function TrainingPage() {
     setIsOpen(true);
   };
 
+  const handleDeleteGroupScore = (group: any) => {
+    setIsConfirmDeleteModalOpen(true);
+    setDeletingGroupScore(group);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      setIsLoading(true);
+      await deleteGroupScore(deletingGroupScore.id);
+      await fetchGroupingScores(id as string);
+      toast.success("Group score deleted successfully");
+    } catch (error) {
+      console.error("Error deleting group score:", error);
+      toast.error("Failed to delete group score");
+    } finally {
+      setIsConfirmDeleteModalOpen(false);
+      setDeletingGroupScore(null);
+      setIsLoading(false);
+    }
+  };
+
   const handleCloseModal = () => {
     setIsOpen(false);
     setEditingGroupScore(null);
@@ -125,6 +151,8 @@ export default function TrainingPage() {
       { id: "status", label: "Status", icon: Calendar },
     ],
   });
+
+  const isDisabled = trainingStatus === TrainingStatus.Completed || trainingStatus === TrainingStatus.Canceled;
 
   const renderComponent = () => {
     if (activeTab.id === "session-stats") {
@@ -139,7 +167,12 @@ export default function TrainingPage() {
     if (activeTab.id === "group-stats") {
       return (
         <div className="grid grid-cols-1 gap-4">
-          <GroupStatsTable onGroupStatsClick={handleSessionClick} onGroupStatsEditClick={handleEditGroupScore} />
+          <GroupStatsTable
+            onGroupStatsClick={handleSessionClick}
+            onGroupStatsEditClick={handleEditGroupScore}
+            onGroupStatsDeleteClick={handleDeleteGroupScore}
+            disabled={isDisabled}
+          />
         </div>
       );
     }
@@ -165,7 +198,11 @@ export default function TrainingPage() {
           {
             label: "Add Session",
             onClick: () => {
-              navigate(`/training/${id}/session-stats-full`);
+              if (isDisabled) {
+                toast.error("Training session is completed or canceled");
+              } else {
+                navigate(`/training/${id}/session-stats-full`);
+              }
             },
           },
           {
@@ -191,6 +228,14 @@ export default function TrainingPage() {
         isLoading={isLoading}
         onSubmit={handleCreateGroupScore}
         initialData={editingGroupScore}
+      />
+      <BaseConfirmDeleteModal
+        isLoading={isLoading}
+        isOpen={isConfirmDeleteModalOpen}
+        onClose={() => setIsConfirmDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Group Score"
+        message="Are you sure you want to delete this group score?"
       />
     </SpPage>
   );

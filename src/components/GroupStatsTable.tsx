@@ -1,4 +1,4 @@
-import { Edit, Target, MoreVertical, BarChart } from "lucide-react";
+import { Edit, Target, MoreVertical, BarChart, Trash } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
@@ -14,10 +14,17 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/r
 interface GroupStatsTableProps {
   onGroupStatsClick?: (group: GroupingScoreEntry) => void;
   onGroupStatsEditClick?: (group: GroupingScoreEntry) => void;
+  onGroupStatsDeleteClick?: (group: GroupingScoreEntry) => void;
   newlyAddedGroupId?: string | null;
+  disabled?: boolean;
 }
 
-export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newlyAddedGroupId }: GroupStatsTableProps) {
+export default function GroupStatsTable({
+  onGroupStatsEditClick = () => {},
+  onGroupStatsDeleteClick = () => {},
+  newlyAddedGroupId,
+  disabled,
+}: GroupStatsTableProps) {
   const { theme } = useTheme();
   const { id } = useParams();
 
@@ -163,45 +170,58 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
     },
   ];
 
-  const actions = (row: GroupingScoreEntry) => (
-    <div className="inline-flex gap-1 sm:gap-2">
-      <Dropdown>
-        <DropdownTrigger>
-          <button
-            onClick={(e) => e.stopPropagation()}
-            className={`p-1.5 sm:p-2 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
-            title="More options"
+  const actions = (row: GroupingScoreEntry) => {
+    if (disabled || isLoading) return null;
+
+    return (
+      <div className="inline-flex gap-1 sm:gap-2">
+        <Dropdown>
+          <DropdownTrigger>
+            <button
+              onClick={(e) => e.stopPropagation()}
+              className={`p-1.5 sm:p-2 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+              title="More options"
+            >
+              <MoreVertical size={16} />
+            </button>
+          </DropdownTrigger>
+          <DropdownMenu
+            aria-label="Group actions"
+            className={`${theme === "dark" ? "bg-zinc-900" : "bg-white"} rounded-lg shadow-lg border ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}
           >
-            <MoreVertical size={16} />
-          </button>
-        </DropdownTrigger>
-        <DropdownMenu
-          aria-label="Group actions"
-          className={`${theme === "dark" ? "bg-zinc-900" : "bg-white"} rounded-lg shadow-lg border ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}
-        >
-          <DropdownItem
-            key="stats"
-            className={`text-sm ${theme === "dark" ? "text-gray-200 hover:bg-zinc-800" : "text-gray-700 hover:bg-gray-50"}`}
-            onPress={async () => {
-              await getGroupingScoreComparisonById(row.id);
-              setIsModalOpen(true);
-            }}
-            startContent={<BarChart size={14} />}
-          >
-            Show Stats
-          </DropdownItem>
-          <DropdownItem
-            key="edit"
-            className={`text-sm ${theme === "dark" ? "text-gray-200 hover:bg-zinc-800" : "text-gray-700 hover:bg-gray-50"}`}
-            onPress={() => onGroupStatsEditClick(row)}
-            startContent={<Edit size={14} />}
-          >
-            Edit
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-    </div>
-  );
+            <DropdownItem
+              key="stats"
+              className={`text-sm ${theme === "dark" ? "text-gray-200 hover:bg-zinc-800" : "text-gray-700 hover:bg-gray-50"}`}
+              onPress={async () => {
+                await getGroupingScoreComparisonById(row.id);
+                setIsModalOpen(true);
+              }}
+              startContent={<BarChart size={14} />}
+            >
+              Show Stats
+            </DropdownItem>
+            <DropdownItem
+              key="edit"
+              className={`text-sm ${theme === "dark" ? "text-gray-200 hover:bg-zinc-800" : "text-gray-700 hover:bg-gray-50"}`}
+              onPress={() => onGroupStatsEditClick(row)}
+              startContent={<Edit size={14} />}
+            >
+              Edit
+            </DropdownItem>
+
+            <DropdownItem
+              key="delete"
+              className={`text-sm text-red-500 ${theme === "dark" ? "hover:bg-zinc-800" : "hover:bg-gray-50"}`}
+              onPress={() => onGroupStatsDeleteClick(row)}
+              startContent={<Trash size={14} />}
+            >
+              Delete
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      </div>
+    );
+  };
 
   const hasMore = (currentPage + 1) * GROUP_LIMIT < groupingScoresTotalCount;
 
