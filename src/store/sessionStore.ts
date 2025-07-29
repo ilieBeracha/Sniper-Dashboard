@@ -4,6 +4,7 @@ import {
   getGroupingScoreComparisonById,
   getSessionStatsCountByTrainingId,
   saveCompleteSession,
+  deleteGroupScoreService,
   updateGroupScoreService,
 } from "@/services/sessionService";
 import type { CreateSessionStatsData, CreateParticipantData, CreateTargetStatsData, CreateTargetEngagementData } from "@/types/sessionStats";
@@ -26,6 +27,7 @@ interface SessionStatsState {
   createGroupScore: (groupScore: any) => Promise<any>;
   updateGroupScore: (id: string, groupScore: any) => Promise<any>;
   getGroupingScoreComparisonById: (groupScoreId: string) => Promise<any>;
+  deleteGroupScore: (id: string) => Promise<any>;
   groupStats: any[];
   groupStatsComparison: GroupStatsComparison | null | undefined;
 }
@@ -221,6 +223,12 @@ export const sessionStore = create<SessionStatsState>((set) => ({
   },
   updateGroupScore: async (id: string, groupScore: any) => {
     const res = await updateGroupScoreService(id, groupScore);
+    set({ groupStats: res });
+    return res;
+  },
+
+  deleteGroupScore: async (id: string) => {
+    const res = await deleteGroupScoreService(id);
     set({ groupStats: res });
     return res;
   },

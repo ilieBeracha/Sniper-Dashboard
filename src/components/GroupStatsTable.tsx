@@ -1,4 +1,4 @@
-import { Edit, Target, MoreVertical, BarChart } from "lucide-react";
+import { Edit, Target, MoreVertical, BarChart, Trash } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
@@ -14,10 +14,15 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/r
 interface GroupStatsTableProps {
   onGroupStatsClick?: (group: GroupingScoreEntry) => void;
   onGroupStatsEditClick?: (group: GroupingScoreEntry) => void;
+  onGroupStatsDeleteClick?: (group: GroupingScoreEntry) => void;
   newlyAddedGroupId?: string | null;
 }
 
-export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newlyAddedGroupId }: GroupStatsTableProps) {
+export default function GroupStatsTable({
+  onGroupStatsEditClick = () => {},
+  onGroupStatsDeleteClick = () => {},
+  newlyAddedGroupId,
+}: GroupStatsTableProps) {
   const { theme } = useTheme();
   const { id } = useParams();
 
@@ -197,6 +202,15 @@ export default function GroupStatsTable({ onGroupStatsEditClick = () => {}, newl
             startContent={<Edit size={14} />}
           >
             Edit
+          </DropdownItem>
+
+          <DropdownItem
+            key="delete"
+            className={`text-sm text-red-500 ${theme === "dark" ? "hover:bg-zinc-800" : "hover:bg-gray-50"}`}
+            onPress={() => onGroupStatsDeleteClick(row)}
+            startContent={<Trash size={14} />}
+          >
+            Delete
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
