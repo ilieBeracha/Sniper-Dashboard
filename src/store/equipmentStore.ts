@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { createEquipment, getEquipmentsByTeamId, updateEquipment } from "@/services/equipmentService";
+import { createEquipment, getEquipmentsByTeamId, updateEquipment, deleteEquipment } from "@/services/equipmentService";
 import { Equipment } from "@/types/equipment";
 
 interface EquipmentStore {
@@ -8,6 +8,7 @@ interface EquipmentStore {
   getEquipments: (teamId: string) => Promise<void>;
   createEquipment: (equipment: Equipment) => Promise<void>;
   updateEquipment: (id: string, equipment: Partial<Equipment>) => Promise<void>;
+  deleteEquipment: (id: string) => Promise<void>;
 }
 
 export const equipmentStore = create(
@@ -32,6 +33,11 @@ export const equipmentStore = create(
             equipments: get().equipments.map((e) => (e.id === id ? { ...e, ...updatedEquipment } : e)),
           });
         }
+      },
+
+      deleteEquipment: async (id: string) => {
+        await deleteEquipment(id);
+        set({ equipments: get().equipments.filter((e) => e.id !== id) });
       },
     }),
     {

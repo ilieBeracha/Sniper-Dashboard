@@ -6,7 +6,7 @@ import { isCommander } from "@/utils/permissions";
 import { userStore } from "@/store/userStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { UserRole } from "@/types/user";
-import { SpTable, SpTableColumn, SpTableFilter } from "@/layouts/SpTable";
+import { SpTable, SpTableActions, SpTableColumn, SpTableFilter } from "@/layouts/SpTable";
 import { Edit, Trash2, MoreHorizontal, Target, Search } from "lucide-react";
 
 export default function DashboardTeamTable() {
@@ -176,7 +176,7 @@ export default function DashboardTeamTable() {
         filters={filters as SpTableFilter[]}
         searchPlaceholder="Search by name, email, or role..."
         searchFields={["first_name", "last_name", "email", "user_role"]}
-        actions={actions}
+        actions={actions as SpTableActions}
         emptyState={
           <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
             <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />

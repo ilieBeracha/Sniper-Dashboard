@@ -1,7 +1,6 @@
-import { Eye, Edit, FileText, ChevronRight, ChevronDown } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
+import { FileText } from "lucide-react";
 import { format } from "date-fns";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useStore } from "zustand";
 import { sessionStore } from "@/store/sessionStore";
 import { useParams } from "react-router-dom";
@@ -12,13 +11,8 @@ interface SessionStatsTableProps {
   onSessionStatsClick: (session: any) => void;
   onSessionStatsEditClick: (session: any) => void;
   newlyAddedSessionId?: string | null;
-}
-
-interface GroupedAssignment {
-  assignmentId: string;
-  assignmentName: string;
-  sessions: any[];
-  expanded: boolean;
+  onSessionStatsDeleteClick?: (session: any) => void;
+  deletingSessionId?: string | null;
 }
 
 export default function SessionStatsTable({
@@ -26,8 +20,9 @@ export default function SessionStatsTable({
   onSessionStatsClick,
   onSessionStatsEditClick,
   newlyAddedSessionId,
+  onSessionStatsDeleteClick,
+  deletingSessionId,
 }: SessionStatsTableProps) {
-  const { theme } = useTheme();
   const { id } = useParams();
   const { getSessionStatsByTrainingId, getSessionStatsCountByTrainingId } = useStore(sessionStore);
 
@@ -39,9 +34,6 @@ export default function SessionStatsTable({
   const [totalCount, setTotalCount] = useState(0);
   const SESSION_LIMIT = 20;
 
-  // Expanded groups state - initialize with all groups expanded
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
-  const [isInitialized, setIsInitialized] = useState(false);
   const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false);
 
   // Load paginated session stats
@@ -88,94 +80,22 @@ export default function SessionStatsTable({
     loadInitialData();
   }, [id]);
 
-  // Removed this effect to prevent reloading when switching tabs
-  // Data is already loaded from the Training page
-
   useEffect(() => {
-    if (newlyAddedSessionId) {
+    if (newlyAddedSessionId || deletingSessionId) {
       loadSessionStats(0, true);
+      if (deletingSessionId && id) {
+        getSessionStatsCountByTrainingId(id).then((count) => setTotalCount(count));
+      }
     }
-  }, [newlyAddedSessionId]);
+  }, [newlyAddedSessionId, deletingSessionId, id]);
 
-  // Initialize expanded groups when data loads
+  // Reload data when sessionStats prop changes (e.g., after deletion)
   useEffect(() => {
-    if (paginatedSessionStats.length > 0 && !isInitialized) {
-      const assignmentIds = new Set<string>();
-      paginatedSessionStats.forEach((session) => {
-        if (session.assignment_id) {
-          assignmentIds.add(session.assignment_id);
-        }
-      });
-      setExpandedGroups(assignmentIds);
-      setIsInitialized(true);
+    if (sessionStats && id && sessionStats !== paginatedSessionStats) {
+      loadSessionStats(0, true);
+      getSessionStatsCountByTrainingId(id).then((count) => setTotalCount(count));
     }
-  }, [paginatedSessionStats, isInitialized]);
-
-  // Group sessions by assignment
-  const groupedData = useMemo(() => {
-    const groups: Record<string, GroupedAssignment> = {};
-
-    paginatedSessionStats.forEach((session) => {
-      const assignmentId = session.assignment_id;
-      const assignmentName = session.assignment_session?.assignment?.assignment_name || "Unknown Assignment";
-
-      if (!groups[assignmentId]) {
-        groups[assignmentId] = {
-          assignmentId,
-          assignmentName,
-          sessions: [],
-          expanded: expandedGroups.has(assignmentId),
-        };
-      }
-
-      groups[assignmentId].sessions.push(session);
-    });
-
-    // Convert to array and sort by assignment name
-    return Object.values(groups).sort((a, b) => a.assignmentName.localeCompare(b.assignmentName));
-  }, [paginatedSessionStats, expandedGroups]);
-
-  // Flatten grouped data for table display
-  const flattenedData = useMemo(() => {
-    const flattened: any[] = [];
-
-    groupedData.forEach((group) => {
-      // Add group header
-      flattened.push({
-        id: `group-${group.assignmentId}`,
-        isGroup: true,
-        assignmentId: group.assignmentId,
-        assignmentName: group.assignmentName,
-        sessionCount: group.sessions.length,
-        expanded: group.expanded,
-      });
-
-      // Add sessions if expanded
-      if (group.expanded) {
-        group.sessions.forEach((session) => {
-          flattened.push({
-            ...session,
-            isGroup: false,
-            isChild: true,
-          });
-        });
-      }
-    });
-
-    return flattened;
-  }, [groupedData]);
-
-  const toggleGroup = (assignmentId: string) => {
-    setExpandedGroups((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(assignmentId)) {
-        newSet.delete(assignmentId);
-      } else {
-        newSet.add(assignmentId);
-      }
-      return newSet;
-    });
-  };
+  }, [sessionStats?.length, id]);
 
   // Pagination handlers
   const nextPage = () => {
@@ -192,41 +112,35 @@ export default function SessionStatsTable({
 
   const columns = [
     {
-      key: "assignment",
-      label: "Assignment / Session",
+      key: "session",
+      label: "Session",
       render: (_value: any, row: any) => {
-        if (row.isGroup) {
-          return (
-            <div className="flex items-center gap-2 font-semibold">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleGroup(row.assignmentId);
-                }}
-                className="p-1 equipments rounded transition-colors"
-              >
-                {row.expanded ? <ChevronDown className="w-4 h-4 " /> : <ChevronRight className="w-4 h-4 " />}
-              </button>
-              <span>{row.assignmentName}</span>
-              <span className="text-sm ">({row.sessionCount})</span>
-            </div>
-          );
-        }
         return (
-          <div className={`${row.isChild ? "pl-8" : ""} flex items-center gap-2`}>
-            <span className="text-sm ">•</span>
-            <span className="truncate max-w-[150px]">Session {format(new Date(row.created_at), "MMM dd, HH:mm")}</span>
+          <div className="flex items-center gap-2">
+            <span className="truncate max-w-[200px]">{format(new Date(row.created_at), "MMM dd, yyyy 'at' HH:mm")}</span>
           </div>
         );
       },
-      className: "px-4 sm:px-4 py-3",
+      className: "px-4 sm:px-4 py-6",
+    },
+    {
+      key: "assignment",
+      label: "Assignment",
+      render: (_value: any, row: any) => {
+        const assignmentName = row.assignment_session?.assignment?.assignment_name || "Unknown Assignment";
+        return (
+          <span className="truncate max-w-[150px]" title={assignmentName}>
+            {assignmentName}
+          </span>
+        );
+      },
+      className: "px-2 sm:px-4 py-3",
     },
     {
       key: "creator",
       label: "Creator",
       render: (_value: any, row: any) => {
         void _value; // Mark as used to satisfy TypeScript
-        if (row.isGroup) return null;
         const creator = row.users;
         return (
           <span className="truncate max-w-[80px] sm:max-w-none">
@@ -239,8 +153,7 @@ export default function SessionStatsTable({
     {
       key: "day_period",
       label: "Day/Night",
-      render: (value: string, row: any) => {
-        if (row.isGroup) return null;
+      render: (value: string) => {
         return <span className="capitalize">{value || "N/A"}</span>;
       },
       className: "px-2 sm:px-4 py-3 hidden lg:table-cell",
@@ -249,8 +162,7 @@ export default function SessionStatsTable({
     {
       key: "time_to_first_shot_sec",
       label: "Time to First Shot",
-      render: (value: number | null, row: any) => {
-        if (row.isGroup) return null;
+      render: (value: number | null) => {
         return value !== null ? `${value}s` : "N/A";
       },
       className: "px-2 sm:px-4 py-3 hidden lg:table-cell",
@@ -259,8 +171,7 @@ export default function SessionStatsTable({
     {
       key: "note",
       label: "Note",
-      render: (value: string, row: any) => {
-        if (row.isGroup) return null;
+      render: (value: string) => {
         return value ? (
           <span className="truncate max-w-[100px]" title={value}>
             {value}
@@ -273,35 +184,6 @@ export default function SessionStatsTable({
       hideOnMobile: true,
     },
   ];
-
-  const actions = (row: any) => {
-    if (row.isGroup) return null;
-
-    return (
-      <div className="inline-flex gap-1 sm:gap-2">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onSessionStatsClick(row);
-          }}
-          className={`p-1.5 sm:p-2 rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
-          title="View"
-        >
-          <Eye size={14} className="sm:w-4 sm:h-4" />
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onSessionStatsEditClick(row);
-          }}
-          className={`p-1.5 sm:p-2 rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
-          title="Edit"
-        >
-          <Edit size={14} className="sm:w-4 sm:h-4" />
-        </button>
-      </div>
-    );
-  };
 
   const pagination = {
     currentPage,
@@ -326,19 +208,18 @@ export default function SessionStatsTable({
 
   return (
     <SpTable
-      data={flattenedData}
+      data={paginatedSessionStats}
       columns={columns}
       filters={[]}
       searchPlaceholder="Search..."
-      onRowClick={(row) => {
-        if (!row.isGroup) {
-          onSessionStatsClick(row);
-        }
+      actions={{
+        onRowClick: onSessionStatsClick,
+        onEdit: onSessionStatsEditClick,
+        onDelete: onSessionStatsDeleteClick,
       }}
-      actions={actions}
       loading={isLoading}
       pagination={pagination}
-      highlightRow={(row) => !row.isGroup && row.id === newlyAddedSessionId}
+      highlightRow={(row) => row.id === newlyAddedSessionId}
       emptyState={
         <div className={`text-center py-12 `}>
           <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />

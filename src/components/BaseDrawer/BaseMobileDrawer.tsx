@@ -8,11 +8,13 @@ export default function BaseMobileDrawer({
   title,
   isOpen,
   setIsOpen,
+  onClose,
 }: {
   children: React.ReactNode;
   title: string;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  onClose?: () => void;
 }) {
   const { theme } = useTheme();
 
@@ -39,7 +41,7 @@ export default function BaseMobileDrawer({
                   <div className="flex items-center justify-between">
                     <DialogTitle className={`text-lg font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{title}</DialogTitle>
                     <button
-                      onClick={() => setIsOpen(false)}
+                      onClick={onClose}
                       className={`p-1.5 rounded-full transition-colors focus:outline-none focus:ring-2 ${
                         theme === "dark"
                           ? "hover:bg-zinc-800 text-zinc-400 hover:text-white focus:ring-zinc-700"

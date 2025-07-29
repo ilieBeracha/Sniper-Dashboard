@@ -6,53 +6,90 @@ import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
 import BaseInput from "@/components/base/BaseInput";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import { FileQuestion } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { toast } from "react-toastify";
 import { BASE_EQUIPMENTS } from "@/utils/BaseData/BaseEquipments";
 import { primitives } from "@/styles/core";
+import { Equipment } from "@/types/equipment";
+import BaseConfirmDeleteModal from "./BaseConfirmDeleteModal";
 
 export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) {
-  const { equipments, createEquipment } = useStore(equipmentStore);
+  const { equipments, createEquipment, updateEquipment, deleteEquipment } = useStore(equipmentStore);
   const { user } = useStore(userStore);
   const { theme } = useTheme();
   const isMobile = useIsMobile();
-
+  const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
+  const [isDeleteEquipment, setIsDeleteEquipment] = useState(false);
   const equipmentsTypes = new Set(BASE_EQUIPMENTS.map((equipment) => equipment.equipment_type));
   const teamId = user?.team_id;
 
   const [equipmentForm, setEquipmentForm] = useState({
-    equipment_type: "",
+    equipment_type: "", // TODO: add default value from BASE_EQUIPMENTS
     serial_number: "",
     day_night: "",
-    team_id: teamId,
+    team_id: teamId as string,
   });
 
+  useEffect(() => {
+    if (selectedEquipment) {
+      setEquipmentForm({ ...selectedEquipment });
+    }
+  }, [selectedEquipment]);
+
   async function handleCreateEquipment() {
-    if (equipmentForm.equipment_type === "" || equipmentForm.serial_number === "" || equipmentForm.day_night === "") {
+    if (equipmentForm?.equipment_type === "" || equipmentForm?.serial_number === "" || equipmentForm?.day_night === "") {
       toast.info("Please fill all the fields");
       return;
     }
-    await createEquipment(equipmentForm as any);
-    setIsOpen(false);
+    try {
+      if (selectedEquipment) {
+        await updateEquipment(selectedEquipment.id!, equipmentForm as any);
+        toast.success("Equipment updated successfully");
+      } else {
+        await createEquipment(equipmentForm as any);
+        toast.success("Equipment created successfully");
+      }
+      setEquipmentForm(equipmentForm);
+    } catch (error) {
+      toast.error("Failed to create equipment");
+    } finally {
+      setIsOpen(false);
+    }
   }
 
+  const handleCancel = () => {
+    setEquipmentForm({
+      equipment_type: "",
+      serial_number: "",
+      day_night: "",
+      team_id: teamId as string,
+    });
+    setIsOpen(false);
+  };
+
+  const handleDeleteEquipment = (equipment: Equipment) => {
+    setIsDeleteEquipment(true);
+    setSelectedEquipment(equipment);
+  };
+
+  const handleEditEquipment = (equipment: Equipment) => {
+    setSelectedEquipment(equipment);
+    setIsOpen(true);
+  };
+
+  const handleDeleteEquipmentConfirm = () => {
+    deleteEquipment(selectedEquipment!.id!);
+    toast.success("Equipment deleted successfully");
+    setIsDeleteEquipment(false);
+    setSelectedEquipment(null);
+  };
   const EquipmentContent = (
     <div
       className={` ${isMobile ? "w-full" : "w-[600px]"} p-4 space-y-6 transition-colors duration-200`}
       style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}
     >
-      <div>
-        <h2 className="text-xl font-semibold">New Equipment</h2>
-        <p
-          className="mt-1 text-sm transition-colors duration-200"
-          style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}
-        >
-          Add new equipment to the inventory.
-        </p>
-      </div>
-
       <select
         className="w-full min-h-9 rounded-lg px-3 py-2 text-sm border transition-colors duration-200"
         style={{
@@ -60,7 +97,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
           color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
           borderColor: theme === "dark" ? primitives.grey.grey700 : primitives.grey.grey300,
         }}
-        value={equipmentForm.equipment_type}
+        value={equipmentForm?.equipment_type}
         onChange={(e) => setEquipmentForm({ ...equipmentForm, equipment_type: e.target.value })}
       >
         <option value="">Select equipment</option>
@@ -76,7 +113,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
       <BaseInput
         label="Serial Number (Name)"
         type="text"
-        value={equipmentForm.serial_number}
+        value={equipmentForm?.serial_number}
         onChange={(e) => setEquipmentForm({ ...equipmentForm, serial_number: e.target.value })}
         placeholder="Enter serial number"
         leftIcon={<FileQuestion size={16} style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey500 }} />}
@@ -97,7 +134,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
             color: theme === "dark" ? primitives.white.white : primitives.grey.grey900,
             borderColor: theme === "dark" ? primitives.grey.grey700 : primitives.grey.grey300,
           }}
-          value={equipmentForm.day_night}
+          value={equipmentForm?.day_night}
           onChange={(e) => setEquipmentForm({ ...equipmentForm, day_night: e.target.value })}
         >
           <option value="">Select day/night</option>
@@ -109,7 +146,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
       <div className="flex items-center justify-end gap-x-4">
         <button
           type="button"
-          onClick={() => setIsOpen(false)}
+          onClick={handleCancel}
           className="px-4 py-1.5 transition-colors rounded-md text-sm font-medium"
           style={{
             backgroundColor: theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey100,
@@ -139,7 +176,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
             e.currentTarget.style.backgroundColor = primitives.blue.blue500;
           }}
         >
-          Create
+          {selectedEquipment ? "Update" : "Create"}
         </button>
       </div>
     </div>
@@ -169,18 +206,36 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
           </div>
         </div>
       </div>
-      <AssetsEquipmentTable equipments={equipments} />
+      <AssetsEquipmentTable equipments={equipments} onDeleteEquipment={handleDeleteEquipment} onEditEquipment={handleEditEquipment} />
 
       {!isMobile && (
-        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={setIsOpen} title="new equipments">
+        <BaseDesktopDrawer
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          title={selectedEquipment?.id ? "Edit Equipment" : "New Equipment"}
+          onClose={handleCancel}
+        >
           {EquipmentContent}
         </BaseDesktopDrawer>
       )}
       {isMobile && (
-        <BaseMobileDrawer isOpen={isOpen} setIsOpen={setIsOpen} title="new equipments">
+        <BaseMobileDrawer
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          title={selectedEquipment?.id ? "Edit Equipment" : "New Equipment"}
+          onClose={handleCancel}
+        >
           {EquipmentContent}
         </BaseMobileDrawer>
       )}
+      <BaseConfirmDeleteModal
+        isOpen={isDeleteEquipment}
+        onClose={() => setIsDeleteEquipment(false)}
+        onConfirm={handleDeleteEquipmentConfirm}
+        title="Delete Equipment"
+        message="Are you sure you want to delete this equipment?"
+        isLoading={false}
+      />
     </div>
   );
 }

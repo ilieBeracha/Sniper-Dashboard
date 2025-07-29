@@ -12,8 +12,13 @@ import { Target, Clock, TrendingUp, Users, Activity, Award } from "lucide-react"
 const CommanderView = () => {
   const { theme } = useTheme();
   const { user } = useStore(userStore);
-  const { squadMajorityPerformance, fetchSquadMajorityPerformance, commanderUserRoleBreakdown, fetchCommanderUserRoleBreakdown } =
-    useStore(performanceStore);
+  const {
+    squadMajorityPerformance,
+    fetchSquadMajorityPerformance,
+    commanderUserRoleBreakdown,
+    fetchCommanderUserRoleBreakdown,
+    getGroupingStatsByTeamIdCommander,
+  } = useStore(performanceStore);
 
   const [loading, setLoading] = useState(true);
 
@@ -22,6 +27,7 @@ const CommanderView = () => {
       if (!user?.team_id) return;
       await fetchSquadMajorityPerformance(user.team_id);
       await fetchCommanderUserRoleBreakdown(user.team_id);
+      await getGroupingStatsByTeamIdCommander(user.team_id, new Date("2025-01-01"), new Date("2025-01-31"));
       setLoading(false);
     };
     load();

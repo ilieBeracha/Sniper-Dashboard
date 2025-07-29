@@ -30,9 +30,9 @@ export default function TrainingPage() {
   const { loadTrainingById, loadAssignments, createAssignment } = useStore(TrainingStore);
   const { isLoading, setIsLoading } = useStore(loaderStore);
   const { training } = useStore(TrainingStore);
-  const { getSessionStatsByTrainingId } = useStore(sessionStore);
+  const { sessionStats, getSessionStatsByTrainingId, deleteSessionStats } = useStore(sessionStore);
   const { createGroupScore, updateGroupScore, deleteGroupScore } = useStore(sessionStore);
-  const { fetchGroupingScores } = useStore(performanceStore);
+  const { fetchGroupingScores, getBestGroupingStatsByTraining } = useStore(performanceStore);
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { isOpen: isOpen, setIsOpen: setIsOpen } = useModal();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -41,6 +41,7 @@ export default function TrainingPage() {
   const [editingGroupScore, setEditingGroupScore] = useState<any>(null);
   const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] = useState(false);
   const [deletingGroupScore, setDeletingGroupScore] = useState<any>(null);
+  const [deletingSession, setDeletingSession] = useState<any>(null);
   const hasLoadedData = useRef(false);
 
   const trainingStatus = training?.status as TrainingStatus;
@@ -49,7 +50,8 @@ export default function TrainingPage() {
     if (!id || hasLoadedData.current) return;
     await loadAssignments();
     await loadTrainingById(id);
-    await getSessionStatsByTrainingId(id);
+    await getSessionStatsByTrainingId(id, 20, 0);
+    await getBestGroupingStatsByTraining(id as string);
     await fetchGroupingScores(id);
     hasLoadedData.current = true;
   }, [id]);
@@ -118,24 +120,51 @@ export default function TrainingPage() {
     setIsOpen(true);
   };
 
+  const handleEditSession = (session: any) => {
+    navigate(`/training/${id}/session-stats-full/${session.id}`);
+  };
+
+  const handleDeleteSession = (session: any) => {
+    setIsConfirmDeleteModalOpen(true);
+    setDeletingSession(session);
+  };
+
   const handleDeleteGroupScore = (group: any) => {
     setIsConfirmDeleteModalOpen(true);
     setDeletingGroupScore(group);
   };
 
   const handleConfirmDelete = async () => {
-    try {
-      setIsLoading(true);
-      await deleteGroupScore(deletingGroupScore.id);
-      await fetchGroupingScores(id as string);
-      toast.success("Group score deleted successfully");
-    } catch (error) {
-      console.error("Error deleting group score:", error);
-      toast.error("Failed to delete group score");
-    } finally {
-      setIsConfirmDeleteModalOpen(false);
-      setDeletingGroupScore(null);
-      setIsLoading(false);
+    if (deletingGroupScore) {
+      try {
+        setIsLoading(true);
+        await deleteGroupScore(deletingGroupScore.id);
+        await fetchGroupingScores(id as string);
+        toast.success("Group score deleted successfully");
+      } catch (error) {
+        console.error("Error deleting group score:", error);
+        toast.error("Failed to delete group score");
+      } finally {
+        setIsConfirmDeleteModalOpen(false);
+        setDeletingGroupScore(null);
+        setIsLoading(false);
+      }
+    }
+
+    if (deletingSession) {
+      try {
+        setIsLoading(true);
+        await deleteSessionStats(deletingSession.id);
+        await getSessionStatsByTrainingId(id as string);
+        toast.success("Session deleted successfully");
+      } catch (error) {
+        console.error("Error deleting session:", error);
+        toast.error("Failed to delete session");
+      } finally {
+        setIsConfirmDeleteModalOpen(false);
+        setDeletingSession(null);
+        setIsLoading(false);
+      }
     }
   };
 
@@ -159,7 +188,13 @@ export default function TrainingPage() {
       return (
         <div className="grid grid-cols-1 gap-4">
           <TrainingSessionStatsCard trainingSessionId={id!} />
-          <SessionStatsTable sessionStats={selectedSession} onSessionStatsClick={handleSessionClick} onSessionStatsEditClick={() => {}} />
+          <SessionStatsTable
+            sessionStats={sessionStats}
+            onSessionStatsClick={handleSessionClick}
+            onSessionStatsEditClick={handleEditSession}
+            onSessionStatsDeleteClick={handleDeleteSession}
+            deletingSessionId={deletingSession?.id}
+          />
         </div>
       );
     }
@@ -201,7 +236,7 @@ export default function TrainingPage() {
               if (isDisabled) {
                 toast.error("Training session is completed or canceled");
               } else {
-                navigate(`/training/${id}/session-stats-full`);
+                navigate(`/training/${id}/session-stats-full/ `);
               }
             },
           },
@@ -234,8 +269,8 @@ export default function TrainingPage() {
         isOpen={isConfirmDeleteModalOpen}
         onClose={() => setIsConfirmDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
-        title="Delete Group Score"
-        message="Are you sure you want to delete this group score?"
+        title={`Delete ${deletingGroupScore ? "Group Score" : "Session"}`}
+        message={`Are you sure you want to delete this ${deletingGroupScore ? "group score" : "session"}?`}
       />
     </SpPage>
   );

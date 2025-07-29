@@ -1,8 +1,9 @@
-import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { CheckCircle, AlertCircle, Loader2, Save } from "lucide-react";
 import { Target, Participant } from "../types";
 import { SectionHeader } from "./SectionHeader";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion, AnimatePresence } from "motion/react";
+import { useParams } from "react-router-dom";
 
 interface SummarySectionProps {
   section: any;
@@ -15,7 +16,7 @@ interface SummarySectionProps {
 
 export const SummarySection = ({ section, participants, targets, validationErrors, handleSubmit, isSubmitting }: SummarySectionProps) => {
   const { theme } = useTheme();
-
+  const { sessionId } = useParams();
   const totalShots = targets.reduce((total, target) => total + target.engagements.reduce((sum, eng) => sum + (eng.shotsFired || 0), 0), 0);
   const totalHits = targets.reduce((total, target) => total + target.engagements.reduce((sum, eng) => sum + (eng.targetHits || 0), 0), 0);
   const accuracy = totalShots > 0 ? Math.round((totalHits / totalShots) * 100) : 0;
@@ -133,7 +134,7 @@ export const SummarySection = ({ section, participants, targets, validationError
                   <Loader2 className="w-5 h-5 animate-spin" />
                   <span>Submitting Training Session...</span>
                 </motion.div>
-              ) : validationErrors.length === 0 ? (
+              ) : validationErrors.length === 0 && !sessionId ? (
                 <motion.div
                   key="ready"
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -144,7 +145,7 @@ export const SummarySection = ({ section, participants, targets, validationError
                   <CheckCircle className="w-5 h-5" />
                   <span>Submit Training Session</span>
                 </motion.div>
-              ) : (
+              ) : validationErrors.length > 0 && sessionId ? (
                 <motion.div
                   key="errors"
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -154,6 +155,17 @@ export const SummarySection = ({ section, participants, targets, validationError
                 >
                   <AlertCircle className="w-5 h-5" />
                   <span>Fix Errors to Submit</span>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="update"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="flex items-center gap-3"
+                >
+                  <Save className="w-5 h-5" />
+                  <span>Update Training Session</span>
                 </motion.div>
               )}
             </AnimatePresence>

@@ -8,12 +8,14 @@ export default function BaseDesktopDrawer({
   isOpen,
   setIsOpen,
   width = "1500px",
+  onClose,
 }: {
   children: React.ReactNode;
   title: string;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   width?: string;
+  onClose?: () => void;
 }) {
   const { theme } = useTheme();
 
@@ -28,7 +30,7 @@ export default function BaseDesktopDrawer({
                 <div className="px-6 flex items-center justify-between">
                   <DialogTitle className={`text-lg ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{title}</DialogTitle>
                   <button
-                    onClick={() => setIsOpen(false)}
+                    onClick={onClose}
                     className={`focus:outline-none transition-colors ${
                       theme === "dark" ? "text-white hover:text-gray-400" : "text-gray-600 hover:text-gray-800"
                     }`}

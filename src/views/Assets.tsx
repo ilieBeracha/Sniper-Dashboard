@@ -11,13 +11,6 @@ import { userStore } from "@/store/userStore";
 import { equipmentStore } from "@/store/equipmentStore";
 
 export default function AssetsPage() {
-  const { tabs, activeTab, handleTabChange } = useTabs({
-    tabs: [
-      { id: "weapons", label: "weapons", icon: FileQuestion },
-      { id: "equipments", label: "equipments", icon: Package },
-    ],
-  });
-
   const { getWeapons, weapons } = useStore(weaponsStore);
   const { getEquipments, equipments } = useStore(equipmentStore);
   const { user } = useStore(userStore);
@@ -31,7 +24,14 @@ export default function AssetsPage() {
     if (user?.team_id && equipments.length === 0) {
       getEquipments(user?.team_id as string);
     }
-  }, [user?.team_id]);
+  }, [user?.team_id, weapons.length, equipments.length]);
+
+  const { tabs, activeTab, handleTabChange } = useTabs({
+    tabs: [
+      { id: "weapons", label: "weapons", icon: FileQuestion },
+      { id: "equipments", label: "equipments", icon: Package },
+    ],
+  });
 
   return (
     <SpPage>

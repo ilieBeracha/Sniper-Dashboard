@@ -8,7 +8,7 @@ import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
 import { useEffect } from "react";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { Badge } from "@/components/ui/badge";
+import { Chip } from "@heroui/react";
 
 export default function DashboardProfileCard() {
   const { theme } = useTheme();
@@ -44,7 +44,7 @@ export default function DashboardProfileCard() {
   return (
     <div className={`w-full h-full relative flex justify-between overflow-hidden ${isMobile ? "px-4 pt-6 pb-4 " : ""}`}>
       <div className="relative z-10 h-full flex flex-col justify-between sm:p-5 lg:p-6 gap-4  rounded-lg">
-        <div>
+        <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2 mb-2">
             <h1 className={`text-sm font-light ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{getWelcomeMessage()},</h1>
           </div>
@@ -53,12 +53,24 @@ export default function DashboardProfileCard() {
           >
             {user?.first_name} {user?.last_name}
           </p>
-          <Badge variant="outline" className={`text-xs ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-            {user?.user_role?.replace("_", " ").toUpperCase()}
-          </Badge>
-
-          <Badge>{user?.team_name}</Badge>
-          {user?.squad_name && <Badge className="bg-zinc-800 text-white">{user?.squad_name}</Badge>}
+          <div className="flex flex-col gap-2">
+            <Chip variant="bordered" className={`bg-zinc-800 text-white text-xs ${theme === "dark" ? "text-white bg-purple-600" : "text-gray-900"}`}>
+              <span className="text-xs">Role: </span> {user?.user_role?.replace("_", " ").toUpperCase()}
+            </Chip>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Chip variant="bordered" className={`bg-zinc-800 text-white text-xs ${theme === "dark" ? "text-white bg-purple-800" : "text-gray-900"}`}>
+              <span className="text-xs">Team: </span> {user?.team_name}
+            </Chip>
+            {user?.squad_name && (
+              <Chip
+                variant="bordered"
+                className={`bg-zinc-800 text-white text-xs ${theme === "dark" ? "text-white bg-purple-800" : "text-gray-900"}`}
+              >
+                <span className="text-xs">Squad: </span> {user?.squad_name}
+              </Chip>
+            )}
+          </div>
         </div>
 
         {/* Team stats and info */}

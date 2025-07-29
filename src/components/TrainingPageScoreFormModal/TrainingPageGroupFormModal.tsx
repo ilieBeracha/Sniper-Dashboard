@@ -310,11 +310,11 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
   return (
     <FormProvider {...methods}>
       {isMobile ? (
-        <BaseMobileDrawer isOpen={isOpen} setIsOpen={handleClose} title={initialData ? "Edit Group Score" : "Add Group Score"}>
+        <BaseMobileDrawer isOpen={isOpen} setIsOpen={handleClose} title={initialData ? "Edit Group Score" : "Add Group Score"} onClose={handleClose}>
           {content}
         </BaseMobileDrawer>
       ) : (
-        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={handleClose} title={initialData ? "Edit Group Score" : "Add Group Score"}>
+        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={handleClose} title={initialData ? "Edit Group Score" : "Add Group Score"} onClose={handleClose}>
           {content}
         </BaseDesktopDrawer>
       )}

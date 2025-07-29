@@ -10,6 +10,7 @@ import {
   SquadMajorityPerformance,
   CommanderUserRoleBreakdown,
   GroupingScoreEntry,
+  GroupingStatsCommander,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
@@ -26,6 +27,8 @@ import {
   getSquadMajoritySessionsPerformance,
   getGroupingScoresByTraining,
   getGroupingScoresCountByTraining,
+  getGroupingStatsByTeamIdCommander,
+  getBestGroupingStatsByTraining,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/user";
@@ -71,6 +74,14 @@ interface PerformanceStore {
   groupingScoresTotalCount: number;
   fetchGroupingScores: (trainingSessionId: string, limit?: number, offset?: number) => Promise<void>;
   getGroupingScoresCount: (trainingSessionId: string) => Promise<number>;
+
+  groupingStatsCommander: GroupingStatsCommander[] | null;
+  getGroupingStatsByTeamIdCommander: (teamId: string, startDate: Date, endDate: Date) => Promise<void>;
+
+  getBestGroupingStatsByTraining: (
+    trainingSessionId: string,
+  ) => Promise<{ total_groups: number; avg_dispersion: number; best_dispersion: number } | null>;
+  bestGroupingByTraining: { total_groups: number; avg_dispersion: number; best_dispersion: number } | null;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
@@ -87,7 +98,8 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   squadMajorityPerformance: null,
   groupingScores: null,
   groupingScoresTotalCount: 0,
-
+  groupingStatsCommander: null,
+  bestGroupingByTraining: null,
   fetchGroupingScores: async (trainingSessionId: string, limit: number = 20, offset: number = 0) => {
     try {
       set({ isLoading: true });
@@ -110,6 +122,23 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       console.error("Failed to load grouping scores count:", error);
       set({ groupingScoresTotalCount: 0 });
       return 0;
+    }
+  },
+
+  getBestGroupingStatsByTraining: async (
+    trainingSessionId: string,
+  ): Promise<{ total_groups: number; avg_dispersion: number; best_dispersion: number }> => {
+    try {
+      set({ isLoading: true });
+      const data = await getBestGroupingStatsByTraining(trainingSessionId);
+      set({ bestGroupingByTraining: data });
+      return data;
+    } catch (error) {
+      console.error("Failed to load best grouping by training:", error);
+      set({ bestGroupingByTraining: { total_groups: 0, avg_dispersion: 0, best_dispersion: 0 } });
+      return { total_groups: 0, avg_dispersion: 0, best_dispersion: 0 };
+    } finally {
+      set({ isLoading: false });
     }
   },
 
@@ -258,6 +287,16 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       set({ squadMajorityPerformance: null });
     } finally {
       set({ isLoading: false });
+    }
+  },
+
+  getGroupingStatsByTeamIdCommander: async (teamId: string, startDate: Date, endDate: Date) => {
+    try {
+      const data = await getGroupingStatsByTeamIdCommander(teamId, startDate, endDate);
+      set({ groupingStatsCommander: data });
+    } catch (error) {
+      console.error("Failed to load grouping stats:", error);
+      set({ groupingStatsCommander: null });
     }
   },
 }));

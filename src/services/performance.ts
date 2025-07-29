@@ -105,6 +105,18 @@ export async function getGroupingScoresByTraining(trainingSessionId: string, lim
   }));
 }
 
+export async function getBestGroupingStatsByTraining(
+  trainingSessionId: string,
+): Promise<{ total_groups: number; avg_dispersion: number; best_dispersion: number }> {
+  const { data, error } = await supabase.rpc("get_best_training_group_stats", { p_training_session_id: trainingSessionId });
+  if (error) {
+    console.error("Error fetching best grouping by training:", error.message);
+    throw new Error("Failed to fetch best grouping by training");
+  }
+
+  return data[0];
+}
+
 export async function getGroupingScoresCountByTraining(trainingSessionId: string): Promise<number> {
   const { count, error } = await supabase
     .from("group_scores")
@@ -269,7 +281,7 @@ export const getSquadMajoritySessionsPerformance = async (teamId: string): Promi
 };
 
 export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsageStats> {
-  const { data, error } = await supabase.rpc("get_weapon_usage_stats", {
+  const { data, error } = await supabase.rpc("get_weapon_stats_summary", {
     p_weapon_id: weaponId,
   });
 
@@ -277,6 +289,7 @@ export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsage
     console.error("Error fetching weapon usage stats:", error.message);
     throw error;
   }
+  console.log("data", data);
 
   const rawResult = data?.[0];
   const result = rawResult
@@ -298,4 +311,19 @@ export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsage
       };
 
   return result;
+}
+
+export async function getGroupingStatsByTeamIdCommander(teamId: string, startDate: Date, endDate: Date) {
+  console.log("startDate", startDate);
+  console.log("endDate", endDate);
+  const { data, error } = await supabase.rpc("get_grouping_stats_for_team", {
+    p_team_id: teamId,
+  });
+
+  if (error) {
+    console.error("Error fetching grouping stats:", error);
+    throw error;
+  }
+
+  return data;
 }
