@@ -12,6 +12,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { toast } from "react-toastify";
 import { BASE_EQUIPMENTS } from "@/utils/BaseData/BaseEquipments";
 import { primitives } from "@/styles/core";
+import { Equipment } from "@/types/equipment";
 
 export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) {
   const { equipments, createEquipment } = useStore(equipmentStore);
@@ -37,6 +38,10 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
     await createEquipment(equipmentForm as any);
     setIsOpen(false);
   }
+
+  const handleDeleteEquipment = (equipment: Equipment) => {
+    console.log(equipment);
+  };
 
   const EquipmentContent = (
     <div
@@ -169,7 +174,7 @@ export default function EquipmentTab({ isOpen, setIsOpen }: { isOpen: boolean; s
           </div>
         </div>
       </div>
-      <AssetsEquipmentTable equipments={equipments} />
+      <AssetsEquipmentTable equipments={equipments} onDeleteEquipment={handleDeleteEquipment} />
 
       {!isMobile && (
         <BaseDesktopDrawer isOpen={isOpen} setIsOpen={setIsOpen} title="new equipments">

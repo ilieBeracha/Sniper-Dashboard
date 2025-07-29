@@ -12,6 +12,7 @@ import { isMobile } from "react-device-detect";
 import { toast } from "react-toastify";
 import { BASE_WEAPONS } from "@/utils/BaseData/BaseWeapons";
 import { primitives } from "@/styles/core";
+import { Weapon } from "@/types/weapon";
 
 export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) {
   const { weapons, createWeapon } = useStore(weaponsStore);
@@ -36,6 +37,14 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
     await createWeapon(weaponForm as any);
     setIsOpen(false);
   }
+
+  const handleDeleteWeapon = (weapon: Weapon) => {
+    console.log(weapon);
+  };
+
+  const handleEditWeapon = (weapon: Weapon) => {
+    console.log(weapon);
+  };
 
   const WeaponsContent = (
     <div
@@ -155,7 +164,7 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
         </div>
       </div>
 
-      <AssetsWeaponsTable weapons={weapons} />
+      <AssetsWeaponsTable weapons={weapons} onDeleteWeapon={handleDeleteWeapon} onEditWeapon={handleEditWeapon} />
 
       {!isMobile && (
         <BaseDesktopDrawer isOpen={isOpen} setIsOpen={setIsOpen} title="new weapons">

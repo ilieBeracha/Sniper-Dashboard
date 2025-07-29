@@ -6,6 +6,9 @@ import {
   saveCompleteSession,
   deleteGroupScoreService,
   updateGroupScoreService,
+  getFullSessionById,
+  deleteSessionStatsService,
+  updateCompleteSession,
 } from "@/services/sessionService";
 import type { CreateSessionStatsData, CreateParticipantData, CreateTargetStatsData, CreateTargetEngagementData } from "@/types/sessionStats";
 import { TrainingStore } from "./trainingStore";
@@ -22,14 +25,24 @@ interface SessionStatsState {
   setError: (error: string | null) => void;
   clearError: () => void;
   saveSessionStats: (sessionData: SessionStatsSaveData) => Promise<any>;
-  getSessionStatsByTrainingId: (trainingId: string, limit?: number, offset?: number) => Promise<any[]>;
+  updateSessionStats: (sessionId: string, sessionData: SessionStatsSaveData) => Promise<any>;
+  getSessionStatsByTrainingId: (
+    trainingId: string,
+    limit?: number,
+    offset?: number,
+    filter?: { assignmentId: string | null; squadId: string | null },
+  ) => Promise<any[]>;
   getSessionStatsCountByTrainingId: (trainingId: string) => Promise<number>;
   createGroupScore: (groupScore: any) => Promise<any>;
   updateGroupScore: (id: string, groupScore: any) => Promise<any>;
   getGroupingScoreComparisonById: (groupScoreId: string) => Promise<any>;
   deleteGroupScore: (id: string) => Promise<any>;
+  selectedSession: any | null;
+  setSelectedSession: (session: any) => void;
   groupStats: any[];
   groupStatsComparison: GroupStatsComparison | null | undefined;
+  getFullSessionById: (id: string) => Promise<any>;
+  deleteSessionStats: (id: string) => Promise<any>;
 }
 
 export interface GroupStatsComparison {
@@ -90,6 +103,7 @@ export interface SessionStatsSaveData {
 
 export const sessionStore = create<SessionStatsState>((set) => ({
   sessionStats: [],
+  selectedSession: null,
   groupStats: [],
   groupStatsComparison: null,
   isLoading: false,
@@ -99,9 +113,15 @@ export const sessionStore = create<SessionStatsState>((set) => ({
   setLoading: (loading: boolean) => set({ isLoading: loading }),
   setError: (error: string | null) => set({ error }),
   clearError: () => set({ error: null }),
+  setSelectedSession: (session: any) => set({ selectedSession: session }),
 
-  getSessionStatsByTrainingId: async (trainingId: string, limit: number = 20, offset: number = 0) => {
-    const result = await getSessionStatsByTrainingId(trainingId, limit, offset);
+  getSessionStatsByTrainingId: async (
+    trainingId: string,
+    limit: number = 20,
+    offset: number = 0,
+    filter: { assignmentId: string | null; squadId: string | null } = { assignmentId: null, squadId: null },
+  ) => {
+    const result = await getSessionStatsByTrainingId(trainingId, limit, offset, filter);
     set({ sessionStats: result });
     return result;
   },
@@ -231,5 +251,108 @@ export const sessionStore = create<SessionStatsState>((set) => ({
     const res = await deleteGroupScoreService(id);
     set({ groupStats: res });
     return res;
+  },
+
+  getFullSessionById: async (id: string) => {
+    const res = await getFullSessionById(id);
+    set({ selectedSession: res });
+    return res;
+  },
+
+  deleteSessionStats: async (id: string) => {
+    const res = await deleteSessionStatsService(id);
+    const sessionsList = sessionStore.getState().sessionStats.filter((session: any) => session.id !== id);
+    set({ sessionStats: sessionsList });
+    return res;
+  },
+
+  updateSessionStats: async (sessionId: string, wizardData: SessionStatsSaveData) => {
+    set({ isLoading: true, error: null });
+    const trainingStore = TrainingStore.getState().training;
+
+    try {
+      // Transform wizard data to database format (same as save)
+      const sessionStatsData: CreateSessionStatsData = {
+        training_session_id: wizardData.sessionData.training_session_id || trainingStore?.id || "",
+        assignment_id: wizardData.sessionData.assignment_id,
+        creator_id: wizardData.currentUser?.id || null,
+        team_id: wizardData.sessionData.team_id,
+        day_period: wizardData.sessionData.dayPeriod,
+        time_to_first_shot_sec: wizardData.sessionData.timeToFirstShot,
+        note: wizardData.sessionData.note || null,
+        squad_id: userStore.getState().user?.squad_id || null,
+      };
+
+      // Transform participants data
+      const participantsData: CreateParticipantData[] = wizardData.participants.map((p) => ({
+        user_id: p.user_id,
+        user_duty: p.user_duty,
+        weapon_id: p.weapon_id || null,
+        equipment_id: p.equipment_id || null,
+        position: p.position,
+        session_stats_id: sessionId, // Will be overwritten in service
+      }));
+
+      // Transform targets and engagements data
+      const targetsData = wizardData.targets.map((target) => {
+        // Calculate total hits from engagements
+        const totalHits = target.engagements.reduce((sum: number, eng: any) => {
+          return sum + (eng.target_hits || 0);
+        }, 0);
+
+        // Target stats
+        const targetStats: CreateTargetStatsData = {
+          distance_m: target.distance,
+          wind_strength: target.windStrength || null,
+          wind_direction_deg: target.windDirection || null,
+          total_hits: totalHits,
+          target_eliminated: totalHits >= 2,
+          mistake_code: target.mistakeCode || null,
+          session_stats_id: sessionId, // Will be overwritten in service
+        };
+
+        const engagements: CreateTargetEngagementData[] = target.engagements.map((eng) => ({
+          user_id: eng.user_id,
+          shots_fired: eng.shots_fired || 0,
+          target_hits: eng.target_hits || 0,
+          is_estimated: eng.target_hits === undefined || eng.target_hits === null,
+          estimated_method: eng.target_hits === undefined || eng.target_hits === null ? "shots_ratio" : null,
+          target_stats_id: "", // Will be set in service
+        }));
+
+        return {
+          targetStats,
+          engagements,
+        };
+      });
+
+      // Call service to update everything
+      const updatedSession = await updateCompleteSession(sessionId, {
+        sessionStats: sessionStatsData,
+        participants: participantsData,
+        targets: targetsData,
+      });
+
+      // Update the sessionStats list with the updated session
+      const trainingId = trainingStore?.id;
+      if (trainingId) {
+        await sessionStore.getState().getSessionStatsByTrainingId(trainingId);
+      }
+
+      set({
+        selectedSession: updatedSession,
+        isLoading: false,
+        error: null,
+      });
+
+      return updatedSession;
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to update session statistics";
+      set({
+        isLoading: false,
+        error: errorMessage,
+      });
+      throw error;
+    }
   },
 }));

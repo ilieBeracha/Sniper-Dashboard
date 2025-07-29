@@ -23,6 +23,21 @@ export type GroupingScoreEntry = {
   type: string; // grouping_type_enum as string
 };
 
+export type GroupingStatsCommander = {
+  avg_bullets: number;
+  avg_dispersion: number;
+  avg_time_seconds: number;
+  best_dispersion: number;
+  effort_percentage: number;
+  first_name: string;
+  last_name: string;
+  mistake_count: number | null;
+  sniper_user_id: string;
+  team_id: string;
+  top_mistake: string | null;
+  total_groups: number;
+  worst_dispersion: number;
+};
 
 export interface HitPercentageData {
   hit_percentage: number;

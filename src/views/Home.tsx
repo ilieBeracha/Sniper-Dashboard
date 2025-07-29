@@ -115,7 +115,7 @@ export default function AppRoutes() {
             }
           />
           <Route
-            path="/training/:id/session-stats-full"
+            path="/training/:id/session-stats-full/:sessionId?"
             element={
               <Suspense fallback={<LoadingFallback />}>
                 <SessionStatsFull />

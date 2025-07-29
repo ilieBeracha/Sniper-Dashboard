@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo, ReactNode, useCallback } from "react";
-import { ChevronLeft, ChevronRight, Filter, Search, X, Edit, Eye, Trash2, ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, Filter, Search, X, Edit, ChevronUp, ChevronDown, Trash, MoreVertical, BarChart } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
 
 export type FilterConfig<T> = {
   key: keyof T;
@@ -180,11 +181,12 @@ export interface SpTableProps<T extends { id: string | number }> {
   filters?: SpTableFilter[];
   searchPlaceholder?: string;
   searchFields?: (keyof T & string)[];
-  onRowClick?: (row: T) => void;
-  onEdit?: (row: T) => void;
-  onView?: (row: T) => void;
-  onDelete?: (row: T) => void;
-  actions?: (row: T) => ReactNode;
+  actions?: {
+    onRowClick?: (row: T) => void;
+    onEdit?: (row: T) => void;
+    onView?: (row: T) => void;
+    onDelete?: (row: T) => void;
+  };
   emptyState?: ReactNode;
   className?: string;
   highlightRow?: (row: T) => boolean;
@@ -207,11 +209,11 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
     filters: staticFilters = [],
     searchPlaceholder = "Search...",
     searchFields = [],
-    onRowClick,
-    onEdit,
-    onView,
-    onDelete,
-    actions,
+    actions = {
+      onView: () => {},
+      onEdit: () => {},
+      onDelete: () => {},
+    },
     emptyState,
     className = "",
     highlightRow,
@@ -360,7 +362,9 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
         />
 
         <div className="overflow-x-auto sm:mx-0">
-          <table className={`min-w-full ${isMobile ? "text-xs" : "text-sm"} transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : " text-gray-700"}`}>
+          <table
+            className={`min-w-full ${isMobile ? "text-xs" : "text-sm"} transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : " text-gray-700"}`}
+          >
             <thead
               className={`${isMobile ? "text-[10px]" : "text-xs"} uppercase border-b transition-colors duration-200 sticky top-0 z-10 ${
                 theme === "dark" ? "border-zinc-800 bg-zinc-900" : "border-gray-200 bg-gray-100"
@@ -411,7 +415,7 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                     </div>
                   </th>
                 ))}
-                {(actions || onView || onEdit || onDelete) && <th className={`${isMobile ? "px-2 py-2" : "px-4 py-3"} text-right`}>{isMobile ? "" : "Actions"}</th>}
+                <th className={`${isMobile ? "px-2 py-2" : "px-4 py-3"} text-right`}>{isMobile ? "" : "Actions"}</th>
               </tr>
             </thead>
             <tbody>
@@ -425,11 +429,14 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                         </td>
                       )}
                       {columns.map((col, colIdx) => (
-                        <td key={colIdx} className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
+                        <td
+                          key={colIdx}
+                          className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}
+                        >
                           <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-full" />
                         </td>
                       ))}
-                      {(actions || onView || onEdit || onDelete) && (
+                      {(actions.onView || actions.onEdit || actions.onDelete) && (
                         <td className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} text-right`}>
                           <div className="inline-flex gap-2">
                             <div className="w-8 h-8 bg-gray-200 dark:bg-zinc-700 rounded" />
@@ -446,7 +453,7 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                     return (
                       <tr
                         key={row.id}
-                        onClick={() => onRowClick?.(row)}
+                        onClick={() => actions.onRowClick?.(row)}
                         className={`transition-colors border-b cursor-pointer ${
                           isLast ? "border-transparent" : theme === "dark" ? "border-zinc-800/50" : "border-gray-100"
                         } ${
@@ -465,15 +472,17 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                           </td>
                         )}
                         {columns.map((col, idx) => (
-                          <td key={idx} className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}>
+                          <td
+                            key={idx}
+                            className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""} min-h-[40px]`}
+                            style={{ minHeight: "40px" }}
+                          >
                             {col.render ? col.render(row[col.key as keyof T], row) : ((row as any)[col.key] ?? "N/A")}
                           </td>
                         ))}
-                        {(actions || onView || onEdit || onDelete) && (
-                          <td className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} text-right`}>
-                            <SpTableActions row={row} onView={onView} onEdit={onEdit} onDelete={onDelete} actions={actions} theme={theme} />
-                          </td>
-                        )}
+                        <td className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} text-right min-h-[40px]`} style={{ minHeight: "40px" }}>
+                          <SpTableActions row={row} onView={actions.onView} onEdit={actions.onEdit} onDelete={actions.onDelete} theme={theme} />
+                        </td>
                       </tr>
                     );
                   })}
@@ -646,61 +655,65 @@ function SpTableActions({
   onView,
   onEdit,
   onDelete,
-  actions,
   theme,
 }: {
   row: any;
   onView?: (r: any) => void;
   onEdit?: (r: any) => void;
   onDelete?: (r: any) => void;
-  actions?: (r: any) => ReactNode;
   theme: string;
 }) {
   const isMobile = useIsMobile();
   return (
     <div className={`inline-flex ${isMobile ? "gap-1" : "gap-2"}`}>
-      {actions ? (
-        actions(row)
-      ) : (
-        <>
-          {onView && (
+      <>
+        <Dropdown>
+          <DropdownTrigger>
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onView(row);
-              }}
-              className={`${isMobile ? "p-1" : "p-2"} rounded hover:bg-indigo-100 dark:hover:bg-indigo-800/40 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}
-              title="View"
+              onClick={(e) => e.stopPropagation()}
+              className={`p-1.5 sm:p-2 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+              title="More options"
             >
-              <Eye size={isMobile ? 14 : 16} />
+              <MoreVertical size={16} />
             </button>
-          )}
-          {onEdit && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(row);
+          </DropdownTrigger>
+          <DropdownMenu
+            aria-label="Group actions"
+            className={`${theme === "dark" ? "bg-zinc-900" : "bg-white"} rounded-lg shadow-lg border ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}
+          >
+            <DropdownItem
+              hidden={!onView}
+              key="view"
+              className={`text-sm ${theme === "dark" ? "text-gray-200 hover:bg-zinc-800" : "text-gray-700 hover:bg-gray-50"}`}
+              onPress={async () => {
+                onView?.(row);
               }}
-              className={`${isMobile ? "p-1" : "p-2"} rounded hover:bg-amber-100 dark:hover:bg-amber-800/40 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
-              title="Edit"
+              startContent={<BarChart size={14} />}
             >
-              <Edit size={isMobile ? 14 : 16} />
-            </button>
-          )}
-          {onDelete && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(row);
-              }}
-              className={`${isMobile ? "p-1" : "p-2"} rounded hover:bg-red-100 dark:hover:bg-red-800/40 ${theme === "dark" ? "text-red-400" : "text-red-600"}`}
-              title="Delete"
+              View
+            </DropdownItem>
+            <DropdownItem
+              hidden={!onEdit}
+              key="edit"
+              className={`text-sm ${theme === "dark" ? "text-gray-200 hover:bg-zinc-800" : "text-gray-700 hover:bg-gray-50"}`}
+              onPress={() => onEdit?.(row)}
+              startContent={<Edit size={14} />}
             >
-              <Trash2 size={isMobile ? 14 : 16} />
-            </button>
-          )}
-        </>
-      )}
+              Edit
+            </DropdownItem>
+
+            <DropdownItem
+              hidden={!onDelete}
+              key="delete"
+              className={`text-sm text-red-500 ${theme === "dark" ? "hover:bg-zinc-800" : "hover:bg-gray-50"}`}
+              onPress={() => onDelete?.(row)}
+              startContent={<Trash size={14} />}
+            >
+              Delete
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      </>
     </div>
   );
 }

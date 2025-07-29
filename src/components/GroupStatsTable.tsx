@@ -1,4 +1,4 @@
-import { Edit, Target, MoreVertical, BarChart, Trash } from "lucide-react";
+import { Target } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
@@ -9,7 +9,6 @@ import { SpTable } from "@/layouts/SpTable";
 import { GroupingScoreEntry } from "@/types/performance";
 import GroupScoreModal from "./GroupScoreModal";
 import { sessionStore } from "@/store/sessionStore";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
 
 interface GroupStatsTableProps {
   onGroupStatsClick?: (group: GroupingScoreEntry) => void;
@@ -23,7 +22,6 @@ export default function GroupStatsTable({
   onGroupStatsEditClick = () => {},
   onGroupStatsDeleteClick = () => {},
   newlyAddedGroupId,
-  disabled,
 }: GroupStatsTableProps) {
   const { theme } = useTheme();
   const { id } = useParams();
@@ -170,59 +168,6 @@ export default function GroupStatsTable({
     },
   ];
 
-  const actions = (row: GroupingScoreEntry) => {
-    if (disabled || isLoading) return null;
-
-    return (
-      <div className="inline-flex gap-1 sm:gap-2">
-        <Dropdown>
-          <DropdownTrigger>
-            <button
-              onClick={(e) => e.stopPropagation()}
-              className={`p-1.5 sm:p-2 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
-              title="More options"
-            >
-              <MoreVertical size={16} />
-            </button>
-          </DropdownTrigger>
-          <DropdownMenu
-            aria-label="Group actions"
-            className={`${theme === "dark" ? "bg-zinc-900" : "bg-white"} rounded-lg shadow-lg border ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}
-          >
-            <DropdownItem
-              key="stats"
-              className={`text-sm ${theme === "dark" ? "text-gray-200 hover:bg-zinc-800" : "text-gray-700 hover:bg-gray-50"}`}
-              onPress={async () => {
-                await getGroupingScoreComparisonById(row.id);
-                setIsModalOpen(true);
-              }}
-              startContent={<BarChart size={14} />}
-            >
-              Show Stats
-            </DropdownItem>
-            <DropdownItem
-              key="edit"
-              className={`text-sm ${theme === "dark" ? "text-gray-200 hover:bg-zinc-800" : "text-gray-700 hover:bg-gray-50"}`}
-              onPress={() => onGroupStatsEditClick(row)}
-              startContent={<Edit size={14} />}
-            >
-              Edit
-            </DropdownItem>
-
-            <DropdownItem
-              key="delete"
-              className={`text-sm text-red-500 ${theme === "dark" ? "hover:bg-zinc-800" : "hover:bg-gray-50"}`}
-              onPress={() => onGroupStatsDeleteClick(row)}
-              startContent={<Trash size={14} />}
-            >
-              Delete
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-      </div>
-    );
-  };
-
   const hasMore = (currentPage + 1) * GROUP_LIMIT < groupingScoresTotalCount;
 
   const pagination = {
@@ -307,8 +252,11 @@ export default function GroupStatsTable({
         columns={columns as any}
         filters={[]}
         searchPlaceholder="Search groups..."
-        onRowClick={(row) => handleGroupStatsClick(row)}
-        actions={actions}
+        actions={{
+          onView: handleGroupStatsClick,
+          onEdit: onGroupStatsEditClick,
+          onDelete: onGroupStatsDeleteClick,
+        }}
         loading={isLoading}
         pagination={pagination}
         highlightRow={(row) => row.id === newlyAddedGroupId}

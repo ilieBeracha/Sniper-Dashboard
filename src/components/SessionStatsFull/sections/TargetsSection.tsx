@@ -43,7 +43,7 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
 
       {/* Targets List - Single Card */}
       <div className={`mt-8 rounded-2xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}>
-        {targets.length > 0 ? (
+        {targets?.length > 0 ? (
           <>
             {/* Table Header */}
             <div
@@ -59,7 +59,7 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
 
             {/* Targets List */}
             <div className="divide-y divide-zinc-800 dark:divide-zinc-700">
-              {targets.map((target, index) => (
+              {targets?.map((target, index) => (
                 <div key={target.id} className="transition-all">
                   {/* Main Row */}
                   <div

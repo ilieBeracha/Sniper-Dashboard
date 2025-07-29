@@ -14,22 +14,42 @@ import { Target as TargetIcon, Users, Crosshair, Settings, CheckCircle2 } from "
 import { useModal } from "@/hooks/useModal";
 
 export const useSessionStats = () => {
-  const { id } = useParams();
+  const { id, sessionId } = useParams();
   const navigate = useNavigate();
   const { user } = useStore(userStore);
   const { training, loadTrainingById } = useStore(TrainingStore);
+  const [isLoading, setIsLoading] = useState(false);
   const { weapons } = useStore(weaponsStore);
   const { equipments } = useStore(equipmentStore);
   const { members, fetchMembers } = useStore(teamStore);
-  const { saveSessionStats } = useStore(sessionStore);
+  const { saveSessionStats, updateSessionStats, getFullSessionById, selectedSession } = useStore(sessionStore);
 
   const { isOpen: isAssignmentModalOpen, setIsOpen: setIsAssignmentModalOpen } = useModal();
   const [activeSection, setActiveSection] = useState(0);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    (async () => {
+      if (sessionId) {
+        console.log("sessionId", sessionId);
+        setIsLoading(true);
+        await getFullSessionById(sessionId);
+        setIsLoading(false);
+      }
+    })();
+  }, [sessionId]);
+
   // Debouncing ref to prevent multiple submissions
   const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    (async () => {
+      if (id) {
+        await fetchMembers(user?.team_id as string);
+        await loadTrainingById(id);
+      }
+    })();
+  }, [id, user?.team_id]);
 
   const [sessionData, setSessionData] = useState<SessionData>({
     assignment_id: "",
@@ -39,33 +59,91 @@ export const useSessionStats = () => {
     squad_id: user?.squad_id || "",
   });
 
-  const [participants, setParticipants] = useState<Participant[]>([
-    {
-      userId: user?.id || "",
-      name: user?.first_name || user?.last_name || user?.email || "",
-      userDuty: user?.user_default_duty || "Sniper",
-      position: "Lying",
-      weaponId: user?.user_default_weapon || "",
-      equipmentId: user?.user_default_equipment || "",
-    },
-  ]);
+  const [participants, setParticipants] = useState<Participant[]>([]);
 
-  const [targets, setTargets] = useState<Target[]>([
-    {
-      id: `target-${Date.now()}`,
-      distance: 500,
-      windStrength: null,
-      windDirection: null,
-      mistakeCode: "",
-      engagements: [
+  const [targets, setTargets] = useState<Target[]>([]);
+
+  useEffect(() => {
+    if (selectedSession && sessionId) {
+      // Load session data for editing
+      setSessionData({
+        assignment_id: selectedSession?.sessionStats?.assignment_id || "",
+        dayPeriod: selectedSession?.sessionStats?.day_period || "",
+        timeToFirstShot: selectedSession?.sessionStats?.time_to_first_shot_sec || null,
+        note: selectedSession?.sessionStats?.note || "",
+        squad_id: selectedSession?.sessionStats?.squad_id || user?.squad_id || "",
+      });
+      
+      // Load participants
+      if (selectedSession?.participants && selectedSession.participants.length > 0) {
+        setParticipants(
+          selectedSession.participants.map((participant: any) => ({
+            userId: participant.user_id,
+            name: participant.name || `${participant.users?.first_name || ""} ${participant.users?.last_name || ""}`.trim() || participant.users?.email || "",
+            userDuty: participant.user_duty,
+            position: participant.position,
+            weaponId: participant.weapon_id || "",
+            equipmentId: participant.equipment_id || "",
+          }))
+        );
+      }
+      
+      // Load targets with engagements
+      if (selectedSession?.targets && selectedSession.targets.length > 0) {
+        setTargets(
+          selectedSession.targets.map((target: any, index: number) => ({
+            id: target.targetStats?.id || target.id || `target-${Date.now()}-${index}`,
+            distance: target.targetStats?.distance_m || target.distance_m || target.distance || 0,
+            windStrength: target.targetStats?.wind_strength || target.wind_strength || null,
+            windDirection: target.targetStats?.wind_direction_deg || target.wind_direction_deg || target.wind_direction || null,
+            mistakeCode: target.targetStats?.mistake_code || target.mistake_code || "",
+            engagements: (target.engagements || target.target_engagements || target.targetStats?.target_engagements || []).map((engagement: any) => ({
+              userId: engagement.user_id,
+              shotsFired: engagement.shots_fired || 0,
+              targetHits: engagement.target_hits || 0,
+            })),
+          }))
+        );
+      }
+    } else if (!sessionId) {
+      // Initialize with default values for new session
+      setSessionData({
+        assignment_id: "",
+        dayPeriod: "",
+        timeToFirstShot: null,
+        note: "",
+        squad_id: user?.squad_id || "",
+      });
+      
+      setParticipants([
         {
           userId: user?.id || "",
-          shotsFired: 0,
-          targetHits: 0,
+          name: user?.first_name || user?.last_name || user?.email || "",
+          userDuty: user?.user_default_duty || "Sniper",
+          position: "Lying",
+          weaponId: user?.user_default_weapon || "",
+          equipmentId: user?.user_default_equipment || "",
         },
-      ],
-    },
-  ]);
+      ]);
+      
+      setTargets([
+        {
+          id: `target-${Date.now()}`,
+          distance: 500,
+          windStrength: null,
+          windDirection: null,
+          mistakeCode: "",
+          engagements: [
+            {
+              userId: user?.id || "",
+              shotsFired: 0,
+              targetHits: 0,
+            },
+          ],
+        },
+      ]);
+    }
+  }, [selectedSession, sessionId, user]);
 
   const trainingAssignments = training?.assignment_sessions || [];
   const teamMembers = members || [];
@@ -77,15 +155,6 @@ export const useSessionStats = () => {
     { id: "engagements", title: "Target Engagements", icon: Crosshair, description: "Performance data" },
     { id: "summary", title: "Summary", icon: CheckCircle2, description: "Review & submit" },
   ];
-
-  useEffect(() => {
-    (async () => {
-      if (id) {
-        await fetchMembers(user?.team_id as string);
-        await loadTrainingById(id);
-      }
-    })();
-  }, [id, loadTrainingById, user?.team_id]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const container = e.currentTarget;
@@ -353,15 +422,23 @@ export const useSessionStats = () => {
         console.log("Submitting session data:", saveData);
 
         try {
-          await saveSessionStats(saveData);
-          toast.success("Training session submitted successfully!");
-          // Navigate back to training page after successful save
+          if (sessionId) {
+            // Update existing session
+            await updateSessionStats(sessionId, saveData);
+            toast.success("Training session updated successfully!");
+          } else {
+            // Create new session
+            await saveSessionStats(saveData);
+            toast.success("Training session submitted successfully!");
+          }
+          
+          // Navigate back to training page after successful save/update
           if (id) {
             navigate(`/training/${id}`);
           }
         } catch (error) {
           console.error("Error saving session:", error);
-          toast.error("Failed to submit training session. Please try again.");
+          toast.error(`Failed to ${sessionId ? 'update' : 'submit'} training session. Please try again.`);
         }
       }
 
@@ -387,7 +464,7 @@ export const useSessionStats = () => {
     validationErrors,
     sections,
     isSubmitting,
-
+    isLoading,
     // Data
     user,
     training,

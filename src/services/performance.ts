@@ -299,3 +299,18 @@ export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsage
 
   return result;
 }
+
+export async function getGroupingStatsByTeamIdCommander(teamId: string, startDate: Date, endDate: Date) {
+  console.log("startDate", startDate);
+  console.log("endDate", endDate);
+  const { data, error } = await supabase.rpc("get_grouping_stats_for_team", {
+    p_team_id: teamId,
+  });
+
+  if (error) {
+    console.error("Error fetching grouping stats:", error);
+    throw error;
+  }
+
+  return data;
+}
