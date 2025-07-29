@@ -40,7 +40,7 @@ export function SpPageHeader({
         </div>
       )}
       <div className={`${isMobile ? "px-6" : "px-6 py-4"} transition-all duration-200 relative`}>
-        <div className="flex flex justify-between sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex  justify-between sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 justify-between w-full">
             <div className="flex items-center gap-3">
               <div className={`p-3 rounded-xl ${theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"}`}>

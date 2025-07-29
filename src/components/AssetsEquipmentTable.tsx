@@ -101,6 +101,7 @@ export default function AssetsEquipmentTable({
       filters={filters}
       searchPlaceholder="Search by serial number, type, or day/night..."
       searchFields={["serial_number", "equipment_type", "day_night"]}
+      isDisplayActions={isCommander(user?.user_role as UserRole)}
       actions={{
         ...actions,
       }}

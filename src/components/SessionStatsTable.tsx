@@ -13,8 +13,6 @@ interface SessionStatsTableProps {
   newlyAddedSessionId?: string | null;
   onSessionStatsDeleteClick?: (session: any) => void;
   deletingSessionId?: string | null;
-  filter: { assignmentId: string | null; squadId: string | null };
-  setFilter: (filter: { assignmentId: string | null; squadId: string | null }) => void;
 }
 
 export default function SessionStatsTable({
@@ -24,7 +22,6 @@ export default function SessionStatsTable({
   newlyAddedSessionId,
   onSessionStatsDeleteClick,
   deletingSessionId,
-  filter,
 }: SessionStatsTableProps) {
   const { id } = useParams();
   const { getSessionStatsByTrainingId, getSessionStatsCountByTrainingId } = useStore(sessionStore);
@@ -46,7 +43,7 @@ export default function SessionStatsTable({
     setIsLoading(true);
     try {
       const offset = page * SESSION_LIMIT;
-      const result = await getSessionStatsByTrainingId(id, SESSION_LIMIT, offset, filter);
+      const result = await getSessionStatsByTrainingId(id, SESSION_LIMIT, offset);
 
       if (reset) {
         setPaginatedSessionStats(result);

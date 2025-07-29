@@ -13,8 +13,7 @@ export default function DashboardMembersTable() {
   const { user } = useStore(userStore);
   const { members } = useStore(teamStore);
   const { squadsWithMembers } = useStore(squadStore);
-  console.log(squadsWithMembers);
-  // Filter members based on user permissions
+
   const dataByPermission = members.filter((member) => {
     if (isCommander(user?.user_role as UserRole)) {
       return true;
@@ -56,14 +55,16 @@ export default function DashboardMembersTable() {
       render: (value: string) => {
         const squad = squadsWithMembers?.find((squad) => squad.id === value);
         if (!squad) return <span className="text-sm text-gray-400">N/A</span>;
-        
+
         return (
           <div className="flex items-center gap-2">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
-              theme === "dark" 
-                ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30" 
-                : "bg-indigo-100 text-indigo-700 border border-indigo-200"
-            }`}>
+            <span
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+                theme === "dark"
+                  ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
+                  : "bg-indigo-100 text-indigo-700 border border-indigo-200"
+              }`}
+            >
               <Users size={12} />
               {squad.squad_name}
             </span>
@@ -101,12 +102,12 @@ export default function DashboardMembersTable() {
 
   return (
     <SpTable
-      className="border-0 w-full"
+      className="border-0 w-full overflow-x-auto"
       data={dataByPermission}
       columns={columns}
       searchPlaceholder="Search by name, email, or ID..."
-      searchFields={["first_name", "last_name", "email"]}
-      //   actions={actions}
+      searchFields={["first_name", "last_name", "email", "user_role"]}
+      isDisplayActions={isCommander(user?.user_role as UserRole)}
       emptyState={
         <div className={`text-center py-16 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
           <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />

@@ -32,7 +32,7 @@ export default function TrainingPage() {
   const { training } = useStore(TrainingStore);
   const { sessionStats, getSessionStatsByTrainingId, deleteSessionStats } = useStore(sessionStore);
   const { createGroupScore, updateGroupScore, deleteGroupScore } = useStore(sessionStore);
-  const { fetchGroupingScores } = useStore(performanceStore);
+  const { fetchGroupingScores, getBestGroupingStatsByTraining } = useStore(performanceStore);
   const { isOpen: isAddAssignmentOpen, setIsOpen: setIsAddAssignmentOpen } = useModal();
   const { isOpen: isOpen, setIsOpen: setIsOpen } = useModal();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -43,7 +43,6 @@ export default function TrainingPage() {
   const [deletingGroupScore, setDeletingGroupScore] = useState<any>(null);
   const [deletingSession, setDeletingSession] = useState<any>(null);
   const hasLoadedData = useRef(false);
-  const [filter, setFilter] = useState<{ assignmentId: string | null; squadId: string | null }>({ assignmentId: null, squadId: null });
 
   const trainingStatus = training?.status as TrainingStatus;
 
@@ -51,7 +50,8 @@ export default function TrainingPage() {
     if (!id || hasLoadedData.current) return;
     await loadAssignments();
     await loadTrainingById(id);
-    await getSessionStatsByTrainingId(id, 20, 0, filter);
+    await getSessionStatsByTrainingId(id, 20, 0);
+    await getBestGroupingStatsByTraining(id as string);
     await fetchGroupingScores(id);
     hasLoadedData.current = true;
   }, [id]);
@@ -194,8 +194,6 @@ export default function TrainingPage() {
             onSessionStatsEditClick={handleEditSession}
             onSessionStatsDeleteClick={handleDeleteSession}
             deletingSessionId={deletingSession?.id}
-            filter={filter}
-            setFilter={setFilter}
           />
         </div>
       );

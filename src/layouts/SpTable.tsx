@@ -6,6 +6,13 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
 
+export type SpTableActions = {
+  onRowClick?: (row: any) => void;
+  onEdit?: (row: any) => void;
+  onView?: (row: any) => void;
+  onDelete?: (row: any) => void;
+};
+
 export type FilterConfig<T> = {
   key: keyof T;
   label: string;
@@ -193,6 +200,7 @@ export interface SpTableProps<T extends { id: string | number }> {
   selectable?: boolean;
   onSelectionChange?: (selectedIds: Set<string | number>) => void;
   bulkActions?: ReactNode;
+  isDisplayActions?: boolean;
 }
 
 export function SpTable<T extends { id: string | number }>(props: SpTableProps<T>) {
@@ -220,6 +228,7 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
     selectable = false,
     onSelectionChange,
     bulkActions,
+    isDisplayActions = true,
   } = props;
 
   const { theme } = useTheme();
@@ -481,7 +490,9 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                           </td>
                         ))}
                         <td className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} text-right min-h-[40px]`} style={{ minHeight: "40px" }}>
-                          <SpTableActions row={row} onView={actions.onView} onEdit={actions.onEdit} onDelete={actions.onDelete} theme={theme} />
+                          {isDisplayActions && (
+                            <SpTableActions row={row} onView={actions.onView} onEdit={actions.onEdit} onDelete={actions.onDelete} theme={theme} />
+                          )}
                         </td>
                       </tr>
                     );
@@ -553,15 +564,15 @@ function SpTableFilters({
       )}
       <div className={`${isMobile ? "" : "space-y-4"}`}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ">
             {isMobile ? (
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center gap-2 px-2 py-1 rounded-lg ${isMobile ? "text-xs" : "text-sm"} transition-colors duration-200 ${
+                className={`flex  items-center gap-2 px-2 py-1 rounded-lg ${isMobile ? "text-xs" : "text-sm"} transition-colors duration-200 ${
                   theme === "dark" ? "bg-zinc-800 text-gray-300 hover:bg-zinc-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
-                <Filter className={`${isMobile ? "w-3 h-3" : "w-4 h-4"}`} />
+                <Filter className={`${isMobile ? "w-3 h-3" : "w-4 h-4"} `} />
                 {showFilters ? "Hide" : "Show"} Filters
               </button>
             ) : (
@@ -572,7 +583,7 @@ function SpTableFilters({
             )}
             {hasActiveFilters && (
               <span
-                className={`inline-flex items-center justify-center w-5 h-5 text-xs rounded-full ${
+                className={`inline-flex  items-center justify-center w-5 h-5 text-xs rounded-full ${
                   theme === "dark" ? "bg-purple-600 text-white" : "bg-purple-500 text-white"
                 }`}
               >
@@ -582,7 +593,7 @@ function SpTableFilters({
           </div>
         </div>
         {showFilters && (
-          <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 mt-2">
             <div className="relative sm:col-span-2 lg:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input

@@ -2,19 +2,12 @@ import { CreateParticipantData, CreateSessionStatsData, CreateTargetEngagementDa
 import { supabase } from "./supabaseClient";
 import { toastService } from "./toastService";
 
-export const getSessionStatsByTrainingId = async (
-  trainingId: string,
-  limit: number = 20,
-  offset: number = 0,
-  filter: { assignmentId: string | null; squadId: string | null } = { assignmentId: null, squadId: null },
-) => {
+export const getSessionStatsByTrainingId = async (trainingId: string, limit: number = 20, offset: number = 0) => {
   const queryBuilder = supabase
     .from("session_stats")
     .select(
       ` *, assignment_session ( assignment ( assignment_name ) ), users!session_stats_creator_id_fkey ( first_name, last_name, email ), teams ( team_name )  `,
     );
-  if (filter.assignmentId) queryBuilder.eq("assignment_id", filter.assignmentId);
-  if (filter.squadId) queryBuilder.eq("squad_id", filter.squadId);
   queryBuilder
     .eq("training_session_id", trainingId)
     .order("created_at", { ascending: false })

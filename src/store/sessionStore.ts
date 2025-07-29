@@ -27,12 +27,11 @@ interface SessionStatsState {
   saveSessionStats: (sessionData: SessionStatsSaveData) => Promise<any>;
   updateSessionStats: (sessionId: string, sessionData: SessionStatsSaveData) => Promise<any>;
   getSessionStatsByTrainingId: (
-    trainingId: string,
+    assignmentId: string,
     limit?: number,
     offset?: number,
-    filter?: { assignmentId: string | null; squadId: string | null },
   ) => Promise<any[]>;
-  getSessionStatsCountByTrainingId: (trainingId: string) => Promise<number>;
+  getSessionStatsCountByTrainingId: (assignmentId: string) => Promise<number>;
   createGroupScore: (groupScore: any) => Promise<any>;
   updateGroupScore: (id: string, groupScore: any) => Promise<any>;
   getGroupingScoreComparisonById: (groupScoreId: string) => Promise<any>;
@@ -116,18 +115,17 @@ export const sessionStore = create<SessionStatsState>((set) => ({
   setSelectedSession: (session: any) => set({ selectedSession: session }),
 
   getSessionStatsByTrainingId: async (
-    trainingId: string,
+    assignmentId: string,
     limit: number = 20,
     offset: number = 0,
-    filter: { assignmentId: string | null; squadId: string | null } = { assignmentId: null, squadId: null },
   ) => {
-    const result = await getSessionStatsByTrainingId(trainingId, limit, offset, filter);
+    const result = await getSessionStatsByTrainingId(assignmentId, limit, offset);
     set({ sessionStats: result });
     return result;
   },
 
-  getSessionStatsCountByTrainingId: async (trainingId: string) => {
-    return await getSessionStatsCountByTrainingId(trainingId);
+  getSessionStatsCountByTrainingId: async (assignmentId: string) => {
+    return await getSessionStatsCountByTrainingId(assignmentId);
   },
 
   createGroupScore: async (groupScore: any) => {

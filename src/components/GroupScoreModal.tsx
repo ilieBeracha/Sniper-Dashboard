@@ -40,7 +40,7 @@ export default function GroupScoreModal({ isOpen, onClose }: GroupScoreModalProp
     <div
       className={`p-3 rounded-lg flex flex-col gap-1 ${highlight ? "ring-2 ring-purple-500/50" : ""} ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}
     >
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center gap-2" onClick={() => onClose()}>
         <Icon className="w-4 h-4 text-zinc-400" />
         <span
           className={`text-[10px] px-2 py-0.5 rounded-full ${highlight ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" : "bg-gray-100 text-gray-600 dark:bg-zinc-700 dark:text-gray-400"}`}
@@ -127,7 +127,7 @@ export default function GroupScoreModal({ isOpen, onClose }: GroupScoreModalProp
 
         <div className="flex justify-end mt-6">
           <button
-            onClick={onClose}
+            onClick={() => onClose()}
             className="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-zinc-800 text-white hover:bg-zinc-700 dark:bg-zinc-800"
           >
             Close

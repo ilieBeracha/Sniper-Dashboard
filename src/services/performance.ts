@@ -105,6 +105,18 @@ export async function getGroupingScoresByTraining(trainingSessionId: string, lim
   }));
 }
 
+export async function getBestGroupingStatsByTraining(
+  trainingSessionId: string,
+): Promise<{ total_groups: number; avg_dispersion: number; best_dispersion: number }> {
+  const { data, error } = await supabase.rpc("get_best_training_group_stats", { p_training_session_id: trainingSessionId });
+  if (error) {
+    console.error("Error fetching best grouping by training:", error.message);
+    throw new Error("Failed to fetch best grouping by training");
+  }
+
+  return data[0];
+}
+
 export async function getGroupingScoresCountByTraining(trainingSessionId: string): Promise<number> {
   const { count, error } = await supabase
     .from("group_scores")
