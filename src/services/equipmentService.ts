@@ -43,3 +43,17 @@ export async function updateEquipment(id: string, equipment: Partial<Equipment>)
     throw new Error("Failed to update equipment");
   }
 }
+
+export async function deleteEquipment(id: string) {
+  try {
+    const { error } = await supabase.from("equipment").delete().eq("id", id);
+    if (error) {
+      toastService.error(error.message);
+      throw new Error("Failed to delete equipment");
+    }
+    return true;
+  } catch (error: any) {
+    console.error("Error deleting equipment:", error.message);
+    throw new Error("Failed to delete equipment");
+  }
+}

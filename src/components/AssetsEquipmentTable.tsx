@@ -3,19 +3,30 @@ import { Equipment } from "@/types/equipment";
 import { format } from "date-fns";
 import { SpTable, SpTableColumn } from "@/layouts/SpTable";
 import { useTheme } from "@/contexts/ThemeContext";
+import { isCommander } from "@/utils/permissions";
+import { useStore } from "zustand";
+import { userStore } from "@/store/userStore";
+import { UserRole } from "@/types/user";
 
-export default function AssetsEquipmentTable({ equipments, onDeleteEquipment }: { equipments: Equipment[]; onDeleteEquipment: (equipment: Equipment) => void }) {
+export default function AssetsEquipmentTable({
+  equipments,
+  onDeleteEquipment,
+  onEditEquipment,
+}: {
+  equipments: Equipment[];
+  onDeleteEquipment: (equipment: Equipment) => void;
+  onEditEquipment: (equipment: Equipment) => void;
+}) {
   const { theme } = useTheme();
+  const { user } = useStore(userStore);
 
-  // Get unique equipment types for filter
   const uniqueEquipmentTypes = useMemo(() => {
     const types = equipments.map((equipment) => equipment.equipment_type).filter(Boolean);
     return [...new Set(types)];
   }, [equipments]);
 
   const handleEditEquipment = (equipment: Equipment) => {
-    // TODO: Implement edit modal or navigation
-    console.log("Edit equipment:", equipment);
+    onEditEquipment(equipment);
   };
 
   const columns: SpTableColumn<Equipment>[] = [
@@ -75,6 +86,14 @@ export default function AssetsEquipmentTable({ equipments, onDeleteEquipment }: 
     },
   ];
 
+  const actions = isCommander(user?.user_role as UserRole)
+    ? {
+        onEdit: handleEditEquipment,
+        onDelete: onDeleteEquipment,
+      }
+    : {
+        onEdit: handleEditEquipment,
+      };
   return (
     <SpTable
       data={equipments}
@@ -83,8 +102,7 @@ export default function AssetsEquipmentTable({ equipments, onDeleteEquipment }: 
       searchPlaceholder="Search by serial number, type, or day/night..."
       searchFields={["serial_number", "equipment_type", "day_night"]}
       actions={{
-        onEdit: handleEditEquipment,
-        onDelete: onDeleteEquipment,
+        ...actions,
       }}
       emptyState={
         <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>

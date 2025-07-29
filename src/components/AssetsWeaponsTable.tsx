@@ -1,23 +1,31 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Weapon } from "@/types/weapon";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Search } from "lucide-react";
 import { format } from "date-fns";
 import { SpTable, SpTableColumn } from "@/layouts/SpTable";
 import WeaponUsageModal from "./WeaponUsageModal";
+import { isCommander } from "@/utils/permissions";
+import { useStore } from "zustand";
+import { userStore } from "@/store/userStore";
+import { UserRole } from "@/types/user";
 
 export default function AssetsWeaponsTable({
   weapons,
   onDeleteWeapon,
+  onViewUsage,
   onEditWeapon,
 }: {
   weapons: Weapon[];
   onDeleteWeapon: (weapon: Weapon) => void;
+  onViewUsage: (weapon: Weapon) => void;
   onEditWeapon: (weapon: Weapon) => void;
 }) {
   const { theme } = useTheme();
+  const { user } = useStore(userStore);
   const weaponsWithIds = weapons.filter((weapon): weapon is Weapon & { id: string } => Boolean(weapon?.id));
-
+  const [isUsageModalOpen, setIsUsageModalOpen] = useState(false);
+  const [selectedWeaponForUsage] = useState<Weapon | null>(null);
   const uniqueWeaponTypes = useMemo(() => {
     const types = weaponsWithIds.map((weapon) => weapon.weapon_type).filter(Boolean);
     return [...new Set(types)];
@@ -66,6 +74,16 @@ export default function AssetsWeaponsTable({
     },
   ];
 
+  const actions = isCommander(user?.user_role as UserRole)
+    ? {
+        onDelete: onDeleteWeapon,
+        onEdit: onEditWeapon,
+        onView: onViewUsage,
+      }
+    : {
+        onView: onViewUsage,
+      };
+
   if (weaponsWithIds.length === 0) {
     return (
       <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
@@ -85,8 +103,7 @@ export default function AssetsWeaponsTable({
         searchPlaceholder="Search by serial number, type, or MV..."
         searchFields={["serial_number", "weapon_type", "mv"]}
         actions={{
-          onEdit: onEditWeapon,
-          onDelete: onDeleteWeapon,
+          ...actions,
         }}
         emptyState={
           <div className={`text-center py-12 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
@@ -97,7 +114,7 @@ export default function AssetsWeaponsTable({
         }
       />
 
-      <WeaponUsageModal isOpen={false} onClose={() => {}} weapon={null} />
+      <WeaponUsageModal isOpen={isUsageModalOpen} onClose={() => setIsUsageModalOpen(false)} weapon={selectedWeaponForUsage} />
     </>
   );
 }

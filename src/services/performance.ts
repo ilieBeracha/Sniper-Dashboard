@@ -269,7 +269,7 @@ export const getSquadMajoritySessionsPerformance = async (teamId: string): Promi
 };
 
 export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsageStats> {
-  const { data, error } = await supabase.rpc("get_weapon_usage_stats", {
+  const { data, error } = await supabase.rpc("get_weapon_stats_summary", {
     p_weapon_id: weaponId,
   });
 
@@ -277,6 +277,7 @@ export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsage
     console.error("Error fetching weapon usage stats:", error.message);
     throw error;
   }
+  console.log("data", data);
 
   const rawResult = data?.[0];
   const result = rawResult

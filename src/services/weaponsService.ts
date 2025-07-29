@@ -37,3 +37,15 @@ export async function updateWeapon(id: string, weapon: Partial<Weapon>) {
     return null;
   }
 }
+
+export async function deleteWeapon(id: string) {
+  try {
+    const { data, error } = await supabase.from("weapons").delete().eq("id", id).select().single();
+    if (error) throw error;
+    return data;
+  } catch (error: any) {
+    toastService.error(error.message);
+    console.error("Error deleting weapon:", error);
+    return null;
+  }
+}

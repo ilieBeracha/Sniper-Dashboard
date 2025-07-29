@@ -6,44 +6,103 @@ import BaseDesktopDrawer from "@/components/BaseDrawer/BaseDesktopDrawer";
 import BaseInput from "@/components/base/BaseInput";
 import BaseMobileDrawer from "@/components/BaseDrawer/BaseMobileDrawer";
 import { FileQuestion } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { isMobile } from "react-device-detect";
 import { toast } from "react-toastify";
 import { BASE_WEAPONS } from "@/utils/BaseData/BaseWeapons";
 import { primitives } from "@/styles/core";
 import { Weapon } from "@/types/weapon";
+import WeaponUsageModal from "./WeaponUsageModal";
+import { performanceStore } from "@/store/performance";
+import BaseConfirmDeleteModal from "@/components/BaseConfirmDeleteModal";
 
 export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) {
-  const { weapons, createWeapon } = useStore(weaponsStore);
+  const { weapons, createWeapon, updateWeapon, deleteWeapon } = useStore(weaponsStore);
+  const { getWeaponUsageStats } = useStore(performanceStore);
   const { user } = useStore(userStore);
   const { theme } = useTheme();
-
+  const [isUsageModalOpen, setIsUsageModalOpen] = useState(false);
+  const [selectedWeaponForUsage, setSelectedWeaponForUsage] = useState<Weapon | null>(null);
   const weaponsTypes = new Set(BASE_WEAPONS.map((weapon) => weapon.weapon_type));
   const teamId = user?.team_id;
-
-  const [weaponForm, setWeaponForm] = useState({
+  const [isDeleteWeapon, setIsDeleteWeapon] = useState(false);
+  const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
+  const [weaponForm, setWeaponForm] = useState<Weapon>({
     weapon_type: "",
     serial_number: "",
     mv: "",
-    team_id: teamId,
+    team_id: teamId as string,
   });
+
+  useEffect(() => {
+    if (selectedWeapon) {
+      setWeaponForm({ ...selectedWeapon });
+    }
+  }, [selectedWeapon]);
+
+  const handleCancel = () => {
+    setWeaponForm({
+      weapon_type: "",
+      serial_number: "",
+      mv: "",
+      team_id: teamId as string,
+    });
+    setSelectedWeapon(null);
+    setIsOpen(false);
+  };
 
   async function handleCreateWeapon() {
     if (weaponForm.weapon_type === "" || weaponForm.serial_number === "" || weaponForm.mv === "") {
       toast.info("Please fill all the fields");
       return;
     }
-    await createWeapon(weaponForm as any);
-    setIsOpen(false);
+    try {
+      if (selectedWeapon) {
+        await updateWeapon(selectedWeapon.id!, weaponForm as any);
+        toast.success("Weapon updated successfully");
+      } else {
+        await createWeapon(weaponForm as any);
+        toast.success("Weapon created successfully");
+      }
+      setWeaponForm(weaponForm);
+    } catch (error) {
+      toast.error("Failed to create weapon");
+    } finally {
+      handleCancel();
+    }
   }
 
-  const handleDeleteWeapon = (weapon: Weapon) => {
-    console.log(weapon);
+  const handleViewUsage = (weapon: Weapon) => {
+    setIsUsageModalOpen(true);
+    setSelectedWeaponForUsage(weapon);
+    getWeaponUsageStats(weapon.id!);
   };
 
   const handleEditWeapon = (weapon: Weapon) => {
-    console.log(weapon);
+    setSelectedWeapon(weapon);
+    setIsOpen(true);
+  };
+
+  const handleDeleteWeapon = (weapon: Weapon) => {
+    setIsDeleteWeapon(true);
+    setSelectedWeapon(weapon);
+  };
+
+  const handleDeleteWeaponConfirm = async () => {
+    if (!selectedWeapon) {
+      toast.error("No weapon selected");
+      return;
+    }
+    try {
+      await deleteWeapon(selectedWeapon!.id!);
+      toast.success("Weapon deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete weapon");
+    } finally {
+      setIsDeleteWeapon(false);
+      setSelectedWeapon(null);
+    }
   };
 
   const WeaponsContent = (
@@ -51,16 +110,6 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
       className={` ${isMobile ? "w-full" : "w-[600px]"} p-4 space-y-6 transition-colors duration-200`}
       style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}
     >
-      <div>
-        <h2 className="text-xl font-semibold">New Weapon</h2>
-        <p
-          className="mt-1 text-sm transition-colors duration-200"
-          style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}
-        >
-          Add a new weapon to the inventory.
-        </p>
-      </div>
-
       <select
         className="min-h-9 rounded-lg px-3 text-sm border transition-colors duration-200 h-full"
         style={{
@@ -93,7 +142,7 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
       <BaseInput
         label="MV"
         type="number"
-        value={weaponForm.mv}
+        value={weaponForm.mv || ""}
         onChange={(e) => setWeaponForm({ ...weaponForm, mv: e.target.value })}
         placeholder="Enter MV"
         leftIcon={<FileQuestion size={16} style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey500 }} />}
@@ -104,7 +153,7 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
       <div className="flex items-center justify-end gap-x-4">
         <button
           type="button"
-          onClick={() => setIsOpen(false)}
+          onClick={handleCancel}
           className="px-4 py-1.5 transition-colors rounded-md text-sm font-medium"
           style={{
             backgroundColor: theme === "dark" ? `${primitives.white.white}0D` : primitives.grey.grey100,
@@ -134,7 +183,7 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
             e.currentTarget.style.backgroundColor = primitives.blue.blue500;
           }}
         >
-          Create
+          {selectedWeapon ? "Update" : "Create"}
         </button>
       </div>
     </div>
@@ -164,18 +213,27 @@ export default function WeaponsTab({ isOpen, setIsOpen }: { isOpen: boolean; set
         </div>
       </div>
 
-      <AssetsWeaponsTable weapons={weapons} onDeleteWeapon={handleDeleteWeapon} onEditWeapon={handleEditWeapon} />
+      <AssetsWeaponsTable weapons={weapons} onDeleteWeapon={handleDeleteWeapon} onViewUsage={handleViewUsage} onEditWeapon={handleEditWeapon} />
+      <BaseConfirmDeleteModal
+        isOpen={isDeleteWeapon}
+        onClose={() => setIsDeleteWeapon(false)}
+        onConfirm={handleDeleteWeaponConfirm}
+        title="Delete Weapon"
+        message="Are you sure you want to delete this weapon?"
+        isLoading={false}
+      />
 
       {!isMobile && (
-        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={setIsOpen} title="new weapons">
+        <BaseDesktopDrawer isOpen={isOpen} setIsOpen={setIsOpen} title={selectedWeapon?.id ? "Edit Weapon" : "New Weapon"} onClose={handleCancel}>
           {WeaponsContent}
         </BaseDesktopDrawer>
       )}
       {isMobile && (
-        <BaseMobileDrawer isOpen={isOpen} setIsOpen={setIsOpen} title="new weapons">
+        <BaseMobileDrawer isOpen={isOpen} setIsOpen={setIsOpen} title={selectedWeapon?.id ? "Edit Weapon" : "New Weapon"} onClose={handleCancel}>
           {WeaponsContent}
         </BaseMobileDrawer>
       )}
+      <WeaponUsageModal isOpen={isUsageModalOpen} onClose={() => setIsUsageModalOpen(false)} weapon={selectedWeaponForUsage} />
     </div>
   );
 }

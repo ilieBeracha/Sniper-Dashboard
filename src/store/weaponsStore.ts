@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { createWeapon, getWeapons, updateWeapon } from "@/services/weaponsService";
+import { createWeapon, deleteWeapon, getWeapons, updateWeapon } from "@/services/weaponsService";
 import { Weapon } from "@/types/weapon";
 
 export const weaponsStore = create(
@@ -9,6 +9,7 @@ export const weaponsStore = create(
     getWeapons: (teamId: string) => Promise<void>;
     createWeapon: (weapon: Weapon) => Promise<void>;
     updateWeapon: (id: string, weapon: Partial<Weapon>) => Promise<void>;
+    deleteWeapon: (id: string) => Promise<void>;
   }>(
     (set, get) => ({
       weapons: [],
@@ -29,6 +30,16 @@ export const weaponsStore = create(
           set({
             weapons: get().weapons.map((w) => (w.id === id ? { ...w, ...updatedWeapon } : w)),
           });
+        }
+      },
+
+      deleteWeapon: async (id: string) => {
+        try {
+          const deletedWeapon = (await deleteWeapon(id)) as Weapon;
+          set({ weapons: get().weapons.filter((w) => w.id !== deletedWeapon.id) });
+        } catch (error) {
+          console.error(error);
+          throw error;
         }
       },
     }),

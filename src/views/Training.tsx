@@ -271,8 +271,8 @@ export default function TrainingPage() {
         isOpen={isConfirmDeleteModalOpen}
         onClose={() => setIsConfirmDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
-        title="Delete Group Score"
-        message="Are you sure you want to delete this group score?"
+        title={`Delete ${deletingGroupScore ? "Group Score" : "Session"}`}
+        message={`Are you sure you want to delete this ${deletingGroupScore ? "group score" : "session"}?`}
       />
     </SpPage>
   );
