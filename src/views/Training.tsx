@@ -43,6 +43,8 @@ export default function TrainingPage() {
   const [deletingGroupScore, setDeletingGroupScore] = useState<any>(null);
   const hasLoadedData = useRef(false);
 
+  const trainingStatus = training?.status as TrainingStatus;
+
   useLoadingState(async () => {
     if (!id || hasLoadedData.current) return;
     await loadAssignments();
@@ -150,6 +152,8 @@ export default function TrainingPage() {
     ],
   });
 
+  const isDisabled = trainingStatus === TrainingStatus.Completed || trainingStatus === TrainingStatus.Canceled;
+
   const renderComponent = () => {
     if (activeTab.id === "session-stats") {
       return (
@@ -167,6 +171,7 @@ export default function TrainingPage() {
             onGroupStatsClick={handleSessionClick}
             onGroupStatsEditClick={handleEditGroupScore}
             onGroupStatsDeleteClick={handleDeleteGroupScore}
+            disabled={isDisabled}
           />
         </div>
       );
@@ -193,7 +198,11 @@ export default function TrainingPage() {
           {
             label: "Add Session",
             onClick: () => {
-              navigate(`/training/${id}/session-stats-full`);
+              if (isDisabled) {
+                toast.error("Training session is completed or canceled");
+              } else {
+                navigate(`/training/${id}/session-stats-full`);
+              }
             },
           },
           {
