@@ -1,60 +1,140 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
 import { performanceStore } from "@/store/performance";
 import { useTheme } from "@/contexts/ThemeContext";
 import UserRoleAccuracyTable from "./UserRoleAccuracyTable";
-import { Search, Zap } from "lucide-react";
+import { Search } from "lucide-react";
 import { GroupingStatsCommander } from "@/types/performance";
-import { Input } from "./ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { PositionScore } from "@/types/user";
+import { Input } from "@headlessui/react";
+import { DatePicker, DateValue } from "@heroui/react";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { squadStore } from "@/store/squadStore";
+import { getSquads } from "@/services/squadService";
+import BaseSelect from "./base/BaseSelect";
 
+/* ------------------------------------------------------------------ */
+/* component                                                          */
+/* ------------------------------------------------------------------ */
 const CommanderView = () => {
+  /* ------------------------------------------------------------------ */
+  /* stores & theme                                                      */
+  /* ------------------------------------------------------------------ */
   const { theme } = useTheme();
   const { user } = useStore(userStore);
   const {
-    squadMajorityPerformance,
-    fetchSquadMajorityPerformance,
     commanderUserRoleBreakdown,
     fetchCommanderUserRoleBreakdown,
     getGroupingStatsByTeamIdCommander,
+    getUserMediansInSquad,
     groupingStatsCommander,
+    userMediansInSquad,
   } = useStore(performanceStore);
+  const { squads } = useStore(squadStore);
 
+  /* ------------------------------------------------------------------ */
+  /* local state – search / sort / basic effort filter                  */
+  /* ------------------------------------------------------------------ */
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<"dispersion" | "effort" | "groups" | "time">("dispersion");
   const [filterEffort, setFilterEffort] = useState<"all" | "high" | "medium" | "low">("all");
 
+  /* ------------------------------------------------------------------ */
+  /* NEW state – full RPC filter set                                    */
+  /* ------------------------------------------------------------------ */
+  const [weaponId, setWeaponId] = useState<string | null>(null);
+  const [effort, setEffort] = useState<string | null>(null); // “slow”, “medium”, “rapid” etc.
+  const [shotType, setShotType] = useState<string | null>(null); // “single”, “burst”, …
+  const [position, setPosition] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [selectedSquadId, setSelectedSquadId] = useState<string | null>(null);
+
+  /* ------------------------------------------------------------------ */
+  /* initial load – NO median call here any more                        */
+  /* ------------------------------------------------------------------ */
   useEffect(() => {
-    const load = async () => {
+    (async () => {
       if (!user?.team_id) return;
-      await fetchSquadMajorityPerformance(user.team_id);
       await fetchCommanderUserRoleBreakdown(user.team_id);
-      await getGroupingStatsByTeamIdCommander(user.team_id, new Date("2025-01-01"), new Date("2025-01-31"));
+      await getSquads(user.team_id);
+      // Set default squad if user has one
+      if (user.squad_id) {
+        setSelectedSquadId(user.squad_id);
+      }
       setLoading(false);
-    };
-    load();
+    })();
   }, [user?.team_id]);
 
+  /* ------------------------------------------------------------------ */
+  /* fetch grouping stats whenever dates change                          */
+  /* ------------------------------------------------------------------ */
   useEffect(() => {
-    if (groupingStatsCommander) {
-      console.log(squadMajorityPerformance);
-      console.log(groupingStatsCommander);
-    }
-  }, [groupingStatsCommander]);
+    if (!user?.team_id) return;
+    getGroupingStatsByTeamIdCommander(user.team_id, startDate || new Date(), endDate || new Date());
+  }, [user?.team_id, startDate, endDate]);
 
-  // Filter and sort grouping stats
+  /* ------------------------------------------------------------------ */
+  /* fetch medians whenever any filter changes                          */
+  /* ------------------------------------------------------------------ */
+  const grabMedians = useCallback(async () => {
+    if (!selectedSquadId) return;
+    await getUserMediansInSquad(selectedSquadId, weaponId, effort, shotType, position, startDate, endDate);
+  }, [selectedSquadId, weaponId, effort, shotType, position, startDate, endDate]);
+
+  useEffect(() => {
+    grabMedians();
+  }, [grabMedians]);
+
+  /* ------------------------------------------------------------------ */
+  /* set initial position based on squad                                */
+  /* ------------------------------------------------------------------ */
+  useEffect(() => {
+    if (!selectedSquadId || !squads) return;
+    const squad = squads.find((s) => s.id === selectedSquadId);
+    if (squad && !position) {
+      setPosition(squad.squad_name);
+    }
+  }, [selectedSquadId, squads]);
+
+  /* ------------------------------------------------------------------ */
+  /* helpers                                                            */
+  /* ------------------------------------------------------------------ */
+  const getDispersionColor = (d: number) => (d <= 3 ? "text-green-500" : d <= 5 ? "text-amber-500" : "text-red-500");
+
+  const getPerformanceRating = (s: GroupingStatsCommander) => {
+    const dispersionScore = s.avg_dispersion ? Math.max(0, 100 - s.avg_dispersion * 10) : 0;
+    const effortScore = (s.effort_percentage || 0) * 2;
+    const consistencyScore = s.best_dispersion && s.worst_dispersion ? Math.max(0, 100 - (s.worst_dispersion - s.best_dispersion) * 5) : 0;
+    return Math.round((dispersionScore + effortScore + consistencyScore) / 3);
+  };
+
+  /* ------------------------------------------------------------------ */
+  /* derived list with search / sort / effort                           */
+  /* ------------------------------------------------------------------ */
   const filteredAndSortedStats = groupingStatsCommander
     ?.filter((stat) => {
-      // Filter by search term
+      /* search name */
       const fullName = `${stat.first_name} ${stat.last_name}`.toLowerCase();
       if (!fullName.includes(searchTerm.toLowerCase())) return false;
 
-      // Filter by effort percentage
+      /* effort band */
       if (filterEffort === "high" && (stat.effort_percentage || 0) < 20) return false;
       if (filterEffort === "medium" && ((stat.effort_percentage || 0) < 10 || (stat.effort_percentage || 0) >= 20)) return false;
       if (filterEffort === "low" && (stat.effort_percentage || 0) >= 10) return false;
+
+      /* filter by squad if selected */
+      if (selectedSquadId) {
+        const userData = commanderUserRoleBreakdown?.find(
+          (u) => u.first_name.trim() === stat.first_name.trim() && u.last_name.trim() === stat.last_name.trim(),
+        );
+        const selectedSquad = squads?.find((s) => s.id === selectedSquadId);
+        if (userData && selectedSquad && userData.squad_name !== selectedSquad.squad_name) {
+          return false;
+        }
+      }
 
       return true;
     })
@@ -73,248 +153,211 @@ const CommanderView = () => {
       }
     });
 
-  const getDispersionColor = (dispersion: number) => {
-    if (dispersion <= 3) return "text-green-500";
-    if (dispersion <= 5) return "text-amber-500";
-    return "text-red-500";
-  };
-
-  const getPerformanceRating = (stat: GroupingStatsCommander) => {
-    const dispersionScore = stat.avg_dispersion ? Math.max(0, 100 - stat.avg_dispersion * 10) : 0;
-    const effortScore = (stat.effort_percentage || 0) * 2;
-    const consistencyScore =
-      stat.best_dispersion && stat.worst_dispersion ? Math.max(0, 100 - (stat.worst_dispersion - stat.best_dispersion) * 5) : 0;
-
-    return Math.round((dispersionScore + effortScore + consistencyScore) / 3);
-  };
-
+  /* ------------------------------------------------------------------ */
+  /* UI                                                                 */
+  /* ------------------------------------------------------------------ */
   return (
     <div className="flex flex-col gap-6">
-      {/* Header Section */}
+      {/* 1️⃣  Filters */}
 
-      {/* Grouping Stats Section */}
-      {groupingStatsCommander && groupingStatsCommander.length > 0 && (
-        <div className="max-w-6xl mx-auto">
-          {/* Section Header - minimal and clean */}
-          <div className="mb-12 text-center">
-            <h2 className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>GROUPING ANALYSIS</h2>
-            <div className={`h-px w-20 mx-auto ${theme === "dark" ? "bg-gray-700" : "bg-gray-300"}`} />
-          </div>
+      <div className="flex flex-col lg:flex-row gap-4 w-full max-w-7xl mx-auto">
+        {/* search */}
+        <Input
+          placeholder="Search by name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className={`flex-1 h-11 rounded-lg shadow-sm border-0 ${
+            theme === "dark" ? "bg-zinc-800/50 text-white placeholder:text-gray-500" : "bg-gray-50 text-gray-900 placeholder:text-gray-400"
+          }`}
+        />
 
-          {/* Filters - floating style */}
-          <div className="mb-12 flex justify-center">
-            <div className="flex flex-col lg:flex-row gap-4 w-full max-w-4xl">
-              {/* Search */}
-              <div className="flex-1">
-                <Input
-                  placeholder="Search by name..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`h-11 border-0 rounded-lg shadow-sm ${
-                    theme === "dark" ? "bg-zinc-800/50 text-white placeholder:text-gray-500" : "bg-gray-50 text-gray-900 placeholder:text-gray-400"
-                  }`}
-                />
-              </div>
+        {/* sort by */}
+        <BaseSelect
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as "dispersion" | "effort" | "groups" | "time")}
+          options={[
+            { label: "Best Dispersion", value: "dispersion" },
+            { label: "Highest Effort", value: "effort" },
+            { label: "Most Groups", value: "groups" },
+            { label: "Fastest Time", value: "time" },
+          ]}
+          placeholder="Sort by"
+        />
+        <BaseSelect
+          value={filterEffort}
+          onChange={(e) => setFilterEffort(e.target.value as "all" | "high" | "medium" | "low")}
+          options={[
+            { label: "All Efforts", value: "all" },
+            { label: "High Effort", value: "high" },
+            { label: "Medium Effort", value: "medium" },
+            { label: "Low Effort", value: "low" },
+          ]}
+          placeholder="Filter Effort"
+        />
 
-              <div className="flex gap-3 justify-center lg:justify-end">
-                {/* Sort */}
-                <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                  <SelectTrigger
-                    className={`w-44 h-11 border-0 rounded-lg shadow-sm ${
-                      theme === "dark" ? "bg-zinc-800/50 text-white" : "bg-gray-50 text-gray-900"
-                    }`}
-                  >
-                    <SelectValue placeholder="Sort by..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dispersion">Best Dispersion</SelectItem>
-                    <SelectItem value="effort">Highest Effort</SelectItem>
-                    <SelectItem value="groups">Most Groups</SelectItem>
-                    <SelectItem value="time">Fastest Time</SelectItem>
-                  </SelectContent>
-                </Select>
+        {/* NEW – full RPC filters (weapon, effort, type, position, dates) */}
+        {/* weapon */}
+        <Input
+          className="w-44 h-11 bg-gray-50 dark:bg-zinc-800/50 rounded-lg shadow-sm"
+          placeholder="Weapon ID"
+          value={weaponId ?? ""}
+          onChange={(e) => setWeaponId(e.target.value || null)}
+        />
+        {/* effort literal */}
+        <Input
+          className="w-32 h-11 bg-gray-50 dark:bg-zinc-800/50 rounded-lg shadow-sm"
+          placeholder="Effort"
+          value={effort ?? ""}
+          onChange={(e) => setEffort(e.target.value || null)}
+        />
+        {/* type */}
+        <Input
+          className="w-32 h-11 bg-gray-50 dark:bg-zinc-800/50 rounded-lg shadow-sm"
+          placeholder="Type"
+          value={shotType ?? ""}
+          onChange={(e) => setShotType(e.target.value || null)}
+        />
+        {/* position enum */}
+        <BaseSelect
+          value={position || ""}
+          onChange={(e) => setPosition(e.target.value || null)}
+          options={Object.values(PositionScore).map((p) => ({ label: p, value: p }))}
+          placeholder="Position"
+        />
+        {/* dates */}
+        <DatePicker label="Start" value={startDate as unknown as DateValue} onChange={(v) => setStartDate(v as unknown as Date | null)} />
+        <DatePicker label="End" value={endDate as unknown as DateValue} onChange={(v) => setEndDate(v as unknown as Date | null)} />
+      </div>
 
-                {/* Filter */}
-                <Select value={filterEffort} onValueChange={(value: any) => setFilterEffort(value)}>
-                  <SelectTrigger
-                    className={`w-44 h-11 border-0 rounded-lg shadow-sm ${
-                      theme === "dark" ? "bg-zinc-800/50 text-white" : "bg-gray-50 text-gray-900"
-                    }`}
-                  >
-                    <SelectValue placeholder="Filter..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Efforts</SelectItem>
-                    <SelectItem value="high">High ≥20%</SelectItem>
-                    <SelectItem value="medium">Medium 10-19%</SelectItem>
-                    <SelectItem value="low">Low &lt;10%</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
+      {/* 2️⃣  Grouping stats list */}
+      {filteredAndSortedStats?.length ? (
+        <div className="space-y-8 max-w-6xl mx-auto">
+          {filteredAndSortedStats.map((stat, idx) => {
+            const perf = getPerformanceRating(stat);
+            const hasData = stat.total_groups > 0;
 
-          {/* Stats Grid - minimal dashboard style */}
-          <div className="space-y-8">
-            {filteredAndSortedStats?.map((stat, idx) => {
-              const performanceRating = getPerformanceRating(stat);
-              const hasData = stat.total_groups > 0;
+            /* find user‑level median row (single lookup, O(1) with Map in prod) */
+            const medianRec = userMediansInSquad?.find((m) => m.user_id === stat.sniper_user_id);
 
-              // Find matching user data from commanderUserRoleBreakdown
-              const userData = commanderUserRoleBreakdown?.find(
-                (user) => user.first_name.trim() === stat.first_name.trim() && user.last_name.trim() === stat.last_name.trim(),
-              );
+            const userData = commanderUserRoleBreakdown?.find(
+              (u) => u.first_name.trim() === stat.first_name.trim() && u.last_name.trim() === stat.last_name.trim(),
+            );
 
-              return (
-                <div key={idx} className={`group ${!hasData ? "opacity-50" : ""}`}>
-                  {/* Sniper Row - simpler layout */}
-                  <div className="flex flex-col gap-6">
-                    {/* Header with name and score */}
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
-                            theme === "dark" ? "bg-zinc-800 text-gray-400" : "bg-gray-100 text-gray-600"
-                          }`}
-                        >
-                          {stat.first_name.charAt(0)}
-                          {stat.last_name.charAt(0)}
-                        </div>
-                        <div>
-                          <h3 className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                            {stat.first_name} {stat.last_name}
-                          </h3>
-                          <p className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>
-                            {hasData ? `${stat.total_groups} groups` : "No data"}
-                            {userData && (
-                              <>
-                                <span className={`mx-1 ${theme === "dark" ? "text-gray-600" : "text-gray-400"}`}>•</span>
-                                {userData.role_or_weapon}
-                              </>
-                            )}
-                          </p>
-                        </div>
+            return (
+              <div key={stat.sniper_user_id} className={`group ${!hasData && "opacity-50"}`}>
+                {/* header */}
+                <div className="flex flex-col sm:flex-row justify-between gap-4">
+                  {/* name / counts */}
+                  <div className="flex gap-4 items-center">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center font-medium ${
+                        theme === "dark" ? "bg-zinc-800 text-gray-400" : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {stat.first_name[0]}
+                      {stat.last_name[0]}
+                    </div>
+                    <div>
+                      <h3 className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                        {stat.first_name} {stat.last_name}
+                      </h3>
+                      <p className="text-sm text-gray-500 flex gap-1 items-center">
+                        {hasData ? `${stat.total_groups} groups` : "No data"}
+                        {userData && (
+                          <>
+                            <span className="mx-1">•</span>
+                            {userData.role_or_weapon}
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* performance score */}
+                  {hasData && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-500">Performance</span>
+                      <span className={`text-2xl font-light ${perf >= 70 ? "text-green-500" : perf >= 50 ? "text-amber-500" : "text-red-500"}`}>
+                        {perf}%
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* metrics */}
+                {hasData && (
+                  <div className="flex flex-wrap gap-x-12 gap-y-4 pl-14 mt-4">
+                    {/* median dispersion */}
+                    {medianRec && (
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm text-gray-500">Median:</span>
+                        <span className={`text-lg font-light ${getDispersionColor(medianRec.median_cm_dispersion)}`}>
+                          {medianRec.median_cm_dispersion.toFixed(1)}cm
+                        </span>
                       </div>
+                    )}
 
-                      {/* Performance Score */}
-                      {hasData && (
-                        <div className="flex items-center gap-3">
-                          <span className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>Performance</span>
-                          <div
-                            className={`text-2xl font-light ${
-                              performanceRating >= 70 ? "text-green-500" : performanceRating >= 50 ? "text-amber-500" : "text-red-500"
-                            }`}
-                          >
-                            {performanceRating}%
-                          </div>
-                        </div>
-                      )}
+                    {/* avg dispersion */}
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-sm text-gray-500">Avg&nbsp;dispersion:</span>
+                      <span className={`text-lg font-light ${getDispersionColor(stat.avg_dispersion)}`}>{stat.avg_dispersion.toFixed(1)}cm</span>
+                      <span className="text-xs text-gray-500">
+                        ({stat.best_dispersion}-{stat.worst_dispersion})
+                      </span>
                     </div>
 
-                    {/* Metrics - flowing layout */}
-                    {hasData && (
-                      <div className="flex flex-wrap gap-x-12 gap-y-4 pl-14">
-                        {/* Hit Accuracy if available */}
-                        {userData && (
-                          <div className="flex items-baseline gap-2">
-                            <span className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>Accuracy:</span>
-                            <span
-                              className={`text-lg font-light ${
-                                userData.hit_percentage >= 75 ? "text-green-500" : userData.hit_percentage >= 50 ? "text-amber-500" : "text-red-500"
-                              }`}
-                            >
-                              {userData.hit_percentage.toFixed(0)}%
-                            </span>
-                            <span className={`text-xs ${theme === "dark" ? "text-gray-600" : "text-gray-500"}`}>
-                              ({userData.hits}/{userData.shots})
-                            </span>
-                          </div>
-                        )}
+                    {/* avg bullets */}
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-sm text-gray-500">Avg&nbsp;bullets:</span>
+                      <span className="text-lg font-light">{stat.avg_bullets.toFixed(1)}</span>
+                    </div>
 
-                        {/* Dispersion */}
-                        <div className="flex items-baseline gap-2">
-                          <span className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>Dispersion:</span>
-                          <span className={`text-lg font-light ${getDispersionColor(stat.avg_dispersion)}`}>{stat.avg_dispersion.toFixed(1)}cm</span>
-                          <span className={`text-xs ${theme === "dark" ? "text-gray-600" : "text-gray-500"}`}>
-                            ({stat.best_dispersion}-{stat.worst_dispersion})
-                          </span>
-                        </div>
+                    {/* avg time */}
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-sm text-gray-500">Avg&nbsp;time:</span>
+                      <span className="text-lg font-light">{stat.avg_time_seconds.toFixed(1)}s</span>
+                    </div>
 
-                        {/* Sessions if available */}
-                        {userData && (
-                          <div className="flex items-baseline gap-2">
-                            <span className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>Sessions:</span>
-                            <span className={`text-lg font-light ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>{userData.sessions}</span>
-                          </div>
-                        )}
+                    {/* effort percentage */}
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-sm text-gray-500">Effort:</span>
+                      <span
+                        className={`text-lg font-light ${stat.effort_percentage >= 20 ? "text-green-500" : stat.effort_percentage >= 10 ? "text-amber-500" : "text-red-500"}`}
+                      >
+                        {stat.effort_percentage.toFixed(0)}%
+                      </span>
+                    </div>
 
-                        {/* Bullets */}
-                        <div className="flex items-baseline gap-2">
-                          <span className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>Avg bullets:</span>
-                          <span className={`text-lg font-light ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-                            {stat.avg_bullets.toFixed(1)}
-                          </span>
-                        </div>
-
-                        {/* Time */}
-                        <div className="flex items-baseline gap-2">
-                          <span className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>Avg time:</span>
-                          <span className={`text-lg font-light ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-                            {stat.avg_time_seconds.toFixed(0)}s
-                          </span>
-                        </div>
-
-                        {/* Effort */}
-                        <div className="flex items-baseline gap-2">
-                          <span className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>Effort:</span>
-                          <div
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm ${
-                              stat.effort_percentage >= 20
-                                ? theme === "dark"
-                                  ? "bg-green-500/10 text-green-400"
-                                  : "bg-green-100 text-green-700"
-                                : stat.effort_percentage >= 10
-                                  ? theme === "dark"
-                                    ? "bg-amber-500/10 text-amber-400"
-                                    : "bg-amber-100 text-amber-700"
-                                  : theme === "dark"
-                                    ? "bg-gray-500/10 text-gray-400"
-                                    : "bg-gray-100 text-gray-600"
-                            }`}
-                          >
-                            <Zap className="w-3 h-3" />
-                            {stat.effort_percentage?.toFixed(0) || 0}%
-                          </div>
-                        </div>
+                    {/* mistakes */}
+                    {stat.mistake_count !== null && stat.mistake_count > 0 && (
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm text-gray-500">Top&nbsp;mistake:</span>
+                        <span className="text-sm font-light text-amber-600">
+                          {stat.top_mistake} ({stat.mistake_count})
+                        </span>
                       </div>
                     )}
                   </div>
+                )}
 
-                  {/* Subtle divider */}
-                  {idx < filteredAndSortedStats.length - 1 && (
-                    <div className={`mt-8 h-px ${theme === "dark" ? "bg-gray-800/50" : "bg-gray-200/50"}`} />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Empty state - minimal */}
-          {filteredAndSortedStats?.length === 0 && (
-            <div className="text-center py-20">
-              <div
-                className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-100"}`}
-              >
-                <Search className="w-8 h-8 opacity-40" />
+                {/* divider */}
+                {idx < filteredAndSortedStats.length - 1 && <div className={`mt-8 h-px ${theme === "dark" ? "bg-gray-800/50" : "bg-gray-200/50"}`} />}
               </div>
-              <h3 className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>No results found</h3>
-              <p className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>Try adjusting your filters</p>
-            </div>
-          )}
+            );
+          })}
+        </div>
+      ) : (
+        /* empty */
+        <div className="text-center py-20">
+          <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-100"}`}>
+            <Search className="w-8 h-8 opacity-40" />
+          </div>
+          <h3 className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>No results found</h3>
+          <p className="text-sm text-gray-500">Try adjusting your filters</p>
         </div>
       )}
 
-      {/* User Accuracy by Role */}
+      {/* accuracy breakdown */}
       <UserRoleAccuracyTable loading={loading} commanderUserRoleBreakdown={commanderUserRoleBreakdown} theme={theme} />
     </div>
   );

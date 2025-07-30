@@ -160,3 +160,29 @@ export type SquadMajorityPerformance = {
   avg_time_to_first_shot: number;
   elimination_rate: number;
 };
+
+export interface GetUserMediansInSquad {
+  squad_id: string;
+  user_id: string;
+  user_duty: "Sniper" | "Spotter";
+  weapon_id?: string | null;
+  equipment_id?: string | null;
+  position: string;
+}
+
+export interface GetUserMediansInSquadQuery {
+  p_squad_id: string;
+  p_weapon_id: string | null;
+  p_effort: string | null;
+  p_type: string | null;
+  p_position: string | null;
+  p_start_date: Date | null;
+  p_end_date: Date | null;
+}
+
+export interface GetUserMediansInSquadQueryResult {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  median_cm_dispersion: number;
+}

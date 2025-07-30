@@ -314,14 +314,41 @@ export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsage
 }
 
 export async function getGroupingStatsByTeamIdCommander(teamId: string, startDate: Date, endDate: Date) {
-  console.log("startDate", startDate);
-  console.log("endDate", endDate);
   const { data, error } = await supabase.rpc("get_grouping_stats_for_team", {
     p_team_id: teamId,
+    p_start_date: startDate,
+    p_end_date: endDate,
   });
 
   if (error) {
     console.error("Error fetching grouping stats:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+export async function getUserMediansInSquad(
+  squadId: string,
+  weaponId: string | null,
+  effort: string | null,
+  type: string | null,
+  position: string | null,
+  startDate: Date | null,
+  endDate: Date | null,
+) {
+  const { data, error } = await supabase.rpc("get_user_medians_in_squad", {
+    p_squad_id: squadId,
+    p_weapon_id: weaponId,
+    p_effort: effort,
+    p_type: type,
+    p_position: position,
+    p_start_date: startDate,
+    p_end_date: endDate,
+  });
+
+  if (error) {
+    console.error("Error fetching user medians in squad:", error);
     throw error;
   }
 

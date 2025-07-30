@@ -11,6 +11,7 @@ import {
   CommanderUserRoleBreakdown,
   GroupingScoreEntry,
   GroupingStatsCommander,
+  GetUserMediansInSquadQueryResult,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
@@ -29,6 +30,7 @@ import {
   getGroupingScoresCountByTraining,
   getGroupingStatsByTeamIdCommander,
   getBestGroupingStatsByTraining,
+  getUserMediansInSquad,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/user";
@@ -82,6 +84,18 @@ interface PerformanceStore {
     trainingSessionId: string,
   ) => Promise<{ total_groups: number; avg_dispersion: number; best_dispersion: number } | null>;
   bestGroupingByTraining: { total_groups: number; avg_dispersion: number; best_dispersion: number } | null;
+
+  userMediansInSquad: GetUserMediansInSquadQueryResult[] | null;
+  getUserMediansInSquad: (
+    squadId: string,
+    weaponId: string | null,
+    effort: string | null,
+    type: string | null,
+    position: string | null,
+    startDate: Date | null,
+    endDate: Date | null,
+  ) => Promise<void>;
+  userMediansInSquadLoading: boolean;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
@@ -100,6 +114,8 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   groupingScoresTotalCount: 0,
   groupingStatsCommander: null,
   bestGroupingByTraining: null,
+  userMediansInSquad: null,
+  userMediansInSquadLoading: false,
   fetchGroupingScores: async (trainingSessionId: string, limit: number = 20, offset: number = 0) => {
     try {
       set({ isLoading: true });
@@ -297,6 +313,27 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     } catch (error) {
       console.error("Failed to load grouping stats:", error);
       set({ groupingStatsCommander: null });
+    }
+  },
+
+  getUserMediansInSquad: async (
+    squadId: string,
+    weaponId: string | null,
+    effort: string | null,
+    type: string | null,
+    position: string | null,
+    startDate: Date | null,
+    endDate: Date | null,
+  ) => {
+    try {
+      set({ userMediansInSquadLoading: true });
+      const data = await getUserMediansInSquad(squadId, weaponId, effort, type, position, startDate, endDate);
+      set({ userMediansInSquad: data });
+    } catch (error) {
+      console.error("Failed to load user medians in squad:", error);
+      set({ userMediansInSquad: null });
+    } finally {
+      set({ userMediansInSquadLoading: false });
     }
   },
 }));
