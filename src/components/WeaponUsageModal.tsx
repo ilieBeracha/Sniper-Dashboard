@@ -2,7 +2,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { performanceStore } from "@/store/performance";
 import { Weapon } from "@/types/weapon";
 import { useStore } from "zustand";
-import { X, Target, TrendingUp, Activity, Crosshair, BarChart3 } from "lucide-react";
+import { X, Target, TrendingUp, Activity, BarChart3 } from "lucide-react";
 import { Skeleton } from "@heroui/react";
 
 interface WeaponUsageModalProps {
@@ -67,7 +67,7 @@ export default function WeaponUsageModal({ isOpen, onClose, weapon }: WeaponUsag
           ) : weaponUsageStats ? (
             <div className="space-y-6">
               {/* Main Stats Grid */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <StatCard
                   icon={<Target className="w-4 h-4" />}
                   label="Total Shots Fired"
@@ -75,28 +75,25 @@ export default function WeaponUsageModal({ isOpen, onClose, weapon }: WeaponUsag
                   theme={theme}
                   colorScheme="blue"
                 />
-                <StatCard
-                  icon={<Crosshair className="w-4 h-4" />}
-                  label="Total Hits"
-                  value={weaponUsageStats.total_hits?.toLocaleString() || "0"}
-                  theme={theme}
-                  colorScheme="green"
-                />
-                <StatCard
-                  icon={<TrendingUp className="w-4 h-4" />}
-                  label="Hit Percentage"
-                  value={weaponUsageStats.hit_percentage ? `${weaponUsageStats.hit_percentage.toFixed(1)}%` : "0%"}
-                  theme={theme}
-                  colorScheme="green"
-                  highlight={true}
-                />
-                <StatCard
-                  icon={<Activity className="w-4 h-4" />}
-                  label="Avg CM Dispersion"
-                  value={weaponUsageStats.avg_cm_dispersion ? `${weaponUsageStats.avg_cm_dispersion.toFixed(1)}cm` : "N/A"}
-                  theme={theme}
-                  colorScheme="purple"
-                />
+                <div className="flex flex-col gap-2">
+                  <StatCard
+                    icon={<TrendingUp className="w-4 h-4" />}
+                    label="Hit Percentage"
+                    value={weaponUsageStats.hit_percentage ? `${weaponUsageStats.hit_percentage.toFixed(1)}%` : "0%"}
+                    theme={theme}
+                    colorScheme="green"
+                    highlight={true}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <StatCard
+                    icon={<Activity className="w-4 h-4" />}
+                    label="Avg CM Dispersion"
+                    value={weaponUsageStats.avg_cm_dispersion ? `${weaponUsageStats.avg_cm_dispersion.toFixed(1)}cm` : "N/A"}
+                    theme={theme}
+                    colorScheme="purple"
+                  />
+                </div>
               </div>
 
               {/* Best Performance */}

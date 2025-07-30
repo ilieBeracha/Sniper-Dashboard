@@ -206,31 +206,30 @@ export default function GroupStatsTable({
     <>
       {/* Stats Header */}
       <div
-        className={`p-3w-full grid col-span-full md:p-6 rounded-lg border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-gray-50 border-gray-200"}`}
+        className={`p-3 w-full grid col-span-full md:p-6 rounded-lg border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-gray-50 border-gray-200"}`}
       >
         <div className="flex flex-col md:flex-row flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap gap-6 text-lg sm:justify-between md:justify-start w-full">
-            <div className="flex flex-col items-center gap-2">
-              <span className={`text-sm    ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Total Groups:</span>
-              <span className="text-2xl font-semibold text-green-400  ">{bestGroupingByTraining?.total_groups || 0}</span>
+            <div className="flex flex-col  gap-1">
+              <span className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Total Groups:</span>
+              <span className="text-lg font-semibold text-green-400  ">{bestGroupingByTraining?.total_groups || 0}</span>
             </div>
 
             {bestGroupingByTraining && (
               <>
-                <div className="flex flex-col items-center justify-center gap-2">
-                  <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Avg Dispersion</span>
+                <div className="flex flex-col  justify-center gap-1">
+                  <span className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Avg Dispersion</span>
                   <span className={`font-semibold text-lg ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
-                    <span className="text-2xl font-semibold text-blue-400  ">
-                      {" "}
+                    <span className="text-lg font-semibold text-blue-400  ">
                       {bestGroupingByTraining?.avg_dispersion !== 0 ? `${bestGroupingByTraining?.avg_dispersion} cm` : "N/A"}
                     </span>
                   </span>
                 </div>
 
-                <div className="flex flex-col items-center gap-2">
-                  <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Best Group</span>
+                <div className="flex flex-col  gap-1">
+                  <span className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Best Group</span>
                   <span className={`font-semibold text-lg ${theme === "dark" ? "text-green-400" : "text-green-600"}`}>
-                    <span className="text-2xl font-semibold text-green-400  ">
+                    <span className="text-lg font-semibold text-green-400  ">
                       {" "}
                       {bestGroupingByTraining?.best_dispersion !== 0 ? `${bestGroupingByTraining?.best_dispersion} cm` : "N/A"}
                     </span>
