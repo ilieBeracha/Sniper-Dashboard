@@ -54,12 +54,12 @@ export default function DashboardProfileCard() {
             {user?.first_name} {user?.last_name}
           </p>
           <div className="flex flex-col gap-2">
-            <Chip variant="bordered" className={`bg-zinc-800 text-white text-xs ${theme === "dark" ? "text-white bg-purple-600" : "text-gray-900"}`}>
+            <Chip variant="bordered" className={`bg-zinc-800 text-white text-xs ${theme === "dark" ? "text-white bg-purple-600" : "text-white"}`}>
               <span className="text-xs">Role: </span> {user?.user_role?.replace("_", " ").toUpperCase()}
             </Chip>
           </div>
           <div className="flex flex-col gap-2">
-            <Chip variant="bordered" className={`bg-zinc-800 text-white text-xs ${theme === "dark" ? "text-white bg-purple-800" : "text-gray-900"}`}>
+            <Chip variant="bordered" className={`bg-zinc-800 text-white text-xs ${theme === "dark" ? "text-white bg-purple-800" : "text-white"}`}>
               <span className="text-xs">Team: </span> {user?.team_name}
             </Chip>
             {user?.squad_name && (
