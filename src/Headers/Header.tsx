@@ -1,17 +1,13 @@
 import { useStore } from "zustand";
 import { useSidebarStore } from "@/store/sidebarStore";
 import { userStore } from "@/store/userStore";
-import { List, User, Moon, Sun, Activity, ChevronDown, UserPlus } from "lucide-react";
+import { List } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { SpPageBreadcrumbs } from "@/layouts/SpPage";
 import { useState, useRef, useEffect } from "react";
 import ActivityFeedDrawer from "@/components/ActivityFeedDrawer";
 import InviteModal from "@/components/InviteModal";
-import { isCommander } from "@/utils/permissions";
-import { UserRole } from "@/types/user";
-import { NavLink } from "react-router-dom";
-import { FaFolderOpen } from "react-icons/fa";
 import ProfileMenu from "./ProfileMenu";
 
 export default function Header({
@@ -24,11 +20,10 @@ export default function Header({
   breadcrumbs?: { label: string; link: string }[];
 }) {
   const { toggleDrawer } = useStore(useSidebarStore);
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const { user } = useStore(userStore);
   const isMobile = useIsMobile();
   const [isActivityFeedOpen, setIsActivityFeedOpen] = useState(false);
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -36,7 +31,7 @@ export default function Header({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
-        setIsProfileMenuOpen(false);
+        setIsInviteModalOpen(false);
       }
     };
 

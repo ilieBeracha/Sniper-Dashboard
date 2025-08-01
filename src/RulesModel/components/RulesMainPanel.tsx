@@ -34,14 +34,6 @@ export default function RulesMainPanel({ onRuleSelect, selectedRuleId }: RulesMa
     }
   };
 
-  // Format trigger type for display
-  const formatTriggerType = (type: string) => {
-    return type
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
-
   return (
     <div className="h-full flex flex-col">
       {/* Header */}

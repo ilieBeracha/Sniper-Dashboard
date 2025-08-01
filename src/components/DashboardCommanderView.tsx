@@ -9,7 +9,6 @@ import { GroupingStatsCommander } from "@/types/performance";
 import { PositionScore } from "@/types/user";
 import { Input } from "@headlessui/react";
 import { DatePicker, DateValue } from "@heroui/react";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { squadStore } from "@/store/squadStore";
 import { getSquads } from "@/services/squadService";
 import BaseSelect from "./base/BaseSelect";

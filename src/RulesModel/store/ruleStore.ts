@@ -11,7 +11,7 @@ type RuleStore = {
   getTeamRules: (teamId: string) => Promise<TeamRule[]>;
 };
 
-export const useRuleStore = create<RuleStore>((set, get) => ({
+export const useRuleStore = create<RuleStore>((set) => ({
   templates: [],
   setTemplates: (templates: RuleTemplate[]) => set({ templates }),
   getRuleTemplates: async () => {
