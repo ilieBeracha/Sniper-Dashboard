@@ -3,6 +3,10 @@ export type RuleTemplate = {
   name: string;
   trigger_type: string;
   default_config: any;
+  mock_flow?: {
+    nodes: any[];
+    edges: any[];
+  };
   description: string;
   tags: string[];
   created_at: string;
@@ -22,7 +26,7 @@ export type RuleExecution = {
   id: string;
   rule_id: string;
   team_id: string;
-  status: 'success' | 'failed' | 'pending';
+  status: "success" | "failed" | "pending";
   started_at: string;
   completed_at?: string;
   error_message?: string;

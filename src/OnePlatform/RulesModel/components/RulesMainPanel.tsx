@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import { FaPlus, FaBolt, FaClock, FaCheckCircle, FaExclamationTriangle, FaRobot, FaCog, FaList, FaPlay, FaPause, FaSync } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaPlus, FaBolt, FaClock, FaCheckCircle, FaExclamationTriangle, FaRobot, FaList, FaPlay, FaPause, FaSync } from "react-icons/fa";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useRuleStore } from "../store/ruleStore";
-import { RuleTemplate, TeamRule } from "../type";
 
 interface RulesMainPanelProps {
   onRuleSelect: (ruleId: string | null) => void;
@@ -12,26 +11,23 @@ interface RulesMainPanelProps {
 export default function RulesMainPanel({ onRuleSelect, selectedRuleId }: RulesMainPanelProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const { templates, teamRules } = useRuleStore();
+  const { templates, teamRules, getRuleExecutions } = useRuleStore();
   const [activeTab, setActiveTab] = useState<"team" | "templates">("team");
 
-  // Get icon based on trigger type
-  const getTriggerIcon = (type: string) => {
-    switch (type) {
-      case "score_update":
-        return <FaExclamationTriangle className="w-4 h-4 text-amber-500" />;
-      case "schedule":
-        return <FaClock className="w-4 h-4 text-blue-500" />;
-      case "training_complete":
-        return <FaCheckCircle className="w-4 h-4 text-green-500" />;
-      case "automation":
-        return <FaRobot className="w-4 h-4 text-purple-500" />;
-      default:
-        return <FaBolt className="w-4 h-4 text-gray-500" />;
-    }
+  const triggerIcons = {
+    score_update: <FaExclamationTriangle className="w-4 h-4 text-amber-500" />,
+    schedule: <FaClock className="w-4 h-4 text-blue-500" />,
+    training_complete: <FaCheckCircle className="w-4 h-4 text-green-500" />,
+    automation: <FaRobot className="w-4 h-4 text-purple-500" />,
   };
 
   const items = activeTab === "team" ? teamRules : templates;
+
+  useEffect(() => {
+    if (selectedRuleId) {
+      getRuleExecutions(selectedRuleId);
+    }
+  }, [selectedRuleId, getRuleExecutions]);
 
   return (
     <div className="h-full flex flex-col">
@@ -102,74 +98,45 @@ export default function RulesMainPanel({ onRuleSelect, selectedRuleId }: RulesMa
           {items.map((item) => {
             const isTeamRule = "template_id" in item;
             const isSelected = selectedRuleId === item.id;
-            const template = isTeamRule ? templates.find((t) => t.id === (item as TeamRule).template_id) : (item as RuleTemplate);
+            const template = isTeamRule ? templates.find((t) => t.id === item.template_id) : item;
 
             return (
               <div
                 key={item.id}
                 onClick={() => onRuleSelect(item.id)}
                 className={`
-                  relative p-4 rounded-lg cursor-pointer transition-all duration-200
+                  p-4 rounded-lg cursor-pointer transition-all
                   ${
                     isSelected
-                      ? isDark
-                        ? "bg-purple-900/30 border border-purple-500"
-                        : "bg-purple-50 border border-purple-400"
-                      : isDark
-                        ? "bg-gray-800/50 hover:bg-gray-700/50 border border-transparent hover:border-gray-600"
-                        : "bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300"
-                  }
+                      ? "bg-purple-50 dark:bg-purple-900/20 border-purple-400"
+                      : "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700"
+                  } border
                 `}
               >
-                {/* Header Row */}
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    {/* Icon */}
-                    <div className={`p-2 rounded ${isDark ? "bg-gray-700/50" : "bg-gray-100"}`}>
-                      {React.cloneElement(getTriggerIcon(template?.trigger_type || ""), { className: "w-4 h-4" })}
-                    </div>
-
-                    {/* Title and Description */}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-medium text-sm">{isTeamRule ? template?.name || "Unknown Rule" : (item as RuleTemplate).name}</h3>
-                        {isTeamRule && (
-                          <div className="flex items-center gap-1">
-                            {(item as TeamRule).enabled ? (
-                              <FaPlay className="w-2.5 h-2.5 text-green-500" title="Active" />
-                            ) : (
-                              <FaPause className="w-2.5 h-2.5 text-gray-400" title="Paused" />
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        {isTeamRule ? (item as TeamRule).message || "No message" : (item as RuleTemplate).description}
-                      </p>
-                    </div>
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded bg-gray-100 dark:bg-gray-700">
+                    {triggerIcons[template?.trigger_type as keyof typeof triggerIcons] || <FaBolt className="w-4 h-4 text-gray-500" />}
                   </div>
 
-                  {/* Quick Actions */}
-                  <div className="flex items-center gap-1">
-                    {isSelected && <FaCog className={`w-3.5 h-3.5 ${isDark ? "text-gray-400" : "text-gray-500"}`} />}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium text-sm">{template?.name || "Unknown Rule"}</h3>
+                      {isTeamRule &&
+                        (item.enabled ? <FaPlay className="w-2.5 h-2.5 text-green-500" /> : <FaPause className="w-2.5 h-2.5 text-gray-400" />)}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5">{isTeamRule ? item.message : template?.description}</p>
+
+                    {template?.tags && template.tags.length > 0 && (
+                      <div className="flex gap-1 mt-2">
+                        {template.tags.map((tag) => (
+                          <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {/* Template Tags */}
-                {!isTeamRule && (item as RuleTemplate).tags && (item as RuleTemplate).tags.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex flex-wrap gap-1">
-                      {(item as RuleTemplate).tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className={`text-xs px-2 py-1 rounded-full ${isDark ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-700"}`}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             );
           })}

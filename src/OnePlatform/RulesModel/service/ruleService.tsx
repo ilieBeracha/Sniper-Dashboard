@@ -1,4 +1,4 @@
-import { RuleTemplate, TeamRule, RuleExecution, RuleStats } from "@/RulesModel/type";
+import { RuleTemplate, TeamRule, RuleExecution, RuleStats } from "@/OnePlatform/RulesModel/type";
 import { supabase } from "@/services/supabaseClient";
 
 export const fetchRuleTemplates = async (): Promise<RuleTemplate[]> => {
@@ -11,18 +11,6 @@ export const fetchTeamRules = async (teamId: string): Promise<TeamRule[]> => {
   const { data, error } = await supabase.from("team_rules").select("*").eq("team_id", teamId);
   if (error) throw error;
   return data as TeamRule[];
-};
-
-export const fetchRuleExecutions = async (ruleId: string, limit = 10): Promise<RuleExecution[]> => {
-  const { data, error } = await supabase
-    .from("rule_executions")
-    .select("*")
-    .eq("rule_id", ruleId)
-    .order("started_at", { ascending: false })
-    .limit(limit);
-
-  if (error) throw error;
-  return data as RuleExecution[];
 };
 
 export const fetchRuleStats = async (ruleId: string): Promise<RuleStats> => {
@@ -50,42 +38,32 @@ export const createTeamRule = async (teamId: string, ruleData: any): Promise<Tea
     .from("team_rules")
     .insert({
       team_id: teamId,
-      template_id: ruleData.templateId || null,
-      enabled: ruleData.enabled || true,
-      custom_config: {
-        nodes: ruleData.flow?.nodes || [],
-        edges: ruleData.flow?.edges || [],
-        trigger: ruleData.trigger,
-        conditions: ruleData.conditions,
-        actions: ruleData.actions,
-      },
-      message: ruleData.name,
+      template_id: ruleData.templateId,
+      enabled: ruleData.enabled ?? true,
+      custom_config: ruleData.config || {},
+      message: ruleData.message,
     })
     .select()
     .single();
 
   if (error) throw error;
-  return data as TeamRule;
+  return data;
 };
 
-export const updateTeamRule = async (ruleId: string, ruleData: any): Promise<TeamRule> => {
-  const { data, error } = await supabase
-    .from("team_rules")
-    .update({
-      enabled: ruleData.enabled,
-      custom_config: {
-        nodes: ruleData.flow?.nodes || [],
-        edges: ruleData.flow?.edges || [],
-        trigger: ruleData.trigger,
-        conditions: ruleData.conditions,
-        actions: ruleData.actions,
-      },
-      message: ruleData.name,
-    })
-    .eq("id", ruleId)
-    .select()
-    .single();
+export const updateTeamRule = async (ruleId: string, updates: Partial<TeamRule>): Promise<TeamRule> => {
+  const { data, error } = await supabase.from("team_rules").update(updates).eq("id", ruleId).select().single();
 
   if (error) throw error;
-  return data as TeamRule;
+  return data;
+};
+
+export const fetchRuleExecutions = async (ruleId: string, limit = 10): Promise<RuleExecution[]> => {
+  const { data, error } = await supabase
+    .from("rule_executions")
+    .select("*")
+    .eq("rule_id", ruleId)
+    .order("started_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data as RuleExecution[];
 };
