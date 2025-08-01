@@ -1,5 +1,5 @@
 import { Dialog } from "@headlessui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { BiSolidDashboard, BiSolidLogOut, BiSolidCog, BiChevronRight, BiChevronLeft } from "react-icons/bi";
 import { BsBarChartFill } from "react-icons/bs";
@@ -21,10 +21,7 @@ const navSections = [
   },
   {
     title: "TEAM",
-    items: [
-      { name: "Assets", href: "/assets", icon: <FaCrosshairs className="w-5 h-5" /> },
-      // { name: "File Vault", href: "/file-vault", icon: <FaFolderOpen className="w-5 h-5" /> },
-    ],
+    items: [{ name: "Assets", href: "/assets", icon: <FaCrosshairs className="w-5 h-5" /> }],
   },
   {
     title: "ACCOUNT",
@@ -32,38 +29,48 @@ const navSections = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed = false, expandable = true }: { collapsed?: boolean; expandable?: boolean }) {
+  const [isCollapsed, setIsCollapsed] = useState(collapsed);
   const { logout } = useStore(authStore);
   const { user } = useStore(userStore);
   const { isDrawerOpen, toggleDrawer } = useStore(useSidebarStore);
   const { theme } = useTheme();
   const userInitial = user?.first_name?.[0] || "U";
   const isMobile = useIsMobile();
-  const [collapsed, setCollapsed] = useState(false);
+
+  const handleToggleExpandable = () => {
+    if (expandable) {
+      setIsCollapsed(!isCollapsed);
+    }
+  };
+
+  useEffect(() => {
+    setIsCollapsed(collapsed);
+  }, [collapsed, expandable]);
 
   const SidebarContent = () => (
     <div
       className={`transition-all duration-300 ease-in-out flex flex-col border-r h-full relative z-[100] ${
         theme === "dark" ? " border-[#1D1D1F]" : " border-gray-200"
-      } ${collapsed ? "w-20" : "w-72"}`}
+      } ${isCollapsed ? "w-20" : "w-72"}`}
     >
       <div
         className={`flex items-center justify-between h-12 px-4 border-b transition-colors duration-200 ${
           theme === "dark" ? "border-[#1D1D1F] " : "border-gray-200 "
         }`}
       >
-        {!collapsed && (
+        {!isCollapsed && (
           <span className={`text-lg font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>ScopeStats</span>
         )}
         <button
-          onClick={() => (isMobile ? toggleDrawer() : setCollapsed(!collapsed))}
+          onClick={() => (isMobile ? toggleDrawer() : handleToggleExpandable())}
           className={`text-xl hover:opacity-80 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-700"}`}
         >
-          {collapsed ? <BiChevronRight className="w-5 h-5" /> : <BiChevronLeft className="w-5 h-5" />}
+          {isCollapsed ? <BiChevronRight className="w-5 h-5" /> : <BiChevronLeft className="w-5 h-5" />}
         </button>
       </div>
 
-      {!collapsed && (
+      {!isCollapsed && (
         <div className="px-4 pt-4">
           <div
             className={`p-3 rounded-lg flex items-center space-x-3 transition-colors duration-200 ${
@@ -84,7 +91,7 @@ export default function Sidebar() {
       <div className="flex-1 px-2 py-4 overflow-y-auto transition-all">
         {navSections.map(({ title, items }) => (
           <div key={title} className="mb-4">
-            {!collapsed && (
+            {!isCollapsed && (
               <h4
                 className={`text-xs px-4 mb-1 tracking-wide transition-colors duration-200 ${theme === "dark" ? "text-gray-500" : "text-gray-600"}`}
               >
@@ -105,11 +112,11 @@ export default function Sidebar() {
                       : theme === "dark"
                         ? "text-gray-400 hover:text-white hover:bg-[#1D1D1F]"
                         : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                  } ${collapsed ? "justify-center" : "justify-start"}`
+                  } ${isCollapsed ? "justify-center" : "justify-start"}`
                 }
               >
                 {icon}
-                {!collapsed && <span className="ml-3">{name}</span>}
+                {!isCollapsed && <span className="ml-3">{name}</span>}
               </NavLink>
             ))}
           </div>
@@ -120,11 +127,11 @@ export default function Sidebar() {
         <button
           onClick={logout}
           className={`flex items-center w-full px-4 py-2 text-sm text-red-400 hover:text-white rounded-lg hover:bg-red-600/20 transition-colors duration-200 ${
-            collapsed ? "justify-center" : "justify-start"
+            isCollapsed ? "justify-center" : "justify-start"
           }`}
         >
           <BiSolidLogOut className="h-5 w-5" />
-          {!collapsed && <span className="ml-3">Logout</span>}
+          {!isCollapsed && <span className="ml-3">Logout</span>}
         </button>
       </div>
     </div>
