@@ -1,11 +1,11 @@
 import { ReactFlowProvider } from "@xyflow/react";
-import FlowBuilder from "@/RulesModel/components/FlowBuilder";
-import RulesMainPanel from "@/RulesModel/components/RulesMainPanel";
+import RulesMainPanel from "@/OnePlatform/RulesModel/components/RulesMainPanel";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useRuleStore } from "../store/ruleStore";
 import { useEffect, useState } from "react";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
+import FlowBuilder from "../components/FlowBuilder";
 
 export default function Rules() {
   const { theme } = useTheme();

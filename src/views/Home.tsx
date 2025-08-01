@@ -21,7 +21,7 @@ const SessionStatsFull = lazy(() => import("./sessionStatsFull"));
 const SettingsPage = lazy(() => import("./Settings"));
 const DataExport = lazy(() => import("./DataExport"));
 const RulesLayout = lazy(() => import("@/layouts/Rulelayout"));
-const Rules = lazy(() => import("@/RulesModel/views/Rules"));
+const Rules = lazy(() => import("@/OnePlatform/RulesModel/views/Rules"));
 
 export default function AppRoutes() {
   const { token } = useStore(authStore);

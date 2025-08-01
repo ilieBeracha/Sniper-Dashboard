@@ -1,7 +1,6 @@
 import {
   Background,
   Controls,
-  MiniMap,
   ReactFlow,
   Node,
   Edge,
@@ -12,17 +11,16 @@ import {
   MarkerType,
   EdgeProps,
   getBezierPath,
+  ReactFlowProvider,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useRuleStore } from "../store/ruleStore";
-import { useMemo, useCallback } from "react";
-import { FaBolt, FaCodeBranch, FaCheckCircle, FaClock, FaExclamationTriangle, FaRobot, FaCogs, FaDatabase } from "react-icons/fa";
-import { BiSolidZap } from "react-icons/bi";
-import { MdInput } from "react-icons/md";
+import { useMemo, useCallback, useState } from "react";
+import RuleDetailView from "./RuleDetailView";
 
-// Custom Edge Component
-const CustomEdge = ({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, markerEnd, data }: EdgeProps) => {
+// Custom Edge Component with smooth curves
+const CustomEdge = ({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, markerEnd }: EdgeProps) => {
   const [edgePath] = getBezierPath({
     sourceX,
     sourceY,
@@ -30,43 +28,33 @@ const CustomEdge = ({ sourceX, sourceY, targetX, targetY, sourcePosition, target
     targetX,
     targetY,
     targetPosition,
+    curvature: 0.25,
   });
 
   return (
     <>
-      <path id="edge-path" style={style} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
-      {data?.label && (
-        <text>
-          <textPath href="#edge-path" style={{ fontSize: 12 }} startOffset="50%" textAnchor="middle">
-            {data.label as string}
-          </textPath>
-        </text>
-      )}
+      <path style={style} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} strokeWidth={2} />
     </>
   );
 };
 
-// Custom node components
+// Professional node designs
 const TriggerNode = ({ data }: { data: any }) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
   return (
     <div
-      className={`relative px-4 py-3 rounded-lg shadow-md border min-w-[160px] ${
-        isDark
-          ? "bg-gradient-to-br from-purple-900 to-purple-800 border-purple-600 text-white"
-          : "bg-gradient-to-br from-purple-500 to-purple-600 border-purple-400 text-white"
-      }`}
+      className={`
+      px-6 py-4 rounded-xl shadow-sm border-2 min-w-[200px]
+      ${isDark ? "bg-gray-800 border-blue-600/50" : "bg-white border-blue-500/50"}
+    `}
     >
-      <Handle type="target" position={Position.Left} className="!bg-purple-400 !w-3 !h-3 !border-2 !border-white" />
-      <div className="flex items-center gap-2 mb-1">
-        {data.icon || <FaBolt className="w-3.5 h-3.5" />}
-        <span className="font-semibold text-xs uppercase tracking-wider">Trigger</span>
+      <Handle type="source" position={Position.Bottom} className="!w-2 !h-2 !bg-blue-500 !border-2 !border-white" />
+      <div className="text-center">
+        <div className={`text-xs font-medium uppercase tracking-wider mb-1 ${isDark ? "text-blue-400" : "text-blue-600"}`}>Trigger</div>
+        <div className={`text-sm font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>{data.label}</div>
       </div>
-      <div className="text-xs font-medium">{data.label}</div>
-      <Handle type="source" position={Position.Right} className="!bg-purple-400 !w-3 !h-3 !border-2 !border-white" />
-      <Handle type="source" position={Position.Bottom} id="bottom" className="!bg-purple-400 !w-3 !h-3 !border-2 !border-white" />
     </div>
   );
 };
@@ -77,27 +65,37 @@ const ConditionNode = ({ data }: { data: any }) => {
 
   return (
     <div
-      className={`relative px-4 py-3 rounded-lg shadow-md border min-w-[160px] ${
-        isDark
-          ? "bg-gradient-to-br from-amber-900 to-amber-800 border-amber-600 text-white"
-          : "bg-gradient-to-br from-amber-500 to-amber-600 border-amber-400 text-white"
-      }`}
+      className={`
+      relative transform rotate-45 w-24 h-24 shadow-sm border-2
+      ${isDark ? "bg-gray-800 border-amber-600/50" : "bg-white border-amber-500/50"}
+    `}
     >
-      <Handle type="target" position={Position.Top} className="!bg-amber-400 !w-3 !h-3 !border-2 !border-white" />
-      <Handle type="target" position={Position.Left} id="left" className="!bg-amber-400 !w-3 !h-3 !border-2 !border-white" />
-      <div className="flex items-center gap-2 mb-1">
-        <FaCodeBranch className="w-3.5 h-3.5" />
-        <span className="font-semibold text-xs uppercase tracking-wider">Condition</span>
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="!w-2 !h-2 !bg-amber-500 !border-2 !border-white !-top-1 !left-1/2 !-translate-x-1/2"
+        style={{ transform: "rotate(-45deg) translateX(-50%)" }}
+      />
+      <div className="absolute inset-0 flex items-center justify-center -rotate-45">
+        <div className="text-center p-2">
+          <div className={`text-xs font-medium uppercase tracking-wider ${isDark ? "text-amber-400" : "text-amber-600"}`}>If</div>
+          <div className={`text-xs font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>{data.label}</div>
+        </div>
       </div>
-      <div className="text-xs font-medium">{data.label}</div>
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="true"
+        className="!w-2 !h-2 !bg-green-500 !border-2 !border-white !top-1/2 !-right-1"
+        style={{ transform: "rotate(-45deg) translateY(-50%)" }}
+      />
       <Handle
         type="source"
         position={Position.Bottom}
-        id="true"
-        className="!bg-green-400 !w-3 !h-3 !border-2 !border-white"
-        style={{ left: "30%" }}
+        id="false"
+        className="!w-2 !h-2 !bg-red-500 !border-2 !border-white !-bottom-1 !left-1/2"
+        style={{ transform: "rotate(-45deg) translateX(-50%)" }}
       />
-      <Handle type="source" position={Position.Bottom} id="false" className="!bg-red-400 !w-3 !h-3 !border-2 !border-white" style={{ left: "70%" }} />
     </div>
   );
 };
@@ -108,89 +106,16 @@ const ActionNode = ({ data }: { data: any }) => {
 
   return (
     <div
-      className={`relative px-4 py-3 rounded-lg shadow-md border min-w-[160px] ${
-        isDark
-          ? "bg-gradient-to-br from-blue-900 to-blue-800 border-blue-600 text-white"
-          : "bg-gradient-to-br from-blue-500 to-blue-600 border-blue-400 text-white"
-      }`}
+      className={`
+      px-6 py-4 rounded-xl shadow-sm border-2 min-w-[200px]
+      ${isDark ? "bg-gray-800 border-green-600/50" : "bg-white border-green-500/50"}
+    `}
     >
-      <Handle type="target" position={Position.Top} className="!bg-blue-400 !w-3 !h-3 !border-2 !border-white" />
-      <div className="flex items-center gap-2 mb-1">
-        <BiSolidZap className="w-3.5 h-3.5" />
-        <span className="font-semibold text-xs uppercase tracking-wider">Action</span>
+      <Handle type="target" position={Position.Top} className="!w-2 !h-2 !bg-green-500 !border-2 !border-white" />
+      <div className="text-center">
+        <div className={`text-xs font-medium uppercase tracking-wider mb-1 ${isDark ? "text-green-400" : "text-green-600"}`}>Action</div>
+        <div className={`text-sm font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>{data.label}</div>
       </div>
-      <div className="text-xs font-medium">{data.label}</div>
-      <Handle type="source" position={Position.Right} className="!bg-blue-400 !w-3 !h-3 !border-2 !border-white" />
-    </div>
-  );
-};
-
-// User Input Node
-const InputNode = ({ data }: { data: any }) => {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-
-  return (
-    <div
-      className={`relative px-4 py-3 rounded-lg shadow-md border min-w-[160px] ${
-        isDark
-          ? "bg-gradient-to-br from-teal-800 to-teal-700 border-teal-600 text-white"
-          : "bg-gradient-to-br from-teal-100 to-teal-200 border-teal-300 text-teal-900"
-      }`}
-    >
-      <div className="flex items-center gap-2 mb-1">
-        <MdInput className="w-3.5 h-3.5" />
-        <span className="font-semibold text-xs uppercase tracking-wider">Input</span>
-      </div>
-      <div className="text-xs">{data.label}</div>
-      <Handle type="source" position={Position.Right} className="!bg-teal-400 !w-3 !h-3 !border-2 !border-white" />
-    </div>
-  );
-};
-
-// Property/Config Node
-const PropertyNode = ({ data }: { data: any }) => {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-
-  return (
-    <div
-      className={`relative px-4 py-3 rounded-lg shadow-md border min-w-[160px] ${
-        isDark
-          ? "bg-gradient-to-br from-gray-700 to-gray-600 border-gray-500 text-white"
-          : "bg-gradient-to-br from-gray-100 to-gray-200 border-gray-300 text-gray-900"
-      }`}
-    >
-      <div className="flex items-center gap-2 mb-1">
-        <FaCogs className="w-3.5 h-3.5" />
-        <span className="font-semibold text-xs uppercase tracking-wider">Config</span>
-      </div>
-      <div className="text-xs">{data.label}</div>
-      <Handle type="source" position={Position.Left} className="!bg-gray-400 !w-3 !h-3 !border-2 !border-white" />
-      <Handle type="source" position={Position.Bottom} id="bottom" className="!bg-gray-400 !w-3 !h-3 !border-2 !border-white" />
-    </div>
-  );
-};
-
-// Data Source Node
-const DataNode = ({ data }: { data: any }) => {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-
-  return (
-    <div
-      className={`relative px-4 py-3 rounded-lg shadow-md border min-w-[160px] ${
-        isDark
-          ? "bg-gradient-to-br from-indigo-800 to-indigo-700 border-indigo-600 text-white"
-          : "bg-gradient-to-br from-indigo-100 to-indigo-200 border-indigo-300 text-indigo-900"
-      }`}
-    >
-      <div className="flex items-center gap-2 mb-1">
-        <FaDatabase className="w-3.5 h-3.5" />
-        <span className="font-semibold text-xs uppercase tracking-wider">Data</span>
-      </div>
-      <div className="text-xs">{data.label}</div>
-      <Handle type="source" position={Position.Left} className="!bg-indigo-400 !w-3 !h-3 !border-2 !border-white" />
     </div>
   );
 };
@@ -199,9 +124,6 @@ const nodeTypes = {
   trigger: TriggerNode,
   condition: ConditionNode,
   action: ActionNode,
-  input: InputNode,
-  property: PropertyNode,
-  data: DataNode,
 };
 
 const edgeTypes = {
@@ -212,27 +134,80 @@ export default function FlowBuilder({ selectedRuleId }: { selectedRuleId?: strin
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { templates, teamRules } = useRuleStore();
-
-  // Get trigger icon
-  const getTriggerIcon = (type: string) => {
-    switch (type) {
-      case "score_update":
-        return <FaExclamationTriangle className="w-4 h-4" />;
-      case "schedule":
-        return <FaClock className="w-4 h-4" />;
-      case "training_complete":
-        return <FaCheckCircle className="w-4 h-4" />;
-      case "automation":
-        return <FaRobot className="w-4 h-4" />;
-      default:
-        return <FaBolt className="w-4 h-4" />;
-    }
-  };
+  const [showDetails, setShowDetails] = useState(false);
 
   // Generate nodes and edges based on selected rule
   const { nodes, edges } = useMemo(() => {
     if (!selectedRuleId) {
-      return { nodes: [], edges: [] };
+      // Show default template flow
+      return {
+        nodes: [
+          {
+            id: "trigger-default",
+            type: "trigger",
+            position: { x: 250, y: 50 },
+            data: { label: "Event Trigger" },
+          },
+          {
+            id: "condition-default",
+            type: "condition",
+            position: { x: 238, y: 150 },
+            data: { label: "Condition" },
+          },
+          {
+            id: "action-1-default",
+            type: "action",
+            position: { x: 100, y: 300 },
+            data: { label: "Action (True)" },
+          },
+          {
+            id: "action-2-default",
+            type: "action",
+            position: { x: 350, y: 300 },
+            data: { label: "Action (False)" },
+          },
+        ],
+        edges: [
+          {
+            id: "e-trigger-condition",
+            source: "trigger-default",
+            target: "condition-default",
+            type: "custom",
+            animated: true,
+            style: { stroke: isDark ? "#6b7280" : "#9ca3af", strokeWidth: 2 },
+          },
+          {
+            id: "e-condition-true",
+            source: "condition-default",
+            sourceHandle: "true",
+            target: "action-1-default",
+            type: "custom",
+            animated: true,
+            style: { stroke: "#10b981", strokeWidth: 2 },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 20,
+              height: 20,
+              color: "#10b981",
+            },
+          },
+          {
+            id: "e-condition-false",
+            source: "condition-default",
+            sourceHandle: "false",
+            target: "action-2-default",
+            type: "custom",
+            animated: true,
+            style: { stroke: "#ef4444", strokeWidth: 2 },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 20,
+              height: 20,
+              color: "#ef4444",
+            },
+          },
+        ],
+      };
     }
 
     const rule = [...teamRules, ...templates].find((r) => r.id === selectedRuleId);
@@ -248,240 +223,117 @@ export default function FlowBuilder({ selectedRuleId }: { selectedRuleId?: strin
 
     if (!template) return { nodes: [], edges: [] };
 
-    // Create a more sophisticated flow layout
-    const centerX = 400;
-    const startY = 50;
+    // Simple flow layout
+    const centerX = 250;
+    let currentY = 50;
     const verticalSpacing = 120;
 
-    // Trigger node (centered)
+    // Trigger node
     generatedNodes.push({
       id: "trigger-1",
       type: "trigger",
-      position: { x: centerX, y: startY },
-      data: {
-        label: template.name,
-        icon: getTriggerIcon(template.trigger_type),
-      },
+      position: { x: centerX, y: currentY },
+      data: { label: template.name },
     });
 
-    // Parse config for conditions and actions
+    currentY += verticalSpacing;
+
+    // Add condition if configured
     const config = isTeamRule ? rule.custom_config : template.default_config;
-
-    // Add input nodes for trigger parameters
-    if (template.trigger_type === "score_update" || template.trigger_type === "training_complete") {
-      generatedNodes.push({
-        id: "input-1",
-        type: "input",
-        position: { x: centerX - 200, y: startY },
-        data: { label: "User Score" },
-      });
-
-      generatedNodes.push({
-        id: "data-1",
-        type: "data",
-        position: { x: centerX + 200, y: startY },
-        data: { label: "Training Data" },
-      });
-
-      // Connect inputs to trigger
-      generatedEdges.push({
-        id: "e-input-trigger",
-        source: "input-1",
-        target: "trigger-1",
-        targetHandle: Position.Left,
-        type: "custom",
-        animated: true,
-        markerEnd: {
-          type: MarkerType.ArrowClosed,
-          width: 20,
-          height: 20,
-          color: isDark ? "#4ade80" : "#22c55e",
-        },
-        style: {
-          stroke: isDark ? "#4ade80" : "#22c55e",
-          strokeWidth: 2,
-        },
-        data: { label: "Score Input" },
-      });
-
-      generatedEdges.push({
-        id: "e-data-trigger",
-        source: "data-1",
-        target: "trigger-1",
-        targetHandle: Position.Right,
-        type: "custom",
-        animated: true,
-        markerEnd: {
-          type: MarkerType.ArrowClosed,
-          width: 20,
-          height: 20,
-          color: isDark ? "#818cf8" : "#6366f1",
-        },
-        style: {
-          stroke: isDark ? "#818cf8" : "#6366f1",
-          strokeWidth: 2,
-        },
-        data: { label: "Training Data" },
-      });
-    }
-
-    // Add property/config node
-    generatedNodes.push({
-      id: "property-1",
-      type: "property",
-      position: { x: centerX + 250, y: startY + verticalSpacing },
-      data: { label: "Rule Config" },
-    });
-
-    let lastNodeId = "trigger-1";
-    let currentY = startY + verticalSpacing;
-
-    // Add condition nodes if any
     if (config?.conditions && config.conditions.length > 0) {
-      config.conditions.forEach((condition: any, index: number) => {
-        const conditionId = `condition-${index + 1}`;
-        currentY += verticalSpacing;
-
-        generatedNodes.push({
-          id: conditionId,
-          type: "condition",
-          position: { x: centerX, y: currentY },
-          data: { label: condition.label || `Check ${condition.field || "Condition"}` },
-        });
-
-        // Add input node for condition parameters
-        if (index === 0) {
-          generatedNodes.push({
-            id: `input-condition-${index + 1}`,
-            type: "input",
-            position: { x: centerX - 200, y: currentY },
-            data: { label: "Threshold Value" },
-          });
-
-          generatedEdges.push({
-            id: `e-input-condition-${index + 1}`,
-            source: `input-condition-${index + 1}`,
-            target: conditionId,
-            animated: true,
-            style: { stroke: isDark ? "#4ade80" : "#22c55e" },
-          });
-        }
-
-        // Connect from last node to condition
-        generatedEdges.push({
-          id: `e-${lastNodeId}-${conditionId}`,
-          source: lastNodeId,
-          sourceHandle: lastNodeId === "trigger-1" ? "bottom" : "true",
-          target: conditionId,
-          targetHandle: Position.Top,
-          type: "custom",
-          animated: true,
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            width: 20,
-            height: 20,
-            color: isDark ? "#f59e0b" : "#f97316",
-          },
-          style: {
-            stroke: isDark ? "#f59e0b" : "#f97316",
-            strokeWidth: 2,
-          },
-        });
-
-        // Connect property to condition
-        generatedEdges.push({
-          id: `e-property-${conditionId}`,
-          source: "property-1",
-          sourceHandle: Position.Left,
-          target: conditionId,
-          targetHandle: "left",
-          type: "custom",
-          animated: false,
-          style: {
-            stroke: isDark ? "#6b7280" : "#9ca3af",
-            strokeDasharray: "5 5",
-            strokeWidth: 2,
-          },
-          data: { label: "Config" },
-        });
-
-        lastNodeId = conditionId;
-      });
-    }
-
-    // Add action nodes with better layout
-    const actions = config?.actions || [{ type: "notify", label: isTeamRule ? rule.message : "Default Action" }];
-    if (actions.length === 1) {
-      // Single action - center it
-      currentY += verticalSpacing;
-      const actionId = "action-1";
-
       generatedNodes.push({
-        id: actionId,
-        type: "action",
-        position: { x: centerX, y: currentY },
-        data: { label: actions[0].label || actions[0].type || "Execute Action" },
+        id: "condition-1",
+        type: "condition",
+        position: { x: centerX - 12, y: currentY },
+        data: { label: config.conditions[0].label || "Check Condition" },
       });
 
       generatedEdges.push({
-        id: `e-${lastNodeId}-${actionId}`,
-        source: lastNodeId,
-        sourceHandle: lastNodeId.includes("condition") ? "true" : "bottom",
-        target: actionId,
-        targetHandle: Position.Top,
+        id: "e-trigger-condition",
+        source: "trigger-1",
+        target: "condition-1",
         type: "custom",
         animated: true,
+        style: {
+          stroke: isDark ? "#6b7280" : "#9ca3af",
+          strokeWidth: 2,
+        },
+      });
+
+      currentY += verticalSpacing + 50;
+
+      // True path action
+      generatedNodes.push({
+        id: "action-true",
+        type: "action",
+        position: { x: centerX - 150, y: currentY },
+        data: { label: "Execute Action" },
+      });
+
+      generatedEdges.push({
+        id: "e-condition-true",
+        source: "condition-1",
+        sourceHandle: "true",
+        target: "action-true",
+        type: "custom",
+        animated: true,
+        style: { stroke: "#10b981", strokeWidth: 2 },
         markerEnd: {
           type: MarkerType.ArrowClosed,
           width: 20,
           height: 20,
-          color: isDark ? "#60a5fa" : "#3b82f6",
+          color: "#10b981",
         },
-        style: {
-          stroke: isDark ? "#60a5fa" : "#3b82f6",
-          strokeWidth: 2,
+      });
+
+      // False path action
+      generatedNodes.push({
+        id: "action-false",
+        type: "action",
+        position: { x: centerX + 150, y: currentY },
+        data: { label: "Skip" },
+      });
+
+      generatedEdges.push({
+        id: "e-condition-false",
+        source: "condition-1",
+        sourceHandle: "false",
+        target: "action-false",
+        type: "custom",
+        animated: true,
+        style: { stroke: "#ef4444", strokeWidth: 2 },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          width: 20,
+          height: 20,
+          color: "#ef4444",
         },
-        data: { label: "Execute" },
       });
     } else {
-      // Multiple actions - spread them horizontally
-      currentY += verticalSpacing;
-      const actionSpacing = 200;
-      const startX = centerX - ((actions.length - 1) * actionSpacing) / 2;
+      // Direct action
+      generatedNodes.push({
+        id: "action-1",
+        type: "action",
+        position: { x: centerX, y: currentY },
+        data: { label: isTeamRule ? rule.message || "Execute Action" : "Execute Action" },
+      });
 
-      actions.forEach((action: any, index: number) => {
-        const actionId = `action-${index + 1}`;
-
-        generatedNodes.push({
-          id: actionId,
-          type: "action",
-          position: { x: startX + index * actionSpacing, y: currentY },
-          data: { label: action.label || action.type || `Action ${index + 1}` },
-        });
-
-        // For multiple actions from conditions, use different source handles
-        const sourceHandle = lastNodeId.includes("condition") ? (index === 0 ? "true" : "false") : "bottom";
-
-        generatedEdges.push({
-          id: `e-${lastNodeId}-${actionId}`,
-          source: lastNodeId,
-          sourceHandle: sourceHandle,
-          target: actionId,
-          targetHandle: Position.Top,
-          type: "custom",
-          animated: true,
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            width: 20,
-            height: 20,
-            color: sourceHandle === "false" ? "#ef4444" : isDark ? "#60a5fa" : "#3b82f6",
-          },
-          style: {
-            stroke: sourceHandle === "false" ? "#ef4444" : isDark ? "#60a5fa" : "#3b82f6",
-            strokeWidth: 2,
-          },
-          data: { label: sourceHandle === "false" ? "On Fail" : "Execute" },
-        });
+      generatedEdges.push({
+        id: "e-trigger-action",
+        source: "trigger-1",
+        target: "action-1",
+        type: "custom",
+        animated: true,
+        style: {
+          stroke: isDark ? "#3b82f6" : "#2563eb",
+          strokeWidth: 2,
+        },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          width: 20,
+          height: 20,
+          color: isDark ? "#3b82f6" : "#2563eb",
+        },
       });
     }
 
@@ -489,77 +341,61 @@ export default function FlowBuilder({ selectedRuleId }: { selectedRuleId?: strin
   }, [selectedRuleId, templates, teamRules, isDark]);
 
   const onConnect = useCallback(() => {
-    // Prevent new connections in view mode
     return;
   }, []);
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        onConnect={onConnect}
-        connectionMode={ConnectionMode.Loose}
-        fitView
-        fitViewOptions={{
-          padding: 0.4,
-          includeHiddenNodes: false,
-          minZoom: 0.5,
-          maxZoom: 1.5,
-        }}
-        defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
-        proOptions={{ hideAttribution: true }}
-        className={`flex-1 ${isDark ? "bg-[#0F0F11]" : "bg-gray-50"}`}
-        connectionLineStyle={{
-          stroke: isDark ? "#6366f1" : "#8b5cf6",
-          strokeWidth: 2,
-        }}
-        defaultEdgeOptions={{
-          type: "custom",
-          animated: true,
-        }}
-      >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color={isDark ? "#1f2937" : "#e5e7eb"} />
-        <MiniMap
-          maskColor={isDark ? "rgba(0, 0, 0, 0.8)" : "rgba(255, 255, 255, 0.8)"}
-          nodeColor={(node) => {
-            switch (node.type) {
-              case "trigger":
-                return "#a855f7";
-              case "condition":
-                return "#f59e0b";
-              case "action":
-                return "#3b82f6";
-              case "input":
-                return "#14b8a6";
-              case "property":
-                return "#6b7280";
-              case "data":
-                return "#6366f1";
-              default:
-                return "#6b7280";
-            }
-          }}
-          pannable
-          zoomable
-        />
-        <Controls showInteractive={false} />
-      </ReactFlow>
+    <ReactFlowProvider>
+      <div className="w-full h-full flex">
+        <div className={`flex-1 relative ${showDetails && selectedRuleId ? "w-3/5" : "w-full"}`}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            onConnect={onConnect}
+            connectionMode={ConnectionMode.Loose}
+            fitView
+            fitViewOptions={{
+              padding: 0.2,
+              includeHiddenNodes: false,
+              minZoom: 0.5,
+              maxZoom: 1.5,
+            }}
+            defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+            proOptions={{ hideAttribution: true }}
+            className={`${isDark ? "bg-gray-950" : "bg-gray-50"}`}
+            defaultEdgeOptions={{
+              type: "custom",
+              animated: true,
+            }}
+          >
+            <Background variant={BackgroundVariant.Dots} gap={16} size={1} color={isDark ? "#374151" : "#e5e7eb"} />
+            <Controls showInteractive={false} className={isDark ? "!bg-gray-800 !border-gray-700" : "!bg-white !border-gray-200"} />
 
-      {/* No Rule Selected State */}
-      {!selectedRuleId && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-center">
-            <div className={`p-6 rounded-full mb-4 inline-block ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
-              <FaBolt className="w-12 h-12 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2 text-gray-600 dark:text-gray-400">No Rule Selected</h3>
-            <p className="text-sm text-gray-500 max-w-xs">Select a rule from the left panel to visualize its flow</p>
-          </div>
+            {/* Details Toggle */}
+            {selectedRuleId && (
+              <button
+                onClick={() => setShowDetails(!showDetails)}
+                className={`absolute top-4 right-4 px-3 py-2 text-sm font-medium rounded-lg transition-all ${
+                  isDark
+                    ? "bg-gray-800 hover:bg-gray-700 text-gray-100 border border-gray-700"
+                    : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200"
+                } shadow-sm`}
+              >
+                {showDetails ? "Hide Details" : "Show Details"}
+              </button>
+            )}
+          </ReactFlow>
         </div>
-      )}
-    </div>
+
+        {/* Detail Panel */}
+        {showDetails && selectedRuleId && (
+          <div className={`w-2/5 border-l ${isDark ? "border-gray-800" : "border-gray-200"}`}>
+            <RuleDetailView selectedRuleId={selectedRuleId} />
+          </div>
+        )}
+      </div>
+    </ReactFlowProvider>
   );
 }
