@@ -19,7 +19,7 @@ export default function RuleDetailView({ selectedRuleId }: RuleDetailViewProps) 
   const executions = ruleExecutions[selectedRuleId] || [];
 
   return (
-    <div className="h-full p-6 overflow-y-auto bg-white dark:bg-gray-900 border-l">
+    <div className="h-full p-6 overflow-y-auto bg-alpha-black border-l">
       <h2 className="text-xl font-semibold mb-2">{template.name}</h2>
       <p className="text-sm text-gray-500 mb-4">{template.description}</p>
 

@@ -1,17 +1,20 @@
 import { ReactFlowProvider } from "@xyflow/react";
 import RulesMainPanel from "@/OnePlatform/RulesModel/components/RulesMainPanel";
+import TemplatesModal from "@/OnePlatform/RulesModel/components/TemplatesModal";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useRuleStore } from "../store/ruleStore";
 import { useEffect, useState } from "react";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import FlowBuilder from "../components/FlowBuilder";
+import { motion } from "framer-motion";
 
 export default function Rules() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { user } = useStore(userStore);
   const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
+  const [showTemplatesModal, setShowTemplatesModal] = useState(false);
 
   const { getRuleTemplates, getTeamRules } = useRuleStore();
 
@@ -23,16 +26,33 @@ export default function Rules() {
   }, [user?.team_id, getRuleTemplates, getTeamRules]);
 
   return (
-    <div className="h-screen w-full grid grid-cols-12 gap-0">
-      <div className={`h-full col-span-4 overflow-hidden border-r ${isDark ? "bg-[#1A1A1C] border-gray-800" : "bg-gray-50 border-gray-200"}`}>
-        <RulesMainPanel onRuleSelect={setSelectedRuleId} selectedRuleId={selectedRuleId} />
+    <>
+      <div className="h-screen w-full flex">
+        {/* Sidebar */}
+        <motion.div
+          initial={{ x: -300, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className={`w-[600px] h-full border-r ${isDark ? "bg-black/30 border-gray-800" : "bg-white border-gray-200"}`}
+        >
+          <RulesMainPanel onRuleSelect={setSelectedRuleId} selectedRuleId={selectedRuleId} onTemplateClick={() => setShowTemplatesModal(true)} />
+        </motion.div>
+
+        {/* Main Content Area */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className={`flex-1 h-full bg-alpha-black`}
+        >
+          <ReactFlowProvider>
+            <FlowBuilder selectedRuleId={selectedRuleId} />
+          </ReactFlowProvider>
+        </motion.div>
       </div>
 
-      <div className={`h-full col-span-8 overflow-hidden ${isDark ? "bg-[#0F0F11]" : "bg-gray-50"}`}>
-        <ReactFlowProvider>
-          <FlowBuilder selectedRuleId={selectedRuleId} />
-        </ReactFlowProvider>
-      </div>
-    </div>
+      {/* Templates Modal */}
+      <TemplatesModal isOpen={showTemplatesModal} onClose={() => setShowTemplatesModal(false)} />
+    </>
   );
 }
