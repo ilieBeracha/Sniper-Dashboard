@@ -6,6 +6,22 @@ export interface SquadWeaponPerformance {
   accuracy: number;
 }
 
+export interface CommanderTeamMedianDispersion {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  squad_name: string;
+  median_cm_dispersion: number | null;
+
+  // new fields
+  weapon_name: string | null;
+  position: string | null;
+  effort: boolean | null;
+  type: string | null;
+  day_period: string | null;
+}
+
+
 export type GroupingScoreEntry = {
   id: string;
   sniper_user_id: string;

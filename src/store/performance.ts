@@ -12,6 +12,7 @@ import {
   GroupingScoreEntry,
   GroupingStatsCommander,
   GetUserMediansInSquadQueryResult,
+  CommanderTeamMedianDispersion,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
@@ -31,6 +32,7 @@ import {
   getGroupingStatsByTeamIdCommander,
   getBestGroupingStatsByTraining,
   getUserMediansInSquad,
+  getCommanderTeamMedianDispersion,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/user";
@@ -85,6 +87,18 @@ interface PerformanceStore {
   ) => Promise<{ total_groups: number; avg_dispersion: number; best_dispersion: number } | null>;
   bestGroupingByTraining: { total_groups: number; avg_dispersion: number; best_dispersion: number } | null;
 
+  commanderTeamMedianDispersion: CommanderTeamMedianDispersion[] | null;
+  fetchCommanderTeamMedianDispersion: (
+    teamId: string,
+    startDate: Date | string | null,
+    endDate: Date | string | null,
+    weaponId?: string | null,
+    effort?: boolean | null,
+    dayPeriod?: string | null,
+    type?: string | null,
+    position?: string | null,
+  ) => Promise<void>;
+
   userMediansInSquad: GetUserMediansInSquadQueryResult[] | null;
   getUserMediansInSquad: (
     squadId: string,
@@ -115,6 +129,8 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   groupingStatsCommander: null,
   bestGroupingByTraining: null,
   userMediansInSquad: null,
+  commanderTeamMedianDispersion: null,
+
   userMediansInSquadLoading: false,
   fetchGroupingScores: async (trainingSessionId: string, limit: number = 20, offset: number = 0) => {
     try {
@@ -141,6 +157,40 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     }
   },
 
+  fetchCommanderTeamMedianDispersion: async (
+    teamId,
+    startDate,
+    endDate,
+    weaponId = null,
+    effort = null,
+    dayPeriod = null,
+    type = null,
+    position = null,
+  ) => {
+    try {
+      const formatDate = (d: Date | string | null) => {
+        if (!d) return null;
+        if (typeof d === "string") return d;
+        return d.toISOString().split("T")[0];
+      };
+
+      const payload = await getCommanderTeamMedianDispersion(
+        teamId,
+        formatDate(startDate),
+        formatDate(endDate),
+        weaponId,
+        effort,
+        dayPeriod,
+        type,
+        position,
+      );
+
+      set({ commanderTeamMedianDispersion: payload });
+    } catch (err) {
+      console.error("fetchCommanderTeamMedianDispersion error:", err);
+      set({ commanderTeamMedianDispersion: null });
+    }
+  },
   getBestGroupingStatsByTraining: async (
     trainingSessionId: string,
   ): Promise<{ total_groups: number; avg_dispersion: number; best_dispersion: number }> => {

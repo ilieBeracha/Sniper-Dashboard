@@ -12,6 +12,7 @@ import { DatePicker, DateValue } from "@heroui/react";
 import { squadStore } from "@/store/squadStore";
 import { getSquads } from "@/services/squadService";
 import BaseSelect from "./base/BaseSelect";
+import CommanderTeamDispersionTable from "./CommanderTeamDispersionTable";
 
 /* ------------------------------------------------------------------ */
 /* component                                                          */
@@ -29,6 +30,7 @@ const CommanderView = () => {
     getUserMediansInSquad,
     groupingStatsCommander,
     userMediansInSquad,
+    commanderTeamMedianDispersion, // ✅ ADD THIS
   } = useStore(performanceStore);
   const { squads } = useStore(squadStore);
 
@@ -51,9 +53,30 @@ const CommanderView = () => {
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [selectedSquadId, setSelectedSquadId] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!user?.team_id) return;
+
+    const formattedStart = startDate?.toISOString().split("T")[0] ?? null;
+    const formattedEnd = endDate?.toISOString().split("T")[0] ?? null;
+
+    const effortBool = effort === "high" ? true : effort === "low" ? false : null;
+
+    performanceStore.getState().fetchCommanderTeamMedianDispersion(
+      user.team_id,
+      formattedStart,
+      formattedEnd,
+      weaponId,
+      effortBool,
+      null, // dayPeriod
+      shotType,
+      position,
+    );
+  }, [user?.team_id, startDate, endDate, weaponId, effort, shotType, position]);
+
   /* ------------------------------------------------------------------ */
   /* initial load – NO median call here any more                        */
   /* ------------------------------------------------------------------ */
+
   useEffect(() => {
     (async () => {
       if (!user?.team_id) return;
@@ -358,6 +381,7 @@ const CommanderView = () => {
 
       {/* accuracy breakdown */}
       <UserRoleAccuracyTable loading={loading} commanderUserRoleBreakdown={commanderUserRoleBreakdown} theme={theme} />
+      <CommanderTeamDispersionTable theme={theme} data={commanderTeamMedianDispersion} />
     </div>
   );
 };
