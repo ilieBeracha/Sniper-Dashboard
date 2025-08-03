@@ -7,7 +7,7 @@ import {
   SquadMajorityPerformance,
   CommanderUserRoleBreakdown,
   GroupingScoreEntry,
-  CommanderTeamMedianDispersion,
+  CommanderTeamDispersionEntry,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/user";
@@ -46,36 +46,29 @@ export async function getUserHitStatsWithFilters(
   }
 }
 
+
+
 export async function getCommanderTeamMedianDispersion(
   teamId: string,
-  startDate: string | null,
-  endDate: string | null,
-  weaponId?: string | null,
-  effort?: boolean | null,
-  dayPeriod?: string | null,
-  type?: string | null,
-  position?: string | null
-): Promise<CommanderTeamMedianDispersion[]> {
-  const { data, error } = await supabase.rpc("get_commander_team_median_dispersion", {
-    p_team_id: teamId,
-    p_start_date: startDate,
-    p_end_date: endDate,
-    p_weapon_id: weaponId ?? null,
-    p_effort: effort,
-    p_day_period: dayPeriod ?? null,
-    p_type: type ?? null,
-    p_position: position ?? null,
-  });
+  startDate?: string,
+  endDate?: string,
+  weaponType?: string,
+  position?: string,
+  dayPeriod?: string
+): Promise<CommanderTeamDispersionEntry[]> {
+  const { data, error } = await supabase
+    .rpc("get_commander_team_median_dispersion", {
+      p_team_id: teamId,
+      p_start_date: startDate ?? null,
+      p_end_date: endDate ?? null,
+      p_weapon_type: weaponType || null,
+      p_position: position || null,
+      p_day_period: dayPeriod || null,
+    });
 
-  if (error) {
-    console.error("RPC Error:", error.message);
-    throw error;
-  }
-
-  return data ?? [];
+  if (error) throw error;
+  return data || [];
 }
-
-
 
 export async function getSquadRoleHitPercentages(squadId: string, distance: string | null = null) {
   try {

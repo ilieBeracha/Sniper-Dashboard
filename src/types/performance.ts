@@ -21,6 +21,21 @@ export interface CommanderTeamMedianDispersion {
   day_period: string | null;
 }
 
+// src/types/performance.ts
+export interface CommanderTeamDispersionEntry {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  squad_name: string;
+  total_median: number | null;
+  median_effort_false: number | null;
+  median_effort_true: number | null;
+  median_type_timed: number | null;
+  weapon_type: string | null;
+  shooting_position: string | null;
+  day_period: string | null;
+}
+
 
 export type GroupingScoreEntry = {
   id: string;
