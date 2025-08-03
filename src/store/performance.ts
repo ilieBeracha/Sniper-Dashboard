@@ -12,12 +12,12 @@ import {
   GroupingScoreEntry,
   GroupingStatsCommander,
   GetUserMediansInSquadQueryResult,
+  CommanderTeamDispersionEntry,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import {
   getWeaponPerformanceBySquadAndWeapon,
   getTrainingEffectivenessByTeam,
-  // getSquadRoleHitPercentages,
   getUserGroupingStatsRpc,
   getUserHitStatsFull,
   getUserHitStatsWithFilters,
@@ -31,6 +31,7 @@ import {
   getGroupingStatsByTeamIdCommander,
   getBestGroupingStatsByTraining,
   getUserMediansInSquad,
+  getCommanderTeamMedianDispersion,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/user";
@@ -85,6 +86,17 @@ interface PerformanceStore {
   ) => Promise<{ total_groups: number; avg_dispersion: number; best_dispersion: number } | null>;
   bestGroupingByTraining: { total_groups: number; avg_dispersion: number; best_dispersion: number } | null;
 
+  commanderTeamDispersion: CommanderTeamDispersionEntry[] | null;
+  fetchCommanderTeamDispersion: (
+    teamId: string,
+    filters: {
+      startDate?: string;
+      endDate?: string;
+      weaponType?: string;
+      position?: string;
+      dayPeriod?: string;
+    },
+  ) => Promise<void>;
   userMediansInSquad: GetUserMediansInSquadQueryResult[] | null;
   getUserMediansInSquad: (
     squadId: string,
@@ -115,7 +127,9 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   groupingStatsCommander: null,
   bestGroupingByTraining: null,
   userMediansInSquad: null,
+  commanderTeamDispersion: [],
   userMediansInSquadLoading: false,
+
   fetchGroupingScores: async (trainingSessionId: string, limit: number = 20, offset: number = 0) => {
     try {
       set({ isLoading: true });
@@ -141,6 +155,17 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     }
   },
 
+  fetchCommanderTeamDispersion: async (teamId, filters) => {
+    const data = await getCommanderTeamMedianDispersion(
+      teamId,
+      filters.startDate,
+      filters.endDate,
+      filters.weaponType,
+      filters.position,
+      filters.dayPeriod,
+    );
+    set({ commanderTeamDispersion: data });
+  },
   getBestGroupingStatsByTraining: async (
     trainingSessionId: string,
   ): Promise<{ total_groups: number; avg_dispersion: number; best_dispersion: number }> => {

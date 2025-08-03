@@ -152,7 +152,7 @@
   margin: 0;
   overflow-x: hidden;
   max-width: 100vw;
-  min-height: 100vh;
+  min-height: 100dvh;
 
   color-scheme: light dark;
 }

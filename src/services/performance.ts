@@ -7,6 +7,7 @@ import {
   SquadMajorityPerformance,
   CommanderUserRoleBreakdown,
   GroupingScoreEntry,
+  CommanderTeamDispersionEntry,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/user";
@@ -43,6 +44,30 @@ export async function getUserHitStatsWithFilters(
     console.error("Error fetching user hit stats with filters:", error.message);
     throw new Error("Could not complete get_user_hit_stats_with_filters");
   }
+}
+
+
+
+export async function getCommanderTeamMedianDispersion(
+  teamId: string,
+  startDate?: string,
+  endDate?: string,
+  weaponType?: string,
+  position?: string,
+  dayPeriod?: string
+): Promise<CommanderTeamDispersionEntry[]> {
+  const { data, error } = await supabase
+    .rpc("get_commander_team_median_dispersion", {
+      p_team_id: teamId,
+      p_start_date: startDate ?? null,
+      p_end_date: endDate ?? null,
+      p_weapon_type: weaponType || null,
+      p_position: position || null,
+      p_day_period: dayPeriod || null,
+    });
+
+  if (error) throw error;
+  return data || [];
 }
 
 export async function getSquadRoleHitPercentages(squadId: string, distance: string | null = null) {

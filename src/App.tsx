@@ -24,7 +24,7 @@ function AppContent() {
   }
 
   return (
-    <div className={`w-screen min-h-screen transition-colors duration-200 ${theme === "dark" ? "bg-black" : "bg-white"}`}>
+    <div className={`w-screen min-h-[100dvh] transition-colors duration-200 ${theme === "dark" ? "bg-black" : "bg-white"}`}>
       <Routes>{token ? <Route path={"*"} element={<Home />} /> : <Route path={"*"} element={<Auth />} />}</Routes>
     </div>
   );

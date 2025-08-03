@@ -97,6 +97,7 @@ export const useSessionStats = () => {
             windStrength: target.targetStats?.wind_strength || target.wind_strength || null,
             windDirection: target.targetStats?.wind_direction_deg || target.wind_direction_deg || target.wind_direction || null,
             mistakeCode: target.targetStats?.mistake_code || target.mistake_code || "",
+            firstShotHit: target.targetStats?.first_shot_hit || target.first_shot_hit || false,
             engagements: (target.engagements || target.target_engagements || target.targetStats?.target_engagements || []).map((engagement: any) => ({
               userId: engagement.user_id,
               shotsFired: engagement.shots_fired || 0,
@@ -133,6 +134,7 @@ export const useSessionStats = () => {
           windStrength: null,
           windDirection: null,
           mistakeCode: "",
+          firstShotHit: false,
           engagements: [
             {
               userId: user?.id || "",
@@ -289,6 +291,7 @@ export const useSessionStats = () => {
       windStrength: null,
       windDirection: null,
       mistakeCode: "",
+      firstShotHit: false,
       engagements: [],
     };
     setTargets((prev) => [...prev, newTarget]);
@@ -409,6 +412,7 @@ export const useSessionStats = () => {
             windDirection: t.windDirection || undefined,
             totalHits: t.engagements.reduce((sum, eng) => sum + (eng.targetHits || 0), 0),
             mistakeCode: t.mistakeCode || undefined,
+            firstShotHit: t.firstShotHit,
             engagements: t.engagements.map((eng) => ({
               user_id: eng.userId,
               shots_fired: eng.shotsFired,

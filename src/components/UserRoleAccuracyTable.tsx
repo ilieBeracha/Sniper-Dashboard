@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import { useState, useMemo } from "react";
 import { CommanderUserRoleBreakdown } from "@/types/performance";
 import BaseDashboardCard from "./base/BaseDashboardCard";
 import NoDataDisplay from "./base/BaseNoData";
 import { ChevronDown, ChevronRight, Users, User, Target } from "lucide-react";
+import { SpTable, SpTableColumn } from "@/layouts/SpTable";
 
 interface UserRoleAccuracyTableProps {
   loading: boolean;
@@ -17,6 +18,23 @@ interface MergedUserData {
   totalHits: number;
   totalSessions: number;
   averageHitPercentage: number;
+}
+
+interface TableRow {
+  id: string;
+  squad_name: string;
+  first_name: string;
+  last_name: string;
+  role_or_weapon: string;
+  hit_percentage: number | null;
+  shots: number;
+  hits: number;
+  sessions: number;
+  // Additional fields for hierarchy
+  level: "squad" | "user" | "role";
+  parentId?: string;
+  isExpanded?: boolean;
+  childCount?: number;
 }
 
 const UserRoleAccuracyTable = ({ loading, commanderUserRoleBreakdown, theme }: UserRoleAccuracyTableProps) => {
@@ -43,307 +61,268 @@ const UserRoleAccuracyTable = ({ loading, commanderUserRoleBreakdown, theme }: U
     setExpandedUsers(newExpanded);
   };
 
-  const getColor = (pct: number) => {
+  const columns: SpTableColumn<TableRow>[] = [
+    {
+      key: "first_name",
+      label: "Hierarchy",
+      width: "40%",
+      render: (_, row) => {
+        const indent = row.level === "user" ? 24 : row.level === "role" ? 48 : 0;
+        const Icon = row.level === "squad" ? Users : row.level === "user" ? User : Target;
+        const iconColor =
+          row.level === "squad"
+            ? theme === "dark"
+              ? "text-blue-400"
+              : "text-blue-600"
+            : row.level === "user"
+              ? theme === "dark"
+                ? "text-green-400"
+                : "text-green-600"
+              : theme === "dark"
+                ? "text-orange-400"
+                : "text-orange-600";
+
+        return (
+          <div className="flex items-center gap-2 py-3" style={{ paddingLeft: `${indent}px` }}>
+            {(row.level === "squad" || row.level === "user") &&
+              (row.isExpanded ? (
+                <ChevronDown className={`w-4 h-4 ${row.level === "squad" ? "text-blue-500" : "text-green-500"}`} />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-gray-500" />
+              ))}
+            <Icon className={`w-4 h-4 ${iconColor}`} />
+            <span className={`${row.level === "squad" ? "font-semibold text-base" : "font-medium"} text-xs sm:text-sm`}>
+              {row.level === "squad" ? row.first_name : row.level === "user" ? `${row.first_name} ${row.last_name}` : row.role_or_weapon}
+            </span>
+            {row.childCount !== undefined && row.childCount > 0 && (
+              <span
+                className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 sm:py-1 rounded-full ${
+                  row.level === "squad"
+                    ? theme === "dark"
+                      ? "bg-blue-900/50 text-blue-300"
+                      : "bg-blue-100 text-blue-700"
+                    : theme === "dark"
+                      ? "bg-green-900/50 text-green-300"
+                      : "bg-green-100 text-green-700"
+                }`}
+              >
+                {row.childCount}
+                <span className="hidden sm:inline">
+                  {" "}
+                  {row.level === "squad" ? "user" : "role"}
+                  {row.childCount !== 1 ? "s" : ""}
+                </span>
+              </span>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      key: "hit_percentage",
+      label: "Hit %",
+      render: (value) => (
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getColor(value) }} />
+          <span className="font-semibold text-xs sm:text-sm">{value !== null ? `${value.toFixed(1)}%` : "0.0%"}</span>
+        </div>
+      ),
+    },
+    {
+      key: "shots",
+      label: "Shots",
+      render: (value) => <span className="font-medium text-xs sm:text-sm">{value}</span>,
+    },
+    {
+      key: "hits",
+      label: "Hits",
+      hideOnMobile: true,
+      render: (value) => <span className="font-medium text-xs sm:text-sm">{value}</span>,
+    },
+    {
+      key: "sessions",
+      label: "Sessions",
+      hideOnMobile: true,
+      render: (value) => <span className="font-medium text-xs sm:text-sm">{value}</span>,
+    },
+    {
+      key: "role_or_weapon",
+      label: "Type",
+      render: (value, row) => {
+        const colors = {
+          squad: theme === "dark" ? "bg-blue-900/50 text-blue-300" : "bg-blue-100 text-blue-700",
+          user: theme === "dark" ? "bg-green-900/50 text-green-300" : "bg-green-100 text-green-700",
+          role: theme === "dark" ? "bg-orange-900/50 text-orange-300" : "bg-orange-100 text-orange-700",
+        };
+        return (
+          <span className={`px-2 py-1 rounded text-[10px] sm:text-xs font-medium ${colors[row.level]}`}>{row.level === "role" ? "Role" : value}</span>
+        );
+      },
+    },
+  ];
+
+  const getColor = (pct: number | null) => {
+    if (pct === null) return "#999999";
     if (pct >= 75) return "#2CB67D";
     if (pct >= 50) return "#FF8906";
     return "#F25F4C";
   };
 
-  // Group and merge user data
-  const processedData = commanderUserRoleBreakdown ? 
-    Array.from(
-      commanderUserRoleBreakdown.reduce((squadMap, entry) => {
-        if (!squadMap.has(entry.squad_name)) {
-          squadMap.set(entry.squad_name, new Map<string, MergedUserData>());
-        }
-        
-        const userMap = squadMap.get(entry.squad_name)!;
-        const userKey = `${entry.first_name} ${entry.last_name}`;
-        
-        if (!userMap.has(userKey)) {
-          userMap.set(userKey, {
-            name: userKey,
-            roles: [],
-            totalShots: 0,
-            totalHits: 0,
-            totalSessions: 0,
-            averageHitPercentage: 0,
+  // Transform hierarchical data into flat structure for SpTable
+  const tableData = useMemo(() => {
+    if (!commanderUserRoleBreakdown || commanderUserRoleBreakdown.length === 0) return [];
+
+    const rows: TableRow[] = [];
+    const squadMap = new Map<string, Map<string, MergedUserData>>();
+
+    // Group data by squad and user
+    commanderUserRoleBreakdown.forEach((entry) => {
+      if (!squadMap.has(entry.squad_name)) {
+        squadMap.set(entry.squad_name, new Map<string, MergedUserData>());
+      }
+
+      const userMap = squadMap.get(entry.squad_name)!;
+      const userKey = `${entry.first_name} ${entry.last_name}`;
+
+      if (!userMap.has(userKey)) {
+        userMap.set(userKey, {
+          name: userKey,
+          roles: [],
+          totalShots: 0,
+          totalHits: 0,
+          totalSessions: 0,
+          averageHitPercentage: 0,
+        });
+      }
+
+      const userData = userMap.get(userKey)!;
+      userData.roles.push(entry);
+      userData.totalShots += entry.shots;
+      userData.totalHits += entry.hits;
+      userData.totalSessions += entry.sessions;
+    });
+
+    // Create flat structure
+    squadMap.forEach((userMap, squadName) => {
+      const users = Array.from(userMap.values());
+      users.forEach((user) => {
+        user.averageHitPercentage = user.totalShots > 0 ? (user.totalHits / user.totalShots) * 100 : 0;
+      });
+
+      const squadTotals = users.reduce(
+        (acc, user) => ({
+          shots: acc.shots + user.totalShots,
+          hits: acc.hits + user.totalHits,
+          sessions: acc.sessions + user.totalSessions,
+        }),
+        { shots: 0, hits: 0, sessions: 0 },
+      );
+
+      const squadHitPct = squadTotals.shots > 0 ? (squadTotals.hits / squadTotals.shots) * 100 : 0;
+
+      // Add squad row
+      const squadId = `squad-${squadName}`;
+      rows.push({
+        id: squadId,
+        squad_name: squadName,
+        first_name: squadName,
+        last_name: "",
+        role_or_weapon: "Squad",
+        hit_percentage: squadHitPct,
+        shots: squadTotals.shots,
+        hits: squadTotals.hits,
+        sessions: squadTotals.sessions,
+        level: "squad",
+        isExpanded: expandedSquads.has(squadName),
+        childCount: users.length,
+      });
+
+      // Add user rows if squad is expanded
+      if (expandedSquads.has(squadName)) {
+        users.forEach((user) => {
+          const userId = `${squadId}-${user.name}`;
+          const [firstName, ...lastNameParts] = user.name.split(" ");
+          const lastName = lastNameParts.join(" ");
+
+          rows.push({
+            id: userId,
+            squad_name: squadName,
+            first_name: firstName,
+            last_name: lastName,
+            role_or_weapon: "User",
+            hit_percentage: user.averageHitPercentage,
+            shots: user.totalShots,
+            hits: user.totalHits,
+            sessions: user.totalSessions,
+            level: "user",
+            parentId: squadId,
+            isExpanded: expandedUsers.has(userId),
+            childCount: user.roles.length,
           });
-        }
-        
-        const userData = userMap.get(userKey)!;
-        userData.roles.push(entry);
-        userData.totalShots += entry.shots;
-        userData.totalHits += entry.hits;
-        userData.totalSessions += entry.sessions;
-        
-        return squadMap;
-      }, new Map<string, Map<string, MergedUserData>>())
-    ).map(([squadName, userMap]) => {
-      const users = Array.from(userMap.values()).map(user => ({
-        ...user,
-        averageHitPercentage: user.totalShots > 0 ? (user.totalHits / user.totalShots) * 100 : 0,
-      }));
-      return [squadName, users] as [string, MergedUserData[]];
-    }) : [];
+
+          // Add role rows if user is expanded
+          if (expandedUsers.has(userId)) {
+            user.roles.forEach((role) => {
+              rows.push({
+                id: `${userId}-${role.role_or_weapon}`,
+                squad_name: squadName,
+                first_name: role.first_name,
+                last_name: role.last_name,
+                role_or_weapon: role.role_or_weapon,
+                hit_percentage: role.hit_percentage,
+                shots: role.shots,
+                hits: role.hits,
+                sessions: role.sessions,
+                level: "role",
+                parentId: userId,
+              });
+            });
+          }
+        });
+      }
+    });
+
+    return rows;
+  }, [commanderUserRoleBreakdown, expandedSquads, expandedUsers]);
 
   return (
     <BaseDashboardCard
-      header="User Accuracy by Role - Hierarchical View"
       tooltipContent="Hierarchical tree view: Team → Squads → Users → Roles. Click to expand/collapse levels."
+      withFilter={[
+        { label: "Role", value: "role", type: "select", options: [{ label: "All Roles", value: "" }], onChange: () => {} },
+        { label: "Weapon", value: "weapon", type: "select", options: [{ label: "All Weapons", value: "" }], onChange: () => {} },
+      ]}
+      onClearFilters={() => {
+        setExpandedSquads(new Set());
+        setExpandedUsers(new Set());
+      }}
+      currentFilterValues={{ role: "" }}
     >
-      {loading || !commanderUserRoleBreakdown ? (
+      {loading ? (
         <div className="py-10 text-center text-sm text-gray-500">Loading user role breakdown...</div>
-      ) : commanderUserRoleBreakdown.length === 0 ? (
+      ) : !commanderUserRoleBreakdown || commanderUserRoleBreakdown.length === 0 ? (
         <NoDataDisplay />
       ) : (
-        <div className={`rounded-xl border transition-colors duration-200 ${
-          theme === "dark" ? "border-zinc-800 bg-zinc-900/50" : "border-gray-200 bg-white shadow-sm"
-        }`}>
-          <div className="overflow-x-auto">
-            <table className={`min-w-full text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-              <thead>
-                <tr className={`text-xs uppercase border-b transition-colors duration-200 ${theme === "dark" ? "border-zinc-800 bg-zinc-800/50" : "border-gray-200 bg-gray-50"}`}>
-                  <th className="text-left p-4 font-medium w-2/5">Hierarchy</th>
-                  <th className="text-left p-4 font-medium">Hit %</th>
-                  <th className="text-left p-4 font-medium">Shots</th>
-                  <th className="text-left p-4 font-medium">Hits</th>
-                  <th className="text-left p-4 font-medium">Sessions</th>
-                  <th className="text-left p-4 font-medium">Type</th>
-                </tr>
-              </thead>
-              <tbody>
-                {processedData.map(([squadName, users]) => (
-                  <React.Fragment key={squadName}>
-                    {/* Squad Row */}
-                    <tr
-                      onClick={() => toggleSquad(squadName)}
-                      className={`cursor-pointer transition-colors duration-200 border-t ${
-                        theme === "dark" 
-                          ? "border-zinc-800/50 hover:bg-zinc-800/30" 
-                          : "border-gray-100 hover:bg-blue-50/50"
-                      } ${expandedSquads.has(squadName) ? (theme === "dark" ? "bg-zinc-800/20" : "bg-blue-50/30") : ""}`}
-                    >
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center">
-                            {expandedSquads.has(squadName) ? (
-                              <ChevronDown className="w-5 h-5 text-blue-500" />
-                            ) : (
-                              <ChevronRight className="w-5 h-5 text-gray-500" />
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Users className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
-                            <span className="font-semibold text-base">{squadName}</span>
-                            <span className={`text-xs px-2 py-1 rounded-full ${
-                              theme === "dark" ? "bg-blue-900/50 text-blue-300" : "bg-blue-100 text-blue-700"
-                            }`}>
-                              {users.length} user{users.length !== 1 ? 's' : ''}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: getColor(
-                              users.reduce((sum, user) => sum + user.averageHitPercentage, 0) / users.length
-                            ) }}
-                          />
-                          <span className="font-semibold">
-                            {(users.reduce((sum, user) => sum + user.averageHitPercentage, 0) / users.length).toFixed(1)}%
-                          </span>
-                        </div>
-                      </td>
-                      <td className="p-4 font-medium">
-                        {users.reduce((sum, user) => sum + user.totalShots, 0)}
-                      </td>
-                      <td className="p-4 font-medium">
-                        {users.reduce((sum, user) => sum + user.totalHits, 0)}
-                      </td>
-                      <td className="p-4 font-medium">
-                        {users.reduce((sum, user) => sum + user.totalSessions, 0)}
-                      </td>
-                      <td className="p-4">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          theme === "dark" ? "bg-blue-900/50 text-blue-300" : "bg-blue-100 text-blue-700"
-                        }`}>
-                          Squad
-                        </span>
-                      </td>
-                    </tr>
-
-                    {/* Squad Users */}
-                    {expandedSquads.has(squadName) && users.map((user, userIdx) => {
-                      const userKey = `${squadName}-${user.name}`;
-                      const isExpanded = expandedUsers.has(userKey);
-                      const isLastUser = userIdx === users.length - 1;
-                      
-                      return (
-                        <React.Fragment key={userKey}>
-                          {/* User Row */}
-                          <tr
-                            onClick={() => toggleUser(userKey)}
-                            className={`cursor-pointer transition-colors duration-200 ${
-                              theme === "dark" 
-                                ? "hover:bg-zinc-800/40" 
-                                : "hover:bg-gray-50"
-                            } ${isExpanded ? (theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50/50") : ""}`}
-                          >
-                            <td className="p-4">
-                              <div className="flex items-center gap-3">
-                                <div className="flex items-center relative">
-                                  {/* Tree lines */}
-                                  <div className={`absolute -left-2 w-6 h-full border-l-2 ${
-                                    theme === "dark" ? "border-zinc-700" : "border-gray-300"
-                                  }`} style={{ left: '10px' }} />
-                                  <div className={`absolute w-4 border-t-2 ${
-                                    theme === "dark" ? "border-zinc-700" : "border-gray-300"
-                                  }`} style={{ 
-                                    left: '10px', 
-                                    top: '50%',
-                                    transform: 'translateY(-50%)'
-                                  }} />
-                                  {!isLastUser && (
-                                    <div className={`absolute w-6 border-l-2 ${
-                                      theme === "dark" ? "border-zinc-700" : "border-gray-300"
-                                    }`} style={{ 
-                                      left: '10px', 
-                                      top: '50%',
-                                      bottom: '-100%'
-                                    }} />
-                                  )}
-                                  
-                                  <div className="ml-8 flex items-center">
-                                    {isExpanded ? (
-                                      <ChevronDown className="w-4 h-4 text-green-500" />
-                                    ) : (
-                                      <ChevronRight className="w-4 h-4 text-gray-500" />
-                                    )}
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <User className={`w-4 h-4 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} />
-                                  <span className="font-medium">{user.name}</span>
-                                  <span className={`text-xs px-2 py-1 rounded-full ${
-                                    theme === "dark" ? "bg-green-900/50 text-green-300" : "bg-green-100 text-green-700"
-                                  }`}>
-                                    {user.roles.length} role{user.roles.length !== 1 ? 's' : ''}
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="p-4">
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="w-3 h-3 rounded-full"
-                                  style={{ backgroundColor: getColor(user.averageHitPercentage) }}
-                                />
-                                <span className="font-semibold">
-                                  {user.averageHitPercentage.toFixed(1)}%
-                                </span>
-                              </div>
-                            </td>
-                            <td className="p-4 font-medium">{user.totalShots}</td>
-                            <td className="p-4 font-medium">{user.totalHits}</td>
-                            <td className="p-4 font-medium">{user.totalSessions}</td>
-                            <td className="p-4">
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                theme === "dark" ? "bg-green-900/50 text-green-300" : "bg-green-100 text-green-700"
-                              }`}>
-                                User
-                              </span>
-                            </td>
-                          </tr>
-
-                          {/* User Roles */}
-                          {isExpanded && user.roles.map((role, roleIdx) => {
-                            const isLastRole = roleIdx === user.roles.length - 1;
-                            
-                            return (
-                              <tr
-                                key={`${userKey}-${roleIdx}`}
-                                className={theme === "dark" ? "bg-zinc-800/40" : "bg-gray-50/70"}
-                              >
-                                <td className="p-4">
-                                  <div className="flex items-center gap-3">
-                                    <div className="flex items-center relative">
-                                      {/* Extended tree lines */}
-                                      <div className={`absolute w-6 h-full border-l-2 ${
-                                        theme === "dark" ? "border-zinc-700" : "border-gray-300"
-                                      }`} style={{ left: '10px' }} />
-                                      {!isLastUser && (
-                                        <div className={`absolute w-6 border-l-2 ${
-                                          theme === "dark" ? "border-zinc-700" : "border-gray-300"
-                                        }`} style={{ 
-                                          left: '10px', 
-                                          top: '100%',
-                                          height: '200%'
-                                        }} />
-                                      )}
-                                      
-                                      <div className={`absolute w-6 h-full border-l-2 ${
-                                        theme === "dark" ? "border-zinc-600" : "border-gray-400"
-                                      }`} style={{ left: '30px' }} />
-                                      <div className={`absolute w-4 border-t-2 ${
-                                        theme === "dark" ? "border-zinc-600" : "border-gray-400"
-                                      }`} style={{ 
-                                        left: '30px', 
-                                        top: '50%',
-                                        transform: 'translateY(-50%)'
-                                      }} />
-                                      {!isLastRole && (
-                                        <div className={`absolute w-6 border-l-2 ${
-                                          theme === "dark" ? "border-zinc-600" : "border-gray-400"
-                                        }`} style={{ 
-                                          left: '30px', 
-                                          top: '50%',
-                                          bottom: '-100%'
-                                        }} />
-                                      )}
-                                      
-                                      <div className="ml-12 flex items-center gap-2">
-                                        <Target className={`w-4 h-4 ${theme === "dark" ? "text-orange-400" : "text-orange-600"}`} />
-                                        <span className="font-medium capitalize">{role.role_or_weapon}</span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="p-4">
-                                  <div className="flex items-center gap-2">
-                                    <div
-                                      className="w-3 h-3 rounded-full"
-                                      style={{ backgroundColor: getColor(role.hit_percentage || 0) }}
-                                    />
-                                    <span className="font-semibold">
-                                      {role.hit_percentage?.toFixed(1) || '0.0'}%
-                                    </span>
-                                  </div>
-                                </td>
-                                <td className="p-4 font-medium">{role.shots}</td>
-                                <td className="p-4 font-medium">{role.hits}</td>
-                                <td className="p-4 font-medium">{role.sessions}</td>
-                                <td className="p-4">
-                                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                    theme === "dark" ? "bg-orange-900/50 text-orange-300" : "bg-orange-100 text-orange-700"
-                                  }`}>
-                                    Role
-                                  </span>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </React.Fragment>
-                      );
-                    })}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <SpTable<TableRow>
+          data={tableData}
+          columns={columns}
+          emptyState={<NoDataDisplay />}
+          actions={{
+            onRowClick: (row) => {
+              if (row.level === "squad") {
+                toggleSquad(row.squad_name);
+              } else if (row.level === "user") {
+                toggleUser(row.id);
+              }
+            },
+          }}
+          highlightRow={(row) => {
+            if (row.level === "squad" && expandedSquads.has(row.squad_name)) return true;
+            if (row.level === "user" && expandedUsers.has(row.id)) return true;
+            return false;
+          }}
+          isDisplayActions={false}
+        />
       )}
     </BaseDashboardCard>
   );
