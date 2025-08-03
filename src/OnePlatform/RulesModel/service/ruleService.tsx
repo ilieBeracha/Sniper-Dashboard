@@ -1,69 +1,69 @@
-import { RuleTemplate, TeamRule, RuleExecution, RuleStats } from "@/OnePlatform/RulesModel/type";
 import { supabase } from "@/services/supabaseClient";
 
-export const fetchRuleTemplates = async (): Promise<RuleTemplate[]> => {
-  const { data, error } = await supabase.from("rule_templates").select("*");
-  if (error) throw error;
-  return data as RuleTemplate[];
+export type RuleEventType = { id: string; key: string; name: string };
+export type RuleActionType = { id: string; key: string; name: string };
+export type RuleDefinition = {
+  id: string;
+  team_id: string;
+  name: string;
+  event_type_id: string;
+  logic: any;
+  is_active: boolean;
+  created_at: string;
+};
+export type RuleEvent = {
+  id: string;
+  event_type_id: string;
+  payload: any;
+  created_at: string;
+};
+export type RuleActionStep = {
+  id: string;
+  definition_id: string;
+  action_type_id: string;
+  params: any;
+  step_order: number;
+};
+export type RuleExecution = {
+  id: string;
+  definition_id: string;
+  event_id: string;
+  status: string;
+  result: any;
+  executed_at: string;
 };
 
-export const fetchTeamRules = async (teamId: string): Promise<TeamRule[]> => {
-  const { data, error } = await supabase.from("team_rules").select("*").eq("team_id", teamId);
-  if (error) throw error;
-  return data as TeamRule[];
-};
+export const fetchRuleEventTypes = () => supabase.from("rule_event_types").select("*");
 
-export const fetchRuleStats = async (ruleId: string): Promise<RuleStats> => {
-  const { data: executions, error } = await supabase
-    .from("rule_executions")
+export const fetchRuleActionTypes = () => supabase.from("rule_action_types").select("*");
+
+export const fetchRuleDefinitions = (teamId: string) => supabase.from("rule_definitions").select("*").eq("team_id", teamId);
+
+export const fetchRuleEvent = (eventId: string) => supabase.from("rule_events").select("*").eq("id", eventId).single();
+
+export const fetchRuleEvents = (eventTypeId: string, teamId: string) =>
+  supabase
+    .from("rule_events")
     .select("*")
-    .eq("rule_id", ruleId)
-    .order("started_at", { ascending: false });
+    .eq("event_type_id", eventTypeId)
+    .contains("payload", { team_id: teamId })
+    .order("created_at", { ascending: false });
 
-  if (error) throw error;
+export const fetchRuleActions = (definitionId: string) =>
+  supabase.from("rule_actions").select("*").eq("definition_id", definitionId).order("step_order", { ascending: true });
 
-  const stats: RuleStats = {
-    total_executions: executions?.length || 0,
-    successful_executions: executions?.filter((e) => e.status === "success").length || 0,
-    failed_executions: executions?.filter((e) => e.status === "failed").length || 0,
-    average_execution_time: executions?.reduce((acc, e) => acc + (e.execution_time_ms || 0), 0) / (executions?.length || 1) || 0,
-    last_execution: executions?.[0] || undefined,
-  };
+export const fetchRuleExecutions = (definitionId: string) =>
+  supabase.from("rule_executions").select("*").eq("definition_id", definitionId).order("executed_at", { ascending: false });
 
-  return stats;
+export const createRuleDefinition = async (newDef: RuleDefinition) => {
+  // drop the id field so Postgres can gen one
+  const { id, ...payload } = newDef as any;
+  const { data, error } = await supabase.from("rule_definitions").insert(payload).select().single();
+  return { data, error } as { data: RuleDefinition | null; error: any };
 };
 
-export const createTeamRule = async (teamId: string, ruleData: any): Promise<TeamRule> => {
-  const { data, error } = await supabase
-    .from("team_rules")
-    .insert({
-      team_id: teamId,
-      template_id: ruleData.templateId,
-      enabled: ruleData.enabled ?? true,
-      custom_config: ruleData.config || {},
-      message: ruleData.message,
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
-};
-
-export const updateTeamRule = async (ruleId: string, updates: Partial<TeamRule>): Promise<TeamRule> => {
-  const { data, error } = await supabase.from("team_rules").update(updates).eq("id", ruleId).select().single();
-
-  if (error) throw error;
-  return data;
-};
-
-export const fetchRuleExecutions = async (ruleId: string, limit = 10): Promise<RuleExecution[]> => {
-  const { data, error } = await supabase
-    .from("rule_executions")
-    .select("*")
-    .eq("rule_id", ruleId)
-    .order("started_at", { ascending: false })
-    .limit(limit);
-  if (error) throw error;
-  return data as RuleExecution[];
+export const updateRuleDefinition = async (definition: RuleDefinition) => {
+  const { id, ...payload } = definition as any;
+  const { data, error } = await supabase.from("rule_definitions").update(payload).eq("id", id).select().single();
+  return { data, error } as { data: RuleDefinition | null; error: any };
 };

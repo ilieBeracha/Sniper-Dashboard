@@ -10,8 +10,8 @@ interface RulesMainPanelProps {
 }
 
 export default function RulesMainPanel({ onRuleSelect, selectedRuleId, onTemplateClick }: RulesMainPanelProps) {
-  const { templates, teamRules, getRuleExecutions } = useRuleStore();
-
+  const { definitions, eventTypes, loadExecutions, loadEvents } = useRuleStore();
+  console.log(definitions);
   const triggerIcons = {
     score_update: <FaExclamationTriangle className="w-3.5 h-3.5" />,
     schedule: <FaClock className="w-3.5 h-3.5" />,
@@ -19,14 +19,16 @@ export default function RulesMainPanel({ onRuleSelect, selectedRuleId, onTemplat
     automation: <FaRobot className="w-3.5 h-3.5" />,
   };
 
-  const activeRules = teamRules.filter((r) => r.enabled);
-  const totalRules = teamRules.length;
+  const activeRules = definitions.filter((r) => r.is_active);
+  const totalRules = definitions.length;
 
   useEffect(() => {
     if (selectedRuleId) {
-      getRuleExecutions(selectedRuleId);
+      loadExecutions(selectedRuleId);
+      loadEvents(selectedRuleId, selectedRuleId);
     }
-  }, [selectedRuleId, getRuleExecutions]);
+    console.log(eventTypes);
+  }, [selectedRuleId, loadExecutions, loadEvents]);
 
   return (
     <div className="h-full flex flex-col">
@@ -65,7 +67,7 @@ export default function RulesMainPanel({ onRuleSelect, selectedRuleId, onTemplat
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => {}}
+            onClick={onTemplateClick}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl transition-all duration-200 text-sm font-medium shadow-lg shadow-blue-500/20"
           >
             <FaPlus className="w-3.5 h-3.5" />
@@ -100,7 +102,7 @@ export default function RulesMainPanel({ onRuleSelect, selectedRuleId, onTemplat
           <AnimatePresence>
             <div className="space-y-2">
               {activeRules.map((rule, index) => {
-                const template = templates.find((t) => t.id === rule.template_id);
+                const template = eventTypes.find((t) => t.id === rule.event_type_id);
                 const isSelected = selectedRuleId === rule.id;
 
                 return (
@@ -136,13 +138,13 @@ export default function RulesMainPanel({ onRuleSelect, selectedRuleId, onTemplat
                       `}
                       >
                         <div className={isSelected ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}>
-                          {triggerIcons[template?.trigger_type as keyof typeof triggerIcons] || <FaBolt className="w-3.5 h-3.5" />}
+                          {triggerIcons[template?.key as keyof typeof triggerIcons] || <FaBolt className="w-3.5 h-3.5" />}
                         </div>
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{template?.name || "Unknown Rule"}</h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">{rule.message}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">{rule.name}</p>
                       </div>
 
                       <div className="flex-shrink-0">

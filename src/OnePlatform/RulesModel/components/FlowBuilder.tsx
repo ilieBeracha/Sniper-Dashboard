@@ -1,152 +1,76 @@
-import { Background, Controls, MiniMap, ReactFlow, BackgroundVariant, ConnectionMode } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
-import { useTheme } from "@/contexts/ThemeContext";
+import { generateFlowFromConfig } from "@/OnePlatform/RulesModel/utils/generateFlowFromConfig";
 import { useRuleStore } from "../store/ruleStore";
-import { useState } from "react";
-import RuleDetailView from "./RuleDetailView";
+import { BackgroundVariant, Background, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import TriggerNode from "./nodes/TriggerNode";
 import ConditionNode from "./nodes/ConditionNode";
 import ActionNode from "./nodes/ActionNode";
-import CustomEdge from "./edges/CustomEdge";
-import { FaBolt, FaEye, FaEyeSlash } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import "@xyflow/react/dist/style.css";
+import { applyDagreLayout, centerNodes } from "@/OnePlatform/RulesModel/utils/applyDagreLayout";
 
-const nodeTypes = {
-  trigger: TriggerNode,
-  condition: ConditionNode,
-  action: ActionNode,
-};
+export default function FlowBuilder({ selectedRuleId, overrideLogic }: { selectedRuleId: string; overrideLogic?: any }) {
+  const { definitions, actions, executions } = useRuleStore();
+  const def = definitions.find((d) => d.id === selectedRuleId);
+  const acts = actions[selectedRuleId] || [];
+  const execs = executions[selectedRuleId] || [];
 
-const edgeTypes = {
-  custom: CustomEdge,
-};
-
-interface FlowBuilderProps {
-  selectedRuleId?: string | null;
-  isTemplate?: boolean;
-  hideDetails?: boolean;
-}
-
-export default function FlowBuilder({ selectedRuleId, isTemplate = false, hideDetails = false }: FlowBuilderProps) {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-  const { templates, teamRules } = useRuleStore();
-  const [showDetails, setShowDetails] = useState(!hideDetails);
-
-  const rule = isTemplate ? templates.find((r) => r.id === selectedRuleId) : [...teamRules, ...templates].find((r) => r.id === selectedRuleId);
-  const isTeamRule = rule && "template_id" in rule;
-
-  const flow = isTeamRule ? rule?.custom_config : (rule as any)?.mock_flow;
-
-  const nodes = flow?.nodes || [];
-  const edges = flow?.edges || [];
-
-  if (!selectedRuleId || !rule) {
+  if (!def) {
+    // Show empty state for new rule creation
     return (
-      <div className="flex-1 relative flex items-center justify-center h-full bg-gray-50 dark:bg-black/30">
-        <div className="text-center">
-          <div className="p-6 rounded-2xl bg-gray-100 dark:bg-gray-900 inline-block mb-4">
-            <FaBolt className="w-10 h-10 text-gray-400 dark:text-gray-600" />
-          </div>
-          <h3 className="text-lg font-medium mb-1 text-gray-700 dark:text-gray-300">No Rule Selected</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Select a rule to view its flow</p>
+      <div className="h-full w-full flex items-center justify-center" style={{ minHeight: "500px" }}>
+        <div className="text-center p-8">
+          <p className="text-gray-500 dark:text-gray-400 mb-4">No rule selected. Create or select a rule to define conditions and actions.</p>
+          <div className="text-sm text-gray-400 dark:text-gray-500">Flow builder will appear here once a rule is created.</div>
         </div>
       </div>
     );
   }
 
+  const mergedDef = overrideLogic !== undefined ? { ...def, logic: overrideLogic } : def;
+
+  const { nodes, edges, labelFromLogic } = generateFlowFromConfig(mergedDef, acts, execs) as any;
+
+  const { nodes: layoutNodes, edges: layoutEdges } = applyDagreLayout(nodes, edges);
+  const centeredNodes = centerNodes(layoutNodes);
+
+  const nodeTypes = {
+    trigger: TriggerNode,
+    condition: ConditionNode,
+    action: ActionNode,
+  } as const;
+
+  // friendly textual summary of logic
+  const summaryItems: string[] = [];
+  if (Array.isArray(mergedDef.logic?.and)) {
+    summaryItems.push("All of these must be true:");
+    mergedDef.logic.and.forEach((c: any) => summaryItems.push(labelFromLogic(c)));
+  } else if (Array.isArray(mergedDef.logic?.or)) {
+    summaryItems.push("Any of these can be true:");
+    mergedDef.logic.or.forEach((c: any) => summaryItems.push(labelFromLogic(c)));
+  }
+
   return (
-    <div className="w-full h-full flex">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={showDetails ? "with-details" : "without-details"}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className={`${showDetails && !hideDetails ? "flex-1" : "w-full"} relative`}
-        >
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            onConnect={() => {}}
-            connectionMode={ConnectionMode.Loose}
-            fitView
-            defaultEdgeOptions={{ type: "custom", animated: true }}
-            className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 bg-alpha-black"
-          >
-            <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
-            <MiniMap
-              style={{
-                backgroundColor: isDark ? "#1f2937" : "#ffffff",
-                border: "1px solid",
-                borderColor: isDark ? "#374151" : "#e5e7eb",
-              }}
-              nodeColor={(node) => {
-                if (node.type === "trigger") return "#6366f1";
-                if (node.type === "condition") return "#f59e0b";
-                if (node.type === "action") return "#10b981";
-                return "#94a3b8";
-              }}
-            />
+    <ReactFlowProvider>
+      <div className="h-full w-full flex flex-col" style={{ minHeight: "500px" }}>
+        {summaryItems.length > 0 && (
+          <div className="mb-2 bg-gray-100 dark:bg-gray-800/40 p-2 rounded-lg text-xs text-gray-800 dark:text-gray-200 max-h-28 overflow-auto">
+            {summaryItems.map((s, i) => (
+              <div key={i}>{s}</div>
+            ))}
+          </div>
+        )}
+        <div className="flex-1">
+          <ReactFlow nodes={centeredNodes} edges={layoutEdges} fitView nodeTypes={nodeTypes}>
+            <Background variant={BackgroundVariant.Dots} />
             <Controls
               style={{
-                border: "1px solid",
-                borderRadius: "0.5rem",
+                background: "#000",
+                border: "1px solid #222",
               }}
-              showInteractive={false}
+              className="[&_button]:!bg-black [&_button]:!text-white [&_button]:!border-gray-700 [&_button]:hover:!bg-gray-800"
             />
           </ReactFlow>
-
-          {!hideDetails && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowDetails(!showDetails)}
-              className="absolute top-4 right-4 p-3 rounded-xl transition-all bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-lg group"
-              title={showDetails ? "Hide Details" : "Show Details"}
-            >
-              <div className="flex items-center gap-2">
-                {showDetails ? (
-                  <>
-                    <FaEyeSlash className="w-4 h-4 text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200" />
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200">
-                      Hide Details
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <FaEye className="w-4 h-4 text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200" />
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200">
-                      Show Details
-                    </span>
-                  </>
-                )}
-              </div>
-            </motion.button>
-          )}
-        </motion.div>
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {showDetails && !hideDetails && (
-          <motion.div
-            initial={{ width: 0, opacity: 0 }}
-            animate={{ width: "24rem", opacity: 1 }}
-            exit={{ width: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="border-l border-gray-200 dark:border-gray-800 overflow-hidden"
-          >
-            <div className="w-96 h-full">
-              <RuleDetailView selectedRuleId={selectedRuleId} />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+        </div>
+      </div>
+    </ReactFlowProvider>
   );
 }

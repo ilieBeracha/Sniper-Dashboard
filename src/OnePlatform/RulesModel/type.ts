@@ -1,43 +1,45 @@
-export type RuleTemplate = {
+export type RuleEventType = {
   id: string;
+  key: string;
   name: string;
-  trigger_type: string;
-  default_config: any;
-  mock_flow?: {
-    nodes: any[];
-    edges: any[];
-  };
-  description: string;
-  tags: string[];
+};
+
+export type RuleActionType = {
+  id: string;
+  key: string;
+  name: string;
+};
+
+export type RuleDefinition = {
+  id: string;
+  team_id: string;
+  name: string;
+  event_type_id: string;
+  logic: any;
+  is_active: boolean;
   created_at: string;
 };
 
-export type TeamRule = {
+export type RuleEvent = {
   id: string;
-  team_id: string;
-  template_id: string;
-  custom_config: any;
-  message: string;
-  enabled: boolean;
+  event_type_id: string;
+  payload: any;
   created_at: string;
+};
+
+export type RuleAction = {
+  id: string;
+  definition_id: string;
+  action_type_id: string;
+  params: any;
+  step_order: number;
 };
 
 export type RuleExecution = {
   id: string;
-  rule_id: string;
-  team_id: string;
-  status: "success" | "failed" | "pending";
-  started_at: string;
-  completed_at?: string;
-  error_message?: string;
-  affected_items?: number;
-  execution_time_ms?: number;
-};
-
-export type RuleStats = {
-  total_executions: number;
-  successful_executions: number;
-  failed_executions: number;
-  average_execution_time: number;
-  last_execution?: RuleExecution;
+  definition_id: string;
+  event_id: string;
+  status: string;
+  result: any;
+  executed_at: string;
 };

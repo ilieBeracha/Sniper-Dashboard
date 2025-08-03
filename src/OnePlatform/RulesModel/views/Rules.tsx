@@ -1,6 +1,5 @@
-import { ReactFlowProvider } from "@xyflow/react";
-import RulesMainPanel from "@/OnePlatform/RulesModel/components/RulesMainPanel";
-import TemplatesModal from "@/OnePlatform/RulesModel/components/TemplatesModal";
+import RulesMainPanel from "../components/RulesMainPanel";
+import TemplatesModal from "../components/TemplatesModal";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useRuleStore } from "../store/ruleStore";
 import { useEffect, useState } from "react";
@@ -16,14 +15,18 @@ export default function Rules() {
   const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
   const [showTemplatesModal, setShowTemplatesModal] = useState(false);
 
-  const { getRuleTemplates, getTeamRules } = useRuleStore();
-
+  const { loadEventTypes, loadActionTypes, loadDefinitions, loadEvents, loadActions, loadExecutions } = useRuleStore();
+  console.log(user);
   useEffect(() => {
-    getRuleTemplates();
+    loadEventTypes();
+    loadActionTypes();
     if (user?.team_id) {
-      getTeamRules(user?.team_id);
+      loadDefinitions(user?.team_id);
+      loadEvents(user?.team_id, user?.team_id);
+      loadActions(user?.team_id);
+      loadExecutions(user?.team_id);
     }
-  }, [user?.team_id, getRuleTemplates, getTeamRules]);
+  }, [user?.team_id, loadEventTypes, loadActionTypes, loadDefinitions, loadEvents, loadActions, loadExecutions]);
 
   return (
     <>
@@ -45,9 +48,7 @@ export default function Rules() {
           transition={{ duration: 0.3, delay: 0.1 }}
           className={`flex-1 h-full bg-alpha-black`}
         >
-          <ReactFlowProvider>
-            <FlowBuilder selectedRuleId={selectedRuleId} />
-          </ReactFlowProvider>
+          <FlowBuilder selectedRuleId={selectedRuleId || ""} />
         </motion.div>
       </div>
 
