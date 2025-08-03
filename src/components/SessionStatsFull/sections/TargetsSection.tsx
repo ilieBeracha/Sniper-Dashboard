@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Target as TargetIcon, Trash2, Wind, Plus, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
+import { Target as TargetIcon, Trash2, Wind, Plus, ChevronDown, ChevronUp, AlertCircle, Crosshair } from "lucide-react";
 import { Target } from "../types";
 import { SectionHeader } from "./SectionHeader";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -23,7 +23,7 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
   };
 
   const hasOptionalData = (target: Target) => {
-    return target.windStrength !== null || target.windDirection !== null || target.mistakeCode !== "";
+    return target.windStrength !== null || target.windDirection !== null || target.mistakeCode !== "" || target.firstShotHit;
   };
 
   return (
@@ -131,7 +131,7 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                   {/* Expanded Options */}
                   {expandedTarget === target.id && (
                     <div className={`px-4 py-3 border-t ${theme === "dark" ? "border-zinc-800 bg-zinc-800/30" : "border-gray-100 bg-gray-50"}`}>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-lg mx-auto">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
                         {/* Wind Speed */}
                         <div>
                           <Label className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"} mb-1 flex items-center gap-1`}>
@@ -173,6 +173,28 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                             onChange={(e) => updateTarget(target.id, "mistakeCode", e.target.value)}
                             className={`h-8 text-sm rounded ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}`}
                           />
+                        </div>
+
+                        {/* First Shot Hit */}
+                        <div className="flex items-center space-x-3">
+                          <input
+                            type="checkbox"
+                            id={`firstShotHit-${target.id}`}
+                            checked={target.firstShotHit}
+                            onChange={(e) => updateTarget(target.id, "firstShotHit", e.target.checked)}
+                            className={`w-4 h-4 rounded border-2 focus:ring-2 focus:ring-offset-2 ${
+                              theme === "dark"
+                                ? "bg-zinc-800 border-zinc-600 text-emerald-500 focus:ring-emerald-500"
+                                : "bg-white border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                            }`}
+                          />
+                          <Label 
+                            htmlFor={`firstShotHit-${target.id}`}
+                            className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"} flex items-center gap-1 cursor-pointer`}
+                          >
+                            <Crosshair className="w-3 h-3" />
+                            First Shot Hit
+                          </Label>
                         </div>
                       </div>
                     </div>

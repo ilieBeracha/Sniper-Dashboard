@@ -26,6 +26,7 @@ export interface CreateTargetStatsData {
   total_hits: number;
   target_eliminated: boolean;
   mistake_code?: string | null;
+  first_shot_hit: boolean;
 }
 
 export interface CreateTargetEngagementData {

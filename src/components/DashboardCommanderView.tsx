@@ -4,7 +4,6 @@ import { userStore } from "@/store/userStore";
 import { performanceStore } from "@/store/performance";
 import { useTheme } from "@/contexts/ThemeContext";
 import UserRoleAccuracyTable from "./UserRoleAccuracyTable";
-import { squadStore } from "@/store/squadStore";
 import { getSquads } from "@/services/squadService";
 import CommanderTeamDispersionTable from "./CommanderTeamDispersionTable";
 
@@ -12,13 +11,9 @@ const CommanderView = () => {
   const { theme } = useTheme();
   const { user } = useStore(userStore);
   const { commanderUserRoleBreakdown, fetchCommanderUserRoleBreakdown, commanderTeamDispersion } = useStore(performanceStore);
-  const { squads } = useStore(squadStore);
 
   const [loading, setLoading] = useState(true);
-
   const [weaponType, setWeaponType] = useState<string | null>(null);
-  const [effort, setEffort] = useState<string | null>(null);
-  const [shotType, setShotType] = useState<string | null>(null);
   const [position, setPosition] = useState<string | null>(null);
   const [dayPeriod, setDayPeriod] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -38,17 +33,15 @@ const CommanderView = () => {
 
     const formattedStart = startDate?.toISOString().split("T")[0] ?? null;
     const formattedEnd = endDate?.toISOString().split("T")[0] ?? null;
-    const effortBool = effort === "true" ? true : effort === "false" ? false : null;
 
-performanceStore.getState().fetchCommanderTeamDispersion(user.team_id, {
-  startDate: formattedStart ?? undefined,
-  endDate: formattedEnd ?? undefined,
-  weaponType: weaponType ?? undefined,
-  position: position ?? undefined,
-  dayPeriod: dayPeriod ?? undefined,
-});
-
-  }, [user?.team_id, startDate, endDate, weaponType, effort, shotType, position, dayPeriod]);
+    performanceStore.getState().fetchCommanderTeamDispersion(user.team_id, {
+      startDate: formattedStart ?? undefined,
+      endDate: formattedEnd ?? undefined,
+      weaponType: weaponType ?? undefined,
+      position: position ?? undefined,
+      dayPeriod: dayPeriod ?? undefined,
+    });
+  }, [user?.team_id, startDate, endDate, weaponType, position, dayPeriod]);
 
   useEffect(() => {
     (async () => {
@@ -57,7 +50,7 @@ performanceStore.getState().fetchCommanderTeamDispersion(user.team_id, {
       await getSquads(user.team_id);
       setLoading(false);
     })();
-  }, [user?.team_id]);
+  }, [user?.team_id, fetchCommanderUserRoleBreakdown]);
 
   return (
     <div className="flex flex-col gap-6">
