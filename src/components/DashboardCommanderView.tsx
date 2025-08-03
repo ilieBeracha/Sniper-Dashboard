@@ -54,8 +54,8 @@ const CommanderView = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <CommanderTeamDispersionTable 
-        theme={theme} 
+      <CommanderTeamDispersionTable
+        theme={theme}
         data={commanderTeamDispersion}
         selectedWeapon={weaponType || ""}
         selectedPosition={position || ""}

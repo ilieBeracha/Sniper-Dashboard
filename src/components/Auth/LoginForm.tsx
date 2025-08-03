@@ -124,7 +124,7 @@ export function ModernLogin({
       {magicLinkSent ? (
         <div
           className={`p-6 rounded-lg text-center space-y-4 ${
-            theme === "dark" ? "bg-green-900/20 border border-green-800" : "bg-green-50 border border-green-200"
+            theme === "dark" ? "bg-green-900/20  border border-green-800" : "bg-green-50 border border-green-200"
           }`}
         >
           <svg
@@ -257,7 +257,7 @@ export function ModernLogin({
           </button>
 
           {onRegisterClick && (
-            <div className={`mt-6 pt-4 border-t transition-colors duration-200 ${theme === "dark" ? "border-[#2A2A2A]" : "border-gray-300"}`}>
+            <div className={`mt-6 pt-4  border-t transition-colors duration-200 ${theme === "dark" ? "border-[#2A2A2A]" : "border-gray-300"}`}>
               <p className={`text-sm text-center mb-3 transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
                 Don't have an account?
               </p>

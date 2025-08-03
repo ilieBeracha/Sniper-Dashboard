@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { ChevronDown, ChevronRight, Users, User } from "lucide-react";
+import { Users, User, ChevronDown, ChevronRight } from "lucide-react";
 import BaseDashboardCard from "./base/BaseDashboardCard";
-import NoDataDisplay from "./base/BaseNoData";
 import { CommanderTeamDispersionEntry } from "@/types/performance";
 import { getEnumValues } from "@/services/supabaseEnums";
+import { SpTable, SpTableColumn } from "@/layouts/SpTable";
+import NoDataDisplay from "./base/BaseNoData";
 
 const formatEnumLabel = (value: string) =>
   value
@@ -22,15 +23,23 @@ interface CommanderTeamDispersionTableProps {
   onDayPeriodChange: (value: string) => void;
 }
 
-const CommanderTeamDispersionTable: React.FC<CommanderTeamDispersionTableProps> = ({ 
-  theme, 
-  data, 
-  selectedWeapon, 
-  selectedPosition, 
-  selectedDayPeriod, 
-  onWeaponChange, 
-  onPositionChange, 
-  onDayPeriodChange 
+interface TableRow extends CommanderTeamDispersionEntry {
+  id: string;
+  isSquadHeader?: boolean;
+  userCount?: number;
+  isExpanded?: boolean;
+  parentSquad?: string;
+}
+
+const CommanderTeamDispersionTable: React.FC<CommanderTeamDispersionTableProps> = ({
+  theme,
+  data,
+  selectedWeapon,
+  selectedPosition,
+  selectedDayPeriod,
+  onWeaponChange,
+  onPositionChange,
+  onDayPeriodChange,
 }) => {
   const [expandedSquads, setExpandedSquads] = useState<Set<string>>(new Set());
   const [weaponTypes, setWeaponTypes] = useState<string[]>([]);
@@ -52,17 +61,6 @@ const CommanderTeamDispersionTable: React.FC<CommanderTeamDispersionTableProps> 
     setExpandedSquads(updated);
   };
 
-  const grouped = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    
-    const map = new Map<string, CommanderTeamDispersionEntry[]>();
-    data.forEach((entry) => {
-      if (!map.has(entry.squad_name)) map.set(entry.squad_name, []);
-      map.get(entry.squad_name)!.push(entry);
-    });
-    return Array.from(map.entries());
-  }, [data]);
-
   const getColor = (cm: number | null) => {
     if (cm == null) return "#999999";
     if (cm <= 3) return "#2CB67D";
@@ -83,29 +81,165 @@ const CommanderTeamDispersionTable: React.FC<CommanderTeamDispersionTableProps> 
     };
   };
 
+  // Transform data into flat structure for SpTable
+  const tableData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+
+    const grouped = new Map<string, CommanderTeamDispersionEntry[]>();
+    data.forEach((entry) => {
+      if (!grouped.has(entry.squad_name)) grouped.set(entry.squad_name, []);
+      grouped.get(entry.squad_name)!.push(entry);
+    });
+
+    const rows: TableRow[] = [];
+
+    Array.from(grouped.entries()).forEach(([squadName, users]) => {
+      const squadAvg = calculateSquadAverages(users);
+      const isExpanded = expandedSquads.has(squadName);
+
+      // Add squad header row
+      rows.push({
+        id: `squad-${squadName}`,
+        user_id: `squad-${squadName}`,
+        first_name: squadName,
+        last_name: "",
+        squad_name: squadName,
+        total_median: squadAvg.total_median,
+        median_effort_false: squadAvg.median_effort_false,
+        median_effort_true: squadAvg.median_effort_true,
+        median_type_timed: squadAvg.median_type_timed,
+        weapon_type: null,
+        shooting_position: null,
+        day_period: null,
+        isSquadHeader: true,
+        userCount: users.length,
+        isExpanded,
+      });
+
+      // Add user rows if expanded
+      if (isExpanded) {
+        users.forEach((user) => {
+          rows.push({
+            ...user,
+            id: user.user_id,
+            parentSquad: squadName,
+          });
+        });
+      }
+    });
+
+    return rows;
+  }, [data, expandedSquads]);
+
+  const columns: SpTableColumn<TableRow>[] = [
+    {
+      key: "first_name",
+      label: "Hierarchy",
+      render: (_, row) => {
+        if (row.isSquadHeader) {
+          return (
+            <div className="flex items-center gap-1 sm:gap-3 py-3">
+              {row.isExpanded ? (
+                <ChevronDown className="text-blue-500 w-4 h-4 sm:w-5 sm:h-5" />
+              ) : (
+                <ChevronRight className="text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
+              )}
+              <Users className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
+              <span className="font-semibold text-xs sm:text-sm">{row.first_name}</span>
+              <span
+                className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 sm:py-1 rounded-full ml-1 sm:ml-2 ${theme === "dark" ? "bg-blue-900/50 text-blue-300" : "bg-blue-100 text-blue-700"}`}
+              >
+                {row.userCount}
+                <span className="hidden sm:inline"> user{row.userCount !== 1 ? "s" : ""}</span>
+              </span>
+            </div>
+          );
+        }
+        return (
+          <div className="flex items-center gap-1 sm:gap-2 pl-6 py-3 sm:pl-12">
+            <User className={`w-3 h-3 sm:w-4 sm:h-4 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} />
+            <span className="text-xs sm:text-sm">
+              <span className="sm:hidden">
+                {row.first_name.charAt(0)}. {row.last_name}
+              </span>
+              <span className="hidden sm:inline">
+                {row.first_name} {row.last_name}
+              </span>
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      key: "total_median",
+      label: "Total",
+      render: (value) => (
+        <span className="font-semibold text-xs sm:text-sm" style={{ color: getColor(value) }}>
+          {value != null ? (
+            <>
+              <span className="sm:hidden">{value.toFixed(1)}</span>
+              <span className="hidden sm:inline">{value.toFixed(2)}cm</span>
+            </>
+          ) : (
+            "–"
+          )}
+        </span>
+      ),
+    },
+    {
+      key: "median_effort_false",
+      label: "Effort: No",
+      hideOnMobile: true,
+      render: (value) => (
+        <span className="font-semibold text-xs sm:text-sm" style={{ color: getColor(value) }}>
+          {value != null ? `${value.toFixed(2)}cm` : "–"}
+        </span>
+      ),
+    },
+    {
+      key: "median_effort_true",
+      label: "Effort: Yes",
+      hideOnMobile: true,
+      render: (value) => (
+        <span className="font-semibold text-xs sm:text-sm" style={{ color: getColor(value) }}>
+          {value != null ? `${value.toFixed(2)}cm` : "–"}
+        </span>
+      ),
+    },
+    {
+      key: "median_type_timed",
+      label: "Timed",
+      render: (value) => (
+        <span className="font-semibold text-xs sm:text-sm" style={{ color: getColor(value) }}>
+          {value != null ? (
+            <>
+              <span className="sm:hidden">{value.toFixed(1)}</span>
+              <span className="hidden sm:inline">{value.toFixed(2)}cm</span>
+            </>
+          ) : (
+            "–"
+          )}
+        </span>
+      ),
+    },
+  ];
+
   return (
-    <BaseDashboardCard 
-      header="Median CM Dispersion by Squad" 
+    <BaseDashboardCard
       tooltipContent="View of multiple median metrics per user in each squad"
       withFilter={[
         {
           label: "Weapon Type",
           value: "weapon_type",
           onChange: onWeaponChange,
-          options: [
-            { label: "All Weapons", value: "" },
-            ...weaponTypes.map((type) => ({ label: formatEnumLabel(type), value: type }))
-          ],
+          options: [{ label: "All Weapons", value: "" }, ...weaponTypes.map((type) => ({ label: formatEnumLabel(type), value: type }))],
           type: "select",
         },
         {
           label: "Position",
           value: "position",
           onChange: onPositionChange,
-          options: [
-            { label: "All Positions", value: "" },
-            ...positions.map((pos) => ({ label: formatEnumLabel(pos), value: pos }))
-          ],
+          options: [{ label: "All Positions", value: "" }, ...positions.map((pos) => ({ label: formatEnumLabel(pos), value: pos }))],
           type: "select",
         },
         {
@@ -131,94 +265,20 @@ const CommanderTeamDispersionTable: React.FC<CommanderTeamDispersionTableProps> 
         day_period: selectedDayPeriod,
       }}
     >
-
-      {!data || data.length === 0 ? (
-        <NoDataDisplay />
-      ) : (
-        <div className={`rounded-xl border ${theme === "dark" ? "border-zinc-800 bg-zinc-900/50" : "border-gray-200 bg-white shadow-sm"}`}>
-          <table className={`min-w-full text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-            <thead>
-              <tr className={`${theme === "dark" ? "bg-zinc-800/50 border-zinc-800" : "bg-gray-50 border-gray-200"} text-xs uppercase border-b`}>
-                <th className="text-left p-4 font-medium">Hierarchy</th>
-                <th className="text-left p-4 font-medium">Total</th>
-                <th className="text-left p-4 font-medium">Effort: No</th>
-                <th className="text-left p-4 font-medium">Effort: Yes</th>
-                <th className="text-left p-4 font-medium">Timed</th>
-              </tr>
-            </thead>
-            <tbody>
-              {grouped.map(([squadName, users]) => {
-                const expanded = expandedSquads.has(squadName);
-                const squadAvg = calculateSquadAverages(users);
-
-                return (
-                  <React.Fragment key={squadName}>
-                    <tr
-                      onClick={() => toggleSquad(squadName)}
-                      className={`cursor-pointer border-t ${theme === "dark" ? "border-zinc-800 hover:bg-zinc-800/40" : "hover:bg-blue-50"}`}
-                    >
-                      <td className="p-4 flex items-center gap-3">
-                        {expanded ? <ChevronDown className="text-blue-500" /> : <ChevronRight className="text-gray-500" />}
-                        <Users className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
-                        <span className="font-semibold">{squadName}</span>
-                        <span
-                          className={`text-xs px-2 py-1 rounded-full ml-2 ${theme === "dark" ? "bg-blue-900/50 text-blue-300" : "bg-blue-100 text-blue-700"}`}
-                        >
-                          {users.length} user{users.length !== 1 ? "s" : ""}
-                        </span>
-                      </td>
-                      <td style={{ color: getColor(squadAvg.total_median) }} className="p-4 font-bold">
-                        {squadAvg.total_median != null ? `${squadAvg.total_median.toFixed(2)}cm` : "–"}
-                      </td>
-                      <td style={{ color: getColor(squadAvg.median_effort_false) }} className="p-4 font-bold">
-                        {squadAvg.median_effort_false != null ? `${squadAvg.median_effort_false.toFixed(2)}cm` : "–"}
-                      </td>
-                      <td style={{ color: getColor(squadAvg.median_effort_true) }} className="p-4 font-bold">
-                        {squadAvg.median_effort_true != null ? `${squadAvg.median_effort_true.toFixed(2)}cm` : "–"}
-                      </td>
-                      <td style={{ color: getColor(squadAvg.median_type_timed) }} className="p-4 font-bold">
-                        {squadAvg.median_type_timed != null ? `${squadAvg.median_type_timed.toFixed(2)}cm` : "–"}
-                      </td>
-                    </tr>
-
-                    {expanded &&
-                      users.map((user) => (
-                        <tr key={user.user_id} className={`${theme === "dark" ? "bg-zinc-800/40" : "bg-gray-50/50"} border-t`}>
-                          <td className="p-4 pl-12 flex items-center gap-2">
-                            <User className={`w-4 h-4 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} />
-                            <span>
-                              {user.first_name} {user.last_name}
-                            </span>
-                          </td>
-                          <td className="p-4">
-                            <span className="font-semibold" style={{ color: getColor(user.total_median) }}>
-                              {user.total_median != null ? `${user.total_median.toFixed(2)}cm` : "–"}
-                            </span>
-                          </td>
-                          <td className="p-4">
-                            <span className="font-semibold" style={{ color: getColor(user.median_effort_false) }}>
-                              {user.median_effort_false != null ? `${user.median_effort_false.toFixed(2)}cm` : "–"}
-                            </span>
-                          </td>
-                          <td className="p-4">
-                            <span className="font-semibold" style={{ color: getColor(user.median_effort_true) }}>
-                              {user.median_effort_true != null ? `${user.median_effort_true.toFixed(2)}cm` : "–"}
-                            </span>
-                          </td>
-                          <td className="p-4">
-                            <span className="font-semibold" style={{ color: getColor(user.median_type_timed) }}>
-                              {user.median_type_timed != null ? `${user.median_type_timed.toFixed(2)}cm` : "–"}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <SpTable<TableRow>
+        data={tableData}
+        columns={columns}
+        emptyState={<NoDataDisplay />}
+        actions={{
+          onRowClick: (row) => {
+            if (row.isSquadHeader) {
+              toggleSquad(row.squad_name);
+            }
+          },
+        }}
+        highlightRow={(row) => !!row.parentSquad}
+        isDisplayActions={false}
+      />
     </BaseDashboardCard>
   );
 };
