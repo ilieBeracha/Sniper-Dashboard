@@ -60,7 +60,7 @@ export default function TrainingSessionStatsCard({ trainingSessionId }: { traini
                   stat.highlight ? (theme === "dark" ? "text-green-400" : "text-green-600") : theme === "dark" ? "text-zinc-500" : "text-gray-400"
                 }`}
               />
-              <p className={`${isMobile ? "text-xs" : "text-sm"} ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>{stat.label}</p>
+              <p className={`${isMobile ? "text-xs" : "text-lg"} ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>{stat.label}</p>
             </div>
             <p
               className={`${isMobile ? "text-lg" : "text-2xl"} font-semibold ${

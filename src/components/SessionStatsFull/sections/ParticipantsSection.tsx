@@ -4,7 +4,6 @@ import { SectionHeader } from "./SectionHeader";
 import { useTheme } from "@/contexts/ThemeContext";
 import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
-import { BaseLabelRequired } from "@/components/base/BaseLabelRequired";
 
 interface ParticipantsSectionProps {
   section: any;
@@ -82,9 +81,7 @@ export const ParticipantsSection = ({
               }`}
             >
               {/* Compact Header */}
-              <div className={`px-3 py-2 flex items-center justify-between ${
-                theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"
-              }`}>
+              <div className={`px-3 py-2 flex items-center justify-between ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${
@@ -94,9 +91,7 @@ export const ParticipantsSection = ({
                     {index + 1}
                   </div>
                   <div className="truncate">
-                    <span className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                      {participant.name}
-                    </span>
+                    <span className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{participant.name}</span>
                     {participant.userId === user?.id && (
                       <span className={`text-xs ml-1 ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>(You)</span>
                     )}
@@ -175,16 +170,10 @@ export const ParticipantsSection = ({
             </div>
           ))
         ) : (
-          <div className={`rounded-lg border p-6 text-center ${
-            theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"
-          }`}>
+          <div className={`rounded-lg border p-6 text-center ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}>
             <UserPlus className={`w-10 h-10 mx-auto mb-3 ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`} />
-            <h3 className={`text-base font-medium ${theme === "dark" ? "text-white" : "text-gray-900"} mb-1`}>
-              No participants yet
-            </h3>
-            <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-              Add team members to start
-            </p>
+            <h3 className={`text-base font-medium ${theme === "dark" ? "text-white" : "text-gray-900"} mb-1`}>No participants yet</h3>
+            <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Add team members to start</p>
           </div>
         )}
       </div>
