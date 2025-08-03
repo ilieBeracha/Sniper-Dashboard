@@ -11,7 +11,7 @@ interface RulesMainPanelProps {
 
 export default function RulesMainPanel({ onRuleSelect, selectedRuleId, onTemplateClick }: RulesMainPanelProps) {
   const { definitions, eventTypes, loadExecutions, loadEvents } = useRuleStore();
-  console.log(definitions);
+
   const triggerIcons = {
     score_update: <FaExclamationTriangle className="w-3.5 h-3.5" />,
     schedule: <FaClock className="w-3.5 h-3.5" />,
@@ -27,7 +27,6 @@ export default function RulesMainPanel({ onRuleSelect, selectedRuleId, onTemplat
       loadExecutions(selectedRuleId);
       loadEvents(selectedRuleId, selectedRuleId);
     }
-    console.log(eventTypes);
   }, [selectedRuleId, loadExecutions, loadEvents]);
 
   return (

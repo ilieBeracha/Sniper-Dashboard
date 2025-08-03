@@ -14,7 +14,6 @@ export default function FlowBuilder({ selectedRuleId, overrideLogic }: { selecte
   const execs = executions[selectedRuleId] || [];
 
   if (!def) {
-    // Show empty state for new rule creation
     return (
       <div className="h-full w-full flex items-center justify-center" style={{ minHeight: "500px" }}>
         <div className="text-center p-8">

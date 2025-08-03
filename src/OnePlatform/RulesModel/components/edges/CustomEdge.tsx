@@ -2,10 +2,10 @@ import { getBezierPath, EdgeProps } from "@xyflow/react";
 
 export default function CustomEdge(props: EdgeProps) {
   const [edgePath] = getBezierPath(props);
-  
+
   const isTrue = props.sourceHandleId === "true";
   const isFalse = props.sourceHandleId === "false";
-  
+
   const strokeColor = isTrue ? "#10b981" : isFalse ? "#ef4444" : "#94a3b8";
   const strokeDasharray = isFalse ? "3 3" : "0";
 
