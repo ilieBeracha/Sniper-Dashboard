@@ -6,6 +6,37 @@ export interface SquadWeaponPerformance {
   accuracy: number;
 }
 
+export interface CommanderTeamMedianDispersion {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  squad_name: string;
+  median_cm_dispersion: number | null;
+
+  // new fields
+  weapon_name: string | null;
+  position: string | null;
+  effort: boolean | null;
+  type: string | null;
+  day_period: string | null;
+}
+
+// src/types/performance.ts
+export interface CommanderTeamDispersionEntry {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  squad_name: string;
+  total_median: number | null;
+  median_effort_false: number | null;
+  median_effort_true: number | null;
+  median_type_timed: number | null;
+  weapon_type: string | null;
+  shooting_position: string | null;
+  day_period: string | null;
+}
+
+
 export type GroupingScoreEntry = {
   id: string;
   sniper_user_id: string;
@@ -160,3 +191,29 @@ export type SquadMajorityPerformance = {
   avg_time_to_first_shot: number;
   elimination_rate: number;
 };
+
+export interface GetUserMediansInSquad {
+  squad_id: string;
+  user_id: string;
+  user_duty: "Sniper" | "Spotter";
+  weapon_id?: string | null;
+  equipment_id?: string | null;
+  position: string;
+}
+
+export interface GetUserMediansInSquadQuery {
+  p_squad_id: string;
+  p_weapon_id: string | null;
+  p_effort: string | null;
+  p_type: string | null;
+  p_position: string | null;
+  p_start_date: Date | null;
+  p_end_date: Date | null;
+}
+
+export interface GetUserMediansInSquadQueryResult {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  median_cm_dispersion: number;
+}

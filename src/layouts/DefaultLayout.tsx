@@ -8,7 +8,7 @@ export default function DefaultLayout() {
   const isMobile = useIsMobile();
   return (
     <div
-      className={`flex w-screen max-h-screen relative ${isMobile ? "flex-col" : "flex-row"} transition-colors duration-200 ${
+      className={`flex w-screen min-h-[100dvh] relative ${isMobile ? "flex-col" : "flex-row"} transition-colors duration-200 ${
         theme === "dark" ? " text-gray-100" : "bg-gray-50 text-gray-900"
       }`}
     >

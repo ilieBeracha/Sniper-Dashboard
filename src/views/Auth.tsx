@@ -73,7 +73,7 @@ export default function Auth() {
   };
 
   return (
-    <div className={`flex h-screen overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-[#121212]" : "bg-gray-100"}`}>
+    <div className={`flex h-[100dvh] overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-[#121212]" : "bg-gray-100"}`}>
       <div
         className={`absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-200 ${
           theme === "dark" ? "opacity-5" : "opacity-10"

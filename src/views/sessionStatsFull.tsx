@@ -111,7 +111,7 @@ export default function ImprovedSessionStats() {
       {/* Main Content Container */}
       <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth lg:pt-0 " onScroll={handleScroll}>
         {/* Section 1: Session Configuration */}
-        <section className="min-h-screen snap-start flex items-center justify-center px-4 sm:px-6 lg:px-8 ">
+        <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8 ">
           <div className="w-full max-w-4xl  py-8">
             <SessionConfigSection
               section={sections[0]}
@@ -124,7 +124,7 @@ export default function ImprovedSessionStats() {
         </section>
 
         {/* Section 2: Participants */}
-        <section className="min-h-screen snap-start flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
             <ParticipantsSection
               section={sections[1]}
@@ -142,21 +142,21 @@ export default function ImprovedSessionStats() {
         </section>
 
         {/* Section 3: Targets */}
-        <section className="min-h-screen snap-start flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
             <TargetsSection section={sections[2]} targets={targets} addTarget={addTarget} updateTarget={updateTarget} removeTarget={removeTarget} />
           </div>
         </section>
 
         {/* Section 4: Engagements */}
-        <section className="min-h-screen snap-start flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
             <EngagementsSection section={sections[3]} targets={targets} participants={participants} updateEngagement={updateEngagement} />
           </div>
         </section>
 
         {/* Section 5: Summary */}
-        <section className="min-h-screen snap-start flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
             <SummarySection
               section={sections[4]}

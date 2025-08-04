@@ -20,6 +20,8 @@ const ErrorPage = lazy(() => import("./404"));
 const SessionStatsFull = lazy(() => import("./sessionStatsFull"));
 const SettingsPage = lazy(() => import("./Settings"));
 const DataExport = lazy(() => import("./DataExport"));
+const RulesLayout = lazy(() => import("@/layouts/Rulelayout"));
+const Rules = lazy(() => import("@/OnePlatform/RulesModel/views/Rules"));
 
 export default function AppRoutes() {
   const { token } = useStore(authStore);
@@ -46,7 +48,7 @@ export default function AppRoutes() {
   }, []);
 
   const LoadingFallback = () => (
-    <div className="flex items-center h-screen justify-center bg-transparent">
+    <div className="flex items-center h-[100dvh] justify-center bg-transparent">
       <WaveLoader />
     </div>
   );
@@ -54,84 +56,97 @@ export default function AppRoutes() {
   return (
     <Routes>
       {token ? (
-        <Route element={<DefaultLayout />}>
-          <Route
-            path="/"
-            element={
-              <div className="w-full overflow-x-hidden">
+        <>
+          <Route element={<DefaultLayout />}>
+            <Route
+              path="/"
+              element={
+                <div className="w-full overflow-x-hidden">
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Dashboard />
+                  </Suspense>
+                </div>
+              }
+            />
+            <Route
+              path="/trainings"
+              element={
                 <Suspense fallback={<LoadingFallback />}>
-                  <Dashboard />
+                  <Training />
                 </Suspense>
-              </div>
-            }
-          />
-          <Route
-            path="/trainings"
-            element={
-              <Suspense fallback={<LoadingFallback />}>
-                <Training />
-              </Suspense>
-            }
-          />
+              }
+            />
 
-          <Route
-            path="/assets"
-            element={
-              <Suspense fallback={<LoadingFallback />}>
-                <Assets />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <Suspense fallback={<LoadingFallback />}>
-                <SettingsPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/data-export"
-            element={
-              <Suspense fallback={<LoadingFallback />}>
-                <DataExport />
-              </Suspense>
-            }
-          />
-          {/* <Route
-            path="/file-vault"
-            element={
-              <Suspense fallback={<LoadingFallback />}>
-                <FileVault />
-              </Suspense>
-            } */}
-          {/* /> */}
-          <Route
-            path="/training/:id"
-            element={
-              <Suspense fallback={<LoadingFallback />}>
-                <TrainingPage />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/training/:id/session-stats-full/:sessionId?"
-            element={
-              <Suspense fallback={<LoadingFallback />}>
-                <SessionStatsFull />
-              </Suspense>
-            }
-          />
+            <Route
+              path="/assets"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <Assets />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <SettingsPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/data-export"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <DataExport />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/file-vault"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <Rules />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/training/:id"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <TrainingPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/training/:id/session-stats-full/:sessionId?"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <SessionStatsFull />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/rules"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <Rules />
+                </Suspense>
+              }
+            />
 
-          <Route
-            path="*"
-            element={
-              <Suspense fallback={<LoadingFallback />}>
-                <ErrorPage />
-              </Suspense>
-            }
-          />
-        </Route>
+            <Route
+              path="*"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <ErrorPage />
+                </Suspense>
+              }
+            />
+          </Route>
+          <Route path="/rules" element={<RulesLayout />}>
+            <Route path="/rules" element={<Rules />} />
+          </Route>
+        </>
       ) : (
         <Route
           path="*"

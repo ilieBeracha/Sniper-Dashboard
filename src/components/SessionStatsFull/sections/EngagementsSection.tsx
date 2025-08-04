@@ -23,7 +23,7 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
         <SectionHeader section={section} />
 
         <div
-          className={`mt-8 justify-between text-center py-16 rounded-2xl border-2 ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}
+          className={`mt-6 text-center py-12 rounded-lg border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}
         >
           {targets.length === 0 ? (
             <>
@@ -49,32 +49,34 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
     <div className="w-full max-w-2xl mx-auto" id="engagements">
       <SectionHeader section={section} />
 
-      {/* Mobile View */}
-      <div className="md:hidden mt-6 space-y-4">
+      {/* Mobile View - Compact */}
+      <div className="md:hidden mt-4 space-y-3">
         {snipers.map((participant, pIndex) => (
           <div
             key={participant.userId}
-            className={`rounded-xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}
+            className={`rounded-lg border overflow-hidden ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}
           >
-            {/* Participant Header */}
-            <div className={`px-4 py-3 border-b ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-200"}`}>
+            {/* Participant Header - Compact */}
+            <div className={`px-3 py-2 border-b ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"}`}>
               <div className="flex items-center gap-2">
                 <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                  className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold ${
                     theme === "dark" ? "bg-amber-500/20 text-amber-400" : "bg-amber-100 text-amber-600"
                   }`}
                 >
                   {pIndex + 1}
                 </div>
-                <div>
-                  <div className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{participant.name}</div>
-                  <div className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{participant.position}</div>
+                <div className="flex-1 min-w-0">
+                  <div className={`text-sm font-medium truncate ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                    {participant.name}
+                    <span className={`text-xs ml-1 ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>• {participant.position}</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Targets */}
-            <div className="p-4 space-y-3">
+            {/* Targets - Compact Grid */}
+            <div className="p-3">
               {targets.map((target, tIndex) => {
                 const engagement = target.engagements.find((e) => e.userId === participant.userId);
                 const shots = engagement?.shotsFired || 0;
@@ -82,38 +84,41 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
                 const accuracy = shots > 0 ? Math.round((hits / shots) * 100) : 0;
 
                 return (
-                  <div key={target.id} className="space-y-4">
-                    <div className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                  <div key={target.id} className={`${tIndex > 0 ? 'mt-3 pt-3 border-t' : ''} ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+                    <div className={`text-xs font-medium mb-2 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
                       Target {tIndex + 1} • {target.distance}m
+                      {target.windStrength && (
+                        <span className="ml-2">Wind: {target.windStrength} @ {target.windDirection}°</span>
+                      )}
                     </div>
-                    <div className="grid grid-cols-2 gap-8 justify-self-center">
-                      <div className="flex flex-col gap-2">
-                        <label className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Shots Fired</label>
+                    <div className="grid grid-cols-3 gap-2 items-end">
+                      <div>
+                        <label className={`text-[10px] block mb-1 ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Shots</label>
                         <Input
+                          type="number"
+                          min="0"
                           value={engagement?.shotsFired || 0}
                           onChange={(e) => {
                             const newShotsFired = parseInt(e.target.value) || 0;
                             updateEngagement(target.id, participant.userId, "shotsFired", newShotsFired);
-                            // If hits exceed new shots fired, reduce hits to match
                             const currentHits = engagement?.targetHits || 0;
                             if (currentHits > newShotsFired) {
                               updateEngagement(target.id, participant.userId, "targetHits", newShotsFired);
                             }
                           }}
-                          className={`h-10 text-center text-sm font-medium rounded-lg ${
+                          className={`h-8 px-2 text-center text-xs font-medium rounded ${
                             theme === "dark"
                               ? "bg-zinc-800 border-zinc-700 focus:border-indigo-500"
                               : "bg-gray-50 border-gray-200 focus:border-indigo-500"
                           }`}
                         />
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <label className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Target Hits</label>
+                      <div>
+                        <label className={`text-[10px] block mb-1 ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Hits</label>
                         <Input
                           type="number"
                           min="0"
-                          placeholder="0"
-                          value={engagement?.targetHits || ""}
+                          value={engagement?.targetHits || 0}
                           onChange={(e) => {
                             const value = parseInt(e.target.value) || 0;
                             const maxValue = engagement?.shotsFired || 0;
@@ -121,21 +126,20 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
                               updateEngagement(target.id, participant.userId, "targetHits", value);
                             }
                           }}
-                          className={`h-10 text-center text-sm font-medium rounded-lg ${
+                          className={`h-8 px-2 text-center text-xs font-medium rounded ${
                             theme === "dark"
                               ? "bg-zinc-800 border-zinc-700 focus:border-indigo-500"
                               : "bg-gray-50 border-gray-200 focus:border-indigo-500"
                           }`}
                         />
-                        {shots > 0 && (
-                          <div
-                            className={`mt-1 text-center text-xs font-bold ${
-                              accuracy >= 80 ? "text-green-500" : accuracy >= 60 ? "text-yellow-500" : "text-red-500"
-                            }`}
-                          >
-                            {accuracy}%
-                          </div>
-                        )}
+                      </div>
+                      <div className={`h-8 rounded flex items-center justify-center text-xs font-bold ${
+                        accuracy >= 80 ? "bg-green-500/20 text-green-500" : 
+                        accuracy >= 60 ? "bg-yellow-500/20 text-yellow-500" : 
+                        accuracy > 0 ? "bg-red-500/20 text-red-500" : 
+                        theme === "dark" ? "bg-zinc-800 text-zinc-500" : "bg-gray-100 text-gray-500"
+                      }`}>
+                        {shots > 0 ? `${accuracy}%` : '-'}
                       </div>
                     </div>
                   </div>
@@ -148,22 +152,22 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
 
       {/* Desktop View */}
       <div
-        className={`hidden md:block mt-8 rounded-2xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}
+        className={`hidden md:block mt-6 rounded-xl border overflow-hidden ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}
       >
         <div className="overflow-x-auto">
           <div style={{ minWidth: `${200 + targets.length * 200}px` }}>
-            {/* Table Header */}
+            {/* Compact Table Header */}
             <div
-              className={`grid gap-2 px-4 py-3 text-xs font-medium border-b ${
-                theme === "dark" ? "bg-zinc-800/50 border-zinc-700 text-zinc-400" : "bg-gray-50 border-gray-200 text-gray-600"
+              className={`grid gap-2 px-3 py-2 text-xs font-medium border-b ${
+                theme === "dark" ? "bg-zinc-800/30 border-zinc-700 text-zinc-400" : "bg-gray-50 border-gray-200 text-gray-600"
               }`}
-              style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 100px)` }}
+              style={{ gridTemplateColumns: `180px repeat(${targets.length * 2}, 80px)` }}
             >
               <div>Participant</div>
               {targets.map((target, index) => (
                 <React.Fragment key={target.id}>
-                  <div className="text-center col-span-2">
-                    Target {index + 1} ({target.distance}m)
+                  <div className="text-center col-span-2 text-[11px]">
+                    T{index + 1} ({target.distance}m)
                   </div>
                 </React.Fragment>
               ))}
@@ -171,10 +175,10 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
 
             {/* Sub-header with Shots/Hits */}
             <div
-              className={`grid gap-2 px-4 py-2 text-xs border-b ${
+              className={`grid gap-2 px-3 py-1 text-[10px] border-b ${
                 theme === "dark" ? "bg-zinc-900/50 border-zinc-700 text-zinc-500" : "bg-gray-100 border-gray-200 text-gray-500"
               }`}
-              style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 100px)` }}
+              style={{ gridTemplateColumns: `180px repeat(${targets.length * 2}, 80px)` }}
             >
               <div></div>
               {targets.map((target) => (
@@ -191,21 +195,23 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
                 return (
                   <div
                     key={participant.userId}
-                    className={`grid gap-2 px-4 py-3 items-center ${theme === "dark" ? "hover:bg-zinc-800/30" : "hover:bg-gray-50"}`}
-                    style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 100px)` }}
+                    className={`grid gap-2 px-3 py-2 items-center ${theme === "dark" ? "hover:bg-zinc-800/20" : "hover:bg-gray-50"}`}
+                    style={{ gridTemplateColumns: `180px repeat(${targets.length * 2}, 80px)` }}
                   >
-                    {/* Participant Info */}
+                    {/* Participant Info - Compact */}
                     <div className="flex items-center gap-2">
                       <div
-                        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                        className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${
                           theme === "dark" ? "bg-amber-500/20 text-amber-400" : "bg-amber-100 text-amber-600"
                         }`}
                       >
                         {pIndex + 1}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className={`text-sm font-medium truncate ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{participant.name}</div>
-                        <div className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{participant.position}</div>
+                        <div className={`text-xs font-medium truncate ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                          {participant.name}
+                          <span className={`text-[10px] ml-1 ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>• {participant.position}</span>
+                        </div>
                       </div>
                     </div>
 
@@ -261,14 +267,14 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
               })}
             </div>
 
-            {/* Summary Row */}
+            {/* Summary Row - Compact */}
             <div
-              className={`grid gap-2 px-4 py-3 border-t font-medium ${
-                theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-200"
+              className={`grid gap-2 px-3 py-2 border-t font-medium ${
+                theme === "dark" ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
               }`}
-              style={{ gridTemplateColumns: `200px repeat(${targets.length * 2}, 100px)` }}
+              style={{ gridTemplateColumns: `180px repeat(${targets.length * 2}, 80px)` }}
             >
-              <div className={`text-sm ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>Total</div>
+              <div className={`text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>Total</div>
               {targets.map((target) => {
                 const totalShots = target.engagements.reduce((sum, e) => sum + (e.shotsFired || 0), 0);
                 const totalHits = target.engagements.reduce((sum, e) => sum + (e.targetHits || 0), 0);
@@ -276,12 +282,12 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
 
                 return (
                   <React.Fragment key={`${target.id}-total`}>
-                    <div className={`text-center text-sm ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>{totalShots}</div>
-                    <div className={`text-center text-sm ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                    <div className={`text-center text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>{totalShots}</div>
+                    <div className={`text-center text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
                       {totalHits}
                       {totalShots > 0 && (
-                        <span className={`ml-1 text-xs ${accuracy >= 80 ? "text-green-500" : accuracy >= 60 ? "text-yellow-500" : "text-red-500"}`}>
-                          ({accuracy}%)
+                        <span className={`block text-[10px] ${accuracy >= 80 ? "text-green-500" : accuracy >= 60 ? "text-yellow-500" : "text-red-500"}`}>
+                          {accuracy}%
                         </span>
                       )}
                     </div>

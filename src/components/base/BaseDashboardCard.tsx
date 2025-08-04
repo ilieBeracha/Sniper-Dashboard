@@ -46,6 +46,22 @@ export default function BaseDashboardCard({
   if (!header || header === "" || header === null) {
     return (
       <Card shadow="none" className={cardClassName}>
+        <div className="flex items-center gap-2 absolute top-0 right-0">
+          <div className={`flex items-center gap-4  shadow-lg rounded-lg p-2`}></div>
+          {tooltipContent && (
+            <BiInfoCircle
+              className={` cursor-help transition-colors duration-200 ${
+                theme === "dark" ? "text-indigo-400/80 hover:text-indigo-400" : "text-indigo-600/80 hover:text-indigo-600"
+              }`}
+              size={16}
+              data-tooltip-id={`${header}-tooltip`}
+              data-tooltip-content={tooltipContent}
+            />
+          )}
+          {withFilter.length > 0 && (
+            <BaseDashboardCardFilter filters={withFilter} onClearFilters={onClearFilters || (() => {})} currentValues={currentFilterValues} />
+          )}
+        </div>
         {children}
       </Card>
     );

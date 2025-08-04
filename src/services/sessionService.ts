@@ -308,6 +308,7 @@ export async function getFullSessionById(sessionId: string): Promise<{
         wind_direction_deg: t.wind_direction_deg,
         total_hits: t.total_hits,
         target_eliminated: t.target_eliminated,
+        first_shot_hit: t.first_shot_hit,
         mistake_code: t.mistake_code,
         session_stats_id: t.session_stats_id,
         target_stats_id: t.id,
