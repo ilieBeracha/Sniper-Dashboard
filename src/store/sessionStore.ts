@@ -67,6 +67,7 @@ export interface SessionStatsSaveData {
     team_id: string | null;
     dayPeriod: string | null;
     timeToFirstShot: number | null;
+    effort: boolean | null;
     note?: string | null;
   };
   // Participants data from wizard
@@ -149,6 +150,7 @@ export const sessionStore = create<SessionStatsState>((set) => ({
         team_id: wizardData.sessionData.team_id,
         day_period: wizardData.sessionData.dayPeriod,
         time_to_first_shot_sec: wizardData.sessionData.timeToFirstShot,
+        effort: wizardData.sessionData.effort || false,
         note: wizardData.sessionData.note || null,
         squad_id: userStore.getState().user?.squad_id || null,
       };
@@ -272,6 +274,7 @@ export const sessionStore = create<SessionStatsState>((set) => ({
         team_id: wizardData.sessionData.team_id,
         day_period: wizardData.sessionData.dayPeriod,
         time_to_first_shot_sec: wizardData.sessionData.timeToFirstShot,
+        effort: wizardData.sessionData.effort || false,
         note: wizardData.sessionData.note || null,
         squad_id: userStore.getState().user?.squad_id || null,
       };

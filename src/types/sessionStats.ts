@@ -7,6 +7,7 @@ export interface CreateSessionStatsData {
   time_to_first_shot_sec: number | null;
   note?: string | null;
   squad_id: string | null;
+  effort: boolean | null;
 }
 
 export interface CreateParticipantData {
