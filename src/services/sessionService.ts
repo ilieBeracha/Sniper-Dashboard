@@ -201,6 +201,7 @@ export async function updateCompleteSession(
         time_to_first_shot_sec: sessionStats.time_to_first_shot_sec,
         note: sessionStats.note,
         squad_id: sessionStats.squad_id,
+        effort: sessionStats.effort,
       })
       .eq("id", sessionId);
 
@@ -268,6 +269,7 @@ export async function getFullSessionById(sessionId: string): Promise<{
 }> {
   // 1. Get session_stats
   const { data: session, error: sessionError } = await supabase.from("session_stats").select("*").eq("id", sessionId).single();
+  console.log("session", session);
   if (sessionError) throw sessionError;
 
   // 2. Get participants
@@ -292,6 +294,7 @@ export async function getFullSessionById(sessionId: string): Promise<{
       note: session.note,
       creator_id: session.creator_id,
       squad_id: session.squad_id,
+      effort: session.effort,
     },
     participants: participants.map((p) => ({
       user_id: p.user_id,

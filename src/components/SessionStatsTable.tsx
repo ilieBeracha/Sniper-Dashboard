@@ -210,7 +210,18 @@ export default function SessionStatsTable({
     <SpTable
       data={paginatedSessionStats}
       columns={columns}
-      filters={[]}
+      filters={[
+        {
+          key: "effort",
+          label: "Effort",
+          type: "select",
+          options: [
+            { label: "Yes", value: "true" },
+            { label: "No", value: "false" },
+            { label: "All", value: "" },
+          ],
+        },
+      ]}
       searchPlaceholder="Search..."
       actions={{
         onRowClick: onSessionStatsClick,

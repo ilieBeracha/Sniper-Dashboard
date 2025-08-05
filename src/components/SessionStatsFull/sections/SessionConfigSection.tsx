@@ -8,6 +8,7 @@ import { useState } from "react";
 import AddPurpleBtn from "@/components/base/buttons/AddPurpleBtn";
 import DayPeriodSelect from "@/components/DayPeriodSelect";
 import { BaseLabelRequired } from "@/components/base/BaseLabelRequired";
+import EffortSelect from "@/components/EffortSelect";
 
 interface SessionConfigSectionProps {
   section: any;
@@ -61,6 +62,8 @@ export const SessionConfigSection = ({
         </div>
 
         <DayPeriodSelect dayPeriod={sessionData.dayPeriod} onDayPeriodChange={(dayPeriod) => updateSessionData("dayPeriod", dayPeriod)} />
+
+        <EffortSelect effort={sessionData.effort} onEffortChange={(effort) => updateSessionData("effort", effort)} />
 
         {/* Optional Fields */}
         <div className="space-y-3">

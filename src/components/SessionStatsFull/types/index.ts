@@ -4,6 +4,7 @@ export interface SessionData {
   timeToFirstShot: number | null;
   note: string;
   squad_id: string;
+  effort: boolean;
 }
 
 export interface Participant {
@@ -20,8 +21,8 @@ export interface Participant {
 
 export interface TargetEngagement {
   userId: string;
-  shotsFired: number;
-  targetHits: number;
+  shotsFired: number | null;
+  targetHits: number | null;
 }
 
 export interface Target {

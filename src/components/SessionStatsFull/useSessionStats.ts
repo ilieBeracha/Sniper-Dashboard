@@ -57,6 +57,7 @@ export const useSessionStats = () => {
     timeToFirstShot: null,
     note: "",
     squad_id: user?.squad_id || "",
+    effort: false,
   });
 
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -72,6 +73,7 @@ export const useSessionStats = () => {
         timeToFirstShot: selectedSession?.sessionStats?.time_to_first_shot_sec || null,
         note: selectedSession?.sessionStats?.note || "",
         squad_id: selectedSession?.sessionStats?.squad_id || user?.squad_id || "",
+        effort: selectedSession?.sessionStats?.effort || false,
       });
 
       // Load participants
@@ -117,6 +119,7 @@ export const useSessionStats = () => {
         dayPeriod: "",
         timeToFirstShot: null,
         note: "",
+        effort: false,
         squad_id: user?.squad_id || "",
       });
 
@@ -182,7 +185,7 @@ export const useSessionStats = () => {
   };
 
   const validateSessionConfig = () => {
-    return sessionData.assignment_id && sessionData.dayPeriod && sessionData.timeToFirstShot !== null;
+    return sessionData.assignment_id && sessionData.dayPeriod && sessionData.timeToFirstShot !== null && sessionData.effort !== undefined;
   };
 
   const validateParticipants = () => {
@@ -204,7 +207,7 @@ export const useSessionStats = () => {
     const snipers = participants.filter((p) => p.userDuty === "Sniper");
     if (snipers.length === 0) return false;
 
-    return targets.some((target) => target.engagements.some((e) => e.shotsFired > 0));
+    return targets.some((target) => target.engagements.some((e) => e.shotsFired && e.shotsFired > 0));
   };
 
   const getSectionValidationStatus = (sectionIndex: number) => {
@@ -342,7 +345,7 @@ export const useSessionStats = () => {
     const errors: string[] = [];
     if (!sessionData.assignment_id) errors.push("Training Assignment is required");
     if (!sessionData.dayPeriod) errors.push("Time Period is required");
-
+    if (sessionData.effort === undefined || sessionData.effort === null) errors.push("Effort is required");
     // Validate participants
     if (participants.length === 0) {
       errors.push("At least one participant is required");
@@ -400,6 +403,7 @@ export const useSessionStats = () => {
             dayPeriod: sessionData.dayPeriod || null,
             timeToFirstShot: sessionData.timeToFirstShot,
             note: sessionData.note || null,
+            effort: sessionData.effort,
           },
           // Participants data from wizard
           participants: participants.map((p) => ({
@@ -419,8 +423,8 @@ export const useSessionStats = () => {
             first_shot_hit: t.firstShotHit || false,
             engagements: t.engagements.map((eng) => ({
               user_id: eng.userId,
-              shots_fired: eng.shotsFired,
-              target_hits: eng.targetHits || undefined,
+              shots_fired: eng.shotsFired || 0,
+              target_hits: eng.targetHits || 0,
             })),
           })),
           // Current user for creator_id
