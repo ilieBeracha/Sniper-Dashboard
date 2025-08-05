@@ -52,15 +52,16 @@ export default function DashboardWelcome({ user }: { user: User }) {
             <div
               className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors duration-200 ${
                 theme === "dark" ? "bg-[#2A2A2A] border-[#333]" : "bg-gray-100 border-gray-300"
-              } ${getRoleColor(user.user_role)}`}
+              } ${getRoleColor(user?.user_role as UserRole)}`}
             >
-              {getRoleIcon(user.user_role)}
+              {getRoleIcon(user?.user_role as UserRole)}
               <span className="text-sm font-medium">
-                {user.user_role
-                  .replace("_", " ")
-                  .split(" ")
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")}
+                {user?.user_role &&
+                  user?.user_role
+                    .replace("_", " ")
+                    .split(" ")
+                    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
               </span>
             </div>
             {user.registered && (
@@ -84,9 +85,9 @@ export default function DashboardWelcome({ user }: { user: User }) {
             <div
               className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors duration-200 ${
                 theme === "dark" ? "bg-[#1a1a1a] border-[#333]" : "bg-white border-gray-300"
-              } ${getRoleColor(user.user_role)}`}
+              } ${getRoleColor(user?.user_role as UserRole)}`}
             >
-              {getRoleIcon(user.user_role)}
+              {getRoleIcon(user?.user_role as UserRole)}
             </div>
           </div>
         )}
