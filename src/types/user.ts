@@ -22,7 +22,7 @@ export enum PositionScore {
 export interface User {
   id: string;
   email: string;
-  user_role: UserRole;
+  user_role: UserRole | null;
   first_name: string;
   last_name: string;
   team_name?: string;

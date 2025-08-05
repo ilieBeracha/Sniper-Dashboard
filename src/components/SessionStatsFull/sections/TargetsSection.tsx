@@ -1,10 +1,11 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Target as TargetIcon, Trash2, Wind, Plus, ChevronDown, ChevronUp, AlertCircle, Crosshair } from "lucide-react";
+import { Target as TargetIcon, Trash2, Wind, Plus, Minus, AlertCircle, ChevronDown } from "lucide-react";
 import { Target } from "../types";
 import { SectionHeader } from "./SectionHeader";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useState } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 
 interface TargetsSectionProps {
   section: any;
@@ -16,198 +17,174 @@ interface TargetsSectionProps {
 
 export const TargetsSection = ({ section, targets, addTarget, updateTarget, removeTarget }: TargetsSectionProps) => {
   const { theme } = useTheme();
-  const [expandedTarget, setExpandedTarget] = useState<string | null>(null);
-
-  const toggleExpanded = (targetId: string) => {
-    setExpandedTarget(expandedTarget === targetId ? null : targetId);
-  };
-
-  const hasOptionalData = (target: Target) => {
-    return target.windStrength !== null || target.windDirection !== null || target.mistakeCode !== "" || target.firstShotHit;
-  };
 
   return (
     <div className="w-full max-w-2xl mx-auto" id="targets">
-      <SectionHeader section={section} />
-
-      {/* Add Target Button */}
-      <div className="mt-6">
+      <div className="flex items-center justify-between mb-4">
+        <SectionHeader section={section} />
         <button
           onClick={addTarget}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500 text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-all hover:scale-105"
         >
-          <Plus className="w-4 h-4" />
-          <span>Add Target</span>
+          <Plus className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Add Target</span>
         </button>
       </div>
 
-      {/* Targets List - Single Card */}
-      <div className={`mt-8 rounded-2xl border-2 overflow-hidden ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}>
+      {/* Targets List - Compact Design */}
+      <div className={`rounded-xl border overflow-hidden ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}>
         {targets?.length > 0 ? (
-          <>
-            {/* Table Header */}
-            <div
-              className={`grid grid-cols-12 gap-2 px-4 py-3 text-xs font-medium border-b ${
-                theme === "dark" ? "bg-zinc-800/50 border-zinc-700 text-zinc-400" : "bg-gray-50 border-gray-200 text-gray-600"
-              }`}
-            >
-              <div className="col-span-1">#</div>
-              <div className="col-span-8">Distance</div>
-              <div className="col-span-2">Options</div>
-              <div className="col-span-1"></div>
-            </div>
+          <div className={`divide-y  ${theme === "dark" ? "divide-zinc-800" : "divide-gray-200"}`}>
+            {targets?.map((target, index) => (
+              <div key={target.id} className={`transition-all space-y-2 ${theme === "dark" ? "hover:bg-zinc-800/20" : "hover:bg-gray-50"}`}>
+                {/* Compact Target Row */}
+                <div className="p-3 pb-2">
+                  <div className="flex items-center gap-3">
+                    {/* Target Number */}
+                    <span className="text-xs text-zinc-500 whitespace-nowrap">Target {index + 1}:</span>
 
-            {/* Targets List */}
-            <div className="divide-y divide-zinc-800 dark:divide-zinc-700">
-              {targets?.map((target, index) => (
-                <div key={target.id} className="transition-all">
-                  {/* Main Row */}
-                  <div
-                    className={`grid grid-cols-12 gap-2 px-4  justify-between py-3 items-center ${theme === "dark" ? "hover:bg-zinc-800/30" : "hover:bg-gray-50"}`}
-                  >
-                    {/* Index */}
-                    <div className="col-span-1">
-                      <div
-                        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                          theme === "dark" ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-100 text-emerald-600"
-                        }`}
-                      >
-                        {index + 1}
-                      </div>
-                    </div>
-
-                    {/* Distance Slider */}
-                    <div className="col-span-9">
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="range"
+                    {/* Distance Controls */}
+                    <div className="flex-1 flex items-center gap-2 w-full">
+                      <div className="flex items-center gap-1.5 px-2 w-full justify-center">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-9 p-0 hover:bg-zinc-800/50 bg-zinc-800/50"
+                          onClick={() => updateTarget(target.id, "distance", Math.max(100, target.distance - 25))}
+                        >
+                          <Minus className="w-3 h-3" />
+                        </Button>
+                        <Input
+                          type="number"
+                          min={100}
+                          max={900}
+                          step={25}
                           value={target.distance}
                           onChange={(e) => updateTarget(target.id, "distance", parseInt(e.target.value))}
-                          className={`flex-1 h-1.5 rounded-lg appearance-none cursor-pointer ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}
-                          style={{
-                            background: `linear-gradient(to right, #10b981 0%, #10b981 ${((target.distance - 100) / 800) * 100}%, ${
-                              theme === "dark" ? "#27272a" : "#e5e7eb"
-                            } ${((target.distance - 100) / 800) * 100}%, ${theme === "dark" ? "#27272a" : "#e5e7eb"} 100%)`,
-                          }}
-                          min="100"
-                          max="900"
-                          step="25"
+                          className={`text-center w-full px-4 h-8 text-sm font-medium ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-200"}`}
                         />
-                        <span className={`text-sm font-medium min-w-[4rem]  ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>
-                          {target.distance}m
-                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-9 p-0 hover:bg-zinc-800/50 bg-zinc-800/50"
+                          onClick={() => updateTarget(target.id, "distance", Math.min(900, target.distance + 25))}
+                        >
+                          <Plus className="w-3 h-3" />
+                        </Button>
                       </div>
                     </div>
 
-                    {/* Options Toggle */}
-                    <div className="col-span-2 flex justify-end">
+                    {/* Options Menu */}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={`h-7 w-7 ${theme === "dark" ? "hover:bg-zinc-800 bg-zinc-700" : "hover:bg-gray-100"}`}
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className={`w-80 p-3 max-h-[80dvh] overflow-y-auto ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}
+                      >
+                        <div className="space-y-3">
+                          {/* Wind Controls */}
+                          <div className="flex gap-2">
+                            <div className="flex-1">
+                              <Label className="text-xs text-zinc-500 mb-1 flex items-center gap-1">
+                                <Wind className="w-3 h-3" />
+                                Wind
+                              </Label>
+                              <div className="flex gap-1.5">
+                                <Input
+                                  type="number"
+                                  placeholder="Speed"
+                                  value={target.windStrength || ""}
+                                  onChange={(e) => updateTarget(target.id, "windStrength", e.target.value ? parseInt(e.target.value) : null)}
+                                  className="h-7 text-xs"
+                                />
+                                <Input
+                                  type="number"
+                                  placeholder="Dir°"
+                                  min="0"
+                                  max="360"
+                                  value={target.windDirection || ""}
+                                  onChange={(e) => updateTarget(target.id, "windDirection", e.target.value ? parseInt(e.target.value) : null)}
+                                  className="h-7 text-xs"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Mistake Code */}
+                          <div>
+                            <Label className="text-xs text-zinc-500 mb-1 flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3" />
+                              Mistake Code
+                            </Label>
+                            <Input
+                              placeholder="Optional"
+                              value={target.mistakeCode}
+                              onChange={(e) => updateTarget(target.id, "mistakeCode", e.target.value)}
+                              className="h-7 text-xs"
+                            />
+                          </div>
+
+                          {/* Delete Button */}
+                          <button
+                            onClick={() => removeTarget(target.id)}
+                            className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors text-xs font-medium"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            Remove Target
+                          </button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+
+                {/* First Shot Hit - Compact Row */}
+                <div className="px-3 pb-2">
+                  <div className="flex items-center justify-start gap-2">
+                    <span className="text-xs text-zinc-500 whitespace-nowrap">First shot:</span>
+                    <div className=" gap-2 flex-1  grid grid-cols-2 w-full">
                       <button
-                        onClick={() => toggleExpanded(target.id)}
-                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
-                          hasOptionalData(target)
-                            ? theme === "dark"
-                              ? "bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30"
-                              : "bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                        onClick={() => updateTarget(target.id, "firstShotHit", true)}
+                        className={`px-3 py-1 min-w-[100px] w-full rounded-md text-xs font-medium transition-all flex-1 ${
+                          target.firstShotHit === true
+                            ? "bg-green-500/20 text-green-500 border border-green-500/30"
                             : theme === "dark"
-                              ? "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-                              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                              ? "bg-zinc-800/50 text-zinc-500 border border-zinc-700 hover:border-zinc-600"
+                              : "bg-gray-100 text-gray-500 border border-gray-200 hover:border-gray-300"
                         }`}
                       >
-                        {expandedTarget === target.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                        Hit
                       </button>
-                      <div className="col-span-1 flex justify-end">
-                        <button
-                          onClick={() => removeTarget(target.id)}
-                          className={`p-1.5 rounded transition-colors ${
-                            theme === "dark" ? "hover:bg-red-500/20 text-red-400" : "hover:bg-red-50 text-red-500"
-                          }`}
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => updateTarget(target.id, "firstShotHit", false)}
+                        className={`px-3 py-1 rounded-md text-xs font-medium transition-all flex-1 ${
+                          target.firstShotHit === false
+                            ? "bg-red-500/20 text-red-500 border border-red-500/30"
+                            : theme === "dark"
+                              ? "bg-zinc-800/50 text-zinc-500 border border-zinc-700 hover:border-zinc-600"
+                              : "bg-gray-100 text-gray-500 border border-gray-200 hover:border-gray-300"
+                        }`}
+                      >
+                        Miss
+                      </button>
                     </div>
                   </div>
-
-                  {/* Expanded Options */}
-                  {expandedTarget === target.id && (
-                    <div className={`px-4 py-3 border-t ${theme === "dark" ? "border-zinc-800 bg-zinc-800/30" : "border-gray-100 bg-gray-50"}`}>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
-                        {/* Wind Speed */}
-                        <div>
-                          <Label className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"} mb-1 flex items-center gap-1`}>
-                            <Wind className="w-3 h-3" />
-                            Speed (m/s)
-                          </Label>
-                          <Input
-                            type="number"
-                            placeholder="0"
-                            value={target.windStrength || ""}
-                            onChange={(e) => updateTarget(target.id, "windStrength", e.target.value ? parseInt(e.target.value) : null)}
-                            className={`h-8 py-4 text-sm rounded ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}`}
-                          />
-                        </div>
-
-                        {/* Wind Direction */}
-                        <div>
-                          <Label className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"} mb-1`}>Direction (°)</Label>
-                          <Input
-                            type="number"
-                            placeholder="0-360"
-                            min="0"
-                            max="360"
-                            value={target.windDirection || ""}
-                            onChange={(e) => updateTarget(target.id, "windDirection", e.target.value ? parseInt(e.target.value) : null)}
-                            className={`h-8 text-sm rounded ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}`}
-                          />
-                        </div>
-
-                        {/* Mistake Code */}
-                        <div>
-                          <Label className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"} mb-1 flex items-center gap-1`}>
-                            <AlertCircle className="w-3 h-3" />
-                            Mistake Code
-                          </Label>
-                          <Input
-                            placeholder="Optional"
-                            value={target.mistakeCode}
-                            onChange={(e) => updateTarget(target.id, "mistakeCode", e.target.value)}
-                            className={`h-8 text-sm rounded ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}`}
-                          />
-                        </div>
-
-                        {/* First Shot Hit */}
-                        <div className="flex items-center space-x-3">
-                          <input
-                            type="checkbox"
-                            id={`firstShotHit-${target.id}`}
-                            checked={target.firstShotHit}
-                            onChange={(e) => updateTarget(target.id, "firstShotHit", e.target.checked)}
-                            className={`w-4 h-4 rounded border-2 focus:ring-2 focus:ring-offset-2 ${
-                              theme === "dark"
-                                ? "bg-zinc-800 border-zinc-600 text-emerald-500 focus:ring-emerald-500"
-                                : "bg-white border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                            }`}
-                          />
-                          <Label 
-                            htmlFor={`firstShotHit-${target.id}`}
-                            className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"} flex items-center gap-1 cursor-pointer`}
-                          >
-                            <Crosshair className="w-3 h-3" />
-                            First Shot Hit
-                          </Label>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
-              ))}
-            </div>
-          </>
+              </div>
+            ))}
+          </div>
         ) : (
-          <div className={`text-center py-12 ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
-            <TargetIcon className={`w-10 h-10 mx-auto mb-3 ${theme === "dark" ? "text-zinc-600" : "text-gray-300"}`} />
-            <h3 className={`text-base font-medium ${theme === "dark" ? "text-white" : "text-gray-900"} mb-1`}>No targets configured</h3>
-            <p className="text-sm">Add targets to define your shooting range</p>
+          <div className={`text-center py-8 ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+            <TargetIcon className={`w-8 h-8 mx-auto mb-2 opacity-50`} />
+            <p className="text-sm font-medium">No targets yet</p>
+            <p className="text-xs mt-1 opacity-75">Click "Add Target" to get started</p>
           </div>
         )}
       </div>

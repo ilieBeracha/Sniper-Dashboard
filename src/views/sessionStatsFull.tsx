@@ -48,7 +48,6 @@ export default function ImprovedSessionStats() {
     addSquad,
     removeParticipant,
     addTarget,
-
     updateTarget,
     removeTarget,
     updateEngagement,
@@ -144,7 +143,13 @@ export default function ImprovedSessionStats() {
         {/* Section 3: Targets */}
         <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
-            <TargetsSection section={sections[2]} targets={targets} addTarget={addTarget} updateTarget={updateTarget} removeTarget={removeTarget} />
+            <TargetsSection
+              section={sections[2]}
+              targets={targets}
+              addTarget={addTarget}
+              updateTarget={updateTarget}
+              removeTarget={removeTarget}
+            />
           </div>
         </section>
 

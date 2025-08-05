@@ -7,24 +7,41 @@ import BaseMobileDrawer from "./BaseDrawer/BaseMobileDrawer";
 import { isMobile } from "react-device-detect";
 import BaseButton from "./base/BaseButton";
 import { useTheme } from "@/contexts/ThemeContext";
+import { userStore } from "@/store/userStore";
 
 export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boolean; setIsOpen: (open: boolean) => void; userId: string }) {
-  const useInvitationStore = useStore(InvitationStore);
-  const invitation = useInvitationStore.invitation;
+  const invitation = useStore(InvitationStore).invitation;
   const [loading, setLoading] = useState(false);
   const [inviteFetched, setInviteFetched] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const { theme } = useTheme();
+  const { user } = useStore(userStore);
+  const { getInviteByInviterId, regenerateInvite } = useStore(InvitationStore);
 
+  const handleCreateInvite = async () => {
+    if (!user) return;
+
+    if (!user.user_role) return;
+    const newInvite = await regenerateInvite(user?.id);
+
+    if (newInvite) {
+      setInviteFetched(true);
+    }
+  };
   const handleInvite = async () => {
     setLoading(true);
     try {
       if (!userId) return;
-      await useInvitationStore.getInviteByInviterId(userId);
-      setInviteFetched(true);
+
+      const existingInvite = await getInviteByInviterId(userId);
+      if (existingInvite && existingInvite.valid) {
+        setInviteFetched(true);
+      } else {
+        await handleCreateInvite();
+      }
     } catch (err) {
-      console.error("Failed to fetch invite:", err);
+      console.error("Failed to fetch or create invite:", err);
     } finally {
       setLoading(false);
     }
@@ -189,11 +206,11 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
   );
 
   return isMobile ? (
-    <BaseMobileDrawer title="Invite Your Squad Commander" isOpen={isOpen} setIsOpen={setIsOpen}>
+    <BaseMobileDrawer title="Invite Your Squad Commander" onClose={() => setIsOpen(false)} isOpen={isOpen} setIsOpen={setIsOpen}>
       {Content}
     </BaseMobileDrawer>
   ) : (
-    <BaseDesktopDrawer title="Invite Your Squad Commander" isOpen={isOpen} setIsOpen={setIsOpen} width="400px">
+    <BaseDesktopDrawer title="Invite Your Squad Commander" onClose={() => setIsOpen(false)} isOpen={isOpen} setIsOpen={setIsOpen} width="400px">
       {Content}
     </BaseDesktopDrawer>
   );

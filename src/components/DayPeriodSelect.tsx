@@ -2,7 +2,13 @@ import { Sun, Moon, Check } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { BaseLabelRequired } from "./base/BaseLabelRequired";
 
-export default function DayPeriodSelect({ dayPeriod, onDayPeriodChange }: { dayPeriod: string; onDayPeriodChange: (dayPeriod: string) => void }) {
+export default function DayPeriodSelect({
+  dayPeriod = "day",
+  onDayPeriodChange,
+}: {
+  dayPeriod: string;
+  onDayPeriodChange: (dayPeriod: string) => void;
+}) {
   const { theme } = useTheme();
 
   return (

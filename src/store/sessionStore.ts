@@ -26,11 +26,7 @@ interface SessionStatsState {
   clearError: () => void;
   saveSessionStats: (sessionData: SessionStatsSaveData) => Promise<any>;
   updateSessionStats: (sessionId: string, sessionData: SessionStatsSaveData) => Promise<any>;
-  getSessionStatsByTrainingId: (
-    assignmentId: string,
-    limit?: number,
-    offset?: number,
-  ) => Promise<any[]>;
+  getSessionStatsByTrainingId: (assignmentId: string, limit?: number, offset?: number) => Promise<any[]>;
   getSessionStatsCountByTrainingId: (assignmentId: string) => Promise<number>;
   createGroupScore: (groupScore: any) => Promise<any>;
   updateGroupScore: (id: string, groupScore: any) => Promise<any>;
@@ -88,7 +84,7 @@ export interface SessionStatsSaveData {
     windDirection?: number;
     totalHits?: number;
     mistakeCode?: string;
-    firstShotHit: boolean;
+    first_shot_hit?: boolean;
     engagements: Array<{
       user_id: string;
       shots_fired: number;
@@ -115,12 +111,9 @@ export const sessionStore = create<SessionStatsState>((set) => ({
   clearError: () => set({ error: null }),
   setSelectedSession: (session: any) => set({ selectedSession: session }),
 
-  getSessionStatsByTrainingId: async (
-    assignmentId: string,
-    limit: number = 20,
-    offset: number = 0,
-  ) => {
+  getSessionStatsByTrainingId: async (assignmentId: string, limit: number = 20, offset: number = 0) => {
     const result = await getSessionStatsByTrainingId(assignmentId, limit, offset);
+    console.log("result", result);
     set({ sessionStats: result });
     return result;
   },
@@ -185,7 +178,7 @@ export const sessionStore = create<SessionStatsState>((set) => ({
             total_hits: totalHits,
             target_eliminated: totalHits >= 2,
             mistake_code: target.mistakeCode || null,
-            first_shot_hit: target.firstShotHit,
+            first_shot_hit: target.first_shot_hit || false,
           };
 
           const engagements: Omit<CreateTargetEngagementData, "target_stats_id">[] = target.engagements.map((eng) => {
@@ -308,7 +301,7 @@ export const sessionStore = create<SessionStatsState>((set) => ({
           total_hits: totalHits,
           target_eliminated: totalHits >= 2,
           mistake_code: target.mistakeCode || null,
-          first_shot_hit: target.firstShotHit,
+          first_shot_hit: target.first_shot_hit || false,
           session_stats_id: sessionId, // Will be overwritten in service
         };
 
