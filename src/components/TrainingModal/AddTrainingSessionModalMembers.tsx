@@ -17,7 +17,7 @@ export default function TeamMembersSection({ teamMembers, members, setMembers }:
     id: member.id,
     label: `${member.first_name} ${member.last_name}`,
     description: member.email,
-    badge: member.user_role,
+    badge: member.user_role || "soldier",
   }));
 
   return (
@@ -27,11 +27,15 @@ export default function TeamMembersSection({ teamMembers, members, setMembers }:
       }`}
     >
       <div className="flex items-center gap-2 mb-4">
-        <h4 className={`text-sm font-medium transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>Assign Members</h4>
+        <h4 className={`text-sm font-medium transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>
+          Assign Members
+        </h4>
         {members.length > 0 && (
-          <div className={`px-2 py-0.5 rounded text-xs ${
-            theme === "dark" ? "bg-indigo-500/20 text-indigo-400" : "bg-indigo-500/10 text-indigo-600"
-          }`}>{members.length} selected</div>
+          <div
+            className={`px-2 py-0.5 rounded text-xs ${theme === "dark" ? "bg-indigo-500/20 text-indigo-400" : "bg-indigo-500/10 text-indigo-600"}`}
+          >
+            {members.length} selected
+          </div>
         )}
       </div>
 
