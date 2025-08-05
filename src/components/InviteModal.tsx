@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UserPlus, ClipboardCheck, Loader2, Info } from "lucide-react";
+import { UserPlus, ClipboardCheck, Loader2, Info, CheckCircle, XCircle, Clock } from "lucide-react";
 import { InvitationStore } from "@/store/InvitationStore";
 import { useStore } from "zustand";
 import BaseDesktopDrawer from "./BaseDrawer/BaseDesktopDrawer";
@@ -11,6 +11,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boolean; setIsOpen: (open: boolean) => void; userId: string }) {
   const useInvitationStore = useStore(InvitationStore);
   const invitation = useInvitationStore.invitation;
+  const invitationWithValidation = useInvitationStore.invitationWithValidation;
   const [loading, setLoading] = useState(false);
   const [inviteFetched, setInviteFetched] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -21,7 +22,7 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
     setLoading(true);
     try {
       if (!userId) return;
-      await useInvitationStore.getInviteByInviterId(userId);
+      await useInvitationStore.getInviteByInviterIdWithValidation(userId);
       setInviteFetched(true);
     } catch (err) {
       console.error("Failed to fetch invite:", err);
@@ -31,14 +32,51 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
   };
 
   const handleCopy = async () => {
-    if (!invitation?.token) return;
+    if (!invitationWithValidation?.token) return;
     try {
-      await navigator.clipboard.writeText(invitation.token);
+      await navigator.clipboard.writeText(invitationWithValidation.token);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
       alert("Failed to copy");
     }
+  };
+
+  const getInviteStatusInfo = () => {
+    if (!invitationWithValidation) return null;
+
+    const now = new Date();
+    const expiresAt = invitationWithValidation.expires_at ? new Date(invitationWithValidation.expires_at) : null;
+    
+    if (invitationWithValidation.isValid) {
+      return {
+        icon: <CheckCircle className="w-4 h-4 text-emerald-500" />,
+        text: "Valid",
+        bgColor: theme === "dark" ? "bg-emerald-900/20 border-emerald-700/50" : "bg-emerald-50 border-emerald-200",
+        textColor: theme === "dark" ? "text-emerald-400" : "text-emerald-700"
+      };
+    } else if (expiresAt && expiresAt <= now) {
+      return {
+        icon: <Clock className="w-4 h-4 text-amber-500" />,
+        text: "Expired",
+        bgColor: theme === "dark" ? "bg-amber-900/20 border-amber-700/50" : "bg-amber-50 border-amber-200",
+        textColor: theme === "dark" ? "text-amber-400" : "text-amber-700"
+      };
+    } else if (invitationWithValidation.used && !invitationWithValidation.multi_use) {
+      return {
+        icon: <XCircle className="w-4 h-4 text-red-500" />,
+        text: "Used",
+        bgColor: theme === "dark" ? "bg-red-900/20 border-red-700/50" : "bg-red-50 border-red-200",
+        textColor: theme === "dark" ? "text-red-400" : "text-red-700"
+      };
+    }
+    
+    return {
+      icon: <XCircle className="w-4 h-4 text-red-500" />,
+      text: "Invalid",
+      bgColor: theme === "dark" ? "bg-red-900/20 border-red-700/50" : "bg-red-50 border-red-200",
+      textColor: theme === "dark" ? "text-red-400" : "text-red-700"
+    };
   };
 
   const onCloseModal = () => {
@@ -47,6 +85,8 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
     setCopied(false);
     setShowInfo(false);
   };
+
+  const statusInfo = getInviteStatusInfo();
 
   const Content = (
     <div className="flex flex-col items-center text-center py-4 space-y-6 h-full w-full">
@@ -60,19 +100,30 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
 
       {inviteFetched ? (
         <div className="w-full space-y-4">
+          {/* Status Badge */}
+          {statusInfo && (
+            <div className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg border ${statusInfo.bgColor}`}>
+              {statusInfo.icon}
+              <span className={`text-sm font-medium ${statusInfo.textColor}`}>
+                {statusInfo.text}
+              </span>
+            </div>
+          )}
+
           {/* Token Display */}
           <div
             className={`relative flex items-center justify-evenly px-4 py-3 rounded-lg font-mono text-sm transition-colors duration-200 ${
               theme === "dark" ? "bg-zinc-800/50 border border-zinc-700/50 text-white" : "bg-gray-100 border border-gray-300 text-gray-900"
             }`}
           >
-            <span className="truncate pr-4">{invitation?.token}</span>
+            <span className="truncate pr-4">{invitationWithValidation?.token}</span>
             <BaseButton
               onClick={handleCopy}
+              disabled={!invitationWithValidation?.isValid}
               className={`flex-shrink-0 px-3 py-1.5 rounded-md transition-colors focus:outline-none focus:ring-2 ${
                 theme === "dark"
-                  ? "bg-zinc-700/50 hover:bg-zinc-700 text-zinc-300 hover:text-white focus:ring-zinc-600"
-                  : "bg-gray-200 hover:bg-gray-300 text-gray-700 hover:text-gray-900 focus:ring-gray-400"
+                  ? "bg-zinc-700/50 hover:bg-zinc-700 text-zinc-300 hover:text-white focus:ring-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  : "bg-gray-200 hover:bg-gray-300 text-gray-700 hover:text-gray-900 focus:ring-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
               }`}
               type="button"
             >
@@ -97,8 +148,19 @@ export default function InviteModal({ isOpen, setIsOpen, userId }: { isOpen: boo
               <li>Share this token securely with your chosen Squad Commander</li>
               <li>They will use this token to register and join your team</li>
               <li>Monitor your team dashboard for when they complete registration</li>
-              <li>This token can only be used once and is time-limited</li>
+              <li>
+                {invitationWithValidation?.multi_use 
+                  ? "This token can be used multiple times" 
+                  : "This token can only be used once"}
+                {invitationWithValidation?.expires_at && " and is time-limited"}
+              </li>
             </ol>
+            
+            {invitationWithValidation?.expires_at && (
+              <p className={`text-xs mt-2 ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+                Expires: {new Date(invitationWithValidation.expires_at).toLocaleDateString()} at {new Date(invitationWithValidation.expires_at).toLocaleTimeString()}
+              </p>
+            )}
           </div>
 
           <BaseButton
