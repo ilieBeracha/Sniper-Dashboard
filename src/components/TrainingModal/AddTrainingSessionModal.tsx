@@ -243,11 +243,11 @@ export default function TrainingAddTrainingSessionModal({
   );
 
   return isMobile ? (
-    <BaseMobileDrawer title="New Training Session" isOpen={isOpen} setIsOpen={onClose}>
+    <BaseMobileDrawer title="New Training Session" isOpen={isOpen} setIsOpen={onClose} onClose={onClose}>
       {Content}
     </BaseMobileDrawer>
   ) : (
-    <BaseDesktopDrawer title="New Training Session" isOpen={isOpen} setIsOpen={onClose}>
+    <BaseDesktopDrawer title="New Training Session" isOpen={isOpen} setIsOpen={onClose} onClose={onClose}>
       {Content}
     </BaseDesktopDrawer>
   );

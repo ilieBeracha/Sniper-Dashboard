@@ -73,21 +73,25 @@ export const useSessionStats = () => {
         note: selectedSession?.sessionStats?.note || "",
         squad_id: selectedSession?.sessionStats?.squad_id || user?.squad_id || "",
       });
-      
+
       // Load participants
       if (selectedSession?.participants && selectedSession.participants.length > 0) {
         setParticipants(
           selectedSession.participants.map((participant: any) => ({
             userId: participant.user_id,
-            name: participant.name || `${participant.users?.first_name || ""} ${participant.users?.last_name || ""}`.trim() || participant.users?.email || "",
+            name:
+              participant.name ||
+              `${participant.users?.first_name || ""} ${participant.users?.last_name || ""}`.trim() ||
+              participant.users?.email ||
+              "",
             userDuty: participant.user_duty,
             position: participant.position,
             weaponId: participant.weapon_id || "",
             equipmentId: participant.equipment_id || "",
-          }))
+          })),
         );
       }
-      
+
       // Load targets with engagements
       if (selectedSession?.targets && selectedSession.targets.length > 0) {
         setTargets(
@@ -103,7 +107,7 @@ export const useSessionStats = () => {
               shotsFired: engagement.shots_fired || 0,
               targetHits: engagement.target_hits || 0,
             })),
-          }))
+          })),
         );
       }
     } else if (!sessionId) {
@@ -115,7 +119,7 @@ export const useSessionStats = () => {
         note: "",
         squad_id: user?.squad_id || "",
       });
-      
+
       setParticipants([
         {
           userId: user?.id || "",
@@ -126,7 +130,7 @@ export const useSessionStats = () => {
           equipmentId: user?.user_default_equipment || "",
         },
       ]);
-      
+
       setTargets([
         {
           id: `target-${Date.now()}`,
@@ -412,7 +416,7 @@ export const useSessionStats = () => {
             windDirection: t.windDirection || undefined,
             totalHits: t.engagements.reduce((sum, eng) => sum + (eng.targetHits || 0), 0),
             mistakeCode: t.mistakeCode || undefined,
-            firstShotHit: t.firstShotHit,
+            first_shot_hit: t.firstShotHit || false,
             engagements: t.engagements.map((eng) => ({
               user_id: eng.userId,
               shots_fired: eng.shotsFired,
@@ -435,14 +439,14 @@ export const useSessionStats = () => {
             await saveSessionStats(saveData);
             toast.success("Training session submitted successfully!");
           }
-          
+
           // Navigate back to training page after successful save/update
           if (id) {
             navigate(`/training/${id}`);
           }
         } catch (error) {
           console.error("Error saving session:", error);
-          toast.error(`Failed to ${sessionId ? 'update' : 'submit'} training session. Please try again.`);
+          toast.error(`Failed to ${sessionId ? "update" : "submit"} training session. Please try again.`);
         }
       }
 

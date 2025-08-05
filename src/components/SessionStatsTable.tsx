@@ -116,8 +116,8 @@ export default function SessionStatsTable({
       label: "Session",
       render: (_value: any, row: any) => {
         return (
-          <div className="flex items-center gap-2">
-            <span className="truncate max-w-[200px]">{format(new Date(row.created_at), "MMM dd, yyyy 'at' HH:mm")}</span>
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <span className="truncate max-w-[200px]">{format(new Date(row.created_at), "HH:mm")}</span>
           </div>
         );
       },

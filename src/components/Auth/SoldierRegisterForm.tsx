@@ -188,6 +188,7 @@ export default function SoldierRegisterForm({
         id="invite-code"
         required
         value={inviteCode}
+        className="p-4"
         onChange={(e) => setInviteCode(e.target.value)}
         placeholder="Code from your squad commander"
         leftIcon={inviteCodeIcon}
