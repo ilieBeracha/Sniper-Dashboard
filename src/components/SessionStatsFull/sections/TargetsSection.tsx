@@ -34,29 +34,22 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
       {/* Targets List - Compact Design */}
       <div className={`rounded-xl border overflow-hidden ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}>
         {targets?.length > 0 ? (
-          <div className={`divide-y ${theme === "dark" ? "divide-zinc-800" : "divide-gray-200"}`}>
+          <div className={`divide-y  ${theme === "dark" ? "divide-zinc-800" : "divide-gray-200"}`}>
             {targets?.map((target, index) => (
-              <div key={target.id} className={`transition-all ${theme === "dark" ? "hover:bg-zinc-800/20" : "hover:bg-gray-50"}`}>
+              <div key={target.id} className={`transition-all space-y-2 ${theme === "dark" ? "hover:bg-zinc-800/20" : "hover:bg-gray-50"}`}>
                 {/* Compact Target Row */}
                 <div className="p-3 pb-2">
                   <div className="flex items-center gap-3">
                     {/* Target Number */}
-                    <div
-                      className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold ${
-                        theme === "dark" ? "bg-zinc-800 text-zinc-400" : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {index + 1}
-                    </div>
+                    <span className="text-xs text-zinc-500 whitespace-nowrap">Target {index + 1}:</span>
 
                     {/* Distance Controls */}
-                    <div className="flex-1 flex items-center gap-2">
-                      <TargetIcon className="w-4 h-4 text-zinc-500" />
-                      <div className="flex items-center gap-1.5">
+                    <div className="flex-1 flex items-center gap-2 w-full">
+                      <div className="flex items-center gap-1.5 px-2 w-full justify-center">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 p-0 hover:bg-zinc-800/50"
+                          className="h-8 w-9 p-0 hover:bg-zinc-800/50 bg-zinc-800/50"
                           onClick={() => updateTarget(target.id, "distance", Math.max(100, target.distance - 25))}
                         >
                           <Minus className="w-3 h-3" />
@@ -68,13 +61,12 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                           step={25}
                           value={target.distance}
                           onChange={(e) => updateTarget(target.id, "distance", parseInt(e.target.value))}
-                          className={`text-center w-20 h-7 text-sm font-medium ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-200"}`}
+                          className={`text-center w-full px-4 h-8 text-sm font-medium ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-200"}`}
                         />
-                        <span className="text-xs text-zinc-500">m</span>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 p-0 hover:bg-zinc-800/50"
+                          className="h-8 w-9 p-0 hover:bg-zinc-800/50 bg-zinc-800/50"
                           onClick={() => updateTarget(target.id, "distance", Math.min(900, target.distance + 25))}
                         >
                           <Plus className="w-3 h-3" />
@@ -85,7 +77,11 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                     {/* Options Menu */}
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon" className={`h-7 w-7 ${theme === "dark" ? "hover:bg-zinc-800" : "hover:bg-gray-100"}`}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={`h-7 w-7 ${theme === "dark" ? "hover:bg-zinc-800 bg-zinc-700" : "hover:bg-gray-100"}`}
+                        >
                           <ChevronDown className="w-4 h-4" />
                         </Button>
                       </PopoverTrigger>
@@ -151,12 +147,12 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
 
                 {/* First Shot Hit - Compact Row */}
                 <div className="px-3 pb-2">
-                  <div className="flex items-center gap-2 ml-11">
-                    <span className="text-xs text-zinc-500">First shot:</span>
-                    <div className="flex gap-1">
+                  <div className="flex items-center justify-start gap-2">
+                    <span className="text-xs text-zinc-500 whitespace-nowrap">First shot:</span>
+                    <div className=" gap-2 flex-1  grid grid-cols-2 w-full">
                       <button
                         onClick={() => updateTarget(target.id, "firstShotHit", true)}
-                        className={`px-2 w-full py-0.5 rounded text-xs font-medium transition-all ${
+                        className={`px-3 py-1 min-w-[100px] w-full rounded-md text-xs font-medium transition-all flex-1 ${
                           target.firstShotHit === true
                             ? "bg-green-500/20 text-green-500 border border-green-500/30"
                             : theme === "dark"
@@ -168,7 +164,7 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                       </button>
                       <button
                         onClick={() => updateTarget(target.id, "firstShotHit", false)}
-                        className={`px-2 py-0.5 rounded text-xs font-medium transition-all ${
+                        className={`px-3 py-1 rounded-md text-xs font-medium transition-all flex-1 ${
                           target.firstShotHit === false
                             ? "bg-red-500/20 text-red-500 border border-red-500/30"
                             : theme === "dark"
