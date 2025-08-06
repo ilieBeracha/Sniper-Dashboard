@@ -253,6 +253,11 @@ export const useSessionStats = () => {
     );
   };
 
+  // NEW: Sync the position of all participants to the provided position value
+  const syncParticipantsPosition = (position: string) => {
+    setParticipants((prev) => prev.map((p) => ({ ...p, position })));
+  };
+
   const addParticipant = (memberId: string) => {
     const member = teamMembers.find((m) => m.id === memberId);
     if (member && !participants.find((p) => p.userId === member.id)) {
@@ -500,5 +505,6 @@ export const useSessionStats = () => {
     handleSubmit,
     isAssignmentModalOpen,
     setIsAssignmentModalOpen,
+    syncParticipantsPosition,
   };
 };
