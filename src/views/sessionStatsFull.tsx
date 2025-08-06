@@ -54,7 +54,6 @@ export default function ImprovedSessionStats() {
     handleSubmit,
     isAssignmentModalOpen,
     setIsAssignmentModalOpen,
-    syncParticipantsPosition,
     autoSyncPosition,
     setAutoSyncPosition,
   } = useSessionStats();
@@ -139,7 +138,6 @@ export default function ImprovedSessionStats() {
               addParticipant={addParticipant}
               removeParticipant={removeParticipant}
               updateParticipant={updateParticipant}
-              syncParticipantsPosition={syncParticipantsPosition}
               autoSyncPosition={autoSyncPosition}
               setAutoSyncPosition={setAutoSyncPosition}
             />

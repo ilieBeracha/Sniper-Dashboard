@@ -16,7 +16,6 @@ interface ParticipantsSectionProps {
   addParticipant: (memberId: string) => void;
   removeParticipant: (userId: string) => void;
   updateParticipant: (userId: string, field: keyof Participant, value: any) => void;
-  syncParticipantsPosition: (position: string) => void;
   autoSyncPosition: boolean;
   setAutoSyncPosition: (value: boolean) => void;
 }
@@ -32,7 +31,6 @@ export const ParticipantsSection = ({
   addParticipant,
   removeParticipant,
   updateParticipant,
-  syncParticipantsPosition,
   autoSyncPosition,
   setAutoSyncPosition,
 }: ParticipantsSectionProps) => {
@@ -155,20 +153,6 @@ export const ParticipantsSection = ({
                     <option value="Sitting">Sitting</option>
                     <option value="Operational">Operational</option>
                   </select>
-                  {participant.userId === user?.id && (
-                    <button
-                      type="button"
-                      title="Sync position to all"
-                      onClick={() => syncParticipantsPosition(participant.position)}
-                      className={`ml-1 px-2 flex items-center justify-center rounded text-xs font-medium border transition-all ${
-                        theme === "dark"
-                          ? "border-indigo-500 text-indigo-400 hover:bg-indigo-500/20"
-                          : "border-indigo-500 text-indigo-600 hover:bg-indigo-50"
-                      }`}
-                    >
-                      Sync
-                    </button>
-                  )}
                 </div>
 
                 {/* Weapon/Equipment */}
@@ -274,36 +258,20 @@ export const ParticipantsSection = ({
 
                   {/* Position */}
                   <div className="col-span-1">
-                    <div className="flex items-center">
-                      <select
-                        value={participant.position}
-                        onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
-                        className={`w-full h-8 px-2 rounded text-xs border transition-all ${
-                          theme === "dark"
-                            ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500"
-                            : "bg-gray-50 border-gray-200 focus:border-indigo-500"
-                        }`}
-                      >
-                        <option value="Lying">Lying</option>
-                        <option value="Standing">Standing</option>
-                        <option value="Sitting">Sitting</option>
-                        <option value="Operational">Operational</option>
-                      </select>
-                      {participant.userId === user?.id && (
-                        <button
-                          type="button"
-                          title="Sync position to all"
-                          onClick={() => syncParticipantsPosition(participant.position)}
-                          className={`ml-2 px-2 h-8 flex items-center justify-center rounded text-xs font-medium border transition-all ${
-                            theme === "dark"
-                              ? "border-indigo-500 text-indigo-400 hover:bg-indigo-500/20"
-                              : "border-indigo-500 text-indigo-600 hover:bg-indigo-50"
-                          }`}
-                        >
-                          Sync
-                        </button>
-                      )}
-                    </div>
+                    <select
+                      value={participant.position}
+                      onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
+                      className={`w-full h-8 px-2 rounded text-xs border transition-all ${
+                        theme === "dark"
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500"
+                          : "bg-gray-50 border-gray-200 focus:border-indigo-500"
+                      }`}
+                    >
+                      <option value="Lying">Lying</option>
+                      <option value="Standing">Standing</option>
+                      <option value="Sitting">Sitting</option>
+                      <option value="Operational">Operational</option>
+                    </select>
                   </div>
 
                   {/* Weapon/Equipment */}
