@@ -54,6 +54,8 @@ export default function ImprovedSessionStats() {
     handleSubmit,
     isAssignmentModalOpen,
     setIsAssignmentModalOpen,
+    autoSyncPosition,
+    setAutoSyncPosition,
   } = useSessionStats();
 
   useEffect(() => {
@@ -136,6 +138,8 @@ export default function ImprovedSessionStats() {
               addParticipant={addParticipant}
               removeParticipant={removeParticipant}
               updateParticipant={updateParticipant}
+              autoSyncPosition={autoSyncPosition}
+              setAutoSyncPosition={setAutoSyncPosition}
             />
           </div>
         </section>

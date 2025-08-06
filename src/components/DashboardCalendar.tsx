@@ -13,11 +13,20 @@ export default function DashboardCalendar() {
   const { last, next } = useTrainingCalendar.trainingsChartDisplay;
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { theme } = useTheme();
   return (
     <div className={`h-full ${isMobile ? "" : ""}`}>
       <div className="relative">
         {/* Timeline line */}
-        <div className="absolute left-3 top-0 bottom-0 w-0.5" />
+        <div
+          className="absolute left-3 top-0 bottom-0 w-0.5 rounded-full"
+          style={{
+            background:
+              theme === "dark"
+                ? `linear-gradient(to bottom, ${primitives.purple.purple400} 0%, ${primitives.grey.grey700} 100%)`
+                : `linear-gradient(to bottom, ${primitives.purple.purple100} 0%, ${primitives.purple.purple400} 100%)`,
+          }}
+        />
 
         <div className="space-y-4  rounded-lg py-4">
           {last ? (
@@ -64,7 +73,7 @@ function TrainingTimelineItem({
       </div>
 
       <div
-        className="group relative p-4 rounded-2xl border border-[#333] cursor-pointer transition-all duration-200 hover:shadow-lg min-h-40"
+        className="group relative p-4 rounded-2xl border cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 min-h-40"
         style={{
           backgroundColor:
             theme === "dark"

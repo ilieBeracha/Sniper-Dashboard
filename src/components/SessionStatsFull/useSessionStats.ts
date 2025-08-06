@@ -28,6 +28,7 @@ export const useSessionStats = () => {
   const [activeSection, setActiveSection] = useState(0);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [autoSyncPosition, setAutoSyncPosition] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -154,6 +155,17 @@ export const useSessionStats = () => {
     }
   }, [selectedSession, sessionId, user]);
 
+  // Effect: when autoSyncPosition is enabled, make sure all participants have the same position as current user
+  useEffect(() => {
+    if (autoSyncPosition) {
+      const pos = participants[0]?.position;
+      if (pos) {
+        setParticipants((prev) => prev.map((p) => ({ ...p, position: pos })));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSyncPosition]);
+
   const trainingAssignments = training?.assignment_sessions || [];
   const teamMembers = members || [];
 
@@ -232,11 +244,17 @@ export const useSessionStats = () => {
   };
 
   const updateParticipant = (userId: string, field: keyof Participant, value: any) => {
+    if (field === "position" && autoSyncPosition) {
+      // When auto-sync is enabled, any position change propagates to everyone
+      setParticipants((prev) => prev.map((p) => ({ ...p, position: value })));
+      return;
+    }
+
+    // Regular update for a single participant
     setParticipants((prev) =>
       prev.map((p) => {
         if (p.userId === userId) {
-          const updatedParticipant = { ...p, [field]: value };
-
+          const updatedParticipant: Participant = { ...p, [field]: value };
           // Clear conflicting fields when duty changes
           if (field === "userDuty") {
             if (value === "Sniper") {
@@ -245,7 +263,6 @@ export const useSessionStats = () => {
               updatedParticipant.weaponId = "";
             }
           }
-
           return updatedParticipant;
         }
         return p;
@@ -253,14 +270,20 @@ export const useSessionStats = () => {
     );
   };
 
+  // NEW: Sync the position of all participants to the provided position value
+  const syncParticipantsPosition = (position: string) => {
+    setParticipants((prev) => prev.map((p) => ({ ...p, position })));
+  };
+
   const addParticipant = (memberId: string) => {
     const member = teamMembers.find((m) => m.id === memberId);
     if (member && !participants.find((p) => p.userId === member.id)) {
+      const commonPosition = participants[0]?.position || "Lying";
       const newParticipant: Participant = {
         userId: member.id,
         name: member.first_name || member.last_name ? `${member.first_name || ""} ${member.last_name || ""}`.trim() : member.email,
         userDuty: member?.user_default_duty || "Sniper",
-        position: "Lying",
+        position: autoSyncPosition ? commonPosition : "Lying",
         weaponId: member?.user_default_weapon || "",
         equipmentId: member?.user_default_equipment || "",
       };
@@ -274,11 +297,12 @@ export const useSessionStats = () => {
     );
 
     squadMembers.forEach((member: any) => {
+      const commonPosition = participants[0]?.position || "Lying";
       const newParticipant: Participant = {
         userId: member.id,
         name: member.first_name || member.last_name ? `${member.first_name || ""} ${member.last_name || ""}`.trim() : member.email,
         userDuty: member?.user_default_duty || "Sniper",
-        position: "Lying",
+        position: autoSyncPosition ? commonPosition : "Lying",
         weaponId: member?.user_default_weapon || "",
         equipmentId: member?.user_default_equipment || "",
       };
@@ -477,6 +501,7 @@ export const useSessionStats = () => {
     sections,
     isSubmitting,
     isLoading,
+    autoSyncPosition,
     // Data
     user,
     training,
@@ -500,5 +525,7 @@ export const useSessionStats = () => {
     handleSubmit,
     isAssignmentModalOpen,
     setIsAssignmentModalOpen,
+    syncParticipantsPosition,
+    setAutoSyncPosition,
   };
 };

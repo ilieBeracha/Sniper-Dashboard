@@ -16,6 +16,8 @@ interface ParticipantsSectionProps {
   addParticipant: (memberId: string) => void;
   removeParticipant: (userId: string) => void;
   updateParticipant: (userId: string, field: keyof Participant, value: any) => void;
+  autoSyncPosition: boolean;
+  setAutoSyncPosition: (value: boolean) => void;
 }
 
 export const ParticipantsSection = ({
@@ -29,6 +31,8 @@ export const ParticipantsSection = ({
   addParticipant,
   removeParticipant,
   updateParticipant,
+  autoSyncPosition,
+  setAutoSyncPosition,
 }: ParticipantsSectionProps) => {
   const { theme } = useTheme();
 
@@ -68,6 +72,16 @@ export const ParticipantsSection = ({
           <Users className="w-4 h-4" />
           <span>Add Squad</span>
         </button>
+        {/* Auto Sync Toggle */}
+        <label className="inline-flex items-center gap-2 text-xs sm:text-sm cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={autoSyncPosition}
+            onChange={(e) => setAutoSyncPosition(e.target.checked)}
+            className="form-checkbox h-4 w-4 text-indigo-600 rounded focus:ring-transparent"
+          />
+          <span className={theme === "dark" ? "text-zinc-300" : "text-gray-600"}>Auto Sync Position</span>
+        </label>
       </div>
 
       {/* Mobile Participants List - Compact Design */}
@@ -128,7 +142,7 @@ export const ParticipantsSection = ({
                   <select
                     value={participant.position}
                     onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
-                    className={`w-full h-8 px-2 rounded text-xs border transition-all ${
+                    className={`w-full h-8 px-2 rounded text-xs border ${
                       theme === "dark"
                         ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500"
                         : "bg-gray-50 border-gray-200 focus:border-indigo-500"
@@ -247,7 +261,7 @@ export const ParticipantsSection = ({
                     <select
                       value={participant.position}
                       onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
-                      className={`w-full h-8 px-2 rounded text-xs border transition-all ${
+                      className={`w-full h-8 px-2 rounded text-xs border ${
                         theme === "dark"
                           ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500"
                           : "bg-gray-50 border-gray-200 focus:border-indigo-500"
