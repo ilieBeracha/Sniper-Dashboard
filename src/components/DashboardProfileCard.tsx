@@ -9,6 +9,7 @@ import { UserRole } from "@/types/user";
 import { useEffect } from "react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { Chip } from "@heroui/react";
+import { Users, Shield } from "lucide-react";
 
 export default function DashboardProfileCard() {
   const { theme } = useTheme();
@@ -74,27 +75,31 @@ export default function DashboardProfileCard() {
           >
             {user?.first_name} {user?.last_name}
           </p>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap gap-2 mt-1">
             <Chip
               variant="bordered"
-              className={`text-xs ${theme === "dark" ? "bg-purple-600 text-white" : "bg-purple-600 text-white"}`}
+              className={`flex items-center gap-1 text-[11px] font-medium tracking-wide uppercase ${
+                theme === "dark" ? "bg-purple-700 text-white" : "bg-purple-600 text-white"
+              }`}
             >
-              <span className="text-xs">Role: </span> {user?.user_role?.replace("_", " ").toUpperCase()}
+              {user?.user_role?.replace("_", " ")}
             </Chip>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Chip
-              variant="bordered"
-              className={`text-xs ${theme === "dark" ? "bg-purple-800 text-white" : "bg-purple-700 text-white"}`}
-            >
-              <span className="text-xs">Team: </span> {user?.team_name}
-            </Chip>
+            {user?.team_name && (
+              <Chip
+                variant="bordered"
+                className={`flex items-center gap-1 text-xs ${theme === "dark" ? "bg-pink-700 text-white" : "bg-pink-600 text-white"}`}
+              >
+                <Users className="w-3 h-3" />
+                {user?.team_name}
+              </Chip>
+            )}
             {user?.squad_name && (
               <Chip
                 variant="bordered"
-                className={`text-xs ${theme === "dark" ? "bg-purple-800 text-white" : "bg-purple-700 text-white"}`}
+                className={`flex items-center gap-1 text-xs ${theme === "dark" ? "bg-blue-700 text-white" : "bg-blue-600 text-white"}`}
               >
-                <span className="text-xs">Squad: </span> {user?.squad_name}
+                <Shield className="w-3 h-3" />
+                {user?.squad_name}
               </Chip>
             )}
           </div>
