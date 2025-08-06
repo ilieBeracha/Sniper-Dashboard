@@ -142,7 +142,7 @@ export const ParticipantsSection = ({
                   <select
                     value={participant.position}
                     onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
-                    className={`w-full h-8 px-2 rounded text-xs border transition-all ${
+                    className={`w-full h-8 px-2 rounded text-xs border ${
                       theme === "dark"
                         ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500"
                         : "bg-gray-50 border-gray-200 focus:border-indigo-500"
@@ -261,7 +261,7 @@ export const ParticipantsSection = ({
                     <select
                       value={participant.position}
                       onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
-                      className={`w-full h-8 px-2 rounded text-xs border transition-all ${
+                      className={`w-full h-8 px-2 rounded text-xs border ${
                         theme === "dark"
                           ? "bg-zinc-800 border-zinc-700 text-white focus:border-indigo-500"
                           : "bg-gray-50 border-gray-200 focus:border-indigo-500"
