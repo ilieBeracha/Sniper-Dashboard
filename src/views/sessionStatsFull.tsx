@@ -76,7 +76,7 @@ export default function ImprovedSessionStats() {
   }
 
   return (
-    <div className={`min-h-screen ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-white"} relative`}>
+    <div className={`min-h-[100dvh] ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-white"} relative`}>
       {/* Progress Indicator - Fixed on larger screens, hidden on mobile */}
       <div className="hidden lg:block">
         <ScrollProgress activeSection={activeSection} totalSections={sections.length} />
@@ -108,10 +108,10 @@ export default function ImprovedSessionStats() {
       </div>
 
       {/* Main Content Container */}
-      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth lg:pt-0 " onScroll={handleScroll}>
+      <div className="w-full h-[100dvh] overflow-y-auto snap-y snap-proximity scroll-smooth lg:pt-0" onScroll={handleScroll}>
         {/* Section 1: Session Configuration */}
-        <section className="min-h-screen snap-start flex py-10 justify-center px-4 sm:px-6 lg:px-8 ">
-          <div className="w-full max-w-4xl  py-8">
+        <section className="min-h-[100dvh] snap-start flex py-10 justify-center px-4 sm:px-6 lg:px-8 ">
+          <div className="w-full max-w-4xl h-full overflow-y-auto py-8">
             <SessionConfigSection
               section={sections[0]}
               sessionData={sessionData}
@@ -123,8 +123,8 @@ export default function ImprovedSessionStats() {
         </section>
 
         {/* Section 2: Participants */}
-        <section className="min-h-screen snap-start flex py-10 justify-center px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-4xl">
+        <section className="min-h-[100dvh] snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-4xl h-full overflow-y-auto">
             <ParticipantsSection
               section={sections[1]}
               participants={participants}
@@ -141,8 +141,8 @@ export default function ImprovedSessionStats() {
         </section>
 
         {/* Section 3: Targets */}
-        <section className="min-h-screen snap-start flex py-10 justify-center px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-4xl">
+        <section className="min-h-[100dvh] snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-4xl h-full overflow-y-auto">
             <TargetsSection
               section={sections[2]}
               targets={targets}
@@ -154,15 +154,15 @@ export default function ImprovedSessionStats() {
         </section>
 
         {/* Section 4: Engagements */}
-        <section className="min-h-screen snap-start flex py-10 justify-center px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-4xl">
+        <section className="min-h-[100dvh] snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-4xl h-full overflow-y-auto">
             <EngagementsSection section={sections[3]} targets={targets} participants={participants} updateEngagement={updateEngagement} />
           </div>
         </section>
 
         {/* Section 5: Summary */}
-        <section className="min-h-screen snap-start flex py-10 justify-center px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-4xl">
+        <section className="min-h-[100dvh] snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-4xl h-full overflow-y-auto">
             <SummarySection
               section={sections[4]}
               participants={participants}
