@@ -42,38 +42,63 @@ export default function DashboardProfileCard() {
   };
 
   return (
-    <div className={`w-full h-full relative flex justify-between overflow-hidden ${isMobile ? "px-4 pt-6 pb-4 " : ""}`}>
-      <div className="relative z-10 h-full flex flex-col justify-between sm:p-5 lg:p-6 gap-4  rounded-lg">
+    <div
+      className={`relative w-full h-full overflow-hidden rounded-xl shadow-lg flex ${isMobile ? "flex-col gap-6 p-4" : "flex-row justify-between p-6"} ${
+        theme === "dark"
+          ? "bg-gradient-to-br from-zinc-800 via-zinc-900 to-black"
+          : "bg-gradient-to-br from-white via-purple-50 to-purple-100"
+      }`}
+    >
+      {/* Decorative gradient blobs */}
+      <span
+        className={`absolute -top-16 -left-16 h-56 w-56 rounded-full blur-3xl opacity-20 ${
+          theme === "dark" ? "bg-purple-700" : "bg-purple-300"
+        }`}
+      />
+      <span
+        className={`absolute -bottom-16 -right-16 h-64 w-64 rounded-full blur-3xl opacity-20 ${
+          theme === "dark" ? "bg-pink-700" : "bg-pink-300"
+        }`}
+      />
+
+      {/* Main content */}
+      <div className="relative z-10 flex flex-col justify-between gap-4 flex-1">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2 mb-2">
-            <h1 className={`text-sm font-light ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{getWelcomeMessage()},</h1>
+            <h1 className={`text-sm font-light ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>{getWelcomeMessage()},</h1>
           </div>
           <p
-            className={`text-xl gap-2 flex items-center sm:text-3xl lg:text-5xl font-bold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            className={`flex items-center gap-2 font-bold mb-2 ${isMobile ? "text-2xl" : "text-4xl lg:text-5xl"} ${
+              theme === "dark" ? "text-white" : "text-gray-900"
+            }`}
           >
             {user?.first_name} {user?.last_name}
           </p>
           <div className="flex flex-col gap-2">
-            <Chip variant="bordered" className={`bg-zinc-800 text-white text-xs ${theme === "dark" ? "text-white bg-purple-600" : "text-white"}`}>
+            <Chip
+              variant="bordered"
+              className={`text-xs ${theme === "dark" ? "bg-purple-600 text-white" : "bg-purple-600 text-white"}`}
+            >
               <span className="text-xs">Role: </span> {user?.user_role?.replace("_", " ").toUpperCase()}
             </Chip>
           </div>
           <div className="flex flex-col gap-2">
-            <Chip variant="bordered" className={`bg-zinc-800 text-white text-xs ${theme === "dark" ? "text-white bg-purple-800" : "text-white"}`}>
+            <Chip
+              variant="bordered"
+              className={`text-xs ${theme === "dark" ? "bg-purple-800 text-white" : "bg-purple-700 text-white"}`}
+            >
               <span className="text-xs">Team: </span> {user?.team_name}
             </Chip>
             {user?.squad_name && (
               <Chip
                 variant="bordered"
-                className={`bg-zinc-800 text-white text-xs ${theme === "dark" ? "text-white bg-purple-800" : "text-gray-900"}`}
+                className={`text-xs ${theme === "dark" ? "bg-purple-800 text-white" : "bg-purple-700 text-white"}`}
               >
                 <span className="text-xs">Squad: </span> {user?.squad_name}
               </Chip>
             )}
           </div>
         </div>
-
-        {/* Team stats and info */}
       </div>
 
       {/* Calendar overlay - hidden on mobile for better readability */}

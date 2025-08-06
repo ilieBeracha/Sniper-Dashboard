@@ -27,16 +27,18 @@ export default function DashboardOverview({ loading }: { loading: boolean }) {
   }, [user?.team_id, user?.user_role]);
 
   return (
-    <>
-      <DashboardProfileCard />
+    <div className="grid gap-6 auto-rows-max grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+      <div className="col-span-1 md:col-span-2 xl:col-span-3">
+        <DashboardProfileCard />
+      </div>
       {isMobile && (
-        <div className="w-full row-span-1 grid col-span-1 xl:col-span-2 sm:col-span-10">
+        <div className="col-span-1">
           <DashboardCalendar />
         </div>
       )}
-      <div className="w-full row-span-1 grid col-span-1 xl:col-span-2 sm:col-span-10 rounded-lg">
+      <div className="col-span-1 md:col-span-2 xl:col-span-3">
         <CyCharts loading={loading} />
       </div>
-    </>
+    </div>
   );
 }
