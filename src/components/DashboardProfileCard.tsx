@@ -42,6 +42,8 @@ export default function DashboardProfileCard() {
     return "Good evening";
   };
 
+  const formatName = (name?: string | null) => (name ? name.charAt(0).toUpperCase() + name.slice(1) : "");
+
   return (
     <div
       className={`relative w-full h-full overflow-hidden rounded-xl shadow-lg flex ${isMobile ? "flex-col gap-6 p-4" : "flex-row justify-between p-6"} ${
@@ -73,13 +75,13 @@ export default function DashboardProfileCard() {
               theme === "dark" ? "text-white" : "text-gray-900"
             }`}
           >
-            {user?.first_name} {user?.last_name}
+            {formatName(user?.first_name)} {user?.last_name}
           </p>
           <div className="flex flex-wrap gap-2 mt-1">
             <Chip
               variant="bordered"
               className={`flex items-center gap-1 text-[11px] font-medium tracking-wide uppercase ${
-                theme === "dark" ? "bg-purple-700 text-white" : "bg-purple-600 text-white"
+                theme === "dark" ? "bg-zinc-700 text-white" : "bg-zinc-200 text-gray-900"
               }`}
             >
               {user?.user_role?.replace("_", " ")}
@@ -87,19 +89,23 @@ export default function DashboardProfileCard() {
             {user?.team_name && (
               <Chip
                 variant="bordered"
-                className={`flex items-center gap-1 text-xs ${theme === "dark" ? "bg-pink-700 text-white" : "bg-pink-600 text-white"}`}
+                className={`flex items-center gap-1 text-xs ${theme === "dark" ? "bg-zinc-800 text-white" : "bg-zinc-300 text-gray-900"}`}
               >
-                <Users className="w-3 h-3" />
-                {user?.team_name}
+                <div className="flex items-center gap-1">
+                  <Users className="w-3 h-3" />
+                  <span>{user?.team_name}</span>
+                </div>
               </Chip>
             )}
             {user?.squad_name && (
               <Chip
                 variant="bordered"
-                className={`flex items-center gap-1 text-xs ${theme === "dark" ? "bg-blue-700 text-white" : "bg-blue-600 text-white"}`}
+                className={`flex items-center gap-1 text-xs ${theme === "dark" ? "bg-zinc-800 text-white" : "bg-zinc-300 text-gray-900"}`}
               >
-                <Shield className="w-3 h-3" />
-                {user?.squad_name}
+                <div className="flex items-center gap-1">
+                  <Shield className="w-3 h-3" />
+                  <span>{user?.squad_name}</span>
+                </div>
               </Chip>
             )}
           </div>
