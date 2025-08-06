@@ -244,28 +244,28 @@ export const useSessionStats = () => {
   };
 
   const updateParticipant = (userId: string, field: keyof Participant, value: any) => {
-    setParticipants((prev) =>
-      prev.map((p) => {
-        if (p.userId === userId) {
-          const updatedParticipant = { ...p, [field]: value };
-
-          // Clear conflicting fields when duty changes
-          if (field === "userDuty") {
-            if (value === "Sniper") {
-              updatedParticipant.equipmentId = "";
-            } else if (value === "Spotter") {
-              updatedParticipant.weaponId = "";
-            }
-          }
-
-          return updatedParticipant;
-        }
-        return p;
-      }),
-    );
-    // If autoSyncPosition is enabled and the current user updates their position, sync others automatically
     if (autoSyncPosition && field === "position" && userId === user?.id) {
+      // Update all participants' positions in one go
       setParticipants((prev) => prev.map((p) => ({ ...p, position: value })));
+    } else {
+      // Regular update for a single participant
+      setParticipants((prev) =>
+        prev.map((p) => {
+          if (p.userId === userId) {
+            const updatedParticipant: Participant = { ...p, [field]: value };
+            // Clear conflicting fields when duty changes
+            if (field === "userDuty") {
+              if (value === "Sniper") {
+                updatedParticipant.equipmentId = "";
+              } else if (value === "Spotter") {
+                updatedParticipant.weaponId = "";
+              }
+            }
+            return updatedParticipant;
+          }
+          return p;
+        }),
+      );
     }
   };
 
