@@ -7,14 +7,21 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function TrainingSessionStatsCard({ trainingSessionId }: { trainingSessionId: string }) {
   const { theme } = useTheme();
-  const { trainingTeamAnalytics, getTrainingTeamAnalytics, isLoading } = performanceStore();
+  // Consume only the analytics data and fetch method from the store.  
+  // We intentionally avoid the global `isLoading` flag because it is reused by
+  // many unrelated async actions in `performanceStore`, which caused the card
+  // to flicker whenever *any* of those actions toggled the flag.  
+  const { trainingTeamAnalytics, getTrainingTeamAnalytics } = performanceStore();
   const isMobile = useIsMobile();
 
   useEffect(() => {
     if (trainingSessionId) getTrainingTeamAnalytics(trainingSessionId);
   }, [trainingSessionId]);
 
-  if (isLoading || !trainingTeamAnalytics) {
+  // Show the skeleton only while the analytics data hasn't been loaded yet.
+  // Relying on the store's global `isLoading` caused unnecessary re-renders
+  // because that flag is shared across multiple unrelated requests.
+  if (!trainingTeamAnalytics) {
     return (
       <div
         className={`rounded-xl ${isMobile ? "p-3" : "p-6"} ${theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-white border border-gray-200"}`}
