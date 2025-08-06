@@ -53,7 +53,7 @@ export const useSessionStats = () => {
 
   const [sessionData, setSessionData] = useState<SessionData>({
     assignment_id: "",
-    dayPeriod: "",
+    dayPeriod: "day",
     timeToFirstShot: null,
     note: "",
     squad_id: user?.squad_id || "",
@@ -69,7 +69,7 @@ export const useSessionStats = () => {
       // Load session data for editing
       setSessionData({
         assignment_id: selectedSession?.sessionStats?.assignment_id || "",
-        dayPeriod: selectedSession?.sessionStats?.day_period || "",
+        dayPeriod: selectedSession?.sessionStats?.day_period || "day",
         timeToFirstShot: selectedSession?.sessionStats?.time_to_first_shot_sec || null,
         note: selectedSession?.sessionStats?.note || "",
         squad_id: selectedSession?.sessionStats?.squad_id || user?.squad_id || "",
@@ -116,7 +116,7 @@ export const useSessionStats = () => {
       // Initialize with default values for new session
       setSessionData({
         assignment_id: "",
-        dayPeriod: "",
+        dayPeriod: "day",
         timeToFirstShot: null,
         note: "",
         effort: false,
