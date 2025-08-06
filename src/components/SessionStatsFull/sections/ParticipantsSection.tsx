@@ -17,6 +17,8 @@ interface ParticipantsSectionProps {
   removeParticipant: (userId: string) => void;
   updateParticipant: (userId: string, field: keyof Participant, value: any) => void;
   syncParticipantsPosition: (position: string) => void;
+  autoSyncPosition: boolean;
+  setAutoSyncPosition: (value: boolean) => void;
 }
 
 export const ParticipantsSection = ({
@@ -31,6 +33,8 @@ export const ParticipantsSection = ({
   removeParticipant,
   updateParticipant,
   syncParticipantsPosition,
+  autoSyncPosition,
+  setAutoSyncPosition,
 }: ParticipantsSectionProps) => {
   const { theme } = useTheme();
 
@@ -70,6 +74,16 @@ export const ParticipantsSection = ({
           <Users className="w-4 h-4" />
           <span>Add Squad</span>
         </button>
+        {/* Auto Sync Toggle */}
+        <label className="inline-flex items-center gap-2 text-xs sm:text-sm cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={autoSyncPosition}
+            onChange={(e) => setAutoSyncPosition(e.target.checked)}
+            className="form-checkbox h-4 w-4 text-indigo-600 rounded focus:ring-transparent"
+          />
+          <span className={theme === "dark" ? "text-zinc-300" : "text-gray-600"}>Auto Sync Position</span>
+        </label>
       </div>
 
       {/* Mobile Participants List - Compact Design */}
