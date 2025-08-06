@@ -158,9 +158,9 @@ export const useSessionStats = () => {
   // Effect: when autoSyncPosition is enabled, make sure all participants have the same position as current user
   useEffect(() => {
     if (autoSyncPosition) {
-      const userPos = participants.find((p) => p.userId === user?.id)?.position;
-      if (userPos) {
-        setParticipants((prev) => prev.map((p) => ({ ...p, position: userPos })));
+      const pos = participants[0]?.position;
+      if (pos) {
+        setParticipants((prev) => prev.map((p) => ({ ...p, position: pos })));
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -244,29 +244,30 @@ export const useSessionStats = () => {
   };
 
   const updateParticipant = (userId: string, field: keyof Participant, value: any) => {
-    if (autoSyncPosition && field === "position" && userId === user?.id) {
-      // Update all participants' positions in one go
+    if (field === "position" && autoSyncPosition) {
+      // When auto-sync is enabled, any position change propagates to everyone
       setParticipants((prev) => prev.map((p) => ({ ...p, position: value })));
-    } else {
-      // Regular update for a single participant
-      setParticipants((prev) =>
-        prev.map((p) => {
-          if (p.userId === userId) {
-            const updatedParticipant: Participant = { ...p, [field]: value };
-            // Clear conflicting fields when duty changes
-            if (field === "userDuty") {
-              if (value === "Sniper") {
-                updatedParticipant.equipmentId = "";
-              } else if (value === "Spotter") {
-                updatedParticipant.weaponId = "";
-              }
-            }
-            return updatedParticipant;
-          }
-          return p;
-        }),
-      );
+      return;
     }
+
+    // Regular update for a single participant
+    setParticipants((prev) =>
+      prev.map((p) => {
+        if (p.userId === userId) {
+          const updatedParticipant: Participant = { ...p, [field]: value };
+          // Clear conflicting fields when duty changes
+          if (field === "userDuty") {
+            if (value === "Sniper") {
+              updatedParticipant.equipmentId = "";
+            } else if (value === "Spotter") {
+              updatedParticipant.weaponId = "";
+            }
+          }
+          return updatedParticipant;
+        }
+        return p;
+      }),
+    );
   };
 
   // NEW: Sync the position of all participants to the provided position value
@@ -277,12 +278,12 @@ export const useSessionStats = () => {
   const addParticipant = (memberId: string) => {
     const member = teamMembers.find((m) => m.id === memberId);
     if (member && !participants.find((p) => p.userId === member.id)) {
-      const userPosition = participants.find((p) => p.userId === user?.id)?.position || "Lying";
+      const commonPosition = participants[0]?.position || "Lying";
       const newParticipant: Participant = {
         userId: member.id,
         name: member.first_name || member.last_name ? `${member.first_name || ""} ${member.last_name || ""}`.trim() : member.email,
         userDuty: member?.user_default_duty || "Sniper",
-        position: autoSyncPosition ? userPosition : "Lying",
+        position: autoSyncPosition ? commonPosition : "Lying",
         weaponId: member?.user_default_weapon || "",
         equipmentId: member?.user_default_equipment || "",
       };
@@ -296,12 +297,12 @@ export const useSessionStats = () => {
     );
 
     squadMembers.forEach((member: any) => {
-      const userPosition = participants.find((p) => p.userId === user?.id)?.position || "Lying";
+      const commonPosition = participants[0]?.position || "Lying";
       const newParticipant: Participant = {
         userId: member.id,
         name: member.first_name || member.last_name ? `${member.first_name || ""} ${member.last_name || ""}`.trim() : member.email,
         userDuty: member?.user_default_duty || "Sniper",
-        position: autoSyncPosition ? userPosition : "Lying",
+        position: autoSyncPosition ? commonPosition : "Lying",
         weaponId: member?.user_default_weapon || "",
         equipmentId: member?.user_default_equipment || "",
       };
