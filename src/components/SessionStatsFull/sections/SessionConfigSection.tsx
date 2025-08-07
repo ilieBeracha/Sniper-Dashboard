@@ -33,16 +33,14 @@ export const SessionConfigSection = ({
     <div className="w-full max-w-2xl mx-auto" id="session-config">
       <SectionHeader section={section} />
 
-      <div className="mt-8 space-y-6">
+      <div className="space-y-2">
         {/* Training Assignment */}
-        <div className="space-y-2">
-          <BaseLabelRequired>Training Assignment</BaseLabelRequired>
-
+        <div className="space-y-1">
           <div className="flex items-center gap-2">
             <select
               value={sessionData.assignment_id}
               onChange={(e) => updateSessionData("assignment_id", e.target.value)}
-              className={`w-full h-12 px-4 rounded-xl border-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+              className={`w-full h-10 px-4 rounded-xl border-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                 theme === "dark"
                   ? "bg-zinc-900 border-zinc-800 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
                   : "bg-white border-gray-200 focus:border-indigo-500 focus:ring-indigo-500/20"

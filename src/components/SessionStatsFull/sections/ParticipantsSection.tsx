@@ -41,7 +41,7 @@ export const ParticipantsSection = ({
       <SectionHeader section={section} />
 
       {/* Add Controls - Compact on mobile */}
-      <div className="flex flex-col gap-2 mt-4 sm:mt-6">
+      <div className="flex  gap-2">
         <select
           className={`w-full py-2 h-10 sm:h-12 px-3 sm:px-4 rounded-lg text-sm sm:text-base border transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
             theme === "dark"
@@ -67,12 +67,14 @@ export const ParticipantsSection = ({
         <button
           onClick={addSquad}
           disabled={isCommander(user?.user_role as UserRole)}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 h-10 sm:h-auto bg-indigo-500 text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-1/4 h-10 sm:w-auto text-xs flex items-center justify-center gap-2 px-4 py-2 h-8 sm:h-auto bg-indigo-500 text-white rounded-lg  font-medium hover:bg-indigo-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Users className="w-4 h-4" />
+          <Users className="w-3.5 h-3.5" />
           <span>Add Squad</span>
         </button>
         {/* Auto Sync Toggle */}
+      </div>
+      <div className="mt-2">
         <label className="inline-flex items-center gap-2 text-xs sm:text-sm cursor-pointer select-none">
           <input
             type="checkbox"
@@ -85,7 +87,7 @@ export const ParticipantsSection = ({
       </div>
 
       {/* Mobile Participants List - Compact Design */}
-      <div className="md:hidden mt-4 space-y-2">
+      <div className="md:hidden mt-2 space-y-2">
         {participants.length > 0 ? (
           participants.map((participant, index) => (
             <div
