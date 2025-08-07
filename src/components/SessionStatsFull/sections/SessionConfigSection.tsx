@@ -7,7 +7,6 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useState } from "react";
 import AddPurpleBtn from "@/components/base/buttons/AddPurpleBtn";
 import DayPeriodSelect from "@/components/DayPeriodSelect";
-import { BaseLabelRequired } from "@/components/base/BaseLabelRequired";
 import EffortSelect from "@/components/EffortSelect";
 
 interface SessionConfigSectionProps {

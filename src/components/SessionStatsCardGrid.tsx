@@ -2,7 +2,6 @@ import { format } from "date-fns";
 import { Sun, Moon, Activity, Clock, Info } from "lucide-react";
 import { Tooltip } from "react-tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
-import { primitives } from "@/styles/core";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface SessionStatsCardGridProps {
