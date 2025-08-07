@@ -67,10 +67,10 @@ export const ParticipantsSection = ({
         <button
           onClick={addSquad}
           disabled={isCommander(user?.user_role as UserRole)}
-          className="w-1/4 h-10 sm:w-auto text-xs flex items-center justify-center gap-2 px-4 py-2 h-8 sm:h-auto bg-indigo-500 text-white rounded-lg  font-medium hover:bg-indigo-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-1/4 sm:w-auto text-xs flex items-center justify-center gap-2 px-4 py-2  sm:h-auto bg-indigo-500 text-white rounded-lg  font-medium hover:bg-indigo-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Users className="w-3.5 h-3.5" />
-          <span>Add Squad</span>
+          <span>Squad</span>
         </button>
         {/* Auto Sync Toggle */}
       </div>
@@ -218,12 +218,12 @@ export const ParticipantsSection = ({
               {participants.map((participant, index) => (
                 <div
                   key={participant.userId}
-                  className={`grid grid-cols-5 gap-2 px-4 py-2 items-center transition-colors ${
+                  className={`grid grid-cols-10 gap-2 px-4 py-2 items-center transition-colors ${
                     theme === "dark" ? "hover:bg-zinc-800/20" : "hover:bg-gray-50"
                   }`}
                 >
                   {/* Name */}
-                  <div className="col-span-1 flex items-center gap-2">
+                  <div className="col-span-2 flex items-center gap-2">
                     <div
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
                         theme === "dark" ? "bg-indigo-500/20 text-indigo-400" : "bg-indigo-100 text-indigo-600"
@@ -242,7 +242,7 @@ export const ParticipantsSection = ({
                   </div>
 
                   {/* Role */}
-                  <div className="col-span-1">
+                  <div className="col-span-2">
                     <select
                       value={participant.userDuty}
                       onChange={(e) => updateParticipant(participant.userId, "userDuty", e.target.value)}
@@ -259,7 +259,7 @@ export const ParticipantsSection = ({
                   </div>
 
                   {/* Position */}
-                  <div className="col-span-1">
+                  <div className="col-span-2">
                     <select
                       value={participant.position}
                       onChange={(e) => updateParticipant(participant.userId, "position", e.target.value)}
@@ -277,7 +277,7 @@ export const ParticipantsSection = ({
                   </div>
 
                   {/* Weapon/Equipment */}
-                  <div className="col-span-1">
+                  <div className="col-span-3">
                     <select
                       value={participant.userDuty === "Sniper" ? participant.weaponId || "" : participant.equipmentId || ""}
                       onChange={(e) =>

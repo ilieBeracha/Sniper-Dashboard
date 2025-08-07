@@ -64,9 +64,23 @@ async function login(user: LoginUserData) {
   }
 }
 
+async function handleSignInWithGoogle(response: any) {
+  const { data, error } = await supabase.auth.signInWithIdToken({
+    provider: "google",
+    token: response.credential,
+  });
+  if (error) {
+    console.error("Error signing in with Google:", error.message);
+    toastService.error(error.message);
+    throw new Error("Failed to sign in with Google");
+  }
+  return data;
+}
+
 export const authService = {
   registerCommander,
   registerSoldier,
   registerSquadCommander,
   login,
+  handleSignInWithGoogle,
 };

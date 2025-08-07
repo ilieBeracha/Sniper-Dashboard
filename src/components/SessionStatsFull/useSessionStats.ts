@@ -29,6 +29,8 @@ export const useSessionStats = () => {
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [autoSyncPosition, setAutoSyncPosition] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -41,8 +43,13 @@ export const useSessionStats = () => {
     })();
   }, [sessionId]);
 
-  // Debouncing ref to prevent multiple submissions
   const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const initialFormState = useRef<{
+    sessionData: SessionData | null;
+    participants: Participant[] | null;
+    targets: Target[] | null;
+  }>({ sessionData: null, participants: null, targets: null });
+
   useEffect(() => {
     (async () => {
       if (id) {
@@ -68,74 +75,84 @@ export const useSessionStats = () => {
   useEffect(() => {
     if (selectedSession && sessionId) {
       // Load session data for editing
-      setSessionData({
+      const loadedSessionData = {
         assignment_id: selectedSession?.sessionStats?.assignment_id || "",
         dayPeriod: selectedSession?.sessionStats?.day_period || "day",
         timeToFirstShot: selectedSession?.sessionStats?.time_to_first_shot_sec || null,
         note: selectedSession?.sessionStats?.note || "",
         squad_id: selectedSession?.sessionStats?.squad_id || user?.squad_id || "",
         effort: selectedSession?.sessionStats?.effort || false,
-      });
+      };
+      setSessionData(loadedSessionData);
 
       // Load participants
+      let loadedParticipants: Participant[] = [];
       if (selectedSession?.participants && selectedSession.participants.length > 0) {
-        setParticipants(
-          selectedSession.participants.map((participant: any) => ({
-            userId: participant.user_id,
-            name:
-              participant.name ||
-              `${participant.users?.first_name || ""} ${participant.users?.last_name || ""}`.trim() ||
-              participant.users?.email ||
-              "",
-            userDuty: participant.user_duty,
-            position: participant.position,
-            weaponId: participant.weapon_id || "",
-            equipmentId: participant.equipment_id || "",
-          })),
-        );
+        loadedParticipants = selectedSession.participants.map((participant: any) => ({
+          userId: participant.user_id,
+          name:
+            participant.name ||
+            `${participant.users?.first_name || ""} ${participant.users?.last_name || ""}`.trim() ||
+            participant.users?.email ||
+            "",
+          userDuty: participant.user_duty,
+          position: participant.position,
+          weaponId: participant.weapon_id || "",
+          equipmentId: participant.equipment_id || "",
+        }));
+        setParticipants(loadedParticipants);
       }
 
       // Load targets with engagements
+      let loadedTargets: Target[] = [];
       if (selectedSession?.targets && selectedSession.targets.length > 0) {
-        setTargets(
-          selectedSession.targets.map((target: any, index: number) => ({
-            id: target.targetStats?.id || target.id || `target-${Date.now()}-${index}`,
-            distance: target.targetStats?.distance_m || target.distance_m || target.distance || 0,
-            windStrength: target.targetStats?.wind_strength || target.wind_strength || null,
-            windDirection: target.targetStats?.wind_direction_deg || target.wind_direction_deg || target.wind_direction || null,
-            mistakeCode: target.targetStats?.mistake_code || target.mistake_code || "",
-            firstShotHit: target.targetStats?.first_shot_hit || target.first_shot_hit || false,
-            engagements: (target.engagements || target.target_engagements || target.targetStats?.target_engagements || []).map((engagement: any) => ({
-              userId: engagement.user_id,
-              shotsFired: engagement.shots_fired || 0,
-              targetHits: engagement.target_hits || 0,
-            })),
+        loadedTargets = selectedSession.targets.map((target: any, index: number) => ({
+          id: target.targetStats?.id || target.id || `target-${Date.now()}-${index}`,
+          distance: target.targetStats?.distance_m || target.distance_m || target.distance || 0,
+          windStrength: target.targetStats?.wind_strength || target.wind_strength || null,
+          windDirection: target.targetStats?.wind_direction_deg || target.wind_direction_deg || target.wind_direction || null,
+          mistakeCode: target.targetStats?.mistake_code || target.mistake_code || "",
+          firstShotHit: target.targetStats?.first_shot_hit || target.first_shot_hit || false,
+          engagements: (target.engagements || target.target_engagements || target.targetStats?.target_engagements || []).map((engagement: any) => ({
+            userId: engagement.user_id,
+            shotsFired: engagement.shots_fired || 0,
+            targetHits: engagement.target_hits || 0,
           })),
-        );
+        }));
+        setTargets(loadedTargets);
       }
+
+      // Store initial state for change detection
+      initialFormState.current = {
+        sessionData: loadedSessionData,
+        participants: loadedParticipants,
+        targets: loadedTargets,
+      };
     } else if (!sessionId) {
       // Initialize with default values for new session
-      setSessionData({
+      const defaultSessionData = {
         assignment_id: "",
-        dayPeriod: "day",
+        dayPeriod: "day" as const,
         timeToFirstShot: null,
         note: "",
         effort: false,
         squad_id: user?.squad_id || "",
-      });
+      };
+      setSessionData(defaultSessionData);
 
-      setParticipants([
+      const defaultParticipants = [
         {
           userId: user?.id || "",
           name: user?.first_name || user?.last_name || user?.email || "",
-          userDuty: user?.user_default_duty || "Sniper",
-          position: "Lying",
+          userDuty: user?.user_default_duty || ("Sniper" as const),
+          position: "Lying" as const,
           weaponId: user?.user_default_weapon || "",
           equipmentId: user?.user_default_equipment || "",
         },
-      ]);
+      ];
+      setParticipants(defaultParticipants);
 
-      setTargets([
+      const defaultTargets = [
         {
           id: `target-${Date.now()}`,
           distance: 500,
@@ -151,7 +168,15 @@ export const useSessionStats = () => {
             },
           ],
         },
-      ]);
+      ];
+      setTargets(defaultTargets);
+
+      // Store initial state for change detection
+      initialFormState.current = {
+        sessionData: defaultSessionData,
+        participants: defaultParticipants,
+        targets: defaultTargets,
+      };
     }
   }, [selectedSession, sessionId, user]);
 
@@ -165,6 +190,25 @@ export const useSessionStats = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSyncPosition]);
+
+  // Check for unsaved changes
+  useEffect(() => {
+    if (isFormSubmitted) {
+      setHasUnsavedChanges(false);
+      return;
+    }
+
+    if (!initialFormState.current.sessionData) {
+      return;
+    }
+
+    const hasChanges =
+      JSON.stringify(sessionData) !== JSON.stringify(initialFormState.current.sessionData) ||
+      JSON.stringify(participants) !== JSON.stringify(initialFormState.current.participants) ||
+      JSON.stringify(targets) !== JSON.stringify(initialFormState.current.targets);
+
+    setHasUnsavedChanges(hasChanges);
+  }, [sessionData, participants, targets, isFormSubmitted]);
 
   const trainingAssignments = training?.assignment_sessions || [];
   const teamMembers = members || [];
@@ -460,6 +504,7 @@ export const useSessionStats = () => {
         try {
           if (sessionId) {
             // Update existing session
+
             await updateSessionStats(sessionId, saveData);
             toast.success("Training session updated successfully!");
           } else {
@@ -467,6 +512,9 @@ export const useSessionStats = () => {
             await saveSessionStats(saveData);
             toast.success("Training session submitted successfully!");
           }
+
+          // Mark form as submitted to prevent unsaved changes warning
+          setIsFormSubmitted(true);
 
           // Navigate back to training page after successful save/update
           if (id) {
@@ -502,6 +550,8 @@ export const useSessionStats = () => {
     isSubmitting,
     isLoading,
     autoSyncPosition,
+    hasUnsavedChanges,
+    isFormSubmitted,
     // Data
     user,
     training,
@@ -527,5 +577,6 @@ export const useSessionStats = () => {
     setIsAssignmentModalOpen,
     syncParticipantsPosition,
     setAutoSyncPosition,
+    setHasUnsavedChanges,
   };
 };
