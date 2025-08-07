@@ -28,7 +28,6 @@ export default function ImprovedSessionStats() {
 
   const { training, createAssignment, loadTrainingById } = useStore(TrainingStore);
   const {
-    // State
     activeSection,
     sessionData,
     participants,
@@ -36,13 +35,11 @@ export default function ImprovedSessionStats() {
     validationErrors,
     sections,
     isSubmitting,
-    // Data
     user,
     weapons,
     equipments,
     teamMembers,
     trainingAssignments,
-    // Methods
     handleScroll,
     getSectionValidationStatus,
     updateSessionData,
@@ -73,27 +70,28 @@ export default function ImprovedSessionStats() {
     })();
   }, [training?.team_id]);
 
-  // Intercept navigation attempts
-  const handleNavigation = useCallback((path: string) => {
-    if (hasUnsavedChanges && !isFormSubmitted) {
-      setPendingNavigation(path);
-      setShowConfirmLeave(true);
-    } else {
-      navigate(path);
-    }
-  }, [hasUnsavedChanges, isFormSubmitted, navigate]);
+  const handleNavigation = useCallback(
+    (path: string) => {
+      if (hasUnsavedChanges && !isFormSubmitted) {
+        setPendingNavigation(path);
+        setShowConfirmLeave(true);
+      } else {
+        navigate(path);
+      }
+    },
+    [hasUnsavedChanges, isFormSubmitted, navigate],
+  );
 
-  // Handle browser back button
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (hasUnsavedChanges && !isFormSubmitted) {
         e.preventDefault();
-        e.returnValue = '';
+        e.returnValue = "";
       }
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasUnsavedChanges, isFormSubmitted]);
 
   async function onSuccessAddAssignment(assignmentName: string) {
@@ -108,17 +106,13 @@ export default function ImprovedSessionStats() {
 
   return (
     <div className={` ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-white"} relative`}>
-      {/* Progress Indicator - Fixed on larger screens, hidden on mobile */}
       <div className="hidden lg:block">
         <ScrollProgress activeSection={activeSection} totalSections={sections.length} />
-        
-        {/* Back button for desktop */}
+
         <button
           onClick={() => handleNavigation(`/training/${training?.id}`)}
           className={`fixed top-4 left-4 z-50 flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-            theme === "dark" 
-              ? "bg-zinc-800/90 hover:bg-zinc-700 text-zinc-300" 
-              : "bg-white/90 hover:bg-gray-100 text-gray-700 shadow-md"
+            theme === "dark" ? "bg-zinc-800/90 hover:bg-zinc-700 text-zinc-300" : "bg-white/90 hover:bg-gray-100 text-gray-700 shadow-md"
           }`}
         >
           <ArrowLeft className="w-4 h-4" />
@@ -126,8 +120,7 @@ export default function ImprovedSessionStats() {
         </button>
       </div>
 
-      {/* Mobile Progress Bar with Navigation */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50  dark:bg-black/95 backdrop-blur-sm shadow-md">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50   backdrop-blur-sm shadow-md">
         <div className="flex h-1 bg-gray-200 dark:bg-gray-800">
           {sections.map((_, index) => (
             <div
@@ -151,9 +144,7 @@ export default function ImprovedSessionStats() {
         </div>
       </div>
 
-      {/* Main Content Container */}
       <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth lg:pt-0 " onScroll={handleScroll}>
-        {/* Section 1: Session Configuration */}
         <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8 ">
           <div className="w-full max-w-4xl">
             <SessionConfigSection
@@ -166,7 +157,6 @@ export default function ImprovedSessionStats() {
           </div>
         </section>
 
-        {/* Section 2: Participants */}
         <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
             <ParticipantsSection
@@ -186,21 +176,18 @@ export default function ImprovedSessionStats() {
           </div>
         </section>
 
-        {/* Section 3: Targets */}
         <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
             <TargetsSection section={sections[2]} targets={targets} addTarget={addTarget} updateTarget={updateTarget} removeTarget={removeTarget} />
           </div>
         </section>
 
-        {/* Section 4: Engagements */}
         <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
             <EngagementsSection section={sections[3]} targets={targets} participants={participants} updateEngagement={updateEngagement} />
           </div>
         </section>
 
-        {/* Section 5: Summary */}
         <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
             <SummarySection
@@ -215,8 +202,7 @@ export default function ImprovedSessionStats() {
         </section>
       </div>
       <AddAssignmentModal isOpen={isAssignmentModalOpen} onClose={() => setIsAssignmentModalOpen(false)} onSuccess={onSuccessAddAssignment} />
-      
-      {/* Confirm Leave Modal */}
+
       <ConfirmLeaveModal
         isOpen={showConfirmLeave}
         onClose={() => {

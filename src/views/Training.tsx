@@ -53,6 +53,7 @@ export default function TrainingPage() {
 
   // Filters
   const [filterDay, setFilterDay] = useState<string>("all");
+
   const [filterEffort, setFilterEffort] = useState<string>("all");
   const [filterDistance, setFilterDistance] = useState<string>("all");
   const [filterParticipated, setFilterParticipated] = useState<boolean>(false);
@@ -85,20 +86,12 @@ export default function TrainingPage() {
     });
   }, [filterDay, filterEffort, filterDistance, filterParticipated, setFilters]);
 
-  // Trigger new query when filters change
   useEffect(() => {
     if (id && hasLoadedData.current) {
       getSessionStatsByTrainingId(id, 20, 0);
     }
   }, [filterDay, filterEffort, filterDistance, filterParticipated, id]);
 
-  // Handle view mode changes
-  const handleViewModeChange = (mode: "grid" | "stack") => {
-    setViewMode(mode);
-    localStorage.setItem("sessionViewMode", mode);
-  };
-
-  // Save auto-load preference
   useEffect(() => {
     localStorage.setItem("autoLoadStackView", autoLoadStackView.toString());
   }, [autoLoadStackView]);
@@ -144,28 +137,33 @@ export default function TrainingPage() {
     return true;
   });
 
-  // Apply sorting
   const sortedSessionStats = [...filteredSessionStats].sort((a, b) => {
+    // 1. Most recent
     if (sortOrder === "recent") {
-      // Sort by created_at descending (most recent first)
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    } else if (sortOrder === "best") {
-      // Sort by best session criteria - you can define what makes a "best" session
-      // For now, let's sort by: effort (true first), then by minimum distance (higher is better)
+    }
 
-      // First sort by effort
+    // 2. Best sessions – high-to-low overall hit percentage, then effort flag, then max distance.
+    if (sortOrder === "best") {
+      const aPct = a.overall_hit_percentage ?? 0;
+      const bPct = b.overall_hit_percentage ?? 0;
+      if (aPct !== bPct) {
+        return bPct - aPct; // highest percentage first
+      }
+
+      // Tie-breaker 1 – effort sessions first
       if (a.effort !== b.effort) {
         return a.effort === true ? -1 : 1;
       }
 
-      // Then by distance (sessions with higher distances are considered better)
+      // Tie-breaker 2 – longer distance first
       const aDistances = (a.target_stats || []).map((t: any) => t.distance_m).filter(Boolean);
       const bDistances = (b.target_stats || []).map((t: any) => t.distance_m).filter(Boolean);
-      const aMaxDistance = aDistances.length > 0 ? Math.max(...aDistances) : 0;
-      const bMaxDistance = bDistances.length > 0 ? Math.max(...bDistances) : 0;
-
-      return bMaxDistance - aMaxDistance;
+      const aMax = aDistances.length ? Math.max(...aDistances) : 0;
+      const bMax = bDistances.length ? Math.max(...bDistances) : 0;
+      return bMax - aMax;
     }
+
     return 0;
   });
 
@@ -615,16 +613,13 @@ export default function TrainingPage() {
           setSortOrder(newFilters.sortOrder);
         }}
         onApply={() => {
-          // Filters are already applied via onFiltersChange
           setIsFilterDrawerOpen(false);
         }}
-        onClear={() => {
-          // Clear is handled in the drawer component
-        }}
+        onClear={() => {}}
         autoLoadStackView={autoLoadStackView}
         onAutoLoadChange={(value) => setAutoLoadStackView(value)}
         viewMode={viewMode}
-        onViewModeChange={handleViewModeChange}
+        onViewModeChange={setViewMode}
       />
     </SpPage>
   );

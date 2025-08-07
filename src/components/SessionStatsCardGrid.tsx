@@ -1,8 +1,11 @@
 import { format } from "date-fns";
-import { Sun, Moon, Activity, Clock, Info, Users, Building2, Target } from "lucide-react";
-import { Tooltip } from "react-tooltip";
+import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical } from "lucide-react";
+import { Tooltip } from "@heroui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { Popover, PopoverTrigger, PopoverContent, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
+import ProfileCapitalFirstLatter from "./ProfileCapitalFirstLatter";
+import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 interface SessionStatsCardGridProps {
   data: any[];
@@ -20,151 +23,270 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
   }
 
   return (
-    <div className="grid gap-4" style={{ gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(260px, 1fr))" }}>
+    <div className="grid gap-3" style={{ gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(320px, 1fr))" }}>
       {data.map((item) => {
         const assignmentName = item?.assignment_session?.assignment?.assignment_name || "Unknown";
-        const shooterName = item?.users ? `${item?.users?.first_name} ${item?.users?.last_name}`.trim() || item?.users?.email : "N/A";
+
         const teamName = item.teams?.team_name || "No Team";
-        const distances = (item.target_stats || []).map((t: any) => t.distance_m).filter(Boolean);
-        const minDistance = distances.length > 0 ? Math.min(...distances) : null;
-        const maxDistance = distances.length > 0 ? Math.max(...distances) : null;
 
         return (
           <div
             key={item.id}
-            className={`rounded-xl border p-4 flex flex-col gap-3 transition-all cursor-pointer ${
+            className={`group relative rounded-lg border p-3 transition-all cursor-pointer overflow-hidden ${
               theme === "dark"
-                ? "border-zinc-800 bg-gradient-to-br from-zinc-900/80 to-zinc-800/50 hover:border-zinc-700 hover:shadow-lg hover:shadow-zinc-900/50"
-                : "border-gray-200 bg-white hover:shadow-md"
+                ? "border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/70 hover:border-zinc-700 hover:shadow-xl"
+                : "border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 hover:shadow-lg"
             }`}
             onClick={() => onCardClick?.(item)}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-sm truncate" title={assignmentName}>
-                {assignmentName}
-              </h3>
-              <span className="text-xs opacity-70">{format(new Date(item.created_at), "dd MMM HH:mm")}</span>
-            </div>
+            {/* Background accent */}
+            <div
+              className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none ${
+                theme === "dark" ? "bg-gradient-to-br from-zinc-800/20 to-transparent" : "bg-gradient-to-br from-gray-100/50 to-transparent"
+              }`}
+            />
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 text-xs">
-              {/* Day/Night */}
-              <span
-                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${
-                  item.day_period === "day"
-                    ? theme === "dark"
-                      ? "bg-yellow-600/20 text-yellow-300"
-                      : "bg-yellow-100 text-yellow-700"
-                    : theme === "dark"
-                      ? "bg-indigo-600/20 text-indigo-300"
-                      : "bg-indigo-100 text-indigo-700"
-                }`}
-              >
-                {item.day_period === "day" ? <Sun size={12} /> : <Moon size={12} />} {item.day_period}
-              </span>
-
-              {/* Effort */}
-              {item.effort !== null && (
-                <span
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${
-                    item.effort
-                      ? theme === "dark"
-                        ? "bg-green-600/20 text-green-300"
-                        : "bg-green-100 text-green-700"
-                      : theme === "dark"
-                        ? "bg-red-600/20 text-red-300"
-                        : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  <Activity size={12} /> {item.effort ? "Effort" : "No Effort"}
-                </span>
-              )}
-            </div>
-
-            {/* Session Info */}
-            <div className="flex flex-col gap-1.5">
-              {/* Shooter */}
-              <div className="flex items-center gap-2 text-xs opacity-80">
-                <Users size={12} className="flex-shrink-0" />
-                <span className="truncate" title={shooterName}>
-                  {shooterName}
-                </span>
-              </div>
-
-              {/* Team */}
-              <div className="flex items-center gap-2 text-xs opacity-80">
-                <Building2 size={12} className="flex-shrink-0" />
-                <span className="truncate" title={teamName}>
-                  {teamName}
-                </span>
-              </div>
-
-              {/* Distance Range */}
-              {minDistance !== null && (
-                <div className="flex items-center gap-2 text-xs opacity-80">
-                  <Target size={12} className="flex-shrink-0" />
-                  <span>{minDistance === maxDistance ? `${minDistance}m` : `${minDistance}-${maxDistance}m`}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Stats Row */}
-            <div className="flex items-center gap-3 text-xs">
-              {item.time_to_first_shot_sec !== null && (
-                <div className="inline-flex items-center gap-1" title="Time to first shot">
-                  <Clock size={12} /> {item?.time_to_first_shot_sec}s
-                </div>
-              )}
-
-              {item.note && (
-                <div className="inline-flex items-center gap-1" data-tooltip-id={`note-${item.id}`} data-tooltip-content={item.note}>
-                  <Info size={12} /> Note
-                  <Tooltip
-                    id={`note-${item.id}`}
-                    className={`!opacity-100 !border !rounded-lg !p-2 !text-xs ${
-                      theme === "dark" ? "!bg-[#1A1A1A] !text-gray-300 !border-white/10" : "!bg-white !text-gray-700 !border-gray-200"
-                    }`}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Edit/Delete Actions */}
+            {/* Action dropdown - positioned absolute */}
             {(onEdit || onDelete) && (
-              <div className="flex justify-end gap-2 mt-auto text-xs">
-                {onEdit && (
-                  <button
-                    className={`px-3 py-1 rounded-md border text-xs font-medium transition-all ${
-                      theme === "dark"
-                        ? "border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700/70 hover:border-zinc-600"
-                        : "border-gray-200 hover:bg-gray-100"
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEdit(item);
+              <div className="absolute top-2 right-2 z-10">
+                <Dropdown placement="bottom-end">
+                  <DropdownTrigger>
+                    <button
+                      className={`p-1.5 rounded-lg transition-colors ${
+                        theme === "dark"
+                          ? "hover:bg-zinc-800 text-zinc-500 hover:text-zinc-200"
+                          : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                      }`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MoreVertical size={16} />
+                    </button>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    aria-label="Session actions"
+                    className={`${theme === "dark" ? "bg-zinc-800/80 border-zinc-700 rounded-lg" : "bg-gray-200/80 shadow-lg border-gray-200 rounded-lg"}`}
+                    onAction={(key) => {
+                      if (key === "edit" && onEdit) {
+                        onEdit(item);
+                      } else if (key === "delete" && onDelete) {
+                        onDelete(item);
+                      }
                     }}
                   >
-                    Edit
-                  </button>
-                )}
-                {onDelete && (
-                  <button
-                    className={`px-3 py-1 rounded-md border text-xs font-medium transition-all ${
-                      theme === "dark"
-                        ? "border-zinc-700 bg-zinc-800/50 hover:bg-red-900/30 hover:border-red-800/50 hover:text-red-400"
-                        : "border-gray-200 hover:bg-red-50 hover:border-red-200 hover:text-red-600"
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(item);
-                    }}
-                  >
-                    Delete
-                  </button>
-                )}
+                    {onEdit ? (
+                      <DropdownItem
+                        key="edit"
+                        startContent={<Edit3 size={14} />}
+                        className={theme === "dark" ? "text-zinc-300 hover:bg-zinc-700" : "text-gray-700 hover:bg-gray-100"}
+                      >
+                        Edit Session
+                      </DropdownItem>
+                    ) : null}
+                    {onDelete ? (
+                      <DropdownItem
+                        key="delete"
+                        startContent={<Trash2 size={14} />}
+                        className={theme === "dark" ? "text-red-400 hover:bg-red-900/20" : "text-red-600 hover:bg-red-50"}
+                        color="danger"
+                      >
+                        Delete Session
+                      </DropdownItem>
+                    ) : null}
+                  </DropdownMenu>
+                </Dropdown>
               </div>
             )}
+
+            {/* Main Content */}
+            <div className="relative">
+              {/* Header Row */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-sm truncate" title={assignmentName}>
+                    {assignmentName}
+                  </h3>
+                  <p className="text-xs opacity-60 mt-0.5">{format(new Date(item.created_at), "dd MMM · HH:mm")}</p>
+                </div>
+              </div>
+
+              {/* Compact Info Grid */}
+              <div className="grid grid-cols-2 gap-2 mb-1">
+                {/* Team & Average Stats */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <Building2 size={10} className="opacity-50" />
+                    <span className="truncate opacity-80" title={teamName}>
+                      {teamName}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Row - Tags */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {/* Day/Night */}
+                <span
+                  className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium ${
+                    item.day_period === "day"
+                      ? theme === "dark"
+                        ? "bg-yellow-500/10 text-yellow-400"
+                        : "bg-yellow-50 text-yellow-700"
+                      : theme === "dark"
+                        ? "bg-indigo-500/10 text-indigo-400"
+                        : "bg-indigo-50 text-indigo-700"
+                  }`}
+                >
+                  {item.day_period === "day" ? <Sun size={10} /> : <Moon size={10} />}
+                  <span className="capitalize">{item.day_period}</span>
+                </span>
+
+                {/* Effort */}
+                {item.effort !== null && (
+                  <span
+                    className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium ${
+                      item.effort
+                        ? theme === "dark"
+                          ? "bg-green-500/10 text-green-400"
+                          : "bg-green-50 text-green-700"
+                        : theme === "dark"
+                          ? "bg-zinc-700/50 text-zinc-400"
+                          : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    <Activity size={10} />
+                    <span>{item.effort ? "Effort" : "Rest"}</span>
+                  </span>
+                )}
+
+                {/* Note indicator */}
+                {item.note && (
+                  <span
+                    className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium ${
+                      theme === "dark" ? "bg-blue-500/10 text-blue-400" : "bg-blue-50 text-blue-700"
+                    }`}
+                    data-tooltip-id={`note-${item.id}`}
+                    data-tooltip-content={item.note}
+                  >
+                    <span>Note</span>
+                    <Tooltip id={`note-${item.id}`}>
+                      <TooltipTrigger>
+                        <Info size={10} />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-xs">{item.note}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Participants avatars in bottom right corner */}
+            <div className="absolute bottom-3 right-3">
+              <Popover placement="top-end">
+                <PopoverTrigger>
+                  <div className="cursor-pointer transition-transform hover:scale-110">
+                    <div className="flex items-center -space-x-2">
+                      {/* Show participants if available */}
+                      {(item.session_participants || []).length > 0 ? (
+                        <>
+                          {/* Show first 3 participants as avatar circles */}
+                          {(item.session_participants || []).slice(0, 3).map((participant: any, idx: number) => (
+                            <div key={idx} className="relative" style={{ zIndex: 30 - idx * 10 }}>
+                              <div
+                                className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-semibold ring-2 ${
+                                  theme === "dark" ? "ring-zinc-900 bg-zinc-700 text-zinc-300" : "ring-white bg-gray-200 text-gray-700"
+                                }`}
+                              >
+                                {participant.users?.first_name?.[0]?.toUpperCase() || participant.users?.email?.[0]?.toUpperCase() || "?"}
+                              </div>
+                              {/* Role indicator dot */}
+                              {participant.user_duty && (
+                                <div
+                                  className={`absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full ${
+                                    participant.user_duty === "Sniper" ? "bg-red-500" : "bg-blue-500"
+                                  }`}
+                                />
+                              )}
+                            </div>
+                          ))}
+
+                          {/* Show remaining count if more than 3 */}
+                          {(item.session_participants || []).length > 3 && (
+                            <div
+                              className={`relative w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-semibold ring-2 ${
+                                theme === "dark" ? "bg-zinc-800 text-zinc-400 ring-zinc-900" : "bg-gray-100 text-gray-600 ring-white"
+                              }`}
+                            >
+                              +{(item.session_participants || []).length - 3}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        /* Show icon when no participants */
+                        <div
+                          className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                            theme === "dark" ? "bg-zinc-800 text-zinc-500" : "bg-gray-100 text-gray-500"
+                          }`}
+                        >
+                          <Users size={12} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent
+                  className={`p-3 min-w-[240px] rounded-lg shadow-xl border ${
+                    theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
+                  }`}
+                >
+                  <h4 className={`text-sm font-medium mb-3 ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>
+                    Session Participants ({item.session_participants?.length || 0})
+                  </h4>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {(item.session_participants || []).length > 0 ? (
+                      (item.session_participants || []).map((participant: any, idx: number) => {
+                        const name = participant.users
+                          ? `${participant.users.first_name || ""} ${participant.users.last_name || ""}`.trim() || participant.users.email
+                          : "Unknown";
+                        return (
+                          <div
+                            key={idx}
+                            className={`p-2 rounded-lg flex items-center gap-3 ${theme === "dark" ? "hover:bg-zinc-700/50" : "hover:bg-gray-50"}`}
+                          >
+                            <ProfileCapitalFirstLatter firstName={participant.users?.first_name} lastName={participant.users?.last_name} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{name}</p>
+                              <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
+                                {participant.user_duty || "Unknown Role"}
+                              </p>
+                            </div>
+                            <span
+                              className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                participant.user_duty === "Sniper"
+                                  ? theme === "dark"
+                                    ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                                    : "bg-red-50 text-red-700 border border-red-200"
+                                  : theme === "dark"
+                                    ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                                    : "bg-blue-50 text-blue-700 border border-blue-200"
+                              }`}
+                            >
+                              {participant.user_duty === "Sniper" ? "SNP" : "SPT"}
+                            </span>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className={`text-center py-4 ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+                        <Users size={24} className="mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">No participants recorded</p>
+                      </div>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
         );
       })}

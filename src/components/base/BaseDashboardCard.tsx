@@ -106,7 +106,7 @@ export default function BaseDashboardCard({
           )}
         </div>
       </div>
-      <div className="pb-4 flex-1 h-full">{children}</div>
+      <div className=" flex-1 h-full">{children}</div>
 
       <Tooltip
         id={`${header}-tooltip`}

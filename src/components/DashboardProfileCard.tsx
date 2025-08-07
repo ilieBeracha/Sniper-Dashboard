@@ -3,13 +3,11 @@ import { userStore } from "@/store/userStore";
 import { teamStore } from "@/store/teamStore";
 import { squadStore } from "@/store/squadStore";
 import { useStore } from "zustand";
-import DashboardCalendar from "./DashboardCalendar";
 import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
 import { useEffect } from "react";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { Chip } from "@heroui/react";
-import { Users, Shield } from "lucide-react";
+import { Users, Shield, Calendar } from "lucide-react";
 
 export default function DashboardProfileCard() {
   const { theme } = useTheme();
@@ -35,89 +33,94 @@ export default function DashboardProfileCard() {
     loadTeamData();
   }, [user?.team_id, user?.user_role]);
 
-  const getWelcomeMessage = () => {
+  const getTimeBasedGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 17) return "Good afternoon";
-    return "Good evening";
+    if (hour < 12) return { greeting: "Morning", icon: "☀️" };
+    if (hour < 17) return { greeting: "Afternoon", icon: "🌤️" };
+    return { greeting: "Evening", icon: "🌙" };
   };
 
-  const formatName = (name?: string | null) => (name ? name.charAt(0).toUpperCase() + name.slice(1) : "");
+  const { greeting, icon } = getTimeBasedGreeting();
 
   return (
-    <div
-      className={`relative w-full h-full overflow-hidden rounded-xl shadow-lg flex ${isMobile ? "flex-col gap-6 p-4" : "flex-row justify-between p-6"} ${
-        theme === "dark"
-          ? "bg-gradient-to-br from-zinc-800 via-zinc-900 to-black"
-          : "bg-gradient-to-br from-white via-purple-50 to-purple-100"
-      }`}
-    >
-      {/* Decorative gradient blobs */}
-      <span
-        className={`absolute -top-16 -left-16 h-56 w-56 rounded-full blur-3xl opacity-20 ${
-          theme === "dark" ? "bg-purple-700" : "bg-purple-300"
-        }`}
-      />
-      <span
-        className={`absolute -bottom-16 -right-16 h-64 w-64 rounded-full blur-3xl opacity-20 ${
-          theme === "dark" ? "bg-pink-700" : "bg-pink-300"
-        }`}
-      />
-
-      {/* Main content */}
-      <div className="relative z-10 flex flex-col justify-between gap-4 flex-1">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2 mb-2">
-            <h1 className={`text-sm font-light ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>{getWelcomeMessage()},</h1>
-          </div>
-          <p
-            className={`flex items-center gap-2 font-bold mb-2 ${isMobile ? "text-2xl" : "text-4xl lg:text-5xl"} ${
-              theme === "dark" ? "text-white" : "text-gray-900"
+    <div className={`rounded-lg border p-4 ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}>
+      <div className="flex items-center justify-between">
+        {/* Left side - Compact user info */}
+        <div className="flex items-center gap-3">
+          {/* Avatar with initials */}
+          <div
+            className={`relative w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
+              theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-700"
             }`}
           >
-            {formatName(user?.first_name)} {user?.last_name}
-          </p>
-          <div className="flex flex-wrap gap-2 mt-1">
-            <Chip
-              variant="bordered"
-              className={`flex items-center gap-1 text-[11px] font-medium tracking-wide uppercase ${
-                theme === "dark" ? "bg-zinc-700 text-white" : "bg-zinc-200 text-gray-900"
-              }`}
-            >
-              {user?.user_role?.replace("_", " ")}
-            </Chip>
-            {user?.team_name && (
-              <Chip
-                variant="bordered"
-                className={`flex items-center gap-1 text-xs ${theme === "dark" ? "bg-zinc-800 text-white" : "bg-zinc-300 text-gray-900"}`}
-              >
-                <div className="flex items-center gap-1">
-                  <Users className="w-3 h-3" />
-                  <span>{user?.team_name}</span>
-                </div>
-              </Chip>
-            )}
-            {user?.squad_name && (
-              <Chip
-                variant="bordered"
-                className={`flex items-center gap-1 text-xs ${theme === "dark" ? "bg-zinc-800 text-white" : "bg-zinc-300 text-gray-900"}`}
-              >
-                <div className="flex items-center gap-1">
-                  <Shield className="w-3 h-3" />
-                  <span>{user?.squad_name}</span>
-                </div>
-              </Chip>
+            {user?.first_name?.[0]}
+            {user?.last_name?.[0]}
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-zinc-900"></div>
+          </div>
+
+          {/* User details - horizontal layout */}
+          <div className="flex items-center gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-medium">
+                  {user?.first_name} {user?.last_name}
+                </h2>
+                {!isMobile && <span className="text-sm opacity-50">{icon}</span>}
+              </div>
+              <p className="text-xs opacity-60">{greeting} Commander</p>
+            </div>
+
+            {/* Divider */}
+            {!isMobile && <div className={`h-8 w-px ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`} />}
+
+            {/* Tags - inline */}
+            {!isMobile && (
+              <div className="flex items-center gap-3 text-xs">
+                <span className={`px-2 py-0.5 rounded ${theme === "dark" ? "bg-zinc-800 text-zinc-400" : "bg-gray-100 text-gray-600"}`}>
+                  {user?.user_role?.replace("_", " ").toUpperCase()}
+                </span>
+
+                {user?.team_name && (
+                  <div className="flex items-center gap-1.5 opacity-70">
+                    <Users size={12} />
+                    <span>{user?.team_name}</span>
+                  </div>
+                )}
+
+                {user?.squad_name && (
+                  <div className="flex items-center gap-1.5 opacity-70">
+                    <Shield size={12} />
+                    <span>{user?.squad_name}</span>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
+
+        {/* Right side - Date */}
+        <div className="hidden md:flex items-center gap-2 text-xs opacity-60">
+          <Calendar size={14} />
+          <span>{new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>
+        </div>
       </div>
 
-      {/* Calendar overlay - hidden on mobile for better readability */}
-      {!isMobile && (
-        <div className="hidden lg:flex right-0 top-0 h-full w-[45%] items-center">
-          <div className="relative w-full h-full z-10">
-            <DashboardCalendar />
-          </div>
+      {/* Mobile tags */}
+      {isMobile && (
+        <div className="flex items-center gap-2 mt-3 text-xs">
+          {user?.team_name && (
+            <div className="flex items-center gap-1 opacity-70">
+              <Users size={12} />
+              <span>{user?.team_name}</span>
+            </div>
+          )}
+
+          {user?.squad_name && (
+            <div className="flex items-center gap-1 opacity-70">
+              <Shield size={12} />
+              <span>{user?.squad_name}</span>
+            </div>
+          )}
         </div>
       )}
     </div>
