@@ -18,7 +18,7 @@ interface props {
   supabaseLogin: (session: { access_token: string; refresh_token: string }) => void;
   error: string;
   resetError: () => void;
-
+  handleSignInWithGoogle: (response: any) => Promise<any>;
   isLoadingAuth: boolean;
 }
 
@@ -169,4 +169,11 @@ export const authStore = create<props>((set, get) => ({
   },
 
   resetError: () => set({ error: "" }),
+
+  handleSignInWithGoogle: async (response: any) => {
+    const res = await authService.handleSignInWithGoogle(response);
+    set({ token: res.session.access_token });
+    get().supabaseLogin(res.session);
+    userStore.getState().setUser(res.user as unknown as User);
+  },
 }));

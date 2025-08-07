@@ -6,10 +6,13 @@ import "react-tooltip/dist/react-tooltip.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "preline/dist/preline.js";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
-    <App />
-    <ToastContainer />
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <App />
+      <ToastContainer />
+    </GoogleOAuthProvider>
   </BrowserRouter>,
 );

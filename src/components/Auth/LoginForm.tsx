@@ -2,15 +2,19 @@ import React, { useState } from "react";
 import BaseInput from "@/components/base/BaseInput";
 import { useTheme } from "@/contexts/ThemeContext";
 import { validateAuthForm } from "@/lib/formValidation";
+import { GoogleLogin } from "@react-oauth/google";
+import { toastService } from "@/services/toastService";
 
 export function ModernLogin({
   AuthSubmit,
   onRegisterClick,
   onSignInWithEmail,
+  handleSignInWithGoogle,
 }: {
   AuthSubmit: any;
   onRegisterClick?: (type: string) => any;
   onSignInWithEmail?: (email: string) => void;
+  handleSignInWithGoogle?: (response: any) => void;
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -54,6 +58,10 @@ export function ModernLogin({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleLogin = (response: any) => {
+    handleSignInWithGoogle?.(response);
   };
 
   const emailIcon = (
@@ -226,9 +234,25 @@ export function ModernLogin({
               rightIcon={togglePasswordIcon}
             />
           )}
+
+          {/* Google Sign In Button */}
+          <div className="w-full [&>div]:w-full [&>div>div]:w-full [&>div>div>div]:w-full [&>div>div>div>iframe]:w-full bg-transparent">
+            <GoogleLogin
+              size="large"
+              width="100%"
+              type="standard"
+              onSuccess={handleGoogleLogin}
+              shape="circle"
+              logo_alignment="center"
+              text="signin_with"
+              auto_select={false}
+              useOneTap={false}
+              ux_mode="popup"
+              onError={() => toastService.error("Failed to sign in with Google")}
+            />
+          </div>
         </>
       )}
-
       {!magicLinkSent && (
         <div className="space-y-4">
           <button

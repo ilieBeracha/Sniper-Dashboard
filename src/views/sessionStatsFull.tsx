@@ -11,17 +11,20 @@ import { ScrollProgress } from "@/components/magicui/scroll-progress";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
 import { useStore } from "zustand";
 import { TrainingStore } from "@/store/trainingStore";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ConfirmLeaveModal from "../components/SessionStatsFull/ConfirmLeaveModal";
 
 export default function ImprovedSessionStats() {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const { getWeapons } = useStore(weaponsStore);
   const { getEquipments } = useStore(equipmentStore);
+  const [showConfirmLeave, setShowConfirmLeave] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
 
   const { training, createAssignment, loadTrainingById } = useStore(TrainingStore);
   const {
@@ -56,6 +59,9 @@ export default function ImprovedSessionStats() {
     setIsAssignmentModalOpen,
     autoSyncPosition,
     setAutoSyncPosition,
+    hasUnsavedChanges,
+    isFormSubmitted,
+    setHasUnsavedChanges,
   } = useSessionStats();
 
   useEffect(() => {
@@ -66,6 +72,29 @@ export default function ImprovedSessionStats() {
       }
     })();
   }, [training?.team_id]);
+
+  // Intercept navigation attempts
+  const handleNavigation = useCallback((path: string) => {
+    if (hasUnsavedChanges && !isFormSubmitted) {
+      setPendingNavigation(path);
+      setShowConfirmLeave(true);
+    } else {
+      navigate(path);
+    }
+  }, [hasUnsavedChanges, isFormSubmitted, navigate]);
+
+  // Handle browser back button
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges && !isFormSubmitted) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges, isFormSubmitted]);
 
   async function onSuccessAddAssignment(assignmentName: string) {
     const res = await createAssignment(assignmentName, true, training?.id as string);
@@ -82,6 +111,19 @@ export default function ImprovedSessionStats() {
       {/* Progress Indicator - Fixed on larger screens, hidden on mobile */}
       <div className="hidden lg:block">
         <ScrollProgress activeSection={activeSection} totalSections={sections.length} />
+        
+        {/* Back button for desktop */}
+        <button
+          onClick={() => handleNavigation(`/training/${training?.id}`)}
+          className={`fixed top-4 left-4 z-50 flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+            theme === "dark" 
+              ? "bg-zinc-800/90 hover:bg-zinc-700 text-zinc-300" 
+              : "bg-white/90 hover:bg-gray-100 text-gray-700 shadow-md"
+          }`}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-sm font-medium">Back to training</span>
+        </button>
       </div>
 
       {/* Mobile Progress Bar with Navigation */}
@@ -96,8 +138,8 @@ export default function ImprovedSessionStats() {
             />
           ))}
         </div>
-        <div className="px-4 py-3 flex items-center justify-between gap-4" onClick={() => navigate(`/training/${training?.id}`)}>
-          <div className="flex items-center gap-2">
+        <div className="px-4 py-3 flex items-center justify-between gap-4" onClick={() => handleNavigation(`/training/${training?.id}`)}>
+          <div className="flex items-center gap-2 cursor-pointer">
             <ArrowLeft className="w-4 h-4" />
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Back to training</p>
           </div>
@@ -173,6 +215,23 @@ export default function ImprovedSessionStats() {
         </section>
       </div>
       <AddAssignmentModal isOpen={isAssignmentModalOpen} onClose={() => setIsAssignmentModalOpen(false)} onSuccess={onSuccessAddAssignment} />
+      
+      {/* Confirm Leave Modal */}
+      <ConfirmLeaveModal
+        isOpen={showConfirmLeave}
+        onClose={() => {
+          setShowConfirmLeave(false);
+          setPendingNavigation(null);
+        }}
+        onConfirm={() => {
+          setShowConfirmLeave(false);
+          setHasUnsavedChanges(false);
+          if (pendingNavigation) {
+            navigate(pendingNavigation);
+          }
+        }}
+        hasUnsavedChanges={hasUnsavedChanges}
+      />
     </div>
   );
 }

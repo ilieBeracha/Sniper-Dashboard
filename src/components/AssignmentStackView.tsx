@@ -3,7 +3,6 @@ import { format } from "date-fns";
 import { ChevronDown, ChevronRight, Sun, Moon, Activity, Clock, Info, Users, Building2, Target, Layers } from "lucide-react";
 import { Tooltip } from "react-tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface AssignmentStackViewProps {
   data: any[];
@@ -14,22 +13,24 @@ interface AssignmentStackViewProps {
 
 export default function AssignmentStackView({ data, onCardClick, onEdit, onDelete }: AssignmentStackViewProps) {
   const { theme } = useTheme();
-  const isMobile = useIsMobile();
   const [expandedAssignments, setExpandedAssignments] = useState<Set<string>>(new Set());
 
   // Group sessions by assignment
   const groupedSessions = useMemo(() => {
-    const groups = data.reduce((acc, session) => {
-      const assignmentName = session.assignment_session?.assignment?.assignment_name || "Unknown Assignment";
-      if (!acc[assignmentName]) {
-        acc[assignmentName] = [];
-      }
-      acc[assignmentName].push(session);
-      return acc;
-    }, {} as Record<string, any[]>);
+    const groups = data.reduce(
+      (acc, session) => {
+        const assignmentName = session.assignment_session?.assignment?.assignment_name || "Unknown Assignment";
+        if (!acc[assignmentName]) {
+          acc[assignmentName] = [];
+        }
+        acc[assignmentName].push(session);
+        return acc;
+      },
+      {} as Record<string, any[]>,
+    );
 
     // Sort sessions within each group by created_at desc
-    Object.keys(groups).forEach(key => {
+    Object.keys(groups).forEach((key) => {
       groups[key].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     });
 
@@ -48,17 +49,13 @@ export default function AssignmentStackView({ data, onCardClick, onEdit, onDelet
 
   const getAssignmentStats = (sessions: any[]) => {
     const totalSessions = sessions.length;
-    const effortSessions = sessions.filter(s => s.effort === true).length;
-    const daySessions = sessions.filter(s => s.day_period === "day").length;
-    const nightSessions = sessions.filter(s => s.day_period === "night").length;
-    
+    const effortSessions = sessions.filter((s) => s.effort === true).length;
+    const daySessions = sessions.filter((s) => s.day_period === "day").length;
+    const nightSessions = sessions.filter((s) => s.day_period === "night").length;
+
     // Get all distances
-    const allDistances = sessions.flatMap(s => 
-      (s.target_stats || []).map((t: any) => t.distance_m).filter(Boolean)
-    );
-    const avgDistance = allDistances.length > 0 
-      ? Math.round(allDistances.reduce((a, b) => a + b, 0) / allDistances.length)
-      : null;
+    const allDistances = sessions.flatMap((s) => (s.target_stats || []).map((t: any) => t.distance_m).filter(Boolean));
+    const avgDistance = allDistances.length > 0 ? Math.round(allDistances.reduce((a, b) => a + b, 0) / allDistances.length) : null;
 
     return { totalSessions, effortSessions, daySessions, nightSessions, avgDistance };
   };
@@ -71,22 +68,18 @@ export default function AssignmentStackView({ data, onCardClick, onEdit, onDelet
     <div className="space-y-4">
       {Object.entries(groupedSessions).map(([assignmentName, sessions]) => {
         const isExpanded = expandedAssignments.has(assignmentName);
-        const stats = getAssignmentStats(sessions);
-        
+        const stats = getAssignmentStats(sessions as any[]);
+
         return (
           <div
             key={assignmentName}
             className={`rounded-xl border overflow-hidden transition-all ${
-              theme === "dark"
-                ? "border-zinc-800 bg-gradient-to-br from-zinc-900/80 to-zinc-800/50"
-                : "border-gray-200 bg-white"
+              theme === "dark" ? "border-zinc-800 bg-gradient-to-br from-zinc-900/80 to-zinc-800/50" : "border-gray-200 bg-white"
             }`}
           >
             {/* Assignment Header */}
             <div
-              className={`p-4 cursor-pointer transition-colors ${
-                theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-gray-50"
-              }`}
+              className={`p-4 cursor-pointer transition-colors ${theme === "dark" ? "hover:bg-zinc-800/50" : "hover:bg-gray-50"}`}
               onClick={() => toggleAssignment(assignmentName)}
             >
               <div className="flex items-center justify-between">
@@ -103,27 +96,33 @@ export default function AssignmentStackView({ data, onCardClick, onEdit, onDelet
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Assignment Stats Pills */}
                 <div className="flex items-center gap-2">
                   {stats.daySessions > 0 && (
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${
-                      theme === "dark" ? "bg-yellow-600/20 text-yellow-300" : "bg-yellow-100 text-yellow-700"
-                    }`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${
+                        theme === "dark" ? "bg-yellow-600/20 text-yellow-300" : "bg-yellow-100 text-yellow-700"
+                      }`}
+                    >
                       <Sun size={10} /> {stats.daySessions}
                     </span>
                   )}
                   {stats.nightSessions > 0 && (
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${
-                      theme === "dark" ? "bg-indigo-600/20 text-indigo-300" : "bg-indigo-100 text-indigo-700"
-                    }`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${
+                        theme === "dark" ? "bg-indigo-600/20 text-indigo-300" : "bg-indigo-100 text-indigo-700"
+                      }`}
+                    >
                       <Moon size={10} /> {stats.nightSessions}
                     </span>
                   )}
                   {stats.effortSessions > 0 && (
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${
-                      theme === "dark" ? "bg-green-600/20 text-green-300" : "bg-green-100 text-green-700"
-                    }`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${
+                        theme === "dark" ? "bg-green-600/20 text-green-300" : "bg-green-100 text-green-700"
+                      }`}
+                    >
                       <Activity size={10} /> {stats.effortSessions}
                     </span>
                   )}
@@ -135,7 +134,7 @@ export default function AssignmentStackView({ data, onCardClick, onEdit, onDelet
             {isExpanded && (
               <div className={`border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
                 <div className="p-4 space-y-3">
-                  {sessions.map((item) => {
+                  {(sessions as any[])?.map((item: any) => {
                     const shooterName = item.users ? `${item.users.first_name} ${item.users.last_name}`.trim() || item.users.email : "N/A";
                     const teamName = item.teams?.team_name || "No Team";
                     const distances = (item.target_stats || []).map((t: any) => t.distance_m).filter(Boolean);
@@ -154,26 +153,36 @@ export default function AssignmentStackView({ data, onCardClick, onEdit, onDelet
                       >
                         {/* Session Header */}
                         <div className="flex items-center justify-between">
-                          <span className="text-xs opacity-70">
-                            {format(new Date(item.created_at), "dd MMM HH:mm")}
-                          </span>
-                          
+                          <span className="text-xs opacity-70">{format(new Date(item.created_at), "dd MMM HH:mm")}</span>
+
                           {/* Tags */}
                           <div className="flex items-center gap-1.5">
-                            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs ${
-                              item.day_period === "day"
-                                ? theme === "dark" ? "bg-yellow-600/20 text-yellow-300" : "bg-yellow-100 text-yellow-700"
-                                : theme === "dark" ? "bg-indigo-600/20 text-indigo-300" : "bg-indigo-100 text-indigo-700"
-                            }`}>
+                            <span
+                              className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs ${
+                                item.day_period === "day"
+                                  ? theme === "dark"
+                                    ? "bg-yellow-600/20 text-yellow-300"
+                                    : "bg-yellow-100 text-yellow-700"
+                                  : theme === "dark"
+                                    ? "bg-indigo-600/20 text-indigo-300"
+                                    : "bg-indigo-100 text-indigo-700"
+                              }`}
+                            >
                               {item.day_period === "day" ? <Sun size={10} /> : <Moon size={10} />}
                             </span>
-                            
+
                             {item.effort !== null && (
-                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs ${
-                                item.effort
-                                  ? theme === "dark" ? "bg-green-600/20 text-green-300" : "bg-green-100 text-green-700"
-                                  : theme === "dark" ? "bg-red-600/20 text-red-300" : "bg-red-100 text-red-700"
-                              }`}>
+                              <span
+                                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs ${
+                                  item.effort
+                                    ? theme === "dark"
+                                      ? "bg-green-600/20 text-green-300"
+                                      : "bg-green-100 text-green-700"
+                                    : theme === "dark"
+                                      ? "bg-red-600/20 text-red-300"
+                                      : "bg-red-100 text-red-700"
+                                }`}
+                              >
                                 <Activity size={10} />
                               </span>
                             )}
@@ -184,11 +193,15 @@ export default function AssignmentStackView({ data, onCardClick, onEdit, onDelet
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           <div className="flex items-center gap-1.5 opacity-80">
                             <Users size={10} />
-                            <span className="truncate" title={shooterName}>{shooterName}</span>
+                            <span className="truncate" title={shooterName}>
+                              {shooterName}
+                            </span>
                           </div>
                           <div className="flex items-center gap-1.5 opacity-80">
                             <Building2 size={10} />
-                            <span className="truncate" title={teamName}>{teamName}</span>
+                            <span className="truncate" title={teamName}>
+                              {teamName}
+                            </span>
                           </div>
                         </div>
 
@@ -208,7 +221,11 @@ export default function AssignmentStackView({ data, onCardClick, onEdit, onDelet
                               </div>
                             )}
                             {item.note && (
-                              <div className="flex items-center gap-1 opacity-80" data-tooltip-id={`note-${item.id}`} data-tooltip-content={item.note}>
+                              <div
+                                className="flex items-center gap-1 opacity-80"
+                                data-tooltip-id={`note-${item.id}`}
+                                data-tooltip-content={item.note}
+                              >
                                 <Info size={10} />
                                 <Tooltip
                                   id={`note-${item.id}`}
