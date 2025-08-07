@@ -43,13 +43,13 @@ export default function DashboardProfileCard() {
   const { greeting, icon } = getTimeBasedGreeting();
 
   return (
-    <div className={`rounded-lg border p-4 ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}>
+    <div className={`rounded-lg border p-3 ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}>
       <div className="flex items-center justify-between">
         {/* Left side - Compact user info */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {/* Avatar with initials */}
           <div
-            className={`relative w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
+            className={`relative w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
               theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-700"
             }`}
           >
@@ -59,10 +59,10 @@ export default function DashboardProfileCard() {
           </div>
 
           {/* User details - horizontal layout */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-medium">
+                <h2 className="text-sm font-medium">
                   {user?.first_name} {user?.last_name}
                 </h2>
                 {!isMobile && <span className="text-sm opacity-50">{icon}</span>}
@@ -71,11 +71,11 @@ export default function DashboardProfileCard() {
             </div>
 
             {/* Divider */}
-            {!isMobile && <div className={`h-8 w-px ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`} />}
+            {!isMobile && <div className={`h-6 w-px ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`} />}
 
             {/* Tags - inline */}
             {!isMobile && (
-              <div className="flex items-center gap-3 text-xs">
+              <div className="flex items-center gap-2 text-xs">
                 <span className={`px-2 py-0.5 rounded ${theme === "dark" ? "bg-zinc-800 text-zinc-400" : "bg-gray-100 text-gray-600"}`}>
                   {user?.user_role?.replace("_", " ").toUpperCase()}
                 </span>

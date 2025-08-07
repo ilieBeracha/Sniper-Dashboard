@@ -27,7 +27,7 @@ export default function DashboardOverview({ loading }: { loading: boolean }) {
   }, [user?.team_id, user?.user_role]);
 
   return (
-    <div className="grid gap-6 auto-rows-max grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 auto-rows-max grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
       <div className="col-span-1 md:col-span-2 xl:col-span-3">
         <DashboardProfileCard />
       </div>
