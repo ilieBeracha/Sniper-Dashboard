@@ -38,6 +38,13 @@ interface SessionStatsState {
   groupStatsComparison: GroupStatsComparison | null | undefined;
   getFullSessionById: (id: string) => Promise<any>;
   deleteSessionStats: (id: string) => Promise<any>;
+  setFilters: (filters: { dayNight: string | null; effort: string | null; distance: string | null; participated: boolean | null }) => void;
+  filters: {
+    dayNight: string | null;
+    effort: string | null;
+    distance: string | null;
+    participated: boolean | null;
+  };
 }
 
 export interface GroupStatsComparison {
@@ -105,7 +112,14 @@ export const sessionStore = create<SessionStatsState>((set) => ({
   groupStatsComparison: null,
   isLoading: false,
   error: null,
-
+  filters: {
+    dayNight: null,
+    effort: null,
+    distance: null,
+    participated: null,
+  },
+  setFilters: (filters: { dayNight: string | null; effort: string | null; distance: string | null; participated: boolean | null }) =>
+    set({ filters }),
   setSessionStats: (sessionStats: any) => set({ sessionStats }),
   setLoading: (loading: boolean) => set({ isLoading: loading }),
   setError: (error: string | null) => set({ error }),
@@ -113,8 +127,18 @@ export const sessionStore = create<SessionStatsState>((set) => ({
   setSelectedSession: (session: any) => set({ selectedSession: session }),
 
   getSessionStatsByTrainingId: async (assignmentId: string, limit: number = 20, offset: number = 0) => {
-    const result = await getSessionStatsByTrainingId(assignmentId, limit, offset);
-    console.log("result", result);
+    const state = sessionStore.getState();
+    const userEmail = userStore.getState().user?.email || null;
+
+    const filters = {
+      dayNight: state.filters.dayNight,
+      effort: state.filters.effort,
+      distance: state.filters.distance,
+      participated: state.filters.participated,
+      userEmail: userEmail,
+    };
+
+    const result = await getSessionStatsByTrainingId(assignmentId, limit, offset, filters);
     set({ sessionStats: result });
     return result;
   },

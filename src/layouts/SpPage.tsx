@@ -161,7 +161,7 @@ export function SpPageTabs({
 export function SpPageBody({ children }: { children: ReactNode }) {
   return (
     <div className="flex-1 overflow-y-auto h-fit">
-      <div className="px-3 sm:px-4 md:px-6 pb-6">{children}</div>
+      <div className="px-3 sm:px-4 md:px-6 pb-3">{children}</div>
     </div>
   );
 }

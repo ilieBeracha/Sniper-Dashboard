@@ -2,16 +2,68 @@ import { CreateParticipantData, CreateSessionStatsData, CreateTargetEngagementDa
 import { supabase } from "./supabaseClient";
 import { toastService } from "./toastService";
 
-export const getSessionStatsByTrainingId = async (trainingId: string, limit: number = 20, offset: number = 0) => {
-  const queryBuilder = supabase
+export const getSessionStatsByTrainingId = async (
+  trainingId: string,
+  limit: number = 20,
+  offset: number = 0,
+  filters?: {
+    dayNight: string | null;
+    effort: string | null;
+    distance: string | null;
+    participated: boolean | null;
+    userEmail?: string | null;
+  },
+) => {
+  let queryBuilder = supabase
     .from("session_stats")
     .select(
-      ` *, assignment_session ( assignment ( assignment_name ) ), users!session_stats_creator_id_fkey ( first_name, last_name, email ), teams ( team_name )  `,
+      ` *, assignment_session ( assignment ( assignment_name ) ), users!session_stats_creator_id_fkey ( first_name, last_name, email ), teams ( team_name ), target_stats!target_stats_session_stats_id_fkey ( distance_m ) `,
     );
-  queryBuilder
-    .eq("training_session_id", trainingId)
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1);
+
+  queryBuilder = queryBuilder.eq("training_session_id", trainingId);
+
+  // Apply filters
+  if (filters) {
+    // Day/Night filter
+    if (filters.dayNight && filters.dayNight !== "all") {
+      queryBuilder = queryBuilder.eq("day_period", filters.dayNight);
+    }
+
+    // Effort filter
+    if (filters.effort && filters.effort !== "all") {
+      const effortBool = filters.effort === "true";
+      queryBuilder = queryBuilder.eq("effort", effortBool);
+    }
+
+    // Distance filter
+    if (filters.distance && filters.distance !== "all") {
+      // Distance filter is complex and requires different handling
+      // We'll filter this client-side in the component
+      // Comment out for now to prevent errors
+      // switch (filters.distance) {
+      //   case "0-300":
+      //     queryBuilder = queryBuilder.gte("target_stats.distance_m", 0).lt("target_stats.distance_m", 300);
+      //     break;
+      //   case "300-600":
+      //     queryBuilder = queryBuilder.gte("target_stats.distance_m", 300).lt("target_stats.distance_m", 600);
+      //     break;
+      //   case "600-900":
+      //     queryBuilder = queryBuilder.gte("target_stats.distance_m", 600).lt("target_stats.distance_m", 900);
+      //     break;
+      //   case "900+":
+      //     queryBuilder = queryBuilder.gte("target_stats.distance_m", 900);
+      //     break;
+      // }
+    }
+
+    // Participated filter
+    if (filters.participated && filters.userEmail) {
+      queryBuilder = queryBuilder.eq("users.email", filters.userEmail);
+    }
+  }
+
+  queryBuilder = queryBuilder.order("created_at", { ascending: false }).range(offset, offset + limit - 1);
+
   const { data, error } = await queryBuilder;
   if (error) {
     toastService.error(error.message);

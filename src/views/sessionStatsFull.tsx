@@ -78,7 +78,7 @@ export default function ImprovedSessionStats() {
   }
 
   return (
-    <div className={`min-h-[100dvh] ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-white"} relative`}>
+    <div className={` ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-white"} relative`}>
       {/* Progress Indicator - Fixed on larger screens, hidden on mobile */}
       <div className="hidden lg:block">
         <ScrollProgress activeSection={activeSection} totalSections={sections.length} />
