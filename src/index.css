@@ -300,3 +300,7 @@ svg .recharts-layer .recharts-bar {
 .animation-delay-4000 {
   animation-delay: 4s;
 }
+
+html, body {
+  background-color: var(--background);
+}
