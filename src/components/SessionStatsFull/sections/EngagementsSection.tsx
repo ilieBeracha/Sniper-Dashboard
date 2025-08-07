@@ -22,9 +22,7 @@ export const EngagementsSection = ({ section, targets, participants, updateEngag
       <div className="w-full max-w-2xl mx-auto" id="engagements">
         <SectionHeader section={section} />
 
-        <div
-          className={`mt-6 text-center py-12 rounded-lg border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}
-        >
+        <div className={` text-center py-12 rounded-lg border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}>
           {targets.length === 0 ? (
             <>
               <TargetIcon className={`w-12 h-12 mx-auto mb-4 ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`} />

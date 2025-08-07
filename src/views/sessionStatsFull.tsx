@@ -78,7 +78,7 @@ export default function ImprovedSessionStats() {
   }
 
   return (
-    <div className={`min-h-screen ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-white"} relative`}>
+    <div className={`min-h-[100dvh] ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-white"} relative`}>
       {/* Progress Indicator - Fixed on larger screens, hidden on mobile */}
       <div className="hidden lg:block">
         <ScrollProgress activeSection={activeSection} totalSections={sections.length} />
@@ -113,7 +113,7 @@ export default function ImprovedSessionStats() {
       <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth lg:pt-0 " onScroll={handleScroll}>
         {/* Section 1: Session Configuration */}
         <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8 ">
-          <div className="w-full max-w-4xl  py-8">
+          <div className="w-full max-w-4xl">
             <SessionConfigSection
               section={sections[0]}
               sessionData={sessionData}
@@ -147,13 +147,7 @@ export default function ImprovedSessionStats() {
         {/* Section 3: Targets */}
         <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
-            <TargetsSection
-              section={sections[2]}
-              targets={targets}
-              addTarget={addTarget}
-              updateTarget={updateTarget}
-              removeTarget={removeTarget}
-            />
+            <TargetsSection section={sections[2]} targets={targets} addTarget={addTarget} updateTarget={updateTarget} removeTarget={removeTarget} />
           </div>
         </section>
 

@@ -15,7 +15,6 @@ import AddAssignmentModal from "@/components/AddAssignmentModal";
 import { useModal } from "@/hooks/useModal";
 import { useTabs } from "@/hooks/useTabs";
 import { Calendar, Target, Crosshair } from "lucide-react";
-import SessionStatsTable from "@/components/SessionStatsTable";
 import GroupStatsTable from "@/components/GroupStatsTable";
 import TrainingStatusTab from "@/components/TrainingStatusTab";
 import TrainingSessionStatsCard from "@/components/TrainingSessionStatsCard";
@@ -23,6 +22,9 @@ import TrainingPageGroupFormModal from "@/components/TrainingPageScoreFormModal/
 import { toast } from "react-toastify";
 import { performanceStore } from "@/store/performance";
 import BaseConfirmDeleteModal from "@/components/BaseConfirmDeleteModal";
+import SessionStatsCardGrid from "@/components/SessionStatsCardGrid";
+import { userStore } from "@/store/userStore";
+import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 
 export default function TrainingPage() {
   const navigate = useNavigate();
@@ -43,6 +45,60 @@ export default function TrainingPage() {
   const [deletingGroupScore, setDeletingGroupScore] = useState<any>(null);
   const [deletingSession, setDeletingSession] = useState<any>(null);
   const hasLoadedData = useRef(false);
+
+  // Filters
+  const [filterDay, setFilterDay] = useState<string>("all");
+  const [filterEffort, setFilterEffort] = useState<string>("all");
+  const [filterDistance, setFilterDistance] = useState<string>("all");
+  const [filterParticipated, setFilterParticipated] = useState<boolean>(false);
+
+  const { user } = useStore(userStore);
+
+  const filteredSessionStats = sessionStats.filter((s) => {
+    // Day/Night
+    if (filterDay !== "all" && s.day_period !== filterDay) return false;
+
+    // Effort
+    if (filterEffort !== "all") {
+      const effortBool = filterEffort === "true";
+      if (s.effort !== effortBool) return false;
+    }
+
+    // Distance
+    if (filterDistance !== "all") {
+      // Gather distances from any targets if present
+      const targetDistances = (s.targets || s.target_stats || []).map((t: any) => t.distance_m || t.distance).filter(Boolean);
+      const minDistance = targetDistances.length ? Math.min(...targetDistances) : null;
+      if (minDistance !== null) {
+        switch (filterDistance) {
+          case "0-300":
+            if (!(minDistance >= 0 && minDistance < 300)) return false;
+            break;
+          case "300-600":
+            if (!(minDistance >= 300 && minDistance < 600)) return false;
+            break;
+          case "600-900":
+            if (!(minDistance >= 600 && minDistance < 900)) return false;
+            break;
+          case "900+":
+            if (minDistance < 900) return false;
+            break;
+        }
+      } else {
+        // no distance data, exclude when filter active
+        return false;
+      }
+    }
+
+    // Participation
+    if (filterParticipated) {
+      if (user?.email && s.users?.email !== user.email) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   const trainingStatus = training?.status as TrainingStatus;
 
@@ -95,11 +151,9 @@ export default function TrainingPage() {
       setIsLoading(true);
 
       if (editingGroupScore) {
-        // Update existing group score
         await updateGroupScore(editingGroupScore.id, groupScore);
         toast.success("Group score updated successfully");
       } else {
-        // Create new group score
         await createGroupScore(groupScore);
         toast.success("Group score created successfully");
       }
@@ -187,13 +241,48 @@ export default function TrainingPage() {
     if (activeTab.id === "session-stats") {
       return (
         <div className="grid grid-cols-1 gap-4">
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3 items-center mb-2">
+            <Select value={filterDay} onValueChange={(v) => setFilterDay(v)}>
+              <SelectTrigger>Day/Night</SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="day">Day</SelectItem>
+                <SelectItem value="night">Night</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={filterEffort} onValueChange={(v) => setFilterEffort(v)}>
+              <SelectTrigger>Effort</SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="true">Yes</SelectItem>
+                <SelectItem value="false">No</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={filterDistance} onValueChange={(v) => setFilterDistance(v)}>
+              <SelectTrigger>Distance</SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="0-300">0-300</SelectItem>
+                <SelectItem value="300-600">300-600</SelectItem>
+                <SelectItem value="600-900">600-900</SelectItem>
+                <SelectItem value="900+">900+</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <label className="inline-flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={filterParticipated} onChange={(e) => setFilterParticipated(e.target.checked)} /> My sessions
+            </label>
+          </div>
+
           <TrainingSessionStatsCard trainingSessionId={id!} />
-          <SessionStatsTable
-            sessionStats={sessionStats}
-            onSessionStatsClick={handleSessionClick}
-            onSessionStatsEditClick={handleEditSession}
-            onSessionStatsDeleteClick={handleDeleteSession}
-            deletingSessionId={deletingSession?.id}
+          <SessionStatsCardGrid
+            data={filteredSessionStats}
+            onCardClick={handleSessionClick}
+            onEdit={handleEditSession}
+            onDelete={handleDeleteSession}
           />
         </div>
       );

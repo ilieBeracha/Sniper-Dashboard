@@ -20,7 +20,7 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
 
   return (
     <div className="w-full max-w-2xl mx-auto" id="targets">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between">
         <SectionHeader section={section} />
         <button
           onClick={addTarget}
