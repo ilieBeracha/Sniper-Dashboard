@@ -15,6 +15,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { weaponsStore } from "@/store/weaponsStore";
 import { insertAssignment } from "@/services/trainingService";
 import { validateTrainingForm } from "@/lib/formValidation";
+import { AlertTriangle, Plus } from "lucide-react";
 
 export default function TrainingAddTrainingSessionModal({
   isOpen,
@@ -146,55 +147,49 @@ export default function TrainingAddTrainingSessionModal({
   };
 
   const Content = (
-    <>
-      <div className={`border-b pb-4 w-full transition-colors duration-200 ${theme === "dark" ? "border-white/10" : "border-gray-200"}`}>
-        <p className={`mt-1 text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-          Plan a session, select assignments, and assign team members to participate.
-        </p>
+    <div className="flex flex-col h-full">
+      {/* Header description */}
+      <div className={`pb-4 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+        <p className="text-sm leading-relaxed">Schedule a new training session with assignments and team members.</p>
       </div>
 
-      {error && (
-        <div
-          className={`p-3 rounded-lg text-sm ${
-            theme === "dark" ? "bg-red-900/50 text-red-300 border border-red-800" : "bg-red-50 text-red-700 border border-red-200"
-          }`}
-        >
-          {error}
-        </div>
-      )}
+      {/* Scrollable content area */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
+        {error && (
+          <div
+            className={`p-3 rounded-lg text-sm mb-4 flex items-start gap-2 ${
+              theme === "dark" ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-red-50 text-red-700 border border-red-200"
+            }`}
+          >
+            <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
-      {(!weapons?.length || !assignments?.length) && (
-        <div
-          className={`p-4 rounded-lg border transition-colors duration-200 ${
-            theme === "dark" ? "bg-red-900/20 border-red-800/50 text-red-400" : "bg-red-50 border-red-200 text-red-700"
-          }`}
-        >
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium">Cannot Create Training</h3>
-              <div className="mt-2 text-sm">
-                <p>The following requirements are missing:</p>
-                <ul className="list-disc list-inside mt-1 space-y-1">
-                  {!weapons?.length && <li>Team must have weapons assigned</li>}
-                  {!assignments?.length && <li>Team must have assignments available</li>}
+        {(!weapons?.length || !assignments?.length) && (
+          <div
+            className={`p-4 rounded-lg mb-4 ${
+              theme === "dark" ? "bg-orange-500/10 border border-orange-500/20" : "bg-orange-50 border border-orange-200"
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <AlertTriangle size={20} className={theme === "dark" ? "text-orange-400 mt-0.5" : "text-orange-600 mt-0.5"} />
+              <div className="flex-1">
+                <h3 className={`text-sm font-semibold mb-1 ${theme === "dark" ? "text-orange-300" : "text-orange-800"}`}>Requirements Missing</h3>
+                <ul className="text-sm space-y-1">
+                  {!weapons?.length && (
+                    <li className={theme === "dark" ? "text-orange-400/80" : "text-orange-700"}>• Team must have weapons assigned</li>
+                  )}
+                  {!assignments?.length && (
+                    <li className={theme === "dark" ? "text-orange-400/80" : "text-orange-700"}>• Team must have assignments available</li>
+                  )}
                 </ul>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="grid grid-cols-1 gap-8 mt-4">
-        <div>
+        <div className="space-y-4">
           <BasicInfoSection
             sessionName={sessionName}
             setSessionName={setSessionName}
@@ -203,30 +198,25 @@ export default function TrainingAddTrainingSessionModal({
             date={date}
             setDate={setDate}
           />
-          <div className="mt-6 space-y-6">
-            <AssignmentsSection
-              assignments={assignments}
-              assignmentIds={assignmentIds}
-              setAssignmentIds={setAssignmentIds}
-              handleAddAssignment={handleAddAssignment}
-              isAddAssignmentOpen={isAddAssignmentOpen}
-              setIsAddAssignmentOpen={setIsAddAssignmentOpen}
-            />
-            {/* <TeamMembersSection teamMembers={teamMembers} members={members} setMembers={setMembers} /> */}
-          </div>
+
+          <AssignmentsSection
+            assignments={assignments}
+            assignmentIds={assignmentIds}
+            setAssignmentIds={setAssignmentIds}
+            handleAddAssignment={handleAddAssignment}
+            isAddAssignmentOpen={isAddAssignmentOpen}
+            setIsAddAssignmentOpen={setIsAddAssignmentOpen}
+          />
         </div>
       </div>
 
-      <div
-        className={`flex items-center justify-end gap-x-4 pt-4 border-t mt-4 text-sm transition-colors duration-200 ${
-          theme === "dark" ? "border-white/10" : "border-gray-200"
-        }`}
-      >
+      {/* Fixed footer */}
+      <div className={`flex items-center justify-end gap-3 pt-4 mt-6 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
         <button
           type="button"
           onClick={handleClose}
-          className={`px-4 py-1.5 transition-colors rounded-md text-sm font-medium ${
-            theme === "dark" ? "bg-white/5 hover:bg-white/10 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            theme === "dark" ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
           }`}
         >
           Cancel
@@ -234,12 +224,22 @@ export default function TrainingAddTrainingSessionModal({
         <button
           onClick={handleSubmit}
           disabled={!sessionName || !location || !date || !weapons?.length || !assignments?.length}
-          className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 transition-colors rounded-md text-sm font-medium text-white shadow-sm disabled:cursor-not-allowed"
+          className={`
+            px-4 py-2 rounded-lg text-sm font-medium transition-all
+            flex items-center gap-2
+            ${
+              theme === "dark"
+                ? "bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/30 text-white"
+                : "bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white"
+            }
+            disabled:cursor-not-allowed
+          `}
         >
+          <Plus size={16} />
           Create Session
         </button>
       </div>
-    </>
+    </div>
   );
 
   return isMobile ? (

@@ -1,10 +1,9 @@
-  import { useState } from "react";
+import { useState } from "react";
 import { Assignment } from "@/types/training";
 import SearchableCheckboxList from "@/components/SearchableCheckboxList";
 import AddAssignmentModal from "@/components/AddAssignmentModal";
-import { Plus } from "lucide-react";
+import { Plus, Target } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-import AddPurpleBtn from "../base/buttons/AddPurpleBtn";
 
 type AssignmentsSectionProps = {
   assignments: Assignment[];
@@ -33,29 +32,31 @@ export default function AssignmentsSection({
   }));
 
   return (
-    <div
-      className={`rounded-lg border p-6 transition-colors duration-200 ${
-        theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"
-      }`}
-    >
-      <div className="flex items-center mb-4 justify-between">
-        <div className={`flex items-center gap-2 text-sm font-medium justify-between w-full ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-sm font-medium">Assignments</span>
-            {assignmentIds.length > 0 && (
-              <div
-                className={`px-2 shrink-0 py-0.5 rounded text-xs ${
-                  theme === "dark" ? "bg-indigo-500/20 text-indigo-400" : "bg-indigo-500/10 text-indigo-600"
-                }`}
-              >
-                {assignmentIds.length} selected
-              </div>
-            )}
-          </div>
-          <AddPurpleBtn onClick={() => setIsAddAssignmentOpen(true)}>
-            <Plus size={14} />
-          </AddPurpleBtn>
-        </div>
+    <div className={`rounded-lg border p-4 ${theme === "dark" ? "bg-zinc-900/30 border-zinc-800" : "bg-gray-50 border-gray-200"}`}>
+      <div className="flex items-center justify-between mb-3">
+        <h4 className={`text-sm font-semibold flex items-center gap-2 ${theme === "dark" ? "text-zinc-200" : "text-gray-900"}`}>
+          <Target size={16} className="opacity-60" />
+          Training Assignments
+          {assignmentIds.length > 0 && (
+            <span
+              className={`ml-2 px-2 py-0.5 rounded-full text-xs font-normal ${
+                theme === "dark" ? "bg-blue-500/20 text-blue-400" : "bg-blue-100 text-blue-700"
+              }`}
+            >
+              {assignmentIds.length} selected
+            </span>
+          )}
+        </h4>
+        <button
+          onClick={() => setIsAddAssignmentOpen(true)}
+          className={`
+            p-1.5 rounded-lg transition-all text-sm
+            flex items-center gap-1
+            ${theme === "dark" ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-white hover:bg-gray-100 text-gray-700 border border-gray-200"}
+          `}
+        >
+          <Plus size={14} />
+        </button>
       </div>
 
       <SearchableCheckboxList

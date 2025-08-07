@@ -80,7 +80,8 @@ export default function SearchableCheckboxList({
 
       {isOpen && (
         <div
-          className={`absolute z-10 w-full mt-1 rounded-lg border border-white/10 shadow-lg ${theme === "dark" ? "bg-[#151515]" : "bg-gray-50 text-black"}`}
+          className={`absolute z-50 w-full mt-1 rounded-lg border border-white/10 shadow-lg ${theme === "dark" ? "bg-[#151515]" : "bg-gray-50 text-black"}`}
+          style={{ maxHeight: "300px", overflowY: "auto" }}
         >
           <div className="px-3 py-2 border-b border-white/5">
             <BaseInput
@@ -95,7 +96,7 @@ export default function SearchableCheckboxList({
           </div>
 
           {/* Items list */}
-          <div className="overflow-y-auto custom-scrollbar" style={{ maxHeight: `${maxHeight}px` }}>
+          <div className="custom-scrollbar">
             {filteredItems.length === 0 ? (
               <div className={`px-4 py-6 text-center text-sm ${theme === "dark" ? "text-white" : "text-black"}`}>{emptyMessage}</div>
             ) : (
