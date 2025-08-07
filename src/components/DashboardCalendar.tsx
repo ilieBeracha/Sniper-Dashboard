@@ -17,7 +17,7 @@ export default function DashboardCalendar() {
     <div className="relative">
       {/* Timeline line */}
       <div
-        className="absolute left-4 top-0 bottom-0 w-0.5 rounded-full"
+        className="absolute left-3 top-0 bottom-0 w-0.5 rounded-full"
         style={{
           background:
             theme === "dark"
@@ -53,10 +53,10 @@ function TimelineCard({
 
   if (isEmpty) {
     return (
-      <div className="relative pl-10">
+      <div className="relative pl-8">
         {/* Timeline dot */}
         <div
-          className="absolute left-0 w-8 h-8 rounded-full border-2 flex items-center justify-center"
+          className="absolute left-0 w-6 h-6 rounded-full border-2 flex items-center justify-center"
           style={{
             backgroundColor: isDark ? primitives.grey.grey900 : primitives.white.white,
             borderColor: isDark ? primitives.grey.grey700 : primitives.grey.grey300,
@@ -107,10 +107,10 @@ function TimelineCard({
   const isUrgent = type === "next" && isToday(sessionDate) && hoursUntil < 3;
 
   return (
-    <div className="relative pl-10">
+    <div className="relative pl-8">
       {/* Timeline dot */}
       <div
-        className="absolute left-0 w-8 h-8 rounded-full border-3 flex items-center justify-center"
+        className="absolute left-0 w-6 h-6 rounded-full border-3 flex items-center justify-center"
         style={{
           backgroundColor: isDark ? primitives.grey.grey900 : primitives.white.white,
           borderColor: type === "last" ? primitives.green.green500 : primitives.blue.blue500,
@@ -128,7 +128,7 @@ function TimelineCard({
       <div
         onClick={onClick}
         className={`
-          group relative overflow-hidden rounded-xl border p-4 cursor-pointer
+          group relative overflow-hidden rounded-xl border p-3 cursor-pointer
           transition-all duration-200 hover:shadow-lg
           ${
             isDark

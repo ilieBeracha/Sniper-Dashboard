@@ -5,14 +5,12 @@ import { userStore } from "@/store/userStore";
 import { teamStore } from "@/store/teamStore";
 import { squadStore } from "@/store/squadStore";
 import { useEffect } from "react";
-import { useIsMobile } from "@/hooks/useIsMobile";
 import DashboardCalendar from "./DashboardCalendar";
 
 export default function DashboardOverview({ loading }: { loading: boolean }) {
   const { user } = useStore(userStore);
   const { fetchMembers } = useStore(teamStore);
   const { getSquadsWithUsersByTeamId } = useStore(squadStore);
-  const isMobile = useIsMobile();
   useEffect(() => {
     const loadTeamData = async () => {
       if (user?.team_id) {
@@ -27,16 +25,22 @@ export default function DashboardOverview({ loading }: { loading: boolean }) {
   }, [user?.team_id, user?.user_role]);
 
   return (
-    <div className="grid gap-6 auto-rows-max grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-      <div className="col-span-1 md:col-span-2 xl:col-span-3">
+    <div className="grid gap-4 auto-rows-max grid-cols-1 md:grid-cols-2">
+      {/* Profile */}
+      <div className="col-span-1">
         <DashboardProfileCard />
       </div>
-      {isMobile && (
-        <div className="col-span-1">
+
+      {/* Timeline / Calendar */}
+      <div className="col-span-1 flex flex-col gap-3">
+        <div className="rounded-lg border p-3 bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-800 h-full">
+          <h3 className="text-sm font-semibold mb-2 opacity-60">Training Timeline</h3>
           <DashboardCalendar />
         </div>
-      )}
-      <div className="col-span-1 md:col-span-2 xl:col-span-3">
+      </div>
+
+      {/* Performance Section */}
+      <div className="col-span-1 md:col-span-2">
         <CyCharts loading={loading} />
       </div>
     </div>

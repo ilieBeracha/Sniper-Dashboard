@@ -128,7 +128,7 @@ export default function RegisterForm({ AuthSubmit }: { AuthSubmit: any }) {
       <div>
         <button
           type="submit"
-          className={`w-full flex justify-center items-center px-4 py-3 rounded-2xl font-semibold focus:outline-none focus:ring-2 transition-all duration-200 ${
+          className={`w-full flex justify-center items-center px-4 py-2 rounded-xl font-semibold focus:outline-none focus:ring-2 transition-all duration-200 ${
             theme === "dark"
               ? "bg-white text-[#0A0A0A] hover:bg-gray-100 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
               : "bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-white"

@@ -94,7 +94,7 @@ export default function Auth() {
       <AuthHero />
 
       <div
-        className={`w-full md:w-3/5 flex items-center justify-center p-6 sm:p-8 md:p-8 relative z-10 transition-all duration-200 ${
+        className={`w-full md:w-3/5 flex items-center justify-center p-4 sm:p-6 md:p-6 relative z-10 transition-all duration-200 ${
           theme === "dark" ? "shadow-black shadow-2xl" : "shadow-gray-300 shadow-lg"
         }`}
       >
@@ -109,7 +109,7 @@ export default function Auth() {
           {/* Form Card */}
           <div className="relative">
             <div
-              className={`relative py-4 px-4 rounded-xl border transition-colors duration-200 ${
+              className={`relative py-3 px-3 rounded-xl border transition-colors duration-200 ${
                 theme === "dark" ? "border-[#2A2A2A] bg-black/20" : "border-gray-300 bg-white/80 backdrop-blur-sm"
               }`}
             >
