@@ -128,7 +128,7 @@ export function ModernLogin({
   );
 
   return (
-    <form className="space-y-6 " onSubmit={handleSubmit}>
+    <form className="space-y-4" onSubmit={handleSubmit}>
       {magicLinkSent ? (
         <div
           className={`p-6 rounded-lg text-center space-y-4 ${
@@ -258,7 +258,7 @@ export function ModernLogin({
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full flex justify-center items-center px-4 py-4 rounded-2xl font-semibold focus:outline-none focus:ring-2 transition-all duration-200 ${
+            className={`w-full flex justify-center items-center px-4 py-3 rounded-xl font-semibold focus:outline-none focus:ring-2 transition-all duration-200 ${
               theme === "dark"
                 ? "bg-white text-[#0A0A0A] hover:bg-gray-100 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] disabled:opacity-50 disabled:cursor-not-allowed"
                 : "bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed"
@@ -281,7 +281,7 @@ export function ModernLogin({
           </button>
 
           {onRegisterClick && (
-            <div className={`mt-6 pt-4  border-t transition-colors duration-200 ${theme === "dark" ? "border-[#2A2A2A]" : "border-gray-300"}`}>
+            <div className={`mt-4 pt-3  border-t transition-colors duration-200 ${theme === "dark" ? "border-[#2A2A2A]" : "border-gray-300"}`}>
               <p className={`text-sm text-center mb-3 transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
                 Don't have an account?
               </p>
@@ -289,7 +289,7 @@ export function ModernLogin({
                 <button
                   type="button"
                   onClick={() => onRegisterClick("team_manager_register")}
-                  className={`w-full px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
+                  className={`w-full px-3 py-1.5 text-sm rounded-lg transition-all duration-200 ${
                     theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#1E1E20]" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                 >
@@ -298,7 +298,7 @@ export function ModernLogin({
                 <button
                   type="button"
                   onClick={() => onRegisterClick("squad_manager_register")}
-                  className={`w-full px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
+                  className={`w-full px-3 py-1.5 text-sm rounded-lg transition-all duration-200 ${
                     theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#1E1E20]" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                 >
@@ -307,7 +307,7 @@ export function ModernLogin({
                 <button
                   type="button"
                   onClick={() => onRegisterClick("soldier_register")}
-                  className={`w-full px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
+                  className={`w-full px-3 py-1.5 text-sm rounded-lg transition-all duration-200 ${
                     theme === "dark" ? "text-gray-300 hover:text-white hover:bg-[#1E1E20]" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                 >
