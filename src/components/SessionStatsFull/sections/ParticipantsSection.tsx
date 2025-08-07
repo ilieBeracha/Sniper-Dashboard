@@ -70,7 +70,7 @@ export const ParticipantsSection = ({
           className="w-1/4 sm:w-auto text-xs flex items-center justify-center gap-2 px-4 py-2  sm:h-auto bg-indigo-500 text-white rounded-lg  font-medium hover:bg-indigo-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Users className="w-3.5 h-3.5" />
-          <span>Add Squad</span>
+          <span>Squad</span>
         </button>
         {/* Auto Sync Toggle */}
       </div>

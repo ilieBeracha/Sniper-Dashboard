@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { X, Filter } from "lucide-react";
+import { X, Filter, LayoutGrid, Layers } from "lucide-react";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface FilterDrawerProps {
   isOpen: boolean;
@@ -16,10 +17,26 @@ interface FilterDrawerProps {
   onFiltersChange: (filters: any) => void;
   onApply: () => void;
   onClear: () => void;
+  autoLoadStackView?: boolean;
+  onAutoLoadChange?: (value: boolean) => void;
+  viewMode?: "grid" | "stack";
+  onViewModeChange?: (mode: "grid" | "stack") => void;
 }
 
-export default function FilterDrawer({ isOpen, onClose, filters, onFiltersChange, onApply, onClear }: FilterDrawerProps) {
+export default function FilterDrawer({
+  isOpen,
+  onClose,
+  filters,
+  onFiltersChange,
+  onApply,
+  onClear,
+  autoLoadStackView,
+  onAutoLoadChange,
+  viewMode,
+  onViewModeChange,
+}: FilterDrawerProps) {
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
   const [localFilters, setLocalFilters] = useState(filters);
 
   useEffect(() => {
@@ -54,19 +71,29 @@ export default function FilterDrawer({ isOpen, onClose, filters, onFiltersChange
       />
 
       {/* Drawer */}
-      <div className={`fixed bottom-0 left-0 right-0 z-50 transition-transform duration-300 ${isOpen ? "translate-y-0" : "translate-y-full"}`}>
+      <div className={`fixed z-50 transition-transform duration-300 ${
+        isMobile 
+          ? `bottom-0 left-0 right-0 ${isOpen ? "translate-y-0" : "translate-y-full"}`
+          : `top-0 right-0 bottom-0 ${isOpen ? "translate-x-0" : "translate-x-full"}`
+      }`}>
         <div
           className={`${
-            theme === "dark" ? "bg-gradient-to-b from-zinc-900 to-zinc-950 border-t border-zinc-800" : "bg-white border-t border-gray-200"
-          } rounded-t-2xl shadow-2xl`}
+            theme === "dark" ? "bg-gradient-to-b from-zinc-900 to-zinc-950" : "bg-white"
+          } ${
+            isMobile 
+              ? `rounded-t-2xl border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}` 
+              : `h-full border-l ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`
+          } shadow-2xl ${!isMobile ? 'w-[400px] relative' : ''}`}
         >
-          {/* Handle */}
-          <div className="flex justify-center pt-2">
-            <div className={`w-12 h-1.5 rounded-full ${theme === "dark" ? "bg-zinc-600" : "bg-gray-300"}`} />
-          </div>
+          {/* Handle - Only on mobile */}
+          {isMobile && (
+            <div className="flex justify-center pt-2">
+              <div className={`w-12 h-1.5 rounded-full ${theme === "dark" ? "bg-zinc-600" : "bg-gray-300"}`} />
+            </div>
+          )}
 
           {/* Header */}
-          <div className="flex items-center justify-between p-4 pb-2">
+          <div className={`flex items-center justify-between p-4 ${isMobile ? 'pb-2' : 'pt-6'}`}>
             <div className="flex items-center gap-2">
               <Filter size={18} className="opacity-70" />
               <h3 className="text-base font-semibold">Filters & Sort</h3>
@@ -82,7 +109,9 @@ export default function FilterDrawer({ isOpen, onClose, filters, onFiltersChange
           </div>
 
           {/* Content */}
-          <div className="px-4 pb-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
+          <div className={`px-4 pb-4 overflow-y-auto custom-scrollbar ${
+            isMobile ? 'max-h-[60vh]' : 'h-[calc(100vh-200px)]'
+          }`}>
             {/* Filters Grid */}
             <div className="grid grid-cols-2 gap-3 mb-4">
               {/* Day/Night */}
@@ -249,6 +278,66 @@ export default function FilterDrawer({ isOpen, onClose, filters, onFiltersChange
               {localFilters.sortOrder === "best" && <p className="text-xs opacity-50 mt-1">Sorted by effort and maximum target distance</p>}
             </div>
 
+            {/* View Mode and Auto-load Settings */}
+            {(onViewModeChange || onAutoLoadChange) && (
+              <div className={`border-t pt-3 mt-3 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+                {/* View Mode Toggle */}
+                {onViewModeChange && (
+                  <div className="mb-3">
+                    <label className="text-xs font-medium opacity-70 mb-2 block">View Mode</label>
+                    <div className={`flex rounded-lg p-1 ${theme === 'dark' ? 'bg-zinc-800/50 border border-zinc-700' : 'bg-gray-100 border border-gray-300'}`}>
+                      <button
+                        onClick={() => onViewModeChange("grid")}
+                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded transition-all ${
+                          viewMode === "grid"
+                            ? theme === 'dark' 
+                              ? 'bg-zinc-700 text-white' 
+                              : 'bg-white text-gray-900 shadow-sm'
+                            : theme === 'dark'
+                              ? 'text-zinc-400 hover:text-zinc-300'
+                              : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                      >
+                        <LayoutGrid size={16} />
+                        <span className="text-sm font-medium">Grid</span>
+                      </button>
+                      <button
+                        onClick={() => onViewModeChange("stack")}
+                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded transition-all ${
+                          viewMode === "stack"
+                            ? theme === 'dark' 
+                              ? 'bg-zinc-700 text-white' 
+                              : 'bg-white text-gray-900 shadow-sm'
+                            : theme === 'dark'
+                              ? 'text-zinc-400 hover:text-zinc-300'
+                              : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                      >
+                        <Layers size={16} />
+                        <span className="text-sm font-medium">Stack</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Auto-load Toggle */}
+                {onAutoLoadChange && (
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={autoLoadStackView || false}
+                      onChange={(e) => onAutoLoadChange(e.target.checked)}
+                      className={`w-4 h-4 rounded ${theme === "dark" ? "accent-blue-500" : "accent-blue-600"}`}
+                    />
+                    <div className="flex-1">
+                      <div className="text-sm font-medium">Auto-disable stack view with filters</div>
+                      <div className="text-xs opacity-60 mt-0.5">When filters are active, automatically switch to grid view</div>
+                    </div>
+                  </label>
+                )}
+              </div>
+            )}
+
             {/* Active Filters Summary */}
             {(localFilters.filterDay !== "all" ||
               localFilters.filterEffort !== "all" ||
@@ -308,7 +397,9 @@ export default function FilterDrawer({ isOpen, onClose, filters, onFiltersChange
           </div>
 
           {/* Actions */}
-          <div className={`flex gap-3 p-4 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+          <div className={`flex gap-3 p-4 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} ${
+            !isMobile ? `absolute bottom-0 left-0 right-0 ${theme === "dark" ? "bg-zinc-950" : "bg-white"}` : ''
+          }`}>
             <button
               onClick={handleClear}
               className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${

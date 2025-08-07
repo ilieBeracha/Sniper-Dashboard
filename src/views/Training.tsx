@@ -27,6 +27,7 @@ import SessionStatsCardGrid from "@/components/SessionStatsCardGrid";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 import { useTheme } from "@/contexts/ThemeContext";
 import FilterDrawer from "@/components/FilterDrawer";
+import AssignmentStackView from "@/components/AssignmentStackView";
 import { Filter } from "lucide-react";
 
 export default function TrainingPage() {
@@ -55,12 +56,24 @@ export default function TrainingPage() {
   const [filterEffort, setFilterEffort] = useState<string>("all");
   const [filterDistance, setFilterDistance] = useState<string>("all");
   const [filterParticipated, setFilterParticipated] = useState<boolean>(false);
-  
+
   // Sort order
   const [sortOrder, setSortOrder] = useState<string>("recent");
-  
+
   // Filter drawer state
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+
+  // View mode state with localStorage persistence
+  const [viewMode, setViewMode] = useState<"grid" | "stack">(() => {
+    const savedMode = localStorage.getItem("sessionViewMode");
+    return savedMode === "stack" ? "stack" : "grid";
+  });
+
+  // Auto-load stack view preference
+  const [autoLoadStackView, setAutoLoadStackView] = useState(() => {
+    const saved = localStorage.getItem("autoLoadStackView");
+    return saved === "true";
+  });
 
   // Update filters in store when they change
   useEffect(() => {
@@ -79,8 +92,29 @@ export default function TrainingPage() {
     }
   }, [filterDay, filterEffort, filterDistance, filterParticipated, id]);
 
+  // Handle view mode changes
+  const handleViewModeChange = (mode: "grid" | "stack") => {
+    setViewMode(mode);
+    localStorage.setItem("sessionViewMode", mode);
+  };
+
+  // Save auto-load preference
+  useEffect(() => {
+    localStorage.setItem("autoLoadStackView", autoLoadStackView.toString());
+  }, [autoLoadStackView]);
+
+  // Check if any filters are active
+  const hasActiveFilters = filterDay !== "all" || filterEffort !== "all" || filterDistance !== "all" || filterParticipated || sortOrder !== "recent";
+
+  // Disable stack view when filters are active (if auto-load is enabled)
+  useEffect(() => {
+    if (hasActiveFilters && autoLoadStackView && viewMode === "stack") {
+      setViewMode("grid");
+    }
+  }, [hasActiveFilters, autoLoadStackView, viewMode]);
+
   // Client-side filtering only for distance (complex query)
-  const filteredSessionStats = sessionStats.filter((s) => {
+  const filteredSessionStats = sessionStats?.filter((s) => {
     // Distance filtering (still done client-side due to complexity)
     if (filterDistance !== "all") {
       // Gather distances from any targets if present
@@ -118,18 +152,18 @@ export default function TrainingPage() {
     } else if (sortOrder === "best") {
       // Sort by best session criteria - you can define what makes a "best" session
       // For now, let's sort by: effort (true first), then by minimum distance (higher is better)
-      
+
       // First sort by effort
       if (a.effort !== b.effort) {
         return a.effort === true ? -1 : 1;
       }
-      
+
       // Then by distance (sessions with higher distances are considered better)
       const aDistances = (a.target_stats || []).map((t: any) => t.distance_m).filter(Boolean);
       const bDistances = (b.target_stats || []).map((t: any) => t.distance_m).filter(Boolean);
       const aMaxDistance = aDistances.length > 0 ? Math.max(...aDistances) : 0;
       const bMaxDistance = bDistances.length > 0 ? Math.max(...bDistances) : 0;
-      
+
       return bMaxDistance - aMaxDistance;
     }
     return 0;
@@ -280,30 +314,33 @@ export default function TrainingPage() {
 
           <TrainingSessionStatsCard trainingSessionId={id!} />
 
-          {/* Filter Button */}
+          {/* Filter Button and View Toggle */}
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-medium opacity-80">Sessions</h3>
               {(filterDay !== "all" || filterEffort !== "all" || filterDistance !== "all" || filterParticipated || sortOrder !== "recent") && (
-                <span className={`text-xs px-2 py-0.5 rounded-full ${theme === 'dark' ? 'bg-zinc-700/50 text-zinc-300' : 'bg-gray-200 text-gray-700'}`}>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-zinc-700/50 text-zinc-300" : "bg-gray-200 text-gray-700"}`}
+                >
                   {
                     [
                       filterDay !== "all" && 1,
                       filterEffort !== "all" && 1,
                       filterDistance !== "all" && 1,
                       filterParticipated && 1,
-                      sortOrder !== "recent" && 1
+                      sortOrder !== "recent" && 1,
                     ].filter(Boolean).length
-                  } active
+                  }{" "}
+                  active
                 </span>
               )}
             </div>
             <button
               onClick={() => setIsFilterDrawerOpen(true)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                theme === 'dark' 
-                  ? 'bg-zinc-800/50 border border-zinc-700 hover:bg-zinc-700/50 hover:border-zinc-600' 
-                  : 'bg-white border border-gray-300 hover:bg-gray-50'
+                theme === "dark"
+                  ? "bg-zinc-800/50 border border-zinc-700 hover:bg-zinc-700/50 hover:border-zinc-600"
+                  : "bg-white border border-gray-300 hover:bg-gray-50"
               }`}
             >
               <Filter size={16} />
@@ -313,168 +350,174 @@ export default function TrainingPage() {
 
           {/* Old Filters Section removed - hidden but kept for reference */}
           {false && (
-          <div className={`rounded-lg p-4 ${theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-gray-50 border border-gray-200"}`}>
-            <h3 className="text-sm font-medium mb-3 opacity-80">Filters</h3>
-            <div className="flex flex-wrap gap-3 items-center">
-              <div className="flex flex-col gap-1">
-                <Select value={filterDay} onValueChange={(v) => setFilterDay(v)}>
-                  <SelectTrigger
-                    className={`min-w-[120px] ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50" : "bg-white border-gray-300 hover:bg-gray-50"}`}
-                  >
-                    <span className="text-xs opacity-70">Day/Night</span>
-                  </SelectTrigger>
-                  <SelectContent className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}>
-                    <SelectItem value="all" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
-                      All
-                    </SelectItem>
-                    <SelectItem value="day" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
-                      Day
-                    </SelectItem>
-                    <SelectItem value="night" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
-                      Night
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+            <div className={`rounded-lg p-4 ${theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-gray-50 border border-gray-200"}`}>
+              <h3 className="text-sm font-medium mb-3 opacity-80">Filters</h3>
+              <div className="flex flex-wrap gap-3 items-center">
+                <div className="flex flex-col gap-1">
+                  <Select value={filterDay} onValueChange={(v) => setFilterDay(v)}>
+                    <SelectTrigger
+                      className={`min-w-[120px] ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50" : "bg-white border-gray-300 hover:bg-gray-50"}`}
+                    >
+                      <span className="text-xs opacity-70">Day/Night</span>
+                    </SelectTrigger>
+                    <SelectContent className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}>
+                      <SelectItem value="all" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                        All
+                      </SelectItem>
+                      <SelectItem value="day" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                        Day
+                      </SelectItem>
+                      <SelectItem value="night" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                        Night
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <Select value={filterEffort} onValueChange={(v) => setFilterEffort(v)}>
+                    <SelectTrigger
+                      className={`min-w-[120px] ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50" : "bg-white border-gray-300 hover:bg-gray-50"}`}
+                    >
+                      <span className="text-xs opacity-70">Effort</span>
+                    </SelectTrigger>
+                    <SelectContent className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}>
+                      <SelectItem value="all" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                        All
+                      </SelectItem>
+                      <SelectItem value="true" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                        Yes
+                      </SelectItem>
+                      <SelectItem value="false" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                        No
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <Select value={filterDistance} onValueChange={(v) => setFilterDistance(v)}>
+                    <SelectTrigger
+                      className={`min-w-[140px] ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50" : "bg-white border-gray-300 hover:bg-gray-50"}`}
+                    >
+                      <span className="text-xs opacity-70">Distance (m)</span>
+                    </SelectTrigger>
+                    <SelectContent className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}>
+                      <SelectItem value="all" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                        All
+                      </SelectItem>
+                      <SelectItem value="0-300" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                        0-300m
+                      </SelectItem>
+                      <SelectItem value="300-600" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                        300-600m
+                      </SelectItem>
+                      <SelectItem value="600-900" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                        600-900m
+                      </SelectItem>
+                      <SelectItem value="900+" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                        900m+
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <label
+                  className={`inline-flex items-center gap-2 text-sm px-3 py-2 rounded-md cursor-pointer transition-colors ${
+                    filterParticipated
+                      ? theme === "dark"
+                        ? "bg-zinc-700/50 border border-zinc-600"
+                        : "bg-gray-200 border border-gray-300"
+                      : theme === "dark"
+                        ? "bg-zinc-800/50 border border-zinc-700 hover:bg-zinc-700/50"
+                        : "bg-white border border-gray-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={filterParticipated}
+                    onChange={(e) => setFilterParticipated(e.target.checked)}
+                    className="accent-blue-500"
+                  />
+                  <span className="text-xs">My sessions</span>
+                </label>
               </div>
 
-              <div className="flex flex-col gap-1">
-                <Select value={filterEffort} onValueChange={(v) => setFilterEffort(v)}>
-                  <SelectTrigger
-                    className={`min-w-[120px] ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50" : "bg-white border-gray-300 hover:bg-gray-50"}`}
-                  >
-                    <span className="text-xs opacity-70">Effort</span>
-                  </SelectTrigger>
-                  <SelectContent className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}>
-                    <SelectItem value="all" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
-                      All
-                    </SelectItem>
-                    <SelectItem value="true" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
-                      Yes
-                    </SelectItem>
-                    <SelectItem value="false" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
-                      No
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <Select value={filterDistance} onValueChange={(v) => setFilterDistance(v)}>
-                  <SelectTrigger
-                    className={`min-w-[140px] ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50" : "bg-white border-gray-300 hover:bg-gray-50"}`}
-                  >
-                    <span className="text-xs opacity-70">Distance (m)</span>
-                  </SelectTrigger>
-                  <SelectContent className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}>
-                    <SelectItem value="all" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
-                      All
-                    </SelectItem>
-                    <SelectItem value="0-300" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
-                      0-300m
-                    </SelectItem>
-                    <SelectItem value="300-600" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
-                      300-600m
-                    </SelectItem>
-                    <SelectItem value="600-900" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
-                      600-900m
-                    </SelectItem>
-                    <SelectItem value="900+" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
-                      900m+
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <label
-                className={`inline-flex items-center gap-2 text-sm px-3 py-2 rounded-md cursor-pointer transition-colors ${
-                  filterParticipated
-                    ? theme === "dark"
-                      ? "bg-zinc-700/50 border border-zinc-600"
-                      : "bg-gray-200 border border-gray-300"
-                    : theme === "dark"
-                      ? "bg-zinc-800/50 border border-zinc-700 hover:bg-zinc-700/50"
-                      : "bg-white border border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={filterParticipated}
-                  onChange={(e) => setFilterParticipated(e.target.checked)}
-                  className="accent-blue-500"
-                />
-                <span className="text-xs">My sessions</span>
-              </label>
-            </div>
-
-            {/* Active Filters Summary */}
-            {(filterDay !== "all" || filterEffort !== "all" || filterDistance !== "all" || filterParticipated) && (
-              <div className="mt-3 pt-3 border-t border-zinc-700/50">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs opacity-60">Active filters:</span>
-                  <div className="flex flex-wrap gap-2">
-                    {filterDay !== "all" && (
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-blue-600/20 text-blue-300" : "bg-blue-100 text-blue-700"}`}
-                      >
-                        {filterDay}
-                      </span>
-                    )}
-                    {filterEffort !== "all" && (
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-green-600/20 text-green-300" : "bg-green-100 text-green-700"}`}
-                      >
-                        Effort: {filterEffort === "true" ? "Yes" : "No"}
-                      </span>
-                    )}
-                    {filterDistance !== "all" && (
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-purple-600/20 text-purple-300" : "bg-purple-100 text-purple-700"}`}
-                      >
-                        {filterDistance}m
-                      </span>
-                    )}
+              {/* Active Filters Summary */}
+              {(filterDay !== "all" || filterEffort !== "all" || filterDistance !== "all" || filterParticipated) && (
+                <div className="mt-3 pt-3 border-t border-zinc-700/50">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs opacity-60">Active filters:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {filterDay !== "all" && (
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-blue-600/20 text-blue-300" : "bg-blue-100 text-blue-700"}`}
+                        >
+                          {filterDay}
+                        </span>
+                      )}
+                      {filterEffort !== "all" && (
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-green-600/20 text-green-300" : "bg-green-100 text-green-700"}`}
+                        >
+                          Effort: {filterEffort === "true" ? "Yes" : "No"}
+                        </span>
+                      )}
+                      {filterDistance !== "all" && (
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-purple-600/20 text-purple-300" : "bg-purple-100 text-purple-700"}`}
+                        >
+                          {filterDistance}m
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
           )}
-          
+
           {/* Sort Order Section - also hidden */}
           {false && (
-          <div className={`rounded-lg p-4 ${theme === 'dark' ? 'bg-zinc-900/50 border border-zinc-800' : 'bg-gray-50 border border-gray-200'}`}>
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium opacity-80">Sort By</h3>
-              <Select value={sortOrder} onValueChange={(v) => setSortOrder(v)}>
-                <SelectTrigger className={`min-w-[160px] ${theme === 'dark' ? 'bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50' : 'bg-white border-gray-300 hover:bg-gray-50'}`}>
-                  <span className="text-xs">
-                    {sortOrder === "recent" ? "Most Recent" : "Best Sessions"}
-                  </span>
-                </SelectTrigger>
-                <SelectContent className={theme === 'dark' ? 'bg-zinc-800 border-zinc-700' : 'bg-white border-gray-200'}>
-                  <SelectItem value="recent" className={theme === 'dark' ? 'focus:bg-zinc-700 focus:text-zinc-100' : ''}>
-                    Most Recent
-                  </SelectItem>
-                  <SelectItem value="best" className={theme === 'dark' ? 'focus:bg-zinc-700 focus:text-zinc-100' : ''}>
-                    Best Sessions
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+            <div className={`rounded-lg p-4 ${theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-gray-50 border border-gray-200"}`}>
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium opacity-80">Sort By</h3>
+                <Select value={sortOrder} onValueChange={(v) => setSortOrder(v)}>
+                  <SelectTrigger
+                    className={`min-w-[160px] ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50" : "bg-white border-gray-300 hover:bg-gray-50"}`}
+                  >
+                    <span className="text-xs">{sortOrder === "recent" ? "Most Recent" : "Best Sessions"}</span>
+                  </SelectTrigger>
+                  <SelectContent className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}>
+                    <SelectItem value="recent" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                      Most Recent
+                    </SelectItem>
+                    <SelectItem value="best" className={theme === "dark" ? "focus:bg-zinc-700 focus:text-zinc-100" : ""}>
+                      Best Sessions
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {sortOrder === "best" && <p className="text-xs opacity-60 mt-2">Sorted by effort and maximum target distance</p>}
             </div>
-            {sortOrder === "best" && (
-              <p className="text-xs opacity-60 mt-2">
-                Sorted by effort and maximum target distance
-              </p>
-            )}
-          </div>
           )}
-          
-          <SessionStatsCardGrid
-            data={sortedSessionStats}
-            onCardClick={handleSessionClick}
-            onEdit={handleEditSession}
-            onDelete={handleDeleteSession}
-          />
+
+          {/* Conditional view rendering */}
+          {viewMode === "grid" ? (
+            <SessionStatsCardGrid
+              data={sortedSessionStats}
+              onCardClick={handleSessionClick}
+              onEdit={handleEditSession}
+              onDelete={handleDeleteSession}
+            />
+          ) : (
+            <AssignmentStackView
+              data={sortedSessionStats}
+              onCardClick={handleSessionClick}
+              onEdit={handleEditSession}
+              onDelete={handleDeleteSession}
+            />
+          )}
         </div>
       );
     }
@@ -552,7 +595,7 @@ export default function TrainingPage() {
         title={`Delete ${deletingGroupScore ? "Group Score" : "Session"}`}
         message={`Are you sure you want to delete this ${deletingGroupScore ? "group score" : "session"}?`}
       />
-      
+
       {/* Filter Drawer */}
       <FilterDrawer
         isOpen={isFilterDrawerOpen}
@@ -562,7 +605,7 @@ export default function TrainingPage() {
           filterEffort,
           filterDistance,
           filterParticipated,
-          sortOrder
+          sortOrder,
         }}
         onFiltersChange={(newFilters) => {
           setFilterDay(newFilters.filterDay);
@@ -578,6 +621,10 @@ export default function TrainingPage() {
         onClear={() => {
           // Clear is handled in the drawer component
         }}
+        autoLoadStackView={autoLoadStackView}
+        onAutoLoadChange={(value) => setAutoLoadStackView(value)}
+        viewMode={viewMode}
+        onViewModeChange={handleViewModeChange}
       />
     </SpPage>
   );
