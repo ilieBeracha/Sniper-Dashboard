@@ -31,7 +31,7 @@ export default function AssignmentStackView({ data, onCardClick, onEdit, onDelet
 
     // Sort sessions within each group by created_at desc
     Object.keys(groups).forEach((key) => {
-      groups[key].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      groups[key].sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     });
 
     return groups;
