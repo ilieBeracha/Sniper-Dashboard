@@ -32,7 +32,6 @@ export default function SearchableCheckboxList({
   setSearchTerm,
   searchPlaceholder = "Search...",
   emptyMessage = "No items found",
-  maxHeight = 200,
   showBadges = false,
 }: SearchableCheckboxListProps) {
   const [isOpen, setIsOpen] = useState(false);
