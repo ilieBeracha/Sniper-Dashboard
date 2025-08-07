@@ -17,7 +17,7 @@ export default function DashboardCalendar() {
     <div className="relative">
       {/* Timeline line */}
       <div
-        className="absolute left-4 top-0 bottom-0 w-0.5 rounded-full"
+        className="absolute left-3 top-0 bottom-0 w-0.5 rounded-full"
         style={{
           background:
             theme === "dark"
@@ -53,7 +53,7 @@ function TimelineCard({
 
   if (isEmpty) {
     return (
-      <div className="relative pl-10">
+      <div className="relative pl-8">
         {/* Timeline dot */}
         <div
           className="absolute left-0 w-6 h-6 rounded-full border-2 flex items-center justify-center"
