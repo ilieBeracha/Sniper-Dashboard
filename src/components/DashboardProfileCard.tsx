@@ -1,4 +1,3 @@
-import { useTheme } from "@/contexts/ThemeContext";
 import { userStore } from "@/store/userStore";
 import { teamStore } from "@/store/teamStore";
 import { squadStore } from "@/store/squadStore";
@@ -10,7 +9,6 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { Users, Shield, Calendar } from "lucide-react";
 
 export default function DashboardProfileCard() {
-  const { theme } = useTheme();
   const { user } = useStore(userStore);
   const { fetchMembers } = useStore(teamStore);
   const { getSquadsWithUsersByTeamId } = useStore(squadStore);
@@ -43,53 +41,49 @@ export default function DashboardProfileCard() {
   const { greeting, icon } = getTimeBasedGreeting();
 
   return (
-    <div className={`rounded-lg border p-4 ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}>
+    <div className="relative overflow-hidden rounded-xl p-6 sm:p-7 shadow-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white ring-1 ring-white/10">
       <div className="flex items-center justify-between">
-        {/* Left side - Compact user info */}
-        <div className="flex items-center gap-3">
-          {/* Avatar with initials */}
-          <div
-            className={`relative w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
-              theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-700"
-            }`}
-          >
+        {/* Left side - Enhanced user info */}
+        <div className="flex items-center gap-4 sm:gap-5">
+          {/* Larger avatar with subtle translucent background */}
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-lg font-semibold bg-white/20 text-white">
             {user?.first_name?.[0]}
             {user?.last_name?.[0]}
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-zinc-900"></div>
+            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-white/80"></div>
           </div>
 
           {/* User details - horizontal layout */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-medium">
+                <h2 className="text-xl sm:text-2xl font-semibold">
                   {user?.first_name} {user?.last_name}
                 </h2>
-                {!isMobile && <span className="text-sm opacity-50">{icon}</span>}
+                {!isMobile && <span className="text-base opacity-90">{icon}</span>}
               </div>
-              <p className="text-xs opacity-60">{greeting} Commander</p>
+              <p className="text-sm text-white/80">{greeting} Commander</p>
             </div>
 
             {/* Divider */}
-            {!isMobile && <div className={`h-8 w-px ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`} />}
+            {!isMobile && <div className="h-10 w-px bg-white/20" />}
 
             {/* Tags - inline */}
             {!isMobile && (
-              <div className="flex items-center gap-3 text-xs">
-                <span className={`px-2 py-0.5 rounded ${theme === "dark" ? "bg-zinc-800 text-zinc-400" : "bg-gray-100 text-gray-600"}`}>
+              <div className="flex items-center gap-3 text-sm">
+                <span className="px-2.5 py-1 rounded-md bg-white/15 text-white/90">
                   {user?.user_role?.replace("_", " ").toUpperCase()}
                 </span>
 
                 {user?.team_name && (
-                  <div className="flex items-center gap-1.5 opacity-70">
-                    <Users size={12} />
+                  <div className="flex items-center gap-1.5 text-white/80">
+                    <Users size={14} />
                     <span>{user?.team_name}</span>
                   </div>
                 )}
 
                 {user?.squad_name && (
-                  <div className="flex items-center gap-1.5 opacity-70">
-                    <Shield size={12} />
+                  <div className="flex items-center gap-1.5 text-white/80">
+                    <Shield size={14} />
                     <span>{user?.squad_name}</span>
                   </div>
                 )}
@@ -99,25 +93,27 @@ export default function DashboardProfileCard() {
         </div>
 
         {/* Right side - Date */}
-        <div className="hidden md:flex items-center gap-2 text-xs opacity-60">
-          <Calendar size={14} />
-          <span>{new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>
+        <div className="hidden md:flex items-center gap-2 text-sm text-white/80">
+          <Calendar size={16} />
+          <span>
+            {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+          </span>
         </div>
       </div>
 
       {/* Mobile tags */}
       {isMobile && (
-        <div className="flex items-center gap-2 mt-3 text-xs">
+        <div className="flex items-center gap-3 mt-4 text-sm text-white/80">
           {user?.team_name && (
-            <div className="flex items-center gap-1 opacity-70">
-              <Users size={12} />
+            <div className="flex items-center gap-1">
+              <Users size={14} />
               <span>{user?.team_name}</span>
             </div>
           )}
 
           {user?.squad_name && (
-            <div className="flex items-center gap-1 opacity-70">
-              <Shield size={12} />
+            <div className="flex items-center gap-1">
+              <Shield size={14} />
               <span>{user?.squad_name}</span>
             </div>
           )}

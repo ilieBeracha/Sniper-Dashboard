@@ -5,7 +5,7 @@ import { squadStore } from "@/store/squadStore";
 import { performanceStore } from "@/store/performance";
 import { TrainingStore } from "@/store/trainingStore";
 import { getUserGroupingStatsRpc } from "@/services/performance";
-import { SpPage, SpPageBody, SpPageHeader, SpPageTabs } from "@/layouts/SpPage";
+import { SpPage, SpPageBody, SpPageTabs } from "@/layouts/SpPage";
 import InviteModal from "@/components/InviteModal";
 import Header from "@/Headers/Header";
 import { Activity, SplinePointerIcon } from "lucide-react";
@@ -64,14 +64,11 @@ export default function Dashboard() {
   return (
     <SpPage>
       <Header breadcrumbs={[{ label: "Dashboard", link: "/" }]} />
-      <SpPageHeader
-        title={activeTab.label}
-        subtitle={activeTab.id === "overview" ? "Team, Squad, and more" : "By Date, Squad, and more"}
-        icon={activeTab.icon}
-      />
       <SpPageTabs tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
       <SpPageBody>{RenderComponent()}</SpPageBody>
-      {userRole !== "soldier" && user?.id && <InviteModal isOpen={isInviteModalOpen} setIsOpen={setIsInviteModalOpen} userId={user.id} />}
+      {userRole !== "soldier" && user?.id && (
+        <InviteModal isOpen={isInviteModalOpen} setIsOpen={setIsInviteModalOpen} userId={user.id} />
+      )}
       <ActivityFeedDrawer isOpen={isActivityFeedOpen} onClose={() => setIsActivityFeedOpen(false)} />
     </SpPage>
   );
