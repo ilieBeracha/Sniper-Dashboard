@@ -5,13 +5,11 @@ import { squadStore } from "@/store/squadStore";
 import { performanceStore } from "@/store/performance";
 import { TrainingStore } from "@/store/trainingStore";
 import { getUserGroupingStatsRpc } from "@/services/performance";
-import { SpPage, SpPageBody, SpPageTabs } from "@/layouts/SpPage";
+import { SpPage, SpPageBody } from "@/layouts/SpPage";
 import InviteModal from "@/components/InviteModal";
 import Header from "@/Headers/Header";
-import { Activity, SplinePointerIcon } from "lucide-react";
 import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
-import { useTabs } from "@/hooks/useTabs";
 import DashboardOverview from "@/components/DashboardOverview";
 import CommanderView from "@/components/DashboardCommanderView";
 import ActivityFeedDrawer from "@/components/ActivityFeedDrawer";
@@ -44,28 +42,19 @@ export default function Dashboard() {
     load();
   }, []);
 
-  const baseTabs = [
-    { id: "overview", label: "Overview", icon: Activity },
-    { id: "commander-view", label: "Commander View", icon: SplinePointerIcon, disabled: !isCommander(userRole as UserRole) },
-  ];
-
-  const { tabs, activeTab, handleTabChange } = useTabs({ tabs: baseTabs as any });
-
-  const RenderComponent = (): React.ReactNode => {
-    if (activeTab.id === "overview") {
-      return <DashboardOverview loading={loading} />;
-    }
-
-    if (activeTab.id === "commander-view") {
-      return <CommanderView />;
-    }
-  };
+  // Removed tabs UI for a cleaner, more professional look.
 
   return (
     <SpPage>
       <Header breadcrumbs={[{ label: "Dashboard", link: "/" }]} />
-      <SpPageTabs tabs={tabs} activeTab={activeTab.id} onChange={handleTabChange} />
-      <SpPageBody>{RenderComponent()}</SpPageBody>
+      <SpPageBody>
+        <DashboardOverview loading={loading} />
+        {isCommander(userRole as UserRole) && (
+          <div className="mt-6">
+            <CommanderView />
+          </div>
+        )}
+      </SpPageBody>
       {userRole !== "soldier" && user?.id && (
         <InviteModal isOpen={isInviteModalOpen} setIsOpen={setIsInviteModalOpen} userId={user.id} />
       )}
