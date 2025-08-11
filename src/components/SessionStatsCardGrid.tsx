@@ -1,11 +1,12 @@
 import { format } from "date-fns";
-import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair, TrendingUp } from "lucide-react";
+import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair, ChevronDown, ChevronUp } from "lucide-react";
 import { Tooltip } from "@heroui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { Popover, PopoverTrigger, PopoverContent, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
 import ProfileCapitalFirstLatter from "./ProfileCapitalFirstLatter";
 import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
+import { useState } from "react";
 
 interface SessionStatsCardGridProps {
   data: any[];
@@ -17,17 +18,31 @@ interface SessionStatsCardGridProps {
 export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDelete }: SessionStatsCardGridProps) {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
 
   if (!data || data.length === 0) {
     return <div className="text-center py-12 opacity-70 text-sm">No session stats yet</div>;
   }
 
+  const toggleCard = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedCards(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <div className="grid gap-3" style={{ gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(320px, 1fr))" }}>
       {data.map((item) => {
         const assignmentName = item?.assignment_session?.assignment?.assignment_name || "Unknown";
-
         const teamName = item.teams?.team_name || "No Team";
+        const isExpanded = expandedCards.has(item.id);
 
         // Calculate total shots and hits from targets
         let totalShots = 0;
@@ -158,100 +173,47 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                 </div>
               </div>
 
-              {/* Stats Overview */}
-              <div className="mt-3 grid grid-cols-3 gap-2 mb-3">
-                {/* Overall Hit Rate */}
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 mb-0.5">
-                    <TrendingUp size={12} className={hitPercentage >= 70 ? (theme === "dark" ? "text-green-400" : "text-green-600") : "opacity-50"} />
-                    <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Hit Rate</span>
-                  </div>
-                  <span className={`font-semibold text-lg ${
-                    hitPercentage >= 70 
-                      ? theme === "dark" ? "text-green-400" : "text-green-600"
-                      : hitPercentage >= 50
-                      ? theme === "dark" ? "text-yellow-400" : "text-yellow-600"
-                      : theme === "dark" ? "text-red-400" : "text-red-600"
-                  }`}>
-                    {hitPercentage}%
-                  </span>
-                </div>
-
-                {/* Total Shots */}
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 mb-0.5">
-                    <Target size={12} className="opacity-50" />
-                    <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Shots</span>
-                  </div>
-                  <span className={`font-semibold text-lg ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
-                    {totalShots}
-                  </span>
-                </div>
-
-                {/* Total Hits */}
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 mb-0.5">
-                    <Crosshair size={12} className="opacity-50" />
-                    <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Hits</span>
-                  </div>
-                  <span className={`font-semibold text-lg ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
-                    {totalHits}
-                  </span>
-                </div>
-              </div>
-
-              {/* Range Breakdown - Only show if there are shots */}
-              {totalShots > 0 && (shortRangeShots > 0 || mediumRangeShots > 0 || longRangeShots > 0) && (
-                <div className={`border-t pt-2 mb-2 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
-                  <p className={`text-xs font-medium mb-1.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-                    Range Breakdown
-                  </p>
-                  <div className="grid grid-cols-3 gap-1 text-xs">
-                    {shortRangeShots > 0 && (
-                      <div className="text-center">
-                        <p className={`${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Short</p>
-                        <p className={`font-medium ${theme === "dark" ? "text-green-400" : "text-green-600"}`}>
-                          {shortRangePercentage}%
-                          <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"} ml-0.5`}>
-                            ({shortRangeShots})
-                          </span>
-                        </p>
-                      </div>
-                    )}
-                    {mediumRangeShots > 0 && (
-                      <div className="text-center">
-                        <p className={`${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Medium</p>
-                        <p className={`font-medium ${theme === "dark" ? "text-yellow-400" : "text-yellow-600"}`}>
-                          {mediumRangePercentage}%
-                          <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"} ml-0.5`}>
-                            ({mediumRangeShots})
-                          </span>
-                        </p>
-                      </div>
-                    )}
-                    {longRangeShots > 0 && (
-                      <div className="text-center">
-                        <p className={`${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Long</p>
-                        <p className={`font-medium ${theme === "dark" ? "text-red-400" : "text-red-600"}`}>
-                          {longRangePercentage}%
-                          <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"} ml-0.5`}>
-                            ({longRangeShots})
-                          </span>
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
               {/* Compact Info Grid */}
               <div className="grid grid-cols-2 gap-2 mb-1">
-                {/* Team */}
-                <div className="flex items-center gap-1.5 text-xs">
-                  <Building2 size={10} className="opacity-50" />
-                  <span className="truncate opacity-80" title={teamName}>
-                    {teamName}
-                  </span>
+                {/* Team & Average Stats */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <Building2 size={10} className="opacity-50" />
+                    <span className="truncate opacity-80" title={teamName}>
+                      {teamName}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Shots and Hits Stats */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 text-xs">
+                    <div className="flex items-center gap-1">
+                      <Target size={10} className="opacity-50" />
+                      <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                        {totalShots}
+                      </span>
+                      <span className="opacity-60">shots</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Crosshair size={10} className="opacity-50" />
+                      <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                        {totalHits}
+                      </span>
+                      <span className="opacity-60">hits</span>
+                      {totalShots > 0 && (
+                        <span className={`ml-1 font-medium ${
+                          hitPercentage >= 70 
+                            ? theme === "dark" ? "text-green-400" : "text-green-600"
+                            : hitPercentage >= 50
+                            ? theme === "dark" ? "text-yellow-400" : "text-yellow-600"
+                            : theme === "dark" ? "text-red-400" : "text-red-600"
+                        }`}>
+                          ({hitPercentage}%)
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -312,6 +274,65 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                   </span>
                 )}
               </div>
+
+              {/* Collapsible Details Section */}
+              {isExpanded && (
+                <div className={`mt-3 pt-3 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} animate-in slide-in-from-top-2 duration-200`}>
+                  {/* Range Breakdown */}
+                  {totalShots > 0 && (shortRangeShots > 0 || mediumRangeShots > 0 || longRangeShots > 0) && (
+                    <div className="mb-3">
+                      <p className={`text-xs font-medium mb-2 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                        Range Breakdown
+                      </p>
+                      <div className="grid grid-cols-3 gap-2 text-xs">
+                        {shortRangeShots > 0 && (
+                          <div className="text-center">
+                            <p className={`${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Short</p>
+                            <p className={`font-medium ${theme === "dark" ? "text-green-400" : "text-green-600"}`}>
+                              {shortRangePercentage}%
+                              <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"} ml-0.5`}>
+                                ({shortRangeShots})
+                              </span>
+                            </p>
+                          </div>
+                        )}
+                        {mediumRangeShots > 0 && (
+                          <div className="text-center">
+                            <p className={`${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Medium</p>
+                            <p className={`font-medium ${theme === "dark" ? "text-yellow-400" : "text-yellow-600"}`}>
+                              {mediumRangePercentage}%
+                              <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"} ml-0.5`}>
+                                ({mediumRangeShots})
+                              </span>
+                            </p>
+                          </div>
+                        )}
+                        {longRangeShots > 0 && (
+                          <div className="text-center">
+                            <p className={`${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Long</p>
+                            <p className={`font-medium ${theme === "dark" ? "text-red-400" : "text-red-600"}`}>
+                              {longRangePercentage}%
+                              <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"} ml-0.5`}>
+                                ({longRangeShots})
+                              </span>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Participants Count */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className={`${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                      Participants
+                    </span>
+                    <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                      {item.session_participants?.length || 0} shooters
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Participants avatars in bottom right corner */}
@@ -420,6 +441,18 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                 </PopoverContent>
               </Popover>
             </div>
+
+            {/* Expand/Collapse button */}
+            <button
+              onClick={(e) => toggleCard(item.id, e)}
+              className={`absolute bottom-3 left-3 p-1 rounded transition-colors ${
+                theme === "dark" 
+                  ? "hover:bg-zinc-800 text-zinc-500 hover:text-zinc-300" 
+                  : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
           </div>
         );
       })}
