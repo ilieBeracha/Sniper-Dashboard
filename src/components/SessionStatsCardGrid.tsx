@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair } from "lucide-react";
+import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair, Zap } from "lucide-react";
 import { Tooltip } from "@heroui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -52,8 +52,12 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
         return (
           <div
             key={item.id}
-            className={`group relative rounded-lg border p-3 transition-all cursor-pointer overflow-hidden ${
-              theme === "dark"
+            className={`group relative rounded-lg border-2 p-3 transition-all cursor-pointer overflow-hidden ${
+              item.sessionStats?.is_quick_stats || item.is_quick_stats
+                ? theme === "dark"
+                  ? "border-purple-600/50 bg-purple-900/10 hover:bg-purple-900/20 hover:border-purple-500 hover:shadow-xl"
+                  : "border-purple-400 bg-purple-50/50 hover:bg-purple-100 hover:border-purple-500 hover:shadow-lg"
+                : theme === "dark"
                 ? "border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/70 hover:border-zinc-700 hover:shadow-xl"
                 : "border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 hover:shadow-lg"
             }`}
@@ -65,6 +69,18 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                 theme === "dark" ? "bg-gradient-to-br from-zinc-800/20 to-transparent" : "bg-gradient-to-br from-gray-100/50 to-transparent"
               }`}
             />
+
+            {/* Quick Stats Badge */}
+            {(item.sessionStats?.is_quick_stats || item.is_quick_stats) && (
+              <div className={`absolute top-2 left-2 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                theme === "dark" 
+                  ? "bg-purple-500/20 text-purple-400" 
+                  : "bg-purple-100 text-purple-700"
+              }`}>
+                <Zap size={12} />
+                Quick
+              </div>
+            )}
 
             {/* Action dropdown - positioned absolute */}
             {(onEdit || onDelete) && (

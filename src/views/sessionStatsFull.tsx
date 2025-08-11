@@ -131,6 +131,7 @@ export default function ImprovedSessionStats() {
           timeToFirstShot: null,
           note: null,
           effort: quickData.effort || false,
+          is_quick_stats: true,
         },
         participants: [{
           user_id: currentUser?.id || "",
