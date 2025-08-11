@@ -107,35 +107,36 @@ export default function TrainingPage() {
   }, [hasActiveFilters, autoLoadStackView, viewMode]);
 
   // Client-side filtering only for distance (complex query)
-  const filteredSessionStats = sessionStats?.filter((s) => {
-    // Distance filtering (still done client-side due to complexity)
-    if (filterDistance !== "all") {
-      // Gather distances from any targets if present
-      const targetDistances = (s.targets || s.target_stats || []).map((t: any) => t.distance_m || t.distance).filter(Boolean);
-      const minDistance = targetDistances.length ? Math.min(...targetDistances) : null;
-      if (minDistance !== null) {
-        switch (filterDistance) {
-          case "0-300":
-            if (!(minDistance >= 0 && minDistance < 300)) return false;
-            break;
-          case "300-600":
-            if (!(minDistance >= 300 && minDistance < 600)) return false;
-            break;
-          case "600-900":
-            if (!(minDistance >= 600 && minDistance < 900)) return false;
-            break;
-          case "900+":
-            if (minDistance < 900) return false;
-            break;
+  const filteredSessionStats = Array.isArray(sessionStats) 
+    ? sessionStats.filter((s) => {
+        // Distance filtering (still done client-side due to complexity)
+        if (filterDistance !== "all") {
+          // Gather distances from any targets if present
+          const targetDistances = (s.targets || s.target_stats || []).map((t: any) => t.distance_m || t.distance).filter(Boolean);
+          const minDistance = targetDistances.length ? Math.min(...targetDistances) : null;
+          if (minDistance !== null) {
+            switch (filterDistance) {
+              case "0-300":
+                if (!(minDistance >= 0 && minDistance < 300)) return false;
+                break;
+              case "300-600":
+                if (!(minDistance >= 300 && minDistance < 600)) return false;
+                break;
+              case "600-900":
+                if (!(minDistance >= 600 && minDistance < 900)) return false;
+                break;
+              case "900+":
+                if (minDistance < 900) return false;
+                break;
+            }
+          } else {
+            // no distance data, exclude when filter active
+            return false;
+          }
         }
-      } else {
-        // no distance data, exclude when filter active
-        return false;
-      }
-    }
-
-    return true;
-  });
+        return true;
+      })
+    : [];
 
   const sortedSessionStats = [...filteredSessionStats].sort((a, b) => {
     // 1. Most recent
@@ -557,7 +558,7 @@ export default function TrainingPage() {
               if (isDisabled) {
                 toast.error("Training session is completed or canceled");
               } else {
-                navigate(`/training/${id}/session-stats-full/ `);
+                navigate(`/training/${id}/session-stats-full/`);
               }
             },
           },
