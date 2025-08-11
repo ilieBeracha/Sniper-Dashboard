@@ -35,6 +35,7 @@ export default function TrainingSessionStatsCard({ trainingSessionId }: { traini
 
   const stats = trainingTeamAnalytics;
 
+  // Primary stats - only shown when closed
   const primaryStats = [
     {
       label: "Hit Rate",
@@ -47,6 +48,10 @@ export default function TrainingSessionStatsCard({ trainingSessionId }: { traini
       value: stats.total_shots_fired ? stats.total_shots_fired : "—",
       icon: Target,
     },
+  ];
+
+  // Additional stats shown when expanded
+  const additionalStats = [
     {
       label: "Avg Dispersion",
       value: stats.avg_cm_dispersion ? `${stats.avg_cm_dispersion.toFixed(1)}cm` : "—",
@@ -106,8 +111,8 @@ export default function TrainingSessionStatsCard({ trainingSessionId }: { traini
     <div
       className={`rounded-xl ${isMobile ? "p-3" : "px-6 py-3"} ${theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-white border border-gray-200"}`}
     >
-      {/* Primary Stats Grid */}
-      <div className={`grid grid-cols-2 md:grid-cols-4 ${isMobile ? "gap-3" : "gap-6"}`}>
+      {/* Primary Stats Grid - Always visible but changes layout when expanded */}
+      <div className={`grid ${isExpanded ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2 md:grid-cols-4"} ${isMobile ? "gap-3" : "gap-6"}`}>
         {primaryStats.map((stat, index) => (
           <div key={index} className="relative">
             <div className={`flex items-center ${isMobile ? "gap-1 mb-0.5" : "gap-2 mb-1"}`}>
@@ -116,7 +121,7 @@ export default function TrainingSessionStatsCard({ trainingSessionId }: { traini
                   stat.highlight ? (theme === "dark" ? "text-green-400" : "text-green-600") : theme === "dark" ? "text-zinc-500" : "text-gray-400"
                 }`}
               />
-              <p className={`${isMobile ? "text-xs" : "text-sm"} ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>{stat.label}</p>
+              <p className={`${isMobile ? "text-xs" : "text-lg"} ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>{stat.label}</p>
             </div>
             <p
               className={`${isMobile ? "text-lg" : "text-xl"} font-semibold ${
@@ -127,34 +132,83 @@ export default function TrainingSessionStatsCard({ trainingSessionId }: { traini
             </p>
           </div>
         ))}
-      </div>
-
-      {/* Range Stats - Always visible */}
-      <div className={`mt-4 pt-4 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
-        <div className={`grid grid-cols-3 ${isMobile ? "gap-2" : "gap-4"}`}>
-          {rangeStats.map((range, index) => (
-            <div key={index} className="text-center">
-              <p className={`${isMobile ? "text-xs" : "text-sm"} ${theme === "dark" ? "text-zinc-500" : "text-gray-500"} mb-1`}>
-                {range.label}
-              </p>
-              <div className={`${isMobile ? "text-sm" : "text-base"} font-medium`}>
-                <span className={
-                  range.color === "green" ? (theme === "dark" ? "text-green-400" : "text-green-600") :
-                  range.color === "yellow" ? (theme === "dark" ? "text-yellow-400" : "text-yellow-600") :
-                  (theme === "dark" ? "text-red-400" : "text-red-600")
-                }>
-                  {range.hitRate}%
-                </span>
-                <span className={`${theme === "dark" ? "text-zinc-400" : "text-gray-600"} ${isMobile ? "text-xs" : "text-sm"} ml-1`}>
-                  ({range.shots})
-                </span>
-              </div>
+        
+        {/* Additional primary stats only shown when expanded */}
+        {isExpanded && additionalStats.map((stat, index) => (
+          <div key={`additional-${index}`} className="relative">
+            <div className={`flex items-center ${isMobile ? "gap-1 mb-0.5" : "gap-2 mb-1"}`}>
+              <stat.icon
+                className={`${isMobile ? "w-3 h-3" : "w-4 h-4"} ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`}
+              />
+              <p className={`${isMobile ? "text-xs" : "text-lg"} ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>{stat.label}</p>
             </div>
-          ))}
-        </div>
+            <p
+              className={`${isMobile ? "text-lg" : "text-xl"} font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            >
+              {stat.value ?? "—"}
+            </p>
+          </div>
+        ))}
       </div>
 
-      {/* Expandable Section */}
+      {/* Expanded Details - Only shown when expanded */}
+      {isExpanded && (
+        <>
+          {/* Range Stats */}
+          <div className={`mt-4 pt-4 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} animate-in slide-in-from-top-2 duration-200`}>
+            <h4 className={`text-sm font-medium mb-3 ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+              Range Performance
+            </h4>
+            <div className={`grid grid-cols-3 ${isMobile ? "gap-2" : "gap-4"}`}>
+              {rangeStats.map((range, index) => (
+                <div key={index} className="text-center">
+                  <p className={`${isMobile ? "text-xs" : "text-sm"} ${theme === "dark" ? "text-zinc-500" : "text-gray-500"} mb-1`}>
+                    {range.label}
+                  </p>
+                  <div className={`${isMobile ? "text-sm" : "text-base"} font-medium`}>
+                    <span className={
+                      range.color === "green" ? (theme === "dark" ? "text-green-400" : "text-green-600") :
+                      range.color === "yellow" ? (theme === "dark" ? "text-yellow-400" : "text-yellow-600") :
+                      (theme === "dark" ? "text-red-400" : "text-red-600")
+                    }>
+                      {range.hitRate}%
+                    </span>
+                    <span className={`${theme === "dark" ? "text-zinc-400" : "text-gray-600"} ${isMobile ? "text-xs" : "text-sm"} ml-1`}>
+                      ({range.shots})
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Detailed Stats */}
+          <div className={`mt-4 pt-4 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+            <h4 className={`text-sm font-medium mb-3 ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+              Session Details
+            </h4>
+            <div className={`grid grid-cols-2 ${isMobile ? "gap-3" : "gap-4"}`}>
+              {detailedStats.map((stat, index) => (
+                <div key={index}>
+                  <p className={`${isMobile ? "text-xs" : "text-sm"} ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+                    {stat.label}
+                  </p>
+                  <p className={`${isMobile ? "text-base" : "text-lg"} font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                    {stat.value}
+                  </p>
+                  {stat.subLabel && (
+                    <p className={`${isMobile ? "text-xs" : "text-sm"} ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                      {stat.subLabel}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Expandable Button */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={`w-full mt-4 pt-3 border-t flex items-center justify-center gap-2 transition-colors ${
@@ -170,29 +224,6 @@ export default function TrainingSessionStatsCard({ trainingSessionId }: { traini
           <ChevronDown className={`${isMobile ? "w-3 h-3" : "w-4 h-4"} ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
         )}
       </button>
-
-      {/* Expanded Details */}
-      {isExpanded && (
-        <div className={`mt-4 pt-4 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} animate-in slide-in-from-top-2 duration-200`}>
-          <div className={`grid grid-cols-2 ${isMobile ? "gap-3" : "gap-4"}`}>
-            {detailedStats.map((stat, index) => (
-              <div key={index}>
-                <p className={`${isMobile ? "text-xs" : "text-sm"} ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
-                  {stat.label}
-                </p>
-                <p className={`${isMobile ? "text-base" : "text-lg"} font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                  {stat.value}
-                </p>
-                {stat.subLabel && (
-                  <p className={`${isMobile ? "text-xs" : "text-sm"} ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-                    {stat.subLabel}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
