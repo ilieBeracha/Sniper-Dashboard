@@ -37,19 +37,19 @@ export const SessionConfigSection = ({
       {/* Quick Mode Indicator */}
       {isQuickMode && (
         <div className={`mb-4 p-3 rounded-lg flex items-start gap-3 ${
-          theme === "dark" ? "bg-amber-500/10 border border-amber-500/20" : "bg-amber-50 border border-amber-200"
+          theme === "dark" ? "bg-indigo-500/10 border border-indigo-500/20" : "bg-indigo-50 border border-indigo-200"
         }`}>
           <Zap className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-            theme === "dark" ? "text-amber-400" : "text-amber-600"
+            theme === "dark" ? "text-indigo-400" : "text-indigo-600"
           }`} />
           <div className="flex-1">
             <p className={`text-sm font-medium ${
-              theme === "dark" ? "text-amber-400" : "text-amber-600"
+              theme === "dark" ? "text-indigo-400" : "text-indigo-600"
             }`}>
               Quick Mode Active
             </p>
             <p className={`text-xs mt-1 ${
-              theme === "dark" ? "text-amber-400/70" : "text-amber-600/70"
+              theme === "dark" ? "text-indigo-400/70" : "text-indigo-600/70"
             }`}>
               You can skip the assignment selection for now and fill it in later. Focus on recording your performance first!
             </p>
@@ -68,7 +68,7 @@ export const SessionConfigSection = ({
                 theme === "dark"
                   ? "bg-zinc-900 border-zinc-800 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
                   : "bg-white border-gray-200 focus:border-indigo-500 focus:ring-indigo-500/20"
-              } ${isQuickMode && !sessionData.assignment_id ? "border-amber-500/50" : ""}`}
+              } ${isQuickMode && !sessionData.assignment_id ? "border-indigo-500/50" : ""}`}
             >
               <option value="">
                 {isQuickMode ? "Select assignment (optional)" : "Select assignment"}
@@ -83,13 +83,13 @@ export const SessionConfigSection = ({
               <Plus size={14} />
             </AddPurpleBtn>
           </div>
-          {isQuickMode && !sessionData.assignment_id && (
-            <p className={`text-xs mt-1 ${
-              theme === "dark" ? "text-amber-400/70" : "text-amber-600/70"
-            }`}>
-              You can select an assignment later
-            </p>
-          )}
+                      {isQuickMode && !sessionData.assignment_id && (
+              <p className={`text-xs mt-1 ${
+                theme === "dark" ? "text-indigo-400/70" : "text-indigo-600/70"
+              }`}>
+                You can select an assignment later
+              </p>
+            )}
         </div>
 
         <DayPeriodSelect dayPeriod={sessionData.dayPeriod} onDayPeriodChange={(dayPeriod) => updateSessionData("dayPeriod", dayPeriod)} />

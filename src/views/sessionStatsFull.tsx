@@ -159,7 +159,7 @@ export default function ImprovedSessionStats() {
           {/* Quick Mode Indicator */}
           {isQuickMode && (
             <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-              theme === "dark" ? "bg-amber-500/20 text-amber-400" : "bg-amber-100 text-amber-600"
+              theme === "dark" ? "bg-indigo-500/20 text-indigo-400" : "bg-indigo-100 text-indigo-600"
             }`}>
               <Zap className="w-4 h-4" />
               <span className="text-sm font-medium">Quick Mode</span>
@@ -186,7 +186,7 @@ export default function ImprovedSessionStats() {
           </div>
           <div className="flex-1 flex items-center justify-center gap-2">
             {isQuickMode && (
-              <div className="flex items-center gap-1 text-amber-500">
+              <div className="flex items-center gap-1 text-indigo-500">
                 <Zap className="w-3 h-3" />
                 <span className="text-xs font-medium">Quick</span>
               </div>
@@ -195,14 +195,14 @@ export default function ImprovedSessionStats() {
               Step {activeSection + 1} of {sections.length}
             </p>
           </div>
-          {!sessionId && !isQuickMode && (
-            <button
-              onClick={() => setShowQuickStart(true)}
-              className="text-amber-500"
-            >
-              <Zap className="w-5 h-5" />
-            </button>
-          )}
+                      {!sessionId && !isQuickMode && (
+              <button
+                onClick={() => setShowQuickStart(true)}
+                className="text-indigo-500"
+              >
+                <Zap className="w-5 h-5" />
+              </button>
+            )}
         </div>
       </div>
 

@@ -89,6 +89,14 @@ const DEFAULT_CATEGORIES = [
       effort: true,
       numberOfTargets: 1,
     }
+  },
+  {
+    id: "quick-log",
+    name: "Quick Log Only",
+    defaults: {
+      distance: 0,
+      numberOfTargets: 1,
+    }
   }
 ];
 
@@ -102,10 +110,10 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
   const [quickData, setQuickData] = useState<QuickStartData>({
     shotsFired: 0,
     targetHits: 0,
-    distance: 100,
+    distance: 0,
     numberOfTargets: 1,
-    position: "Lying",
-    dayPeriod: "day",
+    position: "",
+    dayPeriod: "",
     effort: false,
     includeWind: false,
     squadMode: false,
@@ -123,9 +131,8 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
   };
 
   const handleSubmit = () => {
-    if (quickData.shotsFired > 0) {
-      onQuickStart(quickData);
-    }
+    // Allow submission even with 0 shots - user can fill in later
+    onQuickStart(quickData);
   };
 
   const accuracy = quickData.shotsFired > 0 
@@ -152,10 +159,10 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
         }`}>
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${
-              theme === "dark" ? "bg-amber-500/20" : "bg-amber-100"
+              theme === "dark" ? "bg-indigo-500/20" : "bg-indigo-100"
             }`}>
               <Zap className={`w-5 h-5 ${
-                theme === "dark" ? "text-amber-400" : "text-amber-600"
+                theme === "dark" ? "text-indigo-400" : "text-indigo-600"
               }`} />
             </div>
             <div>
@@ -205,8 +212,8 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
           {/* Primary Score Entry */}
           <div className={`p-4 rounded-lg border-2 ${
             theme === "dark" 
-              ? "bg-zinc-800/50 border-amber-500/50" 
-              : "bg-amber-50 border-amber-300"
+              ? "bg-zinc-800/50 border-indigo-500/50" 
+              : "bg-indigo-50 border-indigo-300"
           }`}>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -260,7 +267,7 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
                   accuracy >= 80 
                     ? "text-green-500" 
                     : accuracy >= 60 
-                    ? "text-amber-500" 
+                    ? "text-indigo-500" 
                     : "text-red-500"
                 }`}>
                   {accuracy}%
@@ -376,8 +383,7 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={quickData.shotsFired === 0}
-            className="flex-1 bg-amber-500 hover:bg-amber-600 text-white"
+            className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white"
           >
             Start Quick Session
           </Button>

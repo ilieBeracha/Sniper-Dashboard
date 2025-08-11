@@ -80,12 +80,14 @@ export const useSessionStats = () => {
     setIsQuickMode(true);
     setQuickStartData(quickData);
     
-    // Set session data with defaults
+    // Set session data with minimal defaults - allow empty fields
     setSessionData(prev => ({
       ...prev,
-      dayPeriod: quickData.dayPeriod || "day",
-      effort: quickData.effort || false,
-      note: "Quick session - details to be filled later",
+      dayPeriod: quickData.dayPeriod || "",
+      effort: quickData.effort !== undefined ? quickData.effort : false,
+      note: "",
+      assignment_id: "",
+      timeToFirstShot: null,
     }));
 
     // Set up participants
@@ -101,7 +103,7 @@ export const useSessionStats = () => {
           ? `${member.first_name || ""} ${member.last_name || ""}`.trim() 
           : member.email,
         userDuty: member?.user_default_duty || "Sniper",
-        position: quickData.position || "Lying",
+        position: quickData.position || "",
         weaponId: member?.user_default_weapon || "",
         equipmentId: member?.user_default_equipment || "",
       }));
@@ -112,7 +114,7 @@ export const useSessionStats = () => {
           userId: user?.id || "",
           name: user?.first_name || user?.last_name || user?.email || "",
           userDuty: user?.user_default_duty || "Sniper",
-          position: quickData.position || "Lying",
+          position: quickData.position || "",
           weaponId: user?.user_default_weapon || "",
           equipmentId: user?.user_default_equipment || "",
         });
@@ -125,7 +127,7 @@ export const useSessionStats = () => {
         userId: user?.id || "",
         name: user?.first_name || user?.last_name || user?.email || "",
         userDuty: user?.user_default_duty || "Sniper",
-        position: quickData.position || "Lying",
+        position: quickData.position || "",
         weaponId: user?.user_default_weapon || "",
         equipmentId: user?.user_default_equipment || "",
       }]);
@@ -147,11 +149,11 @@ export const useSessionStats = () => {
           weaponId: member?.user_default_weapon || "",
           equipmentId: member?.user_default_equipment || "",
         })) || []
-      : [{
+              : [{
           userId: user?.id || "",
           name: user?.first_name || user?.last_name || user?.email || "",
           userDuty: user?.user_default_duty || "Sniper",
-          position: quickData.position || "Lying",
+          position: quickData.position || "",
           weaponId: user?.user_default_weapon || "",
           equipmentId: user?.user_default_equipment || "",
         }];
@@ -162,7 +164,7 @@ export const useSessionStats = () => {
         userId: user?.id || "",
         name: user?.first_name || user?.last_name || user?.email || "",
         userDuty: user?.user_default_duty || "Sniper",
-        position: quickData.position || "Lying",
+        position: quickData.position || "",
         weaponId: user?.user_default_weapon || "",
         equipmentId: user?.user_default_equipment || "",
       });
@@ -188,8 +190,10 @@ export const useSessionStats = () => {
     
     setTargets(newTargets);
     
-    // Jump to engagements section since user already entered scores
-    setActiveSection(3);
+    // Only jump to engagements if user entered scores
+    if (quickData.shotsFired > 0) {
+      setActiveSection(3);
+    }
   }, [user, members]);
 
   useEffect(() => {
@@ -361,19 +365,16 @@ export const useSessionStats = () => {
   };
 
   const validateSessionConfig = () => {
-    // In quick mode, assignment_id can be empty initially
-    if (isQuickMode) {
-      return sessionData.dayPeriod && sessionData.effort !== undefined;
-    }
+    // In quick mode, everything is valid
+    if (isQuickMode) return true;
     return sessionData.assignment_id && sessionData.dayPeriod && sessionData.timeToFirstShot !== null && sessionData.effort !== undefined;
   };
 
   const validateParticipants = () => {
+    // In quick mode, everything is valid
+    if (isQuickMode) return true;
+    
     if (participants.length === 0) return false;
-    // In quick mode, weapon/equipment can be empty initially
-    if (isQuickMode) {
-      return true;
-    }
     return participants.every((p) => {
       if (p.userDuty === "Sniper") {
         return p.weaponId !== "";
@@ -383,18 +384,18 @@ export const useSessionStats = () => {
   };
 
   const validateTargets = () => {
+    // In quick mode, everything is valid
+    if (isQuickMode) return true;
     return targets.length > 0;
   };
 
   const validateEngagements = () => {
+    // In quick mode, everything is valid
+    if (isQuickMode) return true;
+    
     if (targets.length === 0) return false;
     const snipers = participants.filter((p) => p.userDuty === "Sniper");
     if (snipers.length === 0) return false;
-
-    // In quick mode, we already have scores from the quick start
-    if (isQuickMode && quickStartData) {
-      return true;
-    }
 
     return targets.some((target) => target.engagements.some((e) => e.shotsFired && e.shotsFired > 0));
   };
@@ -545,31 +546,29 @@ export const useSessionStats = () => {
   const validateForm = useCallback(() => {
     const errors: string[] = [];
     
-    // In quick mode, relax some validations
+    // In quick mode, no validation - allow saving with any data
     if (isQuickMode) {
-      if (!sessionData.dayPeriod) errors.push("Time Period is required");
-      if (sessionData.effort === undefined || sessionData.effort === null) errors.push("Effort is required");
-      
-      // Don't require assignment_id in quick mode
-      // Don't require weapon/equipment in quick mode initially
+      setValidationErrors([]);
+      return [];
+    }
+    
+    // Normal mode validation
+    if (!sessionData.assignment_id) errors.push("Training Assignment is required");
+    if (!sessionData.dayPeriod) errors.push("Time Period is required");
+    if (sessionData.effort === undefined || sessionData.effort === null) errors.push("Effort is required");
+    
+    // Validate participants
+    if (participants.length === 0) {
+      errors.push("At least one participant is required");
     } else {
-      if (!sessionData.assignment_id) errors.push("Training Assignment is required");
-      if (!sessionData.dayPeriod) errors.push("Time Period is required");
-      if (sessionData.effort === undefined || sessionData.effort === null) errors.push("Effort is required");
-      
-      // Validate participants
-      if (participants.length === 0) {
-        errors.push("At least one participant is required");
-      } else {
-        participants.forEach((p, index) => {
-          if (p.userDuty === "Sniper" && !p.weaponId) {
-            errors.push(`Participant ${index + 1} (${p.name}): Weapon is required for snipers`);
-          }
-          if (p.userDuty === "Spotter" && !p.equipmentId) {
-            errors.push(`Participant ${index + 1} (${p.name}): Equipment is required for spotters`);
-          }
-        });
-      }
+      participants.forEach((p, index) => {
+        if (p.userDuty === "Sniper" && !p.weaponId) {
+          errors.push(`Participant ${index + 1} (${p.name}): Weapon is required for snipers`);
+        }
+        if (p.userDuty === "Spotter" && !p.equipmentId) {
+          errors.push(`Participant ${index + 1} (${p.name}): Equipment is required for spotters`);
+        }
+      });
     }
 
     // Validate targets
