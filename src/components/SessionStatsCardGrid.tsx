@@ -1,11 +1,12 @@
 import { format } from "date-fns";
-import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair } from "lucide-react";
+import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair, ChevronDown, ChevronUp } from "lucide-react";
 import { Tooltip } from "@heroui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { Popover, PopoverTrigger, PopoverContent, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
 import ProfileCapitalFirstLatter from "./ProfileCapitalFirstLatter";
 import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
+import { useState } from "react";
 
 interface SessionStatsCardGridProps {
   data: any[];
@@ -17,37 +18,80 @@ interface SessionStatsCardGridProps {
 export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDelete }: SessionStatsCardGridProps) {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
 
   if (!data || data.length === 0) {
     return <div className="text-center py-12 opacity-70 text-sm">No session stats yet</div>;
   }
 
+  const toggleCard = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedCards(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <div className="grid gap-3" style={{ gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(320px, 1fr))" }}>
       {data.map((item) => {
         const assignmentName = item?.assignment_session?.assignment?.assignment_name || "Unknown";
-
         const teamName = item.teams?.team_name || "No Team";
+        const isExpanded = expandedCards.has(item.id);
 
         // Calculate total shots and hits from targets
         let totalShots = 0;
         let totalHits = 0;
         
+        // Calculate range statistics
+        let shortRangeShots = 0;
+        let shortRangeHits = 0;
+        let mediumRangeShots = 0;
+        let mediumRangeHits = 0;
+        let longRangeShots = 0;
+        let longRangeHits = 0;
+        
         // Check both possible data structures for targets
         const targets = item.targets || item.target_stats || [];
         
         targets.forEach((target: any) => {
+          // Get target distance
+          const distance = target.distance_m || target.distance || 0;
+          
           // Check for engagements in different possible locations
           const engagements = target.engagements || target.target_engagements || [];
           
           engagements.forEach((engagement: any) => {
-            totalShots += engagement.shots_fired || 0;
-            totalHits += engagement.target_hits || 0;
+            const shots = engagement.shots_fired || 0;
+            const hits = engagement.target_hits || 0;
+            
+            totalShots += shots;
+            totalHits += hits;
+            
+            // Categorize by range
+            if (distance < 300) {
+              shortRangeShots += shots;
+              shortRangeHits += hits;
+            } else if (distance < 600) {
+              mediumRangeShots += shots;
+              mediumRangeHits += hits;
+            } else {
+              longRangeShots += shots;
+              longRangeHits += hits;
+            }
           });
         });
 
-        // Calculate hit percentage
+        // Calculate hit percentages
         const hitPercentage = totalShots > 0 ? Math.round((totalHits / totalShots) * 100) : 0;
+        const shortRangePercentage = shortRangeShots > 0 ? Math.round((shortRangeHits / shortRangeShots) * 100) : 0;
+        const mediumRangePercentage = mediumRangeShots > 0 ? Math.round((mediumRangeHits / mediumRangeShots) * 100) : 0;
+        const longRangePercentage = longRangeShots > 0 ? Math.round((longRangeHits / longRangeShots) * 100) : 0;
 
         return (
           <div
@@ -230,6 +274,65 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                   </span>
                 )}
               </div>
+
+              {/* Collapsible Details Section */}
+              {isExpanded && (
+                <div className={`mt-3 pt-3 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} animate-in slide-in-from-top-2 duration-200`}>
+                  {/* Range Breakdown */}
+                  {totalShots > 0 && (shortRangeShots > 0 || mediumRangeShots > 0 || longRangeShots > 0) && (
+                    <div className="mb-3">
+                      <p className={`text-xs font-medium mb-2 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                        Range Breakdown
+                      </p>
+                      <div className="grid grid-cols-3 gap-2 text-xs">
+                        {shortRangeShots > 0 && (
+                          <div className="text-center">
+                            <p className={`${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Short</p>
+                            <p className={`font-medium ${theme === "dark" ? "text-green-400" : "text-green-600"}`}>
+                              {shortRangePercentage}%
+                              <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"} ml-0.5`}>
+                                ({shortRangeShots})
+                              </span>
+                            </p>
+                          </div>
+                        )}
+                        {mediumRangeShots > 0 && (
+                          <div className="text-center">
+                            <p className={`${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Medium</p>
+                            <p className={`font-medium ${theme === "dark" ? "text-yellow-400" : "text-yellow-600"}`}>
+                              {mediumRangePercentage}%
+                              <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"} ml-0.5`}>
+                                ({mediumRangeShots})
+                              </span>
+                            </p>
+                          </div>
+                        )}
+                        {longRangeShots > 0 && (
+                          <div className="text-center">
+                            <p className={`${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Long</p>
+                            <p className={`font-medium ${theme === "dark" ? "text-red-400" : "text-red-600"}`}>
+                              {longRangePercentage}%
+                              <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"} ml-0.5`}>
+                                ({longRangeShots})
+                              </span>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Participants Count */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className={`${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                      Participants
+                    </span>
+                    <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                      {item.session_participants?.length || 0} shooters
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Participants avatars in bottom right corner */}
@@ -338,6 +441,18 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                 </PopoverContent>
               </Popover>
             </div>
+
+            {/* Expand/Collapse button */}
+            <button
+              onClick={(e) => toggleCard(item.id, e)}
+              className={`absolute bottom-3 left-3 p-1 rounded transition-colors ${
+                theme === "dark" 
+                  ? "hover:bg-zinc-800 text-zinc-500 hover:text-zinc-300" 
+                  : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
           </div>
         );
       })}
