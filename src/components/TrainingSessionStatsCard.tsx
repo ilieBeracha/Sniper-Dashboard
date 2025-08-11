@@ -2,7 +2,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { performanceStore } from "@/store/performance";
 import { Skeleton } from "@heroui/react";
 import { useEffect, useState } from "react";
-import { Target, TrendingUp, ChevronDown, ChevronUp, Crosshair, Zap, Clock } from "lucide-react";
+import { Target, TrendingUp, ChevronDown, ChevronUp, Crosshair, Clock } from "lucide-react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function TrainingSessionStatsCard({ trainingSessionId }: { trainingSessionId: string }) {
