@@ -1,11 +1,12 @@
 import { format } from "date-fns";
-import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair } from "lucide-react";
+import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair, ChevronDown } from "lucide-react";
 import { Tooltip } from "@heroui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { Popover, PopoverTrigger, PopoverContent, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
 import ProfileCapitalFirstLatter from "./ProfileCapitalFirstLatter";
 import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
+import { useState } from "react";
 
 interface SessionStatsCardGridProps {
   data: any[];
@@ -17,6 +18,16 @@ interface SessionStatsCardGridProps {
 export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDelete }: SessionStatsCardGridProps) {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+  const toggleExpanded = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   if (!data || data.length === 0) {
     return <div className="text-center py-12 opacity-70 text-sm">No session stats yet</div>;
@@ -36,18 +47,37 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
         // Check both possible data structures for targets
         const targets = item.targets || item.target_stats || [];
         
-        targets.forEach((target: any) => {
+        const perTarget: Array<{ index: number; distance?: number; shots: number; hits: number }> = [];
+        
+        targets.forEach((target: any, idx: number) => {
           // Check for engagements in different possible locations
           const engagements = target.engagements || target.target_engagements || [];
-          
+
+          let targetShots = 0;
+          let targetHits = 0;
           engagements.forEach((engagement: any) => {
-            totalShots += engagement.shots_fired || 0;
-            totalHits += engagement.target_hits || 0;
+            targetShots += engagement.shots_fired || 0;
+            targetHits += engagement.target_hits || 0;
+          });
+
+          totalShots += targetShots;
+          totalHits += targetHits;
+
+          perTarget.push({
+            index: idx + 1,
+            distance: target.distance_m || target.distance,
+            shots: targetShots,
+            hits: targetHits,
           });
         });
 
         // Calculate hit percentage
         const hitPercentage = totalShots > 0 ? Math.round((totalHits / totalShots) * 100) : 0;
+        const targetsCount = targets.length || 0;
+        const avgShotsPerTarget = targetsCount ? Math.round(totalShots / targetsCount) : 0;
+        const avgHitsPerTarget = targetsCount ? Math.round(totalHits / targetsCount) : 0;
+
+        const isExpanded = expandedIds.has(item.id);
 
         return (
           <div
@@ -57,7 +87,10 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                 ? "border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/70 hover:border-zinc-700 hover:shadow-xl"
                 : "border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 hover:shadow-lg"
             }`}
-            onClick={() => onCardClick?.(item)}
+            onClick={() => {
+              toggleExpanded(item.id);
+              onCardClick?.(item);
+            }}
           >
             {/* Background accent */}
             <div
@@ -127,6 +160,12 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                   </h3>
                   <p className="text-xs opacity-60 mt-0.5">{format(new Date(item.created_at), "dd MMM · HH:mm")}</p>
                 </div>
+                <ChevronDown
+                  size={14}
+                  className={`shrink-0 transition-transform mt-0.5 ${isExpanded ? "rotate-180" : "rotate-0"} ${
+                    theme === "dark" ? "text-zinc-500" : "text-gray-400"
+                  }`}
+                />
               </div>
 
               {/* Compact Info Grid */}
@@ -170,6 +209,11 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                       )}
                     </div>
                   </div>
+                  {!isExpanded && (
+                    <div className={`text-[11px] ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
+                      Avg/target: {avgShotsPerTarget} shots · {avgHitsPerTarget} hits
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -236,7 +280,7 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
             <div className="absolute bottom-3 right-3">
               <Popover placement="top-end">
                 <PopoverTrigger>
-                  <div className="cursor-pointer transition-transform hover:scale-110">
+                  <div className="cursor-pointer transition-transform hover:scale-110" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center -space-x-2">
                       {/* Show participants if available */}
                       {(item.session_participants || []).length > 0 ? (
@@ -290,6 +334,7 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                   className={`p-3 min-w-[240px] rounded-lg shadow-xl border ${
                     theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
                   }`}
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <h4 className={`text-sm font-medium mb-3 ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>
                     Session Participants ({item.session_participants?.length || 0})
@@ -338,6 +383,34 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                 </PopoverContent>
               </Popover>
             </div>
+
+            {/* Expanded details: per-target shots & hits */}
+            {isExpanded && (
+              <div className={`mt-2 pt-2 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+                {perTarget.length > 0 ? (
+                  <div className="space-y-1">
+                    {perTarget.slice(0, 5).map((t, idx) => (
+                      <div key={idx} className="flex items-center justify-between text-xs">
+                        <div className={`${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                          Target {t.index}
+                          {t.distance ? <span className="opacity-70"> · {t.distance}m</span> : null}
+                        </div>
+                        <div className={`${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                          {t.shots} shots · {t.hits} hits
+                        </div>
+                      </div>
+                    ))}
+                    {perTarget.length > 5 && (
+                      <div className={`text-[11px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+                        +{perTarget.length - 5} more targets
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className={`text-[12px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>No target data</div>
+                )}
+              </div>
+            )}
           </div>
         );
       })}
