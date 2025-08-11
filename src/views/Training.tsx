@@ -557,7 +557,7 @@ export default function TrainingPage() {
               if (isDisabled) {
                 toast.error("Training session is completed or canceled");
               } else {
-                navigate(`/training/${id}/session-stats-full/ `);
+                navigate(`/training/${id}/session-stats-full/`);
               }
             },
           },
