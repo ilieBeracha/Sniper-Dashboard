@@ -31,7 +31,10 @@ export const getSessionStatsByTrainingId = async (
         team_name
       ),
       target_stats!target_stats_session_stats_id_fkey (
-        distance_m
+        *,
+        target_engagements (
+          *
+        )
       ),
       session_participants!session_participants_session_stats_id_fkey (
         *,
@@ -84,9 +87,10 @@ export const getSessionStatsByTrainingId = async (
   const { data, error } = await queryBuilder;
   if (error) {
     toastService.error(error.message);
-    throw new Error("Failed to fetch session stats");
+    console.error("Failed to fetch session stats:", error);
+    return []; // Return empty array on error instead of throwing
   }
-  return data;
+  return data || []; // Ensure we always return an array
 };
 
 export const getSessionStatsCountByTrainingId = async (trainingId: string) => {

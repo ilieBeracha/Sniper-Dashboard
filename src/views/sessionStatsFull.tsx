@@ -59,16 +59,17 @@ export default function ImprovedSessionStats() {
     hasUnsavedChanges,
     isFormSubmitted,
     setHasUnsavedChanges,
+    isLoading,
   } = useSessionStats();
 
   useEffect(() => {
     (async () => {
-      if (user?.team_id) {
-        await getWeapons(user?.team_id as string);
-        await getEquipments(user?.team_id as string);
+      if (user?.team_id && training?.team_id) {
+        await getWeapons(user.team_id);
+        await getEquipments(user.team_id);
       }
     })();
-  }, [training?.team_id]);
+  }, [user?.team_id, training?.team_id, getWeapons, getEquipments]);
 
   const handleNavigation = useCallback(
     (path: string) => {
@@ -102,6 +103,18 @@ export default function ImprovedSessionStats() {
       setIsAssignmentModalOpen(false);
     }
     setIsAssignmentModalOpen(false);
+  }
+
+  // Show loading screen while data is being fetched
+  if (isLoading || !training || !sections || sections.length === 0 || !sessionData || participants.length === 0) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-[#0a0a0a]" : "bg-white"}`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+          <p className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>Loading session data...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
