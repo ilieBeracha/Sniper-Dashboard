@@ -71,7 +71,6 @@ export default function ImprovedSessionStats() {
     isFormSubmitted,
     setHasUnsavedChanges,
     isLoading,
-    initializeQuickMode,
     isQuickMode,
   } = useSessionStats();
 
@@ -138,7 +137,7 @@ export default function ImprovedSessionStats() {
           user_duty: "Sniper" as const,
           weapon_id: null,
           equipment_id: null,
-          position: quickData.position || null,
+          position: quickData.position || "",
         }],
         targets: [{
           distance: quickData.distance || 0,
