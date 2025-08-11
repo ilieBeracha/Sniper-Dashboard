@@ -31,7 +31,10 @@ export const getSessionStatsByTrainingId = async (
         team_name
       ),
       target_stats!target_stats_session_stats_id_fkey (
-        distance_m
+        *,
+        target_engagements (
+          *
+        )
       ),
       session_participants!session_participants_session_stats_id_fkey (
         *,
