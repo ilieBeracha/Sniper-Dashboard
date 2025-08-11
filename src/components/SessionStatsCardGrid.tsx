@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair } from "lucide-react";
+import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair, Ruler } from "lucide-react";
 import { Tooltip } from "@heroui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -45,6 +45,11 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
             totalHits += engagement.target_hits || 0;
           });
         });
+
+        // Distances (min-max)
+        const distances = targets.map((t: any) => t.distance_m || t.distance).filter(Boolean);
+        const minDistance = distances.length ? Math.min(...distances) : null;
+        const maxDistance = distances.length ? Math.max(...distances) : null;
 
         // Calculate hit percentage
         const hitPercentage = totalShots > 0 ? Math.round((totalHits / totalShots) * 100) : 0;
@@ -120,7 +125,7 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
             {/* Main Content */}
             <div className="relative">
               {/* Header Row */}
-              <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start justify-between gap-2 mb-1.5">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-sm truncate" title={assignmentName}>
                     {assignmentName}
@@ -130,8 +135,8 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
               </div>
 
               {/* Compact Info Grid */}
-              <div className="grid grid-cols-2 gap-2 mb-1">
-                {/* Team & Average Stats */}
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                {/* Team */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-1.5 text-xs">
                     <Building2 size={10} className="opacity-50" />
@@ -142,8 +147,8 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                 </div>
 
                 {/* Shots and Hits Stats */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3 text-xs">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-4 text-xs">
                     <div className="flex items-center gap-1">
                       <Target size={10} className="opacity-50" />
                       <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
@@ -170,6 +175,14 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                       )}
                     </div>
                   </div>
+                  {minDistance !== null && (
+                    <div className={`flex items-center gap-1 text-[11px] ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
+                      <Ruler size={10} className="opacity-50" />
+                      <span>
+                        {minDistance === maxDistance ? `${minDistance}m` : `${minDistance}-${maxDistance}m`}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -236,7 +249,7 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
             <div className="absolute bottom-3 right-3">
               <Popover placement="top-end">
                 <PopoverTrigger>
-                  <div className="cursor-pointer transition-transform hover:scale-110">
+                  <div className="cursor-pointer transition-transform hover:scale-110" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center -space-x-2">
                       {/* Show participants if available */}
                       {(item.session_participants || []).length > 0 ? (
@@ -290,6 +303,7 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                   className={`p-3 min-w-[240px] rounded-lg shadow-xl border ${
                     theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
                   }`}
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <h4 className={`text-sm font-medium mb-3 ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>
                     Session Participants ({item.session_participants?.length || 0})
