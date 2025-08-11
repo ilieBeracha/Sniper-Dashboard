@@ -76,7 +76,7 @@ const DEFAULT_CATEGORIES = [
     name: "Multi-Target Practice",
     defaults: {
       distance: 200,
-      position: "Kneeling",
+      position: "Lying",
       dayPeriod: "day",
       effort: true,
       numberOfTargets: 3,
