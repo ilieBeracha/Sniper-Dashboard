@@ -12,6 +12,7 @@ interface QuickStartModalProps {
   onClose: () => void;
   onQuickStart: (data: QuickStartData) => void;
   trainingCategories?: Array<{ id: string; name: string; defaults: Partial<QuickStartData> }>;
+  isSubmitting?: boolean;
 }
 
 export interface QuickStartData {
@@ -104,7 +105,8 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
   isOpen,
   onClose,
   onQuickStart,
-  trainingCategories = DEFAULT_CATEGORIES
+  trainingCategories = DEFAULT_CATEGORIES,
+  isSubmitting = false
 }) => {
   const { theme } = useTheme();
   const [quickData, setQuickData] = useState<QuickStartData>({
@@ -378,14 +380,16 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
             variant="outline"
             onClick={onClose}
             className="flex-1"
+            disabled={isSubmitting}
           >
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
-            className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white"
+            disabled={isSubmitting}
+            className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Start Quick Session
+            {isSubmitting ? "Submitting..." : "Start Quick Session"}
           </Button>
         </div>
       </div>

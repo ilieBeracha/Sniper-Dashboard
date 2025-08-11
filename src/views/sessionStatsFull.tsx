@@ -14,6 +14,10 @@ import { TrainingStore } from "@/store/trainingStore";
 import { useEffect, useState, useCallback } from "react";
 import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
+import { sessionStore } from "@/store/sessionStore";
+import { userStore } from "@/store/userStore";
+import type { SessionStatsSaveData } from "@/store/sessionStore";
+import { toast } from "react-toastify";
 import { ArrowLeft, Zap } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import ConfirmLeaveModal from "../components/SessionStatsFull/ConfirmLeaveModal";
@@ -26,9 +30,12 @@ export default function ImprovedSessionStats() {
   const { sessionId } = useParams();
   const { getWeapons } = useStore(weaponsStore);
   const { getEquipments } = useStore(equipmentStore);
+  const { saveSessionStats } = useStore(sessionStore);
+  const { user: currentUser } = useStore(userStore);
   const [showConfirmLeave, setShowConfirmLeave] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
+  const [isQuickSubmitting, setIsQuickSubmitting] = useState(false);
 
   const { training, createAssignment, loadTrainingById } = useStore(TrainingStore);
   const {
@@ -112,13 +119,55 @@ export default function ImprovedSessionStats() {
   }
 
   const handleQuickStart = useCallback(async (quickData: QuickStartData) => {
-    initializeQuickMode(quickData);
-    setShowQuickStart(false);
-    // Immediately submit to database
-    setTimeout(() => {
-      handleSubmit();
-    }, 100); // Small delay to ensure state is updated
-  }, [initializeQuickMode, handleSubmit]);
+    setIsQuickSubmitting(true);
+    
+    try {
+      // Create minimal session data for quick submission
+      const quickSessionData: SessionStatsSaveData = {
+        sessionData: {
+          training_session_id: training?.id || null,
+          assignment_id: null,
+          team_id: currentUser?.team_id || null,
+          dayPeriod: quickData.dayPeriod || null,
+          timeToFirstShot: null,
+          note: null,
+          effort: quickData.effort || false,
+        },
+        participants: [{
+          user_id: currentUser?.id || "",
+          user_duty: "Sniper" as const,
+          weapon_id: null,
+          equipment_id: null,
+          position: quickData.position || null,
+        }],
+        targets: [{
+          distance: quickData.distance || 0,
+          windStrength: quickData.includeWind ? quickData.windStrength : undefined,
+          windDirection: quickData.includeWind ? quickData.windDirection : undefined,
+          totalHits: quickData.targetHits || 0,
+          mistakeCode: undefined,
+          first_shot_hit: false,
+          engagements: [{
+            user_id: currentUser?.id || "",
+            shots_fired: quickData.shotsFired || 0,
+            target_hits: quickData.targetHits || 0,
+          }],
+        }],
+        currentUser: currentUser ? { id: currentUser.id } : null,
+      };
+
+      // Save directly to database
+      await saveSessionStats(quickSessionData);
+      toast.success("Quick session saved successfully!");
+      
+      // Navigate back to training
+      navigate(`/training/${training?.id}`);
+    } catch (error) {
+      console.error("Error saving quick session:", error);
+      toast.error("Failed to save quick session. Please try again.");
+      setIsQuickSubmitting(false);
+    }
+  }, [training, currentUser, saveSessionStats, navigate]);
 
   // Show loading screen while data is being fetched
   if (isLoading || !training || !sections || sections.length === 0 || !sessionData || participants.length === 0) {
@@ -209,8 +258,8 @@ export default function ImprovedSessionStats() {
         </div>
       </div>
 
-      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth lg:pt-0 " onScroll={handleScroll}>
-        <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8 ">
+      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth pt-20 lg:pt-24" onScroll={handleScroll}>
+        <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
             <SessionConfigSection
               section={sections[0]}
@@ -289,6 +338,7 @@ export default function ImprovedSessionStats() {
         isOpen={showQuickStart}
         onClose={() => setShowQuickStart(false)}
         onQuickStart={handleQuickStart}
+        isSubmitting={isQuickSubmitting}
       />
     </div>
   );
