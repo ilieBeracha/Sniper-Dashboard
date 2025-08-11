@@ -139,8 +139,8 @@ export const sessionStore = create<SessionStatsState>((set) => ({
     };
 
     const result = await getSessionStatsByTrainingId(assignmentId, limit, offset, filters);
-    set({ sessionStats: result });
-    return result;
+    set({ sessionStats: Array.isArray(result) ? result : [] });
+    return Array.isArray(result) ? result : [];
   },
 
   getSessionStatsCountByTrainingId: async (assignmentId: string) => {

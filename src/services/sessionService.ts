@@ -84,9 +84,10 @@ export const getSessionStatsByTrainingId = async (
   const { data, error } = await queryBuilder;
   if (error) {
     toastService.error(error.message);
-    throw new Error("Failed to fetch session stats");
+    console.error("Failed to fetch session stats:", error);
+    return []; // Return empty array on error instead of throwing
   }
-  return data;
+  return data || []; // Ensure we always return an array
 };
 
 export const getSessionStatsCountByTrainingId = async (trainingId: string) => {
