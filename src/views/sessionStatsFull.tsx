@@ -125,7 +125,7 @@ export default function ImprovedSessionStats() {
       const quickSessionData: SessionStatsSaveData = {
         sessionData: {
           training_session_id: training?.id || null,
-          assignment_id: null,
+          assignment_id: quickData.assignmentId || null,
           team_id: currentUser?.team_id || null,
           dayPeriod: quickData.dayPeriod || null,
           timeToFirstShot: null,
@@ -337,6 +337,7 @@ export default function ImprovedSessionStats() {
         isOpen={showQuickStart}
         onClose={() => setShowQuickStart(false)}
         onQuickStart={handleQuickStart}
+        trainingAssignments={trainingAssignments}
         isSubmitting={isQuickSubmitting}
       />
     </div>

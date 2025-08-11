@@ -12,6 +12,7 @@ interface QuickStartModalProps {
   onClose: () => void;
   onQuickStart: (data: QuickStartData) => void;
   trainingCategories?: Array<{ id: string; name: string; defaults: Partial<QuickStartData> }>;
+  trainingAssignments?: Array<{ id: string; assignment_name: string }>;
   isSubmitting?: boolean;
 }
 
@@ -28,6 +29,7 @@ export interface QuickStartData {
   windDirection?: number;
   numberOfTargets?: number;
   squadMode?: boolean;
+  assignmentId?: string;
   
   // Default values to pre-fill
   position?: string;
@@ -106,6 +108,7 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
   onClose,
   onQuickStart,
   trainingCategories = DEFAULT_CATEGORIES,
+  trainingAssignments = [],
   isSubmitting = false
 }) => {
   const { theme } = useTheme();
@@ -119,6 +122,7 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
     effort: false,
     includeWind: false,
     squadMode: false,
+    assignmentId: "",
   });
 
   const handleCategorySelect = (categoryId: string) => {
@@ -194,6 +198,26 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
 
         {/* Content */}
         <div className="p-6 space-y-6">
+          {/* Training Assignment Selection */}
+          <div>
+            <Label className="mb-2">Training Assignment</Label>
+            <Select 
+              value={quickData.assignmentId} 
+              onValueChange={(value) => setQuickData(prev => ({ ...prev, assignmentId: value }))}
+            >
+              <SelectTrigger className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}>
+                <SelectValue placeholder="Select assignment" />
+              </SelectTrigger>
+              <SelectContent>
+                {trainingAssignments.map(assignment => (
+                  <SelectItem key={assignment.id} value={assignment.id}>
+                    {assignment.assignment_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Training Category Selection */}
           <div>
             <Label className="mb-2">Training Category (Optional)</Label>
