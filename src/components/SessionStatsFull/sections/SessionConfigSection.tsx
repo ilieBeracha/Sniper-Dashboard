@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SessionData } from "../types";
 import { SectionHeader } from "./SectionHeader";
-import { Clock, ChevronDown, ChevronUp, FileText, Plus } from "lucide-react";
+import { Clock, ChevronDown, ChevronUp, FileText, Plus, Zap } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useState } from "react";
 import AddPurpleBtn from "@/components/base/buttons/AddPurpleBtn";
@@ -15,6 +15,7 @@ interface SessionConfigSectionProps {
   updateSessionData: (field: keyof SessionData, value: any) => void;
   trainingAssignments: any[];
   setIsAssignmentModalOpen: (open: boolean) => void;
+  isQuickMode?: boolean;
 }
 
 export const SessionConfigSection = ({
@@ -23,6 +24,7 @@ export const SessionConfigSection = ({
   updateSessionData,
   trainingAssignments,
   setIsAssignmentModalOpen,
+  isQuickMode = false,
 }: SessionConfigSectionProps) => {
   const { theme } = useTheme();
   const [showTimeField, setShowTimeField] = useState(sessionData.timeToFirstShot !== null);
@@ -31,6 +33,29 @@ export const SessionConfigSection = ({
   return (
     <div className="w-full max-w-2xl mx-auto" id="session-config">
       <SectionHeader section={section} />
+
+      {/* Quick Mode Indicator */}
+      {isQuickMode && (
+        <div className={`mb-4 p-3 rounded-lg flex items-start gap-3 ${
+          theme === "dark" ? "bg-amber-500/10 border border-amber-500/20" : "bg-amber-50 border border-amber-200"
+        }`}>
+          <Zap className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
+            theme === "dark" ? "text-amber-400" : "text-amber-600"
+          }`} />
+          <div className="flex-1">
+            <p className={`text-sm font-medium ${
+              theme === "dark" ? "text-amber-400" : "text-amber-600"
+            }`}>
+              Quick Mode Active
+            </p>
+            <p className={`text-xs mt-1 ${
+              theme === "dark" ? "text-amber-400/70" : "text-amber-600/70"
+            }`}>
+              You can skip the assignment selection for now and fill it in later. Focus on recording your performance first!
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-2">
         {/* Training Assignment */}
@@ -43,9 +68,11 @@ export const SessionConfigSection = ({
                 theme === "dark"
                   ? "bg-zinc-900 border-zinc-800 text-white focus:border-indigo-500 focus:ring-indigo-500/20"
                   : "bg-white border-gray-200 focus:border-indigo-500 focus:ring-indigo-500/20"
-              }`}
+              } ${isQuickMode && !sessionData.assignment_id ? "border-amber-500/50" : ""}`}
             >
-              <option value="">Select assignment</option>
+              <option value="">
+                {isQuickMode ? "Select assignment (optional)" : "Select assignment"}
+              </option>
               {trainingAssignments.map((assignment) => (
                 <option key={assignment.id} value={assignment.id}>
                   {assignment.assignment_name}
@@ -56,6 +83,13 @@ export const SessionConfigSection = ({
               <Plus size={14} />
             </AddPurpleBtn>
           </div>
+          {isQuickMode && !sessionData.assignment_id && (
+            <p className={`text-xs mt-1 ${
+              theme === "dark" ? "text-amber-400/70" : "text-amber-600/70"
+            }`}>
+              You can select an assignment later
+            </p>
+          )}
         </div>
 
         <DayPeriodSelect dayPeriod={sessionData.dayPeriod} onDayPeriodChange={(dayPeriod) => updateSessionData("dayPeriod", dayPeriod)} />

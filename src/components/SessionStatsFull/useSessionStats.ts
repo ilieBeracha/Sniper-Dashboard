@@ -12,6 +12,7 @@ import type { SessionData, Participant, Target, Section } from "./types";
 import type { SessionStatsSaveData } from "@/store/sessionStore";
 import { Target as TargetIcon, Users, Crosshair, Settings, CheckCircle2 } from "lucide-react";
 import { useModal } from "@/hooks/useModal";
+import type { QuickStartData } from "./QuickStartModal";
 
 export const useSessionStats = () => {
   const { id, sessionId } = useParams();
@@ -31,6 +32,8 @@ export const useSessionStats = () => {
   const [autoSyncPosition, setAutoSyncPosition] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [isQuickMode, setIsQuickMode] = useState(false);
+  const [quickStartData, setQuickStartData] = useState<QuickStartData | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -71,6 +74,123 @@ export const useSessionStats = () => {
   const [participants, setParticipants] = useState<Participant[]>([]);
 
   const [targets, setTargets] = useState<Target[]>([]);
+
+  // Initialize with quick mode data
+  const initializeQuickMode = useCallback((quickData: QuickStartData) => {
+    setIsQuickMode(true);
+    setQuickStartData(quickData);
+    
+    // Set session data with defaults
+    setSessionData(prev => ({
+      ...prev,
+      dayPeriod: quickData.dayPeriod || "day",
+      effort: quickData.effort || false,
+      note: "Quick session - details to be filled later",
+    }));
+
+    // Set up participants
+    if (quickData.squadMode && user?.squad_id) {
+      // Add squad members
+      const squadMembers = members?.filter(
+        (member: any) => member.squad_id === user?.squad_id
+      ) || [];
+      
+      const participants = squadMembers.map((member: any) => ({
+        userId: member.id,
+        name: member.first_name || member.last_name 
+          ? `${member.first_name || ""} ${member.last_name || ""}`.trim() 
+          : member.email,
+        userDuty: member?.user_default_duty || "Sniper",
+        position: quickData.position || "Lying",
+        weaponId: member?.user_default_weapon || "",
+        equipmentId: member?.user_default_equipment || "",
+      }));
+      
+      // Ensure current user is included
+      if (!participants.find(p => p.userId === user?.id)) {
+        participants.unshift({
+          userId: user?.id || "",
+          name: user?.first_name || user?.last_name || user?.email || "",
+          userDuty: user?.user_default_duty || "Sniper",
+          position: quickData.position || "Lying",
+          weaponId: user?.user_default_weapon || "",
+          equipmentId: user?.user_default_equipment || "",
+        });
+      }
+      
+      setParticipants(participants);
+    } else {
+      // Just current user
+      setParticipants([{
+        userId: user?.id || "",
+        name: user?.first_name || user?.last_name || user?.email || "",
+        userDuty: user?.user_default_duty || "Sniper",
+        position: quickData.position || "Lying",
+        weaponId: user?.user_default_weapon || "",
+        equipmentId: user?.user_default_equipment || "",
+      }]);
+    }
+
+    // Set up targets based on numberOfTargets
+    const numberOfTargets = quickData.numberOfTargets || 1;
+    const newTargets: Target[] = [];
+    
+    // Get the participants array that was just set
+    const currentParticipants = quickData.squadMode && user?.squad_id 
+      ? members?.filter((member: any) => member.squad_id === user?.squad_id).map((member: any) => ({
+          userId: member.id,
+          name: member.first_name || member.last_name 
+            ? `${member.first_name || ""} ${member.last_name || ""}`.trim() 
+            : member.email,
+          userDuty: member?.user_default_duty || "Sniper",
+          position: quickData.position || "Lying",
+          weaponId: member?.user_default_weapon || "",
+          equipmentId: member?.user_default_equipment || "",
+        })) || []
+      : [{
+          userId: user?.id || "",
+          name: user?.first_name || user?.last_name || user?.email || "",
+          userDuty: user?.user_default_duty || "Sniper",
+          position: quickData.position || "Lying",
+          weaponId: user?.user_default_weapon || "",
+          equipmentId: user?.user_default_equipment || "",
+        }];
+    
+    // Ensure current user is included if squad mode
+    if (quickData.squadMode && !currentParticipants.find(p => p.userId === user?.id)) {
+      currentParticipants.unshift({
+        userId: user?.id || "",
+        name: user?.first_name || user?.last_name || user?.email || "",
+        userDuty: user?.user_default_duty || "Sniper",
+        position: quickData.position || "Lying",
+        weaponId: user?.user_default_weapon || "",
+        equipmentId: user?.user_default_equipment || "",
+      });
+    }
+    
+    for (let i = 0; i < numberOfTargets; i++) {
+      const targetEngagements = currentParticipants.filter(p => p.userDuty === "Sniper").map(p => ({
+        userId: p.userId,
+        shotsFired: i === 0 ? quickData.shotsFired : 0, // Only first target gets the quick score
+        targetHits: i === 0 ? quickData.targetHits : 0,
+      }));
+
+      newTargets.push({
+        id: `target-${Date.now()}-${i}`,
+        distance: quickData.distance,
+        windStrength: quickData.includeWind ? (quickData.windStrength || null) : null,
+        windDirection: quickData.includeWind ? (quickData.windDirection || null) : null,
+        mistakeCode: "",
+        firstShotHit: i === 0 && quickData.targetHits > 0,
+        engagements: targetEngagements,
+      });
+    }
+    
+    setTargets(newTargets);
+    
+    // Jump to engagements section since user already entered scores
+    setActiveSection(3);
+  }, [user, members]);
 
   useEffect(() => {
     if (selectedSession && sessionId) {
@@ -241,11 +361,19 @@ export const useSessionStats = () => {
   };
 
   const validateSessionConfig = () => {
+    // In quick mode, assignment_id can be empty initially
+    if (isQuickMode) {
+      return sessionData.dayPeriod && sessionData.effort !== undefined;
+    }
     return sessionData.assignment_id && sessionData.dayPeriod && sessionData.timeToFirstShot !== null && sessionData.effort !== undefined;
   };
 
   const validateParticipants = () => {
     if (participants.length === 0) return false;
+    // In quick mode, weapon/equipment can be empty initially
+    if (isQuickMode) {
+      return true;
+    }
     return participants.every((p) => {
       if (p.userDuty === "Sniper") {
         return p.weaponId !== "";
@@ -262,6 +390,11 @@ export const useSessionStats = () => {
     if (targets.length === 0) return false;
     const snipers = participants.filter((p) => p.userDuty === "Sniper");
     if (snipers.length === 0) return false;
+
+    // In quick mode, we already have scores from the quick start
+    if (isQuickMode && quickStartData) {
+      return true;
+    }
 
     return targets.some((target) => target.engagements.some((e) => e.shotsFired && e.shotsFired > 0));
   };
@@ -411,21 +544,32 @@ export const useSessionStats = () => {
   // Validation function that runs on data changes
   const validateForm = useCallback(() => {
     const errors: string[] = [];
-    if (!sessionData.assignment_id) errors.push("Training Assignment is required");
-    if (!sessionData.dayPeriod) errors.push("Time Period is required");
-    if (sessionData.effort === undefined || sessionData.effort === null) errors.push("Effort is required");
-    // Validate participants
-    if (participants.length === 0) {
-      errors.push("At least one participant is required");
+    
+    // In quick mode, relax some validations
+    if (isQuickMode) {
+      if (!sessionData.dayPeriod) errors.push("Time Period is required");
+      if (sessionData.effort === undefined || sessionData.effort === null) errors.push("Effort is required");
+      
+      // Don't require assignment_id in quick mode
+      // Don't require weapon/equipment in quick mode initially
     } else {
-      participants.forEach((p, index) => {
-        if (p.userDuty === "Sniper" && !p.weaponId) {
-          errors.push(`Participant ${index + 1} (${p.name}): Weapon is required for snipers`);
-        }
-        if (p.userDuty === "Spotter" && !p.equipmentId) {
-          errors.push(`Participant ${index + 1} (${p.name}): Equipment is required for spotters`);
-        }
-      });
+      if (!sessionData.assignment_id) errors.push("Training Assignment is required");
+      if (!sessionData.dayPeriod) errors.push("Time Period is required");
+      if (sessionData.effort === undefined || sessionData.effort === null) errors.push("Effort is required");
+      
+      // Validate participants
+      if (participants.length === 0) {
+        errors.push("At least one participant is required");
+      } else {
+        participants.forEach((p, index) => {
+          if (p.userDuty === "Sniper" && !p.weaponId) {
+            errors.push(`Participant ${index + 1} (${p.name}): Weapon is required for snipers`);
+          }
+          if (p.userDuty === "Spotter" && !p.equipmentId) {
+            errors.push(`Participant ${index + 1} (${p.name}): Equipment is required for spotters`);
+          }
+        });
+      }
     }
 
     // Validate targets
@@ -435,7 +579,7 @@ export const useSessionStats = () => {
 
     setValidationErrors(errors);
     return errors;
-  }, [sessionData, participants, targets]);
+  }, [sessionData, participants, targets, isQuickMode]);
 
   // Run validation when data changes
   useEffect(() => {
@@ -552,6 +696,8 @@ export const useSessionStats = () => {
     autoSyncPosition,
     hasUnsavedChanges,
     isFormSubmitted,
+    isQuickMode,
+    quickStartData,
     // Data
     user,
     training,
@@ -578,5 +724,7 @@ export const useSessionStats = () => {
     syncParticipantsPosition,
     setAutoSyncPosition,
     setHasUnsavedChanges,
+    initializeQuickMode,
+    setIsQuickMode,
   };
 };

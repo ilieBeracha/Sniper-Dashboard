@@ -14,17 +14,21 @@ import { TrainingStore } from "@/store/trainingStore";
 import { useEffect, useState, useCallback } from "react";
 import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Zap } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 import ConfirmLeaveModal from "../components/SessionStatsFull/ConfirmLeaveModal";
+import { QuickStartModal, type QuickStartData } from "../components/SessionStatsFull/QuickStartModal";
+import { Button } from "@/components/ui/button";
 
 export default function ImprovedSessionStats() {
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const { sessionId } = useParams();
   const { getWeapons } = useStore(weaponsStore);
   const { getEquipments } = useStore(equipmentStore);
   const [showConfirmLeave, setShowConfirmLeave] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [showQuickStart, setShowQuickStart] = useState(false);
 
   const { training, createAssignment, loadTrainingById } = useStore(TrainingStore);
   const {
@@ -60,6 +64,8 @@ export default function ImprovedSessionStats() {
     isFormSubmitted,
     setHasUnsavedChanges,
     isLoading,
+    initializeQuickMode,
+    isQuickMode,
   } = useSessionStats();
 
   useEffect(() => {
@@ -105,6 +111,12 @@ export default function ImprovedSessionStats() {
     setIsAssignmentModalOpen(false);
   }
 
+  const handleQuickStart = useCallback((quickData: QuickStartData) => {
+    initializeQuickMode(quickData);
+    setShowQuickStart(false);
+    setHasUnsavedChanges(true);
+  }, [initializeQuickMode, setHasUnsavedChanges]);
+
   // Show loading screen while data is being fetched
   if (isLoading || !training || !sections || sections.length === 0 || !sessionData || participants.length === 0) {
     return (
@@ -122,15 +134,38 @@ export default function ImprovedSessionStats() {
       <div className="hidden lg:block">
         <ScrollProgress activeSection={activeSection} totalSections={sections.length} />
 
-        <button
-          onClick={() => handleNavigation(`/training/${training?.id}`)}
-          className={`fixed top-4 left-4 z-50 flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-            theme === "dark" ? "bg-zinc-800/90 hover:bg-zinc-700 text-zinc-300" : "bg-white/90 hover:bg-gray-100 text-gray-700 shadow-md"
-          }`}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="text-sm font-medium">Back to training</span>
-        </button>
+        <div className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between">
+          <button
+            onClick={() => handleNavigation(`/training/${training?.id}`)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              theme === "dark" ? "bg-zinc-800/90 hover:bg-zinc-700 text-zinc-300" : "bg-white/90 hover:bg-gray-100 text-gray-700 shadow-md"
+            }`}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm font-medium">Back to training</span>
+          </button>
+
+          {/* Quick Start Button - Only show for new sessions */}
+          {!sessionId && !isQuickMode && (
+            <Button
+              onClick={() => setShowQuickStart(true)}
+              className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white"
+            >
+              <Zap className="w-4 h-4" />
+              <span className="text-sm font-medium">Quick Start</span>
+            </Button>
+          )}
+
+          {/* Quick Mode Indicator */}
+          {isQuickMode && (
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+              theme === "dark" ? "bg-amber-500/20 text-amber-400" : "bg-amber-100 text-amber-600"
+            }`}>
+              <Zap className="w-4 h-4" />
+              <span className="text-sm font-medium">Quick Mode</span>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50   backdrop-blur-sm shadow-md">
@@ -144,16 +179,30 @@ export default function ImprovedSessionStats() {
             />
           ))}
         </div>
-        <div className="px-4 py-3 flex items-center justify-between gap-4" onClick={() => handleNavigation(`/training/${training?.id}`)}>
-          <div className="flex items-center gap-2 cursor-pointer">
+        <div className="px-4 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleNavigation(`/training/${training?.id}`)}>
             <ArrowLeft className="w-4 h-4" />
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Back to training</p>
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Back</p>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 flex items-center justify-center gap-2">
+            {isQuickMode && (
+              <div className="flex items-center gap-1 text-amber-500">
+                <Zap className="w-3 h-3" />
+                <span className="text-xs font-medium">Quick</span>
+              </div>
+            )}
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
               Step {activeSection + 1} of {sections.length}
             </p>
           </div>
+          {!sessionId && !isQuickMode && (
+            <button
+              onClick={() => setShowQuickStart(true)}
+              className="text-amber-500"
+            >
+              <Zap className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -166,6 +215,7 @@ export default function ImprovedSessionStats() {
               updateSessionData={updateSessionData}
               trainingAssignments={trainingAssignments}
               setIsAssignmentModalOpen={setIsAssignmentModalOpen}
+              isQuickMode={isQuickMode}
             />
           </div>
         </section>
@@ -230,6 +280,12 @@ export default function ImprovedSessionStats() {
           }
         }}
         hasUnsavedChanges={hasUnsavedChanges}
+      />
+
+      <QuickStartModal
+        isOpen={showQuickStart}
+        onClose={() => setShowQuickStart(false)}
+        onQuickStart={handleQuickStart}
       />
     </div>
   );
