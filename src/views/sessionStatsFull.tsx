@@ -111,11 +111,14 @@ export default function ImprovedSessionStats() {
     setIsAssignmentModalOpen(false);
   }
 
-  const handleQuickStart = useCallback((quickData: QuickStartData) => {
+  const handleQuickStart = useCallback(async (quickData: QuickStartData) => {
     initializeQuickMode(quickData);
     setShowQuickStart(false);
-    setHasUnsavedChanges(true);
-  }, [initializeQuickMode, setHasUnsavedChanges]);
+    // Immediately submit to database
+    setTimeout(() => {
+      handleSubmit();
+    }, 100); // Small delay to ensure state is updated
+  }, [initializeQuickMode, handleSubmit]);
 
   // Show loading screen while data is being fetched
   if (isLoading || !training || !sections || sections.length === 0 || !sessionData || participants.length === 0) {
