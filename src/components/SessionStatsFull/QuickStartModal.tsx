@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface QuickStartModalProps {
   isOpen: boolean;
@@ -289,20 +289,21 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
           {/* Optional Settings */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <Label 
+                htmlFor="wind-toggle" 
+                className="flex items-center gap-2 cursor-pointer flex-1"
+              >
+                <Checkbox
+                  id="wind-toggle"
+                  checked={quickData.includeWind}
+                  onCheckedChange={(checked: boolean) => setQuickData(prev => ({
+                    ...prev,
+                    includeWind: checked
+                  }))}
+                />
                 <Wind className="w-4 h-4" />
-                <Label htmlFor="wind-toggle" className="cursor-pointer">
-                  Include Wind Conditions
-                </Label>
-              </div>
-              <Switch
-                id="wind-toggle"
-                checked={quickData.includeWind}
-                onCheckedChange={(checked) => setQuickData(prev => ({
-                  ...prev,
-                  includeWind: checked
-                }))}
-              />
+                <span>Include Wind Conditions</span>
+              </Label>
             </div>
 
             {quickData.includeWind && (
@@ -343,20 +344,21 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
             )}
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <Label 
+                htmlFor="squad-toggle" 
+                className="flex items-center gap-2 cursor-pointer flex-1"
+              >
+                <Checkbox
+                  id="squad-toggle"
+                  checked={quickData.squadMode}
+                  onCheckedChange={(checked: boolean) => setQuickData(prev => ({
+                    ...prev,
+                    squadMode: checked
+                  }))}
+                />
                 <Users className="w-4 h-4" />
-                <Label htmlFor="squad-toggle" className="cursor-pointer">
-                  Include Squad Members
-                </Label>
-              </div>
-              <Switch
-                id="squad-toggle"
-                checked={quickData.squadMode}
-                onCheckedChange={(checked) => setQuickData(prev => ({
-                  ...prev,
-                  squadMode: checked
-                }))}
-              />
+                <span>Include Squad Members</span>
+              </Label>
             </div>
           </div>
         </div>
