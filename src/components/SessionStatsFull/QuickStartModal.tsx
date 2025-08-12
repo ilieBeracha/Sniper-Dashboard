@@ -195,25 +195,23 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
 
         {/* Content */}
         <div className="p-4 space-y-3">
-          {/* Main Preset Selection */}
-          <div>
-            <Select value={quickData.categoryId} onValueChange={handleCategorySelect}>
-              <SelectTrigger className={`h-12 text-base font-medium ${
-                theme === "dark" 
-                  ? "bg-zinc-800 border-zinc-700 hover:bg-zinc-700" 
-                  : "hover:bg-gray-50"
-              }`}>
-                <SelectValue placeholder="Choose training scenario" />
-              </SelectTrigger>
-              <SelectContent>
-                {trainingCategories.map(category => (
-                  <SelectItem key={category.id} value={category.id} className="py-2">
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Main Preset Selection - Full Width */}
+          <Select value={quickData.categoryId} onValueChange={handleCategorySelect}>
+            <SelectTrigger className={`w-full h-12 text-base font-medium ${
+              theme === "dark" 
+                ? "bg-zinc-800 border-zinc-700 hover:bg-zinc-700" 
+                : "hover:bg-gray-50"
+            }`}>
+              <SelectValue placeholder="Choose training scenario" />
+            </SelectTrigger>
+            <SelectContent>
+              {trainingCategories.map(category => (
+                <SelectItem key={category.id} value={category.id} className="py-2">
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
           {/* Display Selected Preset Data */}
           {quickData.categoryId && quickData.categoryId !== 'custom' && (
@@ -230,7 +228,59 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
             </div>
           )}
 
-          {/* Score Entry */}
+          {/* Configuration Grid - Always Show */}
+          <div className="grid grid-cols-3 gap-2">
+            <div>
+              <Label className="text-xs mb-1">Distance</Label>
+              <Input
+                type="number"
+                min="0"
+                max="2000"
+                step="50"
+                value={quickData.distance}
+                onChange={(e) => setQuickData(prev => ({
+                  ...prev,
+                  distance: parseInt(e.target.value) || 0
+                }))}
+                className={`w-full h-8 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <Label className="text-xs mb-1">Position</Label>
+              <Select 
+                value={quickData.position || ""} 
+                onValueChange={(value) => setQuickData(prev => ({ ...prev, position: value }))}
+              >
+                <SelectTrigger className={`w-full h-8 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}>
+                  <SelectValue placeholder="Select" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Laying">Laying</SelectItem>
+                  <SelectItem value="Standing">Standing</SelectItem>
+                  <SelectItem value="Operational">Operational</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs mb-1">Time</Label>
+              <Select 
+                value={quickData.dayPeriod || ""} 
+                onValueChange={(value) => setQuickData(prev => ({ ...prev, dayPeriod: value }))}
+              >
+                <SelectTrigger className={`w-full h-8 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}>
+                  <SelectValue placeholder="Day" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="day">Day</SelectItem>
+                  <SelectItem value="twilight">Twilight</SelectItem>
+                  <SelectItem value="night">Night</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Score Entry - 2 Column Grid */}
           <div className="grid grid-cols-2 gap-2">
             <div>
               <Label className="text-xs mb-1">Shots Fired</Label>
@@ -242,7 +292,7 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
                   ...prev,
                   shotsFired: parseInt(e.target.value) || 0
                 }))}
-                className={`h-8 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}
+                className={`w-full h-8 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}
                 placeholder="0"
               />
             </div>
@@ -257,65 +307,11 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
                   ...prev,
                   targetHits: Math.min(parseInt(e.target.value) || 0, prev.shotsFired)
                 }))}
-                className={`h-8 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}
+                className={`w-full h-8 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}
                 placeholder="0"
               />
             </div>
           </div>
-
-          {/* Manual Configuration - Only for Custom */}
-          {(!quickData.categoryId || quickData.categoryId === 'custom') && (
-            <div className="grid grid-cols-3 gap-2">
-              <div>
-                <Label className="text-xs mb-1">Distance</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  max="2000"
-                  step="50"
-                  value={quickData.distance}
-                  onChange={(e) => setQuickData(prev => ({
-                    ...prev,
-                    distance: parseInt(e.target.value) || 0
-                  }))}
-                  className={`h-8 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}
-                  placeholder="0"
-                />
-              </div>
-              <div>
-                <Label className="text-xs mb-1">Position</Label>
-                <Select 
-                  value={quickData.position || ""} 
-                  onValueChange={(value) => setQuickData(prev => ({ ...prev, position: value }))}
-                >
-                  <SelectTrigger className={`h-8 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Laying">Laying</SelectItem>
-                    <SelectItem value="Standing">Standing</SelectItem>
-                    <SelectItem value="Operational">Operational</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs mb-1">Time</Label>
-                <Select 
-                  value={quickData.dayPeriod || ""} 
-                  onValueChange={(value) => setQuickData(prev => ({ ...prev, dayPeriod: value }))}
-                >
-                  <SelectTrigger className={`h-8 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}>
-                    <SelectValue placeholder="Day" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="day">Day</SelectItem>
-                    <SelectItem value="twilight">Twilight</SelectItem>
-                    <SelectItem value="night">Night</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Footer */}
