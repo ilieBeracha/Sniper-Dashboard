@@ -7,6 +7,8 @@ import { squadStore } from "@/store/squadStore";
 import { useEffect } from "react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import DashboardCalendar from "./DashboardCalendar";
+// import { ChartUserScoresByWeaponSquad } from "./ChartUserScoresByWeaponSquad";
+import ComingSoon from "./ComingSoon";
 
 export default function DashboardOverview({ loading }: { loading: boolean }) {
   const { user } = useStore(userStore);
@@ -29,8 +31,14 @@ export default function DashboardOverview({ loading }: { loading: boolean }) {
   return (
     <div className="grid gap-6 auto-rows-max grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
       <div className="col-span-1 md:col-span-2 xl:col-span-3">
+        <ComingSoon />
+      </div>
+      <div className="col-span-1 md:col-span-2 xl:col-span-3">
         <DashboardProfileCard />
       </div>
+      {/* <div className="col-span-1 md:col-span-2 xl:col-span-3">
+        <ChartUserScoresByWeaponSquad />
+      </div> */}
       {isMobile && (
         <div className="col-span-1">
           <DashboardCalendar />
