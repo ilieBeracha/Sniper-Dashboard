@@ -138,7 +138,7 @@ export default function ImprovedSessionStats() {
           user_duty: "Sniper" as const,
           weapon_id: currentUser?.user_default_weapon || null,
           equipment_id: null,
-          position: quickData.position || "Lying",
+          position: quickData.position || "Laying",
         }],
         targets: [{
           distance: quickData.distance || 0,

@@ -38,55 +38,77 @@ export interface QuickStartData {
 
 const DEFAULT_CATEGORIES = [
   {
-    id: "zero-100m",
-    name: "Zeroing - 100m Prone",
+    id: "precision-100",
+    name: "Precision Zero",
     defaults: {
       distance: 100,
-      position: "Lying",
+      position: "Laying",
       dayPeriod: "day",
       effort: false,
       numberOfTargets: 1,
     }
   },
   {
-    id: "qual-300m",
-    name: "Qualification - 300m",
+    id: "standard-300",
+    name: "Standard Qualification",
     defaults: {
       distance: 300,
-      position: "Lying",
+      position: "Laying",
       dayPeriod: "day",
       effort: true,
       numberOfTargets: 1,
     }
   },
   {
-    id: "combat-200m",
-    name: "Combat Drill - 200m",
+    id: "operational-200",
+    name: "Operational Readiness",
     defaults: {
       distance: 200,
-      position: "Sitting",
+      position: "Operational",
       dayPeriod: "day",
       effort: true,
       numberOfTargets: 3,
     }
   },
   {
-    id: "long-range-500m",
-    name: "Long Range - 500m",
+    id: "distance-500",
+    name: "Distance Challenge",
     defaults: {
       distance: 500,
-      position: "Lying",
+      position: "Laying",
       dayPeriod: "day",
       effort: true,
       numberOfTargets: 1,
     }
   },
   {
-    id: "night-300m",
-    name: "Night Training - 300m",
+    id: "lowlight-300",
+    name: "Low Light Operations",
     defaults: {
       distance: 300,
-      position: "Lying",
+      position: "Laying",
+      dayPeriod: "twilight",
+      effort: true,
+      numberOfTargets: 2,
+    }
+  },
+  {
+    id: "standing-150",
+    name: "Standing Engagement",
+    defaults: {
+      distance: 150,
+      position: "Standing",
+      dayPeriod: "day",
+      effort: true,
+      numberOfTargets: 2,
+    }
+  },
+  {
+    id: "night-ops-400",
+    name: "Night Operations",
+    defaults: {
+      distance: 400,
+      position: "Laying",
       dayPeriod: "night",
       effort: true,
       numberOfTargets: 1,
@@ -94,7 +116,7 @@ const DEFAULT_CATEGORIES = [
   },
   {
     id: "custom",
-    name: "Custom Session",
+    name: "Custom Configuration",
     defaults: {
       distance: 0,
       numberOfTargets: 1,
@@ -202,14 +224,29 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
               <Label className="text-xs mb-1">Preset</Label>
               <Select value={quickData.categoryId} onValueChange={handleCategorySelect}>
                 <SelectTrigger className={`h-8 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}>
-                  <SelectValue placeholder="Optional" />
+                  <SelectValue placeholder="Choose preset" />
                 </SelectTrigger>
-                <SelectContent>
-                  {trainingCategories.map(category => (
-                    <SelectItem key={category.id} value={category.id} className="text-sm">
-                      {category.name}
-                    </SelectItem>
-                  ))}
+                <SelectContent className="max-h-[300px]">
+                  {trainingCategories.map(category => {
+                    const isCustom = category.id === 'custom';
+                    const preset = category.defaults;
+                    return (
+                      <SelectItem 
+                        key={category.id} 
+                        value={category.id} 
+                        className={`text-sm py-2 ${isCustom ? 'border-t mt-1 pt-2' : ''}`}
+                      >
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-medium">{category.name}</span>
+                          {!isCustom && (
+                            <span className="text-xs opacity-60">
+                              {preset.distance}m • {preset.position} • {preset.dayPeriod === 'twilight' ? 'Twilight' : preset.dayPeriod === 'night' ? 'Night' : 'Day'}
+                            </span>
+                          )}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -276,9 +313,9 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Lying">Lying</SelectItem>
-                  <SelectItem value="Sitting">Sitting</SelectItem>
+                  <SelectItem value="Laying">Laying</SelectItem>
                   <SelectItem value="Standing">Standing</SelectItem>
+                  <SelectItem value="Operational">Operational</SelectItem>
                 </SelectContent>
               </Select>
             </div>
