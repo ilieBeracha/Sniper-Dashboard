@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Sparkles, Zap, Star, ArrowRight, Clock, Rocket } from "lucide-react";
+import { Sparkles, Zap, Star, Rocket } from "lucide-react";
 
 export const ComingSoon: React.FC = () => {
   const { theme } = useTheme();
