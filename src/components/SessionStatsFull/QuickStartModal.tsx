@@ -11,7 +11,6 @@ interface QuickStartModalProps {
   onClose: () => void;
   onQuickStart: (data: QuickStartData) => void;
   trainingCategories?: Array<{ id: string; name: string; defaults: Partial<QuickStartData> }>;
-  trainingAssignments?: Array<{ id: string; assignment_name: string }>;
   isSubmitting?: boolean;
 }
 
@@ -28,7 +27,6 @@ export interface QuickStartData {
   windDirection?: number;
   numberOfTargets?: number;
   squadMode?: boolean;
-  assignmentId?: string;
   
   // Default values to pre-fill
   position?: string;
@@ -129,7 +127,6 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
   onClose,
   onQuickStart,
   trainingCategories = DEFAULT_CATEGORIES,
-  trainingAssignments = [],
   isSubmitting = false
 }) => {
   const { theme } = useTheme();
@@ -143,7 +140,6 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
     effort: false,
     includeWind: false,
     squadMode: false,
-    assignmentId: "",
   });
 
   const handleCategorySelect = (categoryId: string) => {
@@ -199,36 +195,19 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
 
         {/* Content */}
         <div className="p-4 space-y-3">
-          {/* Assignment */}
+          {/* Main Preset Selection */}
           <div>
-            <Label className="text-xs mb-1">Assignment</Label>
-            <Select 
-              value={quickData.assignmentId} 
-              onValueChange={(value) => setQuickData(prev => ({ ...prev, assignmentId: value }))}
-            >
-              <SelectTrigger className={`h-8 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}>
-                <SelectValue placeholder="Select assignment" />
-              </SelectTrigger>
-              <SelectContent>
-                {trainingAssignments.map(assignment => (
-                  <SelectItem key={assignment.id} value={assignment.id}>
-                    {assignment.assignment_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {/* Preset Selection - Bigger */}
-          <div>
-            <Label className="text-xs mb-1">Training Preset</Label>
             <Select value={quickData.categoryId} onValueChange={handleCategorySelect}>
-              <SelectTrigger className={`h-10 text-sm ${theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}`}>
-                <SelectValue placeholder="Select training preset" />
+              <SelectTrigger className={`h-12 text-base font-medium ${
+                theme === "dark" 
+                  ? "bg-zinc-800 border-zinc-700 hover:bg-zinc-700" 
+                  : "hover:bg-gray-50"
+              }`}>
+                <SelectValue placeholder="Choose training scenario" />
               </SelectTrigger>
               <SelectContent>
                 {trainingCategories.map(category => (
-                  <SelectItem key={category.id} value={category.id}>
+                  <SelectItem key={category.id} value={category.id} className="py-2">
                     {category.name}
                   </SelectItem>
                 ))}
