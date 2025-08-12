@@ -46,8 +46,6 @@ const DEFAULT_CATEGORIES = [
       dayPeriod: "day",
       effort: false,
       numberOfTargets: 1,
-      shotsFired: 5,
-      targetHits: 4,
     }
   },
   {
@@ -59,8 +57,6 @@ const DEFAULT_CATEGORIES = [
       dayPeriod: "day",
       effort: true,
       numberOfTargets: 1,
-      shotsFired: 10,
-      targetHits: 8,
     }
   },
   {
@@ -72,8 +68,6 @@ const DEFAULT_CATEGORIES = [
       dayPeriod: "day",
       effort: true,
       numberOfTargets: 3,
-      shotsFired: 6,
-      targetHits: 5,
     }
   },
   {
@@ -85,8 +79,6 @@ const DEFAULT_CATEGORIES = [
       dayPeriod: "day",
       effort: true,
       numberOfTargets: 1,
-      shotsFired: 5,
-      targetHits: 3,
     }
   },
   {
@@ -98,8 +90,6 @@ const DEFAULT_CATEGORIES = [
       dayPeriod: "night",
       effort: true,
       numberOfTargets: 1,
-      shotsFired: 5,
-      targetHits: 3,
     }
   },
   {
@@ -108,8 +98,6 @@ const DEFAULT_CATEGORIES = [
     defaults: {
       distance: 0,
       numberOfTargets: 1,
-      shotsFired: 0,
-      targetHits: 0,
     }
   }
 ];
@@ -151,10 +139,6 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
     // Allow submission even with 0 shots - user can fill in later
     onQuickStart(quickData);
   };
-
-  const accuracy = quickData.shotsFired > 0 
-    ? Math.round((quickData.targetHits / quickData.shotsFired) * 100) 
-    : 0;
 
   if (!isOpen) return null;
 
