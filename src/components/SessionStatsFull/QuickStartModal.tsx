@@ -38,67 +38,173 @@ export interface QuickStartData {
 }
 
 const DEFAULT_CATEGORIES = [
+  // BASIC TIER - Most Common Training Scenarios
   {
-    id: "basic-100m",
-    name: "Basic Training (100m)",
+    id: "zero-100m-prone",
+    name: "🎯 Zeroing - 100m Prone",
     defaults: {
       distance: 100,
       position: "Lying",
       dayPeriod: "day",
       effort: false,
       numberOfTargets: 1,
+      shotsFired: 5,
+      targetHits: 4,
+      includeWind: false,
     }
   },
   {
-    id: "medium-300m",
-    name: "Medium Range (300m)",
+    id: "qual-300m-prone",
+    name: "🎖️ Qualification - 300m Prone",
     defaults: {
       distance: 300,
       position: "Lying",
       dayPeriod: "day",
       effort: true,
       numberOfTargets: 1,
+      shotsFired: 10,
+      targetHits: 8,
+      includeWind: true,
+      windStrength: 5,
+      windDirection: 90,
     }
   },
   {
-    id: "long-500m",
-    name: "Long Range (500m)",
+    id: "combat-200m-kneeling",
+    name: "⚔️ Combat Drill - 200m Kneeling",
     defaults: {
-      distance: 500,
+      distance: 200,
+      position: "Sitting",
+      dayPeriod: "day",
+      effort: true,
+      numberOfTargets: 3,
+      shotsFired: 6,
+      targetHits: 5,
+      includeWind: false,
+    }
+  },
+  
+  // INTERMEDIATE TIER - Mixed Conditions
+  {
+    id: "wind-400m-prone",
+    name: "💨 Wind Training - 400m Prone",
+    defaults: {
+      distance: 400,
       position: "Lying",
       dayPeriod: "day",
       effort: true,
       numberOfTargets: 1,
+      shotsFired: 10,
+      targetHits: 7,
+      includeWind: true,
+      windStrength: 10,
+      windDirection: 270,
     }
   },
   {
-    id: "multi-target",
-    name: "Multi-Target Practice",
+    id: "twilight-300m-mixed",
+    name: "🌅 Twilight Ops - 300m Mixed",
     defaults: {
-      distance: 200,
+      distance: 300,
+      position: "Sitting",
+      dayPeriod: "twilight",
+      effort: true,
+      numberOfTargets: 2,
+      shotsFired: 8,
+      targetHits: 6,
+      includeWind: true,
+      windStrength: 3,
+      windDirection: 45,
+    }
+  },
+  {
+    id: "rapid-150m-standing",
+    name: "⚡ Rapid Fire - 150m Standing",
+    defaults: {
+      distance: 150,
+      position: "Standing",
+      dayPeriod: "day",
+      effort: true,
+      numberOfTargets: 4,
+      shotsFired: 8,
+      targetHits: 6,
+      includeWind: false,
+    }
+  },
+  
+  // ADVANCED TIER - Challenging Scenarios
+  {
+    id: "long-800m-prone",
+    name: "🔭 Long Range - 800m Prone",
+    defaults: {
+      distance: 800,
       position: "Lying",
       dayPeriod: "day",
       effort: true,
-      numberOfTargets: 3,
+      numberOfTargets: 1,
+      shotsFired: 5,
+      targetHits: 3,
+      includeWind: true,
+      windStrength: 15,
+      windDirection: 135,
     }
   },
   {
-    id: "night-training",
-    name: "Night Training",
+    id: "night-500m-prone",
+    name: "🌙 Night Ops - 500m Prone",
     defaults: {
-      distance: 150,
+      distance: 500,
       position: "Lying",
       dayPeriod: "night",
       effort: true,
       numberOfTargets: 1,
+      shotsFired: 5,
+      targetHits: 3,
+      includeWind: true,
+      windStrength: 8,
+      windDirection: 180,
     }
   },
   {
-    id: "quick-log",
-    name: "Quick Log Only",
+    id: "extreme-1000m-prone",
+    name: "🎯 Extreme Range - 1000m+",
+    defaults: {
+      distance: 1000,
+      position: "Lying",
+      dayPeriod: "day",
+      effort: true,
+      numberOfTargets: 1,
+      shotsFired: 3,
+      targetHits: 1,
+      includeWind: true,
+      windStrength: 20,
+      windDirection: 225,
+    }
+  },
+  
+  // SPECIAL SCENARIOS
+  {
+    id: "stress-mixed-100-300",
+    name: "😤 Stress Drill - Mixed Range",
+    defaults: {
+      distance: 200,
+      position: "Sitting",
+      dayPeriod: "day",
+      effort: true,
+      numberOfTargets: 5,
+      shotsFired: 10,
+      targetHits: 7,
+      includeWind: false,
+    }
+  },
+  {
+    id: "custom-blank",
+    name: "📝 Custom Session",
     defaults: {
       distance: 0,
       numberOfTargets: 1,
+      shotsFired: 0,
+      targetHits: 0,
     }
   }
 ];
@@ -218,21 +324,58 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
             </Select>
           </div>
 
-          {/* Training Category Selection */}
-          <div>
-            <Label className="mb-2">Training Category (Optional)</Label>
+          {/* Training Preset Selection - Highlighted */}
+          <div className={`p-4 rounded-lg border-2 ${
+            theme === "dark" 
+              ? "bg-zinc-800/50 border-indigo-500/30" 
+              : "bg-indigo-50/50 border-indigo-200"
+          }`}>
+            <Label className="mb-2 flex items-center gap-2">
+              <span className="text-sm font-semibold">Quick Preset Scenarios</span>
+              <span className={`text-xs ${
+                theme === "dark" ? "text-zinc-400" : "text-gray-500"
+              }`}>(Recommended)</span>
+            </Label>
             <Select value={quickData.categoryId} onValueChange={handleCategorySelect}>
-              <SelectTrigger className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}>
-                <SelectValue placeholder="Select a preset or customize below" />
+              <SelectTrigger className={`${
+                theme === "dark" ? "bg-zinc-900 border-zinc-700" : "bg-white"
+              } ${quickData.categoryId ? "border-indigo-500" : ""}`}>
+                <SelectValue placeholder="Choose a training scenario..." />
               </SelectTrigger>
-              <SelectContent>
-                {trainingCategories.map(category => (
+              <SelectContent className="max-h-[300px]">
+                <div className="px-2 py-1 text-xs font-semibold text-gray-500">BASIC</div>
+                {trainingCategories.slice(0, 3).map(category => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+                <div className="px-2 py-1 text-xs font-semibold text-gray-500 mt-2">INTERMEDIATE</div>
+                {trainingCategories.slice(3, 6).map(category => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+                <div className="px-2 py-1 text-xs font-semibold text-gray-500 mt-2">ADVANCED</div>
+                {trainingCategories.slice(6, 9).map(category => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+                <div className="px-2 py-1 text-xs font-semibold text-gray-500 mt-2">SPECIAL</div>
+                {trainingCategories.slice(9).map(category => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {quickData.categoryId && quickData.categoryId !== 'custom-blank' && (
+              <div className={`mt-2 text-xs ${
+                theme === "dark" ? "text-indigo-400" : "text-indigo-600"
+              }`}>
+                ✓ Preset loaded - Modify any field below as needed
+              </div>
+            )}
           </div>
 
           {/* Primary Score Entry */}
@@ -302,21 +445,57 @@ export const QuickStartModal: React.FC<QuickStartModalProps> = ({
             )}
           </div>
 
-          {/* Basic Target Setup */}
+          {/* Target & Position Setup */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="mb-2">Target Distance (m)</Label>
+              <Input
+                type="number"
+                min="50"
+                max="2000"
+                step="50"
+                value={quickData.distance}
+                onChange={(e) => setQuickData(prev => ({
+                  ...prev,
+                  distance: parseInt(e.target.value) || 100
+                }))}
+                className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}
+              />
+            </div>
+            <div>
+              <Label className="mb-2">Position</Label>
+              <Select 
+                value={quickData.position || ""} 
+                onValueChange={(value) => setQuickData(prev => ({ ...prev, position: value }))}
+              >
+                <SelectTrigger className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}>
+                  <SelectValue placeholder="Select position" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Lying">Lying</SelectItem>
+                  <SelectItem value="Sitting">Sitting</SelectItem>
+                  <SelectItem value="Standing">Standing</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Day Period */}
           <div>
-            <Label className="mb-2">Target Distance (meters)</Label>
-            <Input
-              type="number"
-              min="50"
-              max="2000"
-              step="50"
-              value={quickData.distance}
-              onChange={(e) => setQuickData(prev => ({
-                ...prev,
-                distance: parseInt(e.target.value) || 100
-              }))}
-              className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}
-            />
+            <Label className="mb-2">Time of Day</Label>
+            <Select 
+              value={quickData.dayPeriod || ""} 
+              onValueChange={(value) => setQuickData(prev => ({ ...prev, dayPeriod: value }))}
+            >
+              <SelectTrigger className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : ""}>
+                <SelectValue placeholder="Select time" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="day">Day</SelectItem>
+                <SelectItem value="twilight">Twilight</SelectItem>
+                <SelectItem value="night">Night</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Optional Settings */}
