@@ -14,17 +14,28 @@ import { TrainingStore } from "@/store/trainingStore";
 import { useEffect, useState, useCallback } from "react";
 import { weaponsStore } from "@/store/weaponsStore";
 import { equipmentStore } from "@/store/equipmentStore";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { sessionStore } from "@/store/sessionStore";
+import { userStore } from "@/store/userStore";
+import type { SessionStatsSaveData } from "@/store/sessionStore";
+import { toast } from "react-toastify";
+import { ArrowLeft, Zap } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 import ConfirmLeaveModal from "../components/SessionStatsFull/ConfirmLeaveModal";
+import { QuickStartModal, type QuickStartData } from "../components/SessionStatsFull/QuickStartModal";
+import { Button } from "@/components/ui/button";
 
 export default function ImprovedSessionStats() {
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const { sessionId } = useParams();
   const { getWeapons } = useStore(weaponsStore);
   const { getEquipments } = useStore(equipmentStore);
+  const { saveSessionStats } = useStore(sessionStore);
+  const { user: currentUser } = useStore(userStore);
   const [showConfirmLeave, setShowConfirmLeave] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [showQuickStart, setShowQuickStart] = useState(false);
+  const [isQuickSubmitting, setIsQuickSubmitting] = useState(false);
 
   const { training, createAssignment, loadTrainingById } = useStore(TrainingStore);
   const {
@@ -60,6 +71,7 @@ export default function ImprovedSessionStats() {
     isFormSubmitted,
     setHasUnsavedChanges,
     isLoading,
+    isQuickMode,
   } = useSessionStats();
 
   useEffect(() => {
@@ -105,6 +117,58 @@ export default function ImprovedSessionStats() {
     setIsAssignmentModalOpen(false);
   }
 
+  const handleQuickStart = useCallback(async (quickData: QuickStartData) => {
+    setIsQuickSubmitting(true);
+    
+    try {
+      // Create minimal session data for quick submission
+      const quickSessionData: SessionStatsSaveData = {
+        sessionData: {
+          training_session_id: training?.id || null,
+          assignment_id: null,
+          team_id: currentUser?.team_id || null,
+          dayPeriod: quickData.dayPeriod || "day",
+          timeToFirstShot: null,
+          note: null,
+          effort: quickData.effort !== undefined ? quickData.effort : false,
+          is_quick_stats: true,
+        },
+        participants: [{
+          user_id: currentUser?.id || "",
+          user_duty: "Sniper" as const,
+          weapon_id: currentUser?.user_default_weapon || null,
+          equipment_id: null,
+          position: quickData.position || "Laying",
+        }],
+        targets: [{
+          distance: quickData.distance || 0,
+          windStrength: quickData.includeWind ? quickData.windStrength : undefined,
+          windDirection: quickData.includeWind ? quickData.windDirection : undefined,
+          totalHits: quickData.targetHits || 0,
+          mistakeCode: undefined,
+          first_shot_hit: false,
+          engagements: [{
+            user_id: currentUser?.id || "",
+            shots_fired: quickData.shotsFired || 0,
+            target_hits: quickData.targetHits || 0,
+          }],
+        }],
+        currentUser: currentUser ? { id: currentUser.id } : null,
+      };
+
+      // Save directly to database
+      await saveSessionStats(quickSessionData);
+      toast.success("Quick session saved successfully!");
+      
+      // Navigate back to training
+      navigate(`/training/${training?.id}`);
+    } catch (error) {
+      console.error("Error saving quick session:", error);
+      toast.error("Failed to save quick session. Please try again.");
+      setIsQuickSubmitting(false);
+    }
+  }, [training, currentUser, saveSessionStats, navigate]);
+
   // Show loading screen while data is being fetched
   if (isLoading || !training || !sections || sections.length === 0 || !sessionData || participants.length === 0) {
     return (
@@ -122,15 +186,38 @@ export default function ImprovedSessionStats() {
       <div className="hidden lg:block">
         <ScrollProgress activeSection={activeSection} totalSections={sections.length} />
 
-        <button
-          onClick={() => handleNavigation(`/training/${training?.id}`)}
-          className={`fixed top-4 left-4 z-50 flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-            theme === "dark" ? "bg-zinc-800/90 hover:bg-zinc-700 text-zinc-300" : "bg-white/90 hover:bg-gray-100 text-gray-700 shadow-md"
-          }`}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="text-sm font-medium">Back to training</span>
-        </button>
+        <div className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between">
+          <button
+            onClick={() => handleNavigation(`/training/${training?.id}`)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              theme === "dark" ? "bg-zinc-800/90 hover:bg-zinc-700 text-zinc-300" : "bg-white/90 hover:bg-gray-100 text-gray-700 shadow-md"
+            }`}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm font-medium">Back to training</span>
+          </button>
+
+          {/* Quick Start Button - Only show for new sessions */}
+          {!sessionId && !isQuickMode && (
+            <Button
+              onClick={() => setShowQuickStart(true)}
+              className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white"
+            >
+              <Zap className="w-4 h-4" />
+              <span className="text-sm font-medium">Quick Start</span>
+            </Button>
+          )}
+
+          {/* Quick Mode Indicator */}
+          {isQuickMode && (
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+              theme === "dark" ? "bg-indigo-500/20 text-indigo-400" : "bg-indigo-100 text-indigo-600"
+            }`}>
+              <Zap className="w-4 h-4" />
+              <span className="text-sm font-medium">Quick Mode</span>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50   backdrop-blur-sm shadow-md">
@@ -144,21 +231,35 @@ export default function ImprovedSessionStats() {
             />
           ))}
         </div>
-        <div className="px-4 py-3 flex items-center justify-between gap-4" onClick={() => handleNavigation(`/training/${training?.id}`)}>
-          <div className="flex items-center gap-2 cursor-pointer">
+        <div className="px-4 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleNavigation(`/training/${training?.id}`)}>
             <ArrowLeft className="w-4 h-4" />
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Back to training</p>
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Back</p>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 flex items-center justify-center gap-2">
+            {isQuickMode && (
+              <div className="flex items-center gap-1 text-indigo-500">
+                <Zap className="w-3 h-3" />
+                <span className="text-xs font-medium">Quick</span>
+              </div>
+            )}
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
               Step {activeSection + 1} of {sections.length}
             </p>
           </div>
+                      {!sessionId && !isQuickMode && (
+              <button
+                onClick={() => setShowQuickStart(true)}
+                className="text-indigo-500"
+              >
+                <Zap className="w-5 h-5" />
+              </button>
+            )}
         </div>
       </div>
 
-      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth lg:pt-0 " onScroll={handleScroll}>
-        <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8 ">
+      <div className="w-full h-screen overflow-y-auto snap-y snap-mandatory scroll-smooth pt-20 lg:pt-24" onScroll={handleScroll}>
+        <section className="min-h-screen snap-start flex py-16 justify-center px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl">
             <SessionConfigSection
               section={sections[0]}
@@ -166,6 +267,7 @@ export default function ImprovedSessionStats() {
               updateSessionData={updateSessionData}
               trainingAssignments={trainingAssignments}
               setIsAssignmentModalOpen={setIsAssignmentModalOpen}
+              isQuickMode={isQuickMode}
             />
           </div>
         </section>
@@ -230,6 +332,13 @@ export default function ImprovedSessionStats() {
           }
         }}
         hasUnsavedChanges={hasUnsavedChanges}
+      />
+
+      <QuickStartModal
+        isOpen={showQuickStart}
+        onClose={() => setShowQuickStart(false)}
+        onQuickStart={handleQuickStart}
+        isSubmitting={isQuickSubmitting}
       />
     </div>
   );
