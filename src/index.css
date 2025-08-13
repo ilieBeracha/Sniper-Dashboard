@@ -376,3 +376,18 @@ svg .recharts-layer .recharts-bar {
 .animation-delay-4000 {
   animation-delay: 4s;
 }
+
+/* Gradient animation for stats banner */
+@keyframes gradient-x {
+  0%, 100% {
+    transform: translateX(0%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-gradient-x {
+  animation: gradient-x 15s ease infinite;
+  background-size: 200% 200%;
+}

@@ -36,7 +36,7 @@ export default function Stats() {
     <SpPage>
       <Header breadcrumbs={[{ label: "Stats", link: "/stats" }]} />
       <SpPageBody>
-        <div className={`space-y-4 ${theme === "dark" ? "bg-zinc-900" : "bg-gray-50"}`}>
+        <div className={`space-y-4 ${theme === "dark" ? "" : "bg-gray-50"}`}>
           <WeeklyKPIs />
           <HeatmapAllActions />
           <ChartMatrix />
