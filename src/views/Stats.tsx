@@ -5,9 +5,13 @@ import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { useEffect, useState } from "react";
 import { performanceStore } from "@/store/performance";
+import Header from "@/Headers/Header";
+import { SpPage, SpPageBody } from "@/layouts/SpPage";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Stats() {
   const { user } = useStore(userStore);
+  const { theme } = useTheme();
   const { firstShotMatrix, getFirstShotMatrix, getUserWeeklyActivitySummary, getSquadWeaponStats } = useStore(performanceStore);
   const { userWeeklyActivitySummary, squadWeaponStats } = useStore(performanceStore);
   const [filters] = useState({
@@ -29,10 +33,21 @@ export default function Stats() {
   }, [user?.team_id, filters]);
 
   return (
-    <div className="space-y-3 p-4 bg-zinc-900">
-      <WeeklyKPIs />
-      <HeatmapAllActions />
-      <ChartMatrix />
-    </div>
+    <SpPage>
+      <Header breadcrumbs={[{ label: "Stats", link: "/stats" }]} />
+      <SpPageBody>
+        <div className={`space-y-6 p-6 ${theme === "dark" ? "bg-zinc-900" : "bg-gray-50"}`}>
+          <div className="space-y-6">
+            <WeeklyKPIs />
+          </div>
+          <div className="space-y-6">
+            <HeatmapAllActions />
+          </div>
+          <div className="space-y-6">
+            <ChartMatrix />
+          </div>
+        </div>
+      </SpPageBody>
+    </SpPage>
   );
 }
