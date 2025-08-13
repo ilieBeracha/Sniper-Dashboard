@@ -40,10 +40,10 @@ export default function HeatmapAllActions() {
       try {
         // Fetch data for all positions
         await Promise.all([
-          fetchPositionHeatmap(user.team_id, "Lying", dateRange.start, dateRange.end),
-          fetchPositionHeatmap(user.team_id, "Sitting", dateRange.start, dateRange.end),
-          fetchPositionHeatmap(user.team_id, "Standing", dateRange.start, dateRange.end),
-          fetchPositionHeatmap(user.team_id, "Operational", dateRange.start, dateRange.end),
+          fetchPositionHeatmap(user.team_id!, "Lying", dateRange.start, dateRange.end),
+          fetchPositionHeatmap(user.team_id!, "Sitting", dateRange.start, dateRange.end),
+          fetchPositionHeatmap(user.team_id!, "Standing", dateRange.start, dateRange.end),
+          fetchPositionHeatmap(user.team_id!, "Operational", dateRange.start, dateRange.end),
         ]);
       } catch (error) {
         console.error("Error loading position heatmap data:", error);
