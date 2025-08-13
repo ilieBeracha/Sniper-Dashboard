@@ -37,16 +37,16 @@ export default function ChartMatrix() {
 
   if (isLoading) {
     return (
-      <div className={`rounded-lg border p-6 ${
+      <div className={`rounded-lg border p-4 ${
         theme === "dark" 
           ? "bg-zinc-900/30 border-zinc-800/30" 
           : "bg-white border-gray-200"
       }`}>
-        <div className="animate-pulse space-y-4">
+        <div className="animate-pulse space-y-3">
           <div className={`h-4 rounded w-1/3 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-5 gap-1">
             {[...Array(20)].map((_, i) => (
-              <div key={i} className={`h-10 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+              <div key={i} className={`h-8 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
             ))}
           </div>
         </div>
@@ -56,12 +56,12 @@ export default function ChartMatrix() {
 
   if (!firstShotMatrix || matrixData.positions.length === 0) {
     return (
-      <div className={`rounded-lg border p-4 text-center ${
+      <div className={`rounded border p-3 text-center ${
         theme === "dark" 
           ? "bg-zinc-900/20 border-zinc-800/20" 
           : "bg-gray-50 border-gray-200"
       }`}>
-        <p className={`text-sm ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+        <p className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
           No first shot data available
         </p>
       </div>
@@ -69,13 +69,13 @@ export default function ChartMatrix() {
   }
 
   return (
-    <div className={`rounded-xl border p-6 shadow-lg ${
+    <div className={`rounded-xl border p-4 shadow-lg ${
       theme === "dark" 
         ? "bg-gradient-to-br from-zinc-900/40 to-zinc-800/30 border-zinc-700/40" 
         : "bg-white border-gray-200"
     }`}>
       {/* Header Section */}
-      <div className={`mb-4 pb-3 border-b ${theme === "dark" ? "border-zinc-700/40" : "border-gray-200"}`}>
+      <div className={`mb-3 pb-2 border-b ${theme === "dark" ? "border-zinc-700/40" : "border-gray-200"}`}>
         <div className="flex items-center gap-2">
           <div className={`w-6 h-6 rounded-lg flex items-center justify-center border ${
             theme === "dark" 
@@ -96,15 +96,15 @@ export default function ChartMatrix() {
       </div>
 
       {/* Matrix Section */}
-      <div className="space-y-3 mb-6">
+      <div className="space-y-2 mb-4">
         {/* Distance Header */}
-        <div className={`grid grid-cols-5 gap-3 pb-3 border-b ${
+        <div className={`grid grid-cols-5 gap-2 pb-2 border-b ${
           theme === "dark" ? "border-zinc-700/30" : "border-gray-200"
         }`}>
           <div></div>
           {matrixData.distances.map((distance) => (
             <div key={distance} className="text-center">
-              <div className={`inline-block px-3 py-1 rounded border ${
+              <div className={`inline-block px-2 py-0.5 rounded border ${
                 theme === "dark" 
                   ? "bg-zinc-800/50 border-zinc-700/30" 
                   : "bg-gray-100 border-gray-300"
@@ -121,14 +121,14 @@ export default function ChartMatrix() {
         {matrixData.positions.map((position, index) => (
           <div
             key={position}
-            className={`grid grid-cols-5 gap-3 items-center py-2 px-2 rounded transition-all duration-200 ${
+            className={`grid grid-cols-5 gap-2 items-center py-1 px-1 rounded transition-all duration-200 ${
               theme === "dark"
                 ? `hover:bg-zinc-800/20 ${index % 2 === 0 ? "bg-zinc-800/15" : "bg-zinc-800/8"}`
                 : `hover:bg-gray-50 ${index % 2 === 0 ? "bg-gray-50/50" : "bg-white"}`
             }`}
           >
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${theme === "dark" ? "bg-zinc-500" : "bg-gray-400"}`}></div>
+            <div className="flex items-center gap-1.5">
+              <div className={`w-1.5 h-1.5 rounded-full ${theme === "dark" ? "bg-zinc-500" : "bg-gray-400"}`}></div>
               <span className={`text-xs uppercase font-medium tracking-wide ${
                 theme === "dark" ? "text-zinc-200" : "text-gray-700"
               }`}>{position}</span>
@@ -140,12 +140,12 @@ export default function ChartMatrix() {
               if (!cellData || cellData.targets === 0) {
                 return (
                   <div key={`${position}-${distance}`} className="text-center">
-                    <div className={`w-full h-12 rounded border flex items-center justify-center ${
+                    <div className={`w-6 h-6 rounded border flex items-center justify-center ${
                       theme === "dark" 
                         ? "bg-zinc-800/40 border-zinc-700/30" 
                         : "bg-gray-100 border-gray-300"
                     }`}>
-                      <span className={theme === "dark" ? "text-zinc-600" : "text-gray-400"}>—</span>
+                      <span className={`text-xs ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`}>—</span>
                     </div>
                   </div>
                 );
@@ -157,7 +157,7 @@ export default function ChartMatrix() {
               return (
                 <div key={`${position}-${distance}`} className="text-center">
                   <div
-                    className={`w-full h-12 rounded border flex items-center justify-center transition-all duration-200 hover:scale-105 ${
+                    className={`w-6 h-6 rounded border flex items-center justify-center transition-all duration-200 hover:scale-105 ${
                       hitRate === 0
                         ? theme === "dark" 
                           ? "bg-zinc-800/40 border-zinc-700/30"
@@ -176,7 +176,7 @@ export default function ChartMatrix() {
                     }`}
                   >
                     <span
-                      className={`text-sm font-bold ${
+                      className={`text-xs font-bold ${
                         hitRate === 0 
                           ? theme === "dark" ? "text-zinc-500" : "text-gray-500"
                           : hitRate < 0.5 
@@ -197,13 +197,13 @@ export default function ChartMatrix() {
       </div>
 
       {/* Chart Section */}
-      <div className={`pt-4 border-t ${theme === "dark" ? "border-zinc-700/40" : "border-gray-200"}`}>
-        <div className="mb-3">
-          <h4 className={`text-sm font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+      <div className={`pt-3 border-t ${theme === "dark" ? "border-zinc-700/40" : "border-gray-200"}`}>
+        <div className="mb-2">
+          <h4 className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
             Performance Overview
           </h4>
         </div>
-        <div className={`h-48 rounded border p-4 ${
+        <div className={`h-28 rounded border p-2 ${
           theme === "dark" 
             ? "bg-gradient-to-br from-zinc-800/20 to-zinc-700/10 border-zinc-700/30" 
             : "bg-gray-50 border-gray-200"
@@ -256,7 +256,7 @@ export default function ChartMatrix() {
                   backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
                   border: theme === "dark" ? "1px solid #52525b" : "1px solid #e5e7eb",
                   borderRadius: "8px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
                 }}
               />
               <Bar dataKey="rate" fill="url(#gradient)" radius={[4, 4, 0, 0]} stroke="#10b981" strokeWidth={1} />

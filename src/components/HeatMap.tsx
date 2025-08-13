@@ -97,39 +97,39 @@ export default function HeatmapAllActions() {
   };
 
   return (
-    <div className={`rounded-xl border p-6 shadow-lg ${
+    <div className={`rounded-lg border p-3 ${
       theme === "dark" 
         ? "bg-zinc-900/30 border-zinc-800/30" 
         : "bg-white border-gray-200"
     }`}>
       {/* Header */}
-      <div className="mb-4">
-        <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-          Monthly Activity Heatmap
+      <div className="mb-3">
+        <h3 className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+          Monthly Activity
         </h3>
-        <p className={`text-sm ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
-          Last 30 days of activity across all types
+        <p className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+          Last 30 days
         </p>
       </div>
 
       {/* Heatmap Grid */}
-      <div className="mb-6">
-        <div className="grid grid-cols-7 sm:grid-cols-10 gap-1.5 sm:gap-2">
+      <div className="mb-3">
+        <div className="grid grid-cols-7 sm:grid-cols-10 gap-1 sm:gap-2">
           {activityData.map((day, index) => (
             <div key={index} className="relative group">
               <div
-                className={`aspect-square rounded-lg ${getIntensityClass(day.totalCount)} 
-                  hover:ring-2 transition-all cursor-pointer relative overflow-hidden ${
+                className={`aspect-square rounded ${getIntensityClass(day.totalCount)} 
+                  hover:ring-1 transition-all cursor-pointer relative overflow-hidden ${
                   theme === "dark" ? "hover:ring-zinc-400" : "hover:ring-gray-400"
                 }`}
               >
                 {/* Activity type indicators */}
                 {day.activities.length > 0 && (
-                  <div className="absolute inset-0 flex flex-wrap gap-0.5 p-1">
+                  <div className="absolute inset-0 flex flex-wrap gap-0.5 p-0.5">
                     {day.activities.map((activity, idx) => (
                       <div
                         key={idx}
-                        className={`w-1.5 h-1.5 rounded-sm ${
+                        className={`w-1 h-1 rounded-sm ${
                           activityColors[activity.type][theme === "dark" ? "dark" : "light"]
                         }`}
                       />
@@ -138,34 +138,23 @@ export default function HeatmapAllActions() {
                 )}
                 
                 {/* Day number on hover */}
-                <div className={`text-xs sm:text-sm font-medium opacity-0 group-hover:opacity-100 
+                <div className={`text-xs sm:text-sm font-normal opacity-0 group-hover:opacity-100 
                   transition-opacity flex items-center justify-center h-full absolute inset-0 ${
-                  theme === "dark" ? "text-white bg-black/50" : "text-gray-900 bg-white/80"
+                  theme === "dark" ? "text-zinc-300" : "text-gray-900"
                 }`}>
                   {day.day}
                 </div>
               </div>
               
               {/* Tooltip */}
-              <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 
-                rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10 
+              <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 
+                rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10 
                 pointer-events-none whitespace-nowrap ${
                 theme === "dark" ? "bg-zinc-800 text-white" : "bg-gray-800 text-white"
               }`}>
-                <div className="text-xs font-medium mb-1">
-                  {format(new Date(day.date), "MMM dd, yyyy")}
+                <div className="text-xs">
+                  {format(new Date(day.date), "MMM dd")}: {day.totalCount} activities
                 </div>
-                {day.activities.length > 0 ? (
-                  <div className="space-y-0.5">
-                    {day.activities.map((activity, idx) => (
-                      <div key={idx} className="text-xs">
-                        {activity.type}: {activity.count}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-xs opacity-75">No activities</div>
-                )}
               </div>
             </div>
           ))}
@@ -173,52 +162,35 @@ export default function HeatmapAllActions() {
       </div>
 
       {/* Legend Section */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Intensity Legend */}
-        <div className={`flex items-center justify-between p-3 rounded-lg ${
-          theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"
+        <div className={`flex items-center justify-between text-xs ${
+          theme === "dark" ? "text-zinc-500" : "text-gray-500"
         }`}>
-          <div className="flex items-center gap-3">
-            <span className={`text-xs font-medium ${
-              theme === "dark" ? "text-zinc-400" : "text-gray-600"
-            }`}>Less</span>
+          <div className="flex items-center gap-2">
+            <span>Less</span>
             <div className="flex gap-1">
-              <div className={`w-3 h-3 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
-              <div className={`w-3 h-3 rounded ${theme === "dark" ? "bg-emerald-900/30" : "bg-emerald-100"}`}></div>
-              <div className={`w-3 h-3 rounded ${theme === "dark" ? "bg-emerald-700/50" : "bg-emerald-300"}`}></div>
-              <div className={`w-3 h-3 rounded ${theme === "dark" ? "bg-emerald-600" : "bg-emerald-400"}`}></div>
-              <div className={`w-3 h-3 rounded ${theme === "dark" ? "bg-emerald-500" : "bg-emerald-500"}`}></div>
+              <div className={`w-2 h-2 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+              <div className={`w-2 h-2 rounded ${theme === "dark" ? "bg-emerald-900/30" : "bg-emerald-100"}`}></div>
+              <div className={`w-2 h-2 rounded ${theme === "dark" ? "bg-emerald-700/50" : "bg-emerald-300"}`}></div>
+              <div className={`w-2 h-2 rounded ${theme === "dark" ? "bg-emerald-600" : "bg-emerald-400"}`}></div>
+              <div className={`w-2 h-2 rounded ${theme === "dark" ? "bg-emerald-500" : "bg-emerald-500"}`}></div>
             </div>
-            <span className={`text-xs font-medium ${
-              theme === "dark" ? "text-zinc-400" : "text-gray-600"
-            }`}>More</span>
+            <span>More</span>
           </div>
-          <div className={`hidden sm:block text-xs ${
-            theme === "dark" ? "text-zinc-500" : "text-gray-500"
-          }`}>
-            Hover for details
-          </div>
+          <div className="hidden sm:block">Hover for details</div>
         </div>
 
         {/* Activity Type Legend */}
-        <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
-          <h4 className={`text-xs font-medium mb-2 ${
-            theme === "dark" ? "text-zinc-300" : "text-gray-700"
-          }`}>
-            Activity Types
-          </h4>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {Object.entries(activityColors).map(([type, colors]) => (
-              <div key={type} className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded ${colors[theme === "dark" ? "dark" : "light"]}`}></div>
-                <span className={`text-xs capitalize ${
-                  theme === "dark" ? "text-zinc-400" : "text-gray-600"
-                }`}>
-                  {type}
-                </span>
-              </div>
-            ))}
-          </div>
+        <div className={`flex flex-wrap gap-3 text-xs ${
+          theme === "dark" ? "text-zinc-500" : "text-gray-600"
+        }`}>
+          {Object.entries(activityColors).map(([type, colors]) => (
+            <div key={type} className="flex items-center gap-1">
+              <div className={`w-2 h-2 rounded ${colors[theme === "dark" ? "dark" : "light"]}`}></div>
+              <span className="capitalize">{type}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
