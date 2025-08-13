@@ -10,7 +10,7 @@ export default function Stats() {
   const { user } = useStore(userStore);
   const { firstShotMatrix, getFirstShotMatrix, getUserWeeklyActivitySummary, getSquadWeaponStats } = useStore(performanceStore);
   const { userWeeklyActivitySummary, squadWeaponStats } = useStore(performanceStore);
-  const [filters, setFilters] = useState({
+  const [filters] = useState({
     startDate: new Date(),
     endDate: new Date(),
     positions: ["Lying", "Standing", "Sitting", "Operational"],

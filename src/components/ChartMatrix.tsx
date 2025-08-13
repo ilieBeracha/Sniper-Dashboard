@@ -33,20 +33,6 @@ export default function ChartMatrix() {
     return { positions, distances, grid };
   }, [firstShotMatrix, isLoading]);
 
-  const getPerformanceColor = (rate: number) => {
-    if (rate === 0) return "bg-zinc-800/30 border-zinc-700/20";
-    if (rate < 0.5) return "bg-zinc-800/30 border-zinc-600/30";
-    if (rate < 0.8) return "bg-zinc-800/30 border-zinc-500/30";
-    return "bg-zinc-800/30 border-zinc-400/30";
-  };
-
-  const getPerformanceText = (rate: number) => {
-    if (rate === 0) return "text-zinc-500";
-    if (rate < 0.5) return "text-zinc-400";
-    if (rate < 0.8) return "text-zinc-300";
-    return "text-zinc-200";
-  };
-
   if (isLoading) {
     return (
       <div className="bg-zinc-900/30 rounded-lg border border-zinc-800/30 p-4">

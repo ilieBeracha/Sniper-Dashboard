@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
 import { TrainingStore } from "@/store/trainingStore";
