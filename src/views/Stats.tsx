@@ -12,8 +12,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 export default function Stats() {
   const { user } = useStore(userStore);
   const { theme } = useTheme();
-  const { firstShotMatrix, getFirstShotMatrix, getUserWeeklyActivitySummary, getSquadWeaponStats } = useStore(performanceStore);
-  const { userWeeklyActivitySummary, squadWeaponStats } = useStore(performanceStore);
+  const { getFirstShotMatrix, getUserWeeklyActivitySummary, getSquadWeaponStats } = useStore(performanceStore);
   const [filters] = useState({
     startDate: new Date(),
     endDate: new Date(),
@@ -26,9 +25,6 @@ export default function Stats() {
       getFirstShotMatrix(user.team_id, filters.startDate, filters.endDate, filters.positions, filters.bucketSize);
       getUserWeeklyActivitySummary(new Date(), user.team_id);
       getSquadWeaponStats(user?.id, user?.user_default_weapon || "", user?.team_id || "", filters.startDate, filters.endDate);
-      console.log(firstShotMatrix);
-      console.log(userWeeklyActivitySummary);
-      console.log(squadWeaponStats);
     }
   }, [user?.team_id, filters]);
 

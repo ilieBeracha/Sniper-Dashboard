@@ -11,6 +11,7 @@ import {
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/user";
+import { PositionHeatmapDay } from "@/types/positionHeatmap";
 
 export async function getUserHitStatsFull(userId: string): Promise<UserHitsData> {
   try {
@@ -461,3 +462,53 @@ export type GetSquadStatsArgs = {
   start?: string | Date | null; // optional window
   end?: string | Date | null; // optional window
 };
+
+export async function fetchPositionHeatmap(
+  teamId: string,
+  position: "Lying" | "Sitting" | "Standing" | "Operational",
+  start?: Date,
+  end?: Date
+): Promise<PositionHeatmapDay[]> {
+  const { data, error } = await supabase
+    .from("target_engagements")
+    .select(`
+      shots_fired,
+      target_hits,
+      target_stats!inner(
+        session_stats!inner(
+          created_at,
+          team_id,
+          session_participants!inner(position, user_duty)
+        )
+      )
+    `)
+    .eq("target_stats.session_stats.team_id", teamId)
+    .eq("target_stats.session_stats.session_participants.position", position)
+    .eq("target_stats.session_stats.session_participants.user_duty", "Sniper")
+    .gte(start ? "target_stats.session_stats.created_at" : "", start ? start.toISOString() : undefined)
+    .lte(end ? "target_stats.session_stats.created_at" : "", end ? end.toISOString() : undefined);
+
+  if (error) throw error;
+
+  // Aggregate per day
+  const dailyMap = new Map<string, { shots: number; hits: number; engagements: number }>();
+
+  data.forEach((row: any) => {
+    const date = new Date(row.target_stats.session_stats.created_at).toISOString().split("T")[0];
+    const entry = dailyMap.get(date) || { shots: 0, hits: 0, engagements: 0 };
+    entry.shots += row.shots_fired ?? 0;
+    entry.hits += row.target_hits ?? 0;
+    entry.engagements += 1;
+    dailyMap.set(date, entry);
+  });
+
+  // Shape into array
+  return Array.from(dailyMap.entries()).map(([date, stats]) => ({
+    date,
+    position,
+    engagements: stats.engagements,
+    totalShots: stats.shots,
+    totalHits: stats.hits,
+    hitRatio: stats.shots > 0 ? stats.hits / stats.shots : 0,
+  }));
+}
