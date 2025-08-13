@@ -46,25 +46,22 @@ export async function getUserHitStatsWithFilters(
   }
 }
 
-
-
 export async function getCommanderTeamMedianDispersion(
   teamId: string,
   startDate?: string,
   endDate?: string,
   weaponType?: string,
   position?: string,
-  dayPeriod?: string
+  dayPeriod?: string,
 ): Promise<CommanderTeamDispersionEntry[]> {
-  const { data, error } = await supabase
-    .rpc("get_commander_team_median_dispersion", {
-      p_team_id: teamId,
-      p_start_date: startDate ?? null,
-      p_end_date: endDate ?? null,
-      p_weapon_type: weaponType || null,
-      p_position: position || null,
-      p_day_period: dayPeriod || null,
-    });
+  const { data, error } = await supabase.rpc("get_commander_team_median_dispersion", {
+    p_team_id: teamId,
+    p_start_date: startDate ?? null,
+    p_end_date: endDate ?? null,
+    p_weapon_type: weaponType || null,
+    p_position: position || null,
+    p_day_period: dayPeriod || null,
+  });
 
   if (error) throw error;
   return data || [];
@@ -379,3 +376,88 @@ export async function getUserMediansInSquad(
 
   return data;
 }
+export async function getFirstShotMatrix(
+  teamId: string,
+  startDate: Date | null,
+  endDate: Date | null,
+  positions: string[] | null,
+  bucketSize: number,
+) {
+  const { data, error } = await supabase.rpc("get_first_shot_matrix", {
+    p_team_id: teamId,
+    p_start: startDate,
+    p_end: endDate,
+    p_positions: positions ?? null,
+    p_distance_bucket: bucketSize,
+  });
+
+  if (error) {
+    console.error("Error fetching first shot matrix:", error);
+    throw error;
+  }
+  return data;
+}
+
+export async function getUserWeeklyActivitySummary(ref: Date | null, teamId: string) {
+  const { data, error } = await supabase.rpc("get_user_weekly_activity_summary", {
+    p_ref: ref,
+    p_team_id: teamId,
+  });
+  if (error) {
+    console.error("Error fetching user weekly activity summary:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+const toIso = (d?: string | Date | null) => (d ? new Date(d).toISOString() : null);
+
+/** Calls RPC: get_squad_stats_when_user_holds_weapon */
+export async function getSquadWeaponStats({
+  userId,
+  weaponId,
+  teamId = null,
+  start = null,
+  end = null,
+}: GetSquadStatsArgs): Promise<SquadWeaponSessionRow[]> {
+  const { data, error } = await supabase.rpc("get_squad_stats_when_user_holds_weapon", {
+    p_user_id: userId,
+    p_weapon_id: weaponId,
+    p_team_id: teamId,
+    p_start: toIso(start),
+    p_end: toIso(end),
+  });
+  if (error) throw error;
+  return (data ?? []) as SquadWeaponSessionRow[];
+}
+
+export interface SquadWeaponSessionRow {
+  session_stats_id: string;
+  training_session_id: string;
+  training_date: string; // ISO date (YYYY-MM-DD)
+  squad_id: string | null;
+
+  user_id: string; // the user you're querying for
+  weapon_id: string; // the weapon they're holding
+
+  targets: number;
+
+  squad_engagements: number;
+  squad_total_shots: number;
+  squad_total_hits: number;
+  squad_hit_ratio: number; // 0..1
+
+  user_engagements: number;
+  user_total_shots: number;
+  user_total_hits: number;
+  user_hit_ratio: number; // 0..1
+}
+
+export type GetSquadStatsArgs = {
+  userId: string;
+  weaponId: string;
+  teamId?: string | null;
+  start?: string | Date | null; // optional window
+  end?: string | Date | null; // optional window
+};

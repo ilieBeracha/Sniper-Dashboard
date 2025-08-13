@@ -22,6 +22,7 @@ const SettingsPage = lazy(() => import("./Settings"));
 const DataExport = lazy(() => import("./DataExport"));
 const RulesLayout = lazy(() => import("@/layouts/Rulelayout"));
 const Rules = lazy(() => import("@/OnePlatform/RulesModel/views/Rules"));
+const Stats = lazy(() => import("@/views/Stats"));
 
 export default function AppRoutes() {
   const { token } = useStore(authStore);
@@ -146,6 +147,7 @@ export default function AppRoutes() {
           <Route path="/rules" element={<RulesLayout />}>
             <Route path="/rules" element={<Rules />} />
           </Route>
+          <Route path="/stats" element={<Stats />} />
         </>
       ) : (
         <Route

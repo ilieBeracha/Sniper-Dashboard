@@ -32,6 +32,10 @@ import {
   getBestGroupingStatsByTraining,
   getUserMediansInSquad,
   getCommanderTeamMedianDispersion,
+  getFirstShotMatrix,
+  getUserWeeklyActivitySummary,
+  getSquadWeaponStats,
+  SquadWeaponSessionRow,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/user";
@@ -108,6 +112,16 @@ interface PerformanceStore {
     endDate: Date | null,
   ) => Promise<void>;
   userMediansInSquadLoading: boolean;
+
+  firstShotMatrix: any[] | null;
+  getFirstShotMatrix: (teamId: string, startDate: Date | null, endDate: Date | null, positions: string[] | null, bucketSize: number) => Promise<void>;
+
+  userWeeklyActivitySummary: any[] | null;
+  getUserWeeklyActivitySummary: (ref: Date | null, teamId: string) => Promise<void>;
+
+  // squad weapon stats
+  squadWeaponStats: SquadWeaponSessionRow[] | null;
+  getSquadWeaponStats: (userId: string, weaponId: string, teamId: string, start: Date | null, end: Date | null) => Promise<void>;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
@@ -129,7 +143,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   userMediansInSquad: null,
   commanderTeamDispersion: [],
   userMediansInSquadLoading: false,
-
+  firstShotMatrix: null,
   fetchGroupingScores: async (trainingSessionId: string, limit: number = 20, offset: number = 0) => {
     try {
       set({ isLoading: true });
@@ -360,5 +374,40 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     } finally {
       set({ userMediansInSquadLoading: false });
     }
+  },
+
+  getFirstShotMatrix: async (teamId: string, startDate: Date | null, endDate: Date | null, positions: string[] | null, bucketSize: number) => {
+    try {
+      set({ isLoading: true });
+      const data = await getFirstShotMatrix(teamId, startDate, endDate, positions, bucketSize);
+      set({ firstShotMatrix: data });
+    } catch (error) {
+      console.error("Failed to load first shot matrix:", error);
+      set({ firstShotMatrix: null });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  userWeeklyActivitySummary: null,
+  getUserWeeklyActivitySummary: async (ref: Date | null, teamId: string) => {
+    try {
+      const data = await getUserWeeklyActivitySummary(ref, teamId);
+      set({ userWeeklyActivitySummary: data });
+    } catch (error) {
+      console.error("Failed to load user weekly activity summary:", error);
+      set({ userWeeklyActivitySummary: null });
+    }
+  },
+
+  squadWeaponStats: null,
+      getSquadWeaponStats: async (userId: string, weaponId: string, teamId: string, start: Date | null, end: Date | null) => {
+    console.log("userId", userId);
+    console.log("weaponId", weaponId);
+    console.log("teamId", teamId);
+    console.log("start", start);
+    console.log("end", end);
+    const data = await getSquadWeaponStats({ userId, weaponId, teamId, start, end });
+    set({ squadWeaponStats: data });
   },
 }));
