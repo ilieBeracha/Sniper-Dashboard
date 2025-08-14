@@ -5,12 +5,11 @@ import { userStore } from "@/store/userStore";
 import { weaponsStore } from "@/store/weaponsStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TrendingUp, TrendingDown, Minus, Target, Users, Zap, Activity, Trophy, Medal, Award } from "lucide-react";
-import { getWeapons } from "@/services/weaponsService";
 import { RadialBarChart, RadialBar, Legend, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function SquadImpactStats() {
-  const { user, getTeamMembers, teamMembers } = useStore(userStore);
+  const { user, teamMembers } = useStore(userStore);
   const { weapons } = useStore(weaponsStore);
   const { squadWeaponStats, isLoading, getSquadWeaponStats } = useStore(performanceStore);
   const { theme } = useTheme();
