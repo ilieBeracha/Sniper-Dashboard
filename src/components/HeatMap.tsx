@@ -1,116 +1,229 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
-import { TrainingStore } from "@/store/trainingStore";
-import { sessionStore } from "@/store/sessionStore";
+import { performanceStore } from "@/store/performance";
 import { subDays, startOfDay, format, eachDayOfInterval } from "date-fns";
+import { useTheme } from "@/contexts/ThemeContext";
+
+interface DayActivity {
+  date: string;
+  totalShots: number;
+  totalHits: number;
+  totalMisses: number;
+  hitRatio: number;
+  day: string;
+}
 
 export default function HeatmapAllActions() {
   const { user } = useStore(userStore);
-  const { loadNextAndLastTraining, trainings } = useStore(TrainingStore);
-  const { sessionStats } = useStore(sessionStore);
-  const [ready, setReady] = useState(false);
+  const { theme } = useTheme();
+  const { positionHeatmapData, fetchPositionHeatmap } = useStore(performanceStore);
+  const [loading, setLoading] = useState(false);
 
   const dateRange = useMemo(() => {
     const end = new Date();
-    const start = subDays(end, 30); // Last 30 days
+    const start = subDays(end, 30);
     return { start: startOfDay(start), end: startOfDay(end) };
   }, []);
 
   useEffect(() => {
     if (!user?.team_id) return;
-    loadNextAndLastTraining(user.team_id);
-    setReady(true);
-  }, [user?.team_id]);
+    
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([
+          fetchPositionHeatmap(user.team_id!, "Lying", dateRange.start, dateRange.end),
+          fetchPositionHeatmap(user.team_id!, "Sitting", dateRange.start, dateRange.end),
+          fetchPositionHeatmap(user.team_id!, "Standing", dateRange.start, dateRange.end),
+          fetchPositionHeatmap(user.team_id!, "Operational", dateRange.start, dateRange.end),
+        ]);
+      } catch (error) {
+        console.error("Error loading position heatmap data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, [user?.team_id, dateRange.start, dateRange.end]);
 
-  // Generate all dates and their activity values
   const activityData = useMemo(() => {
-    if (!ready) return [];
+    const map = new Map<string, DayActivity>();
 
-    const map = new Map<string, number>();
-
-    // Initialize all dates with mock data
     eachDayOfInterval(dateRange).forEach((date) => {
       const key = format(date, "yyyy-MM-dd");
-      // Generate random activity for demonstration
-      const activity = Math.floor(Math.random() * 10);
-      map.set(key, activity);
+      map.set(key, {
+        date: key,
+        totalShots: 0,
+        totalHits: 0,
+        totalMisses: 0,
+        hitRatio: 0,
+        day: format(date, "d"),
+      });
     });
 
-    // Add real training data if available
-    (trainings ?? []).forEach((t: any) => {
-      if (t?.date) {
-        const date = new Date(t.date);
-        const key = format(startOfDay(date), "yyyy-MM-dd");
-        if (map.has(key)) {
-          map.set(key, (map.get(key) ?? 0) + 2);
+    if (positionHeatmapData) {
+      positionHeatmapData.forEach((dayData) => {
+        const activity = map.get(dayData.date);
+        if (activity) {
+          activity.totalShots += dayData.totalShots;
+          activity.totalHits += dayData.totalHits;
+          activity.totalMisses += dayData.totalShots - dayData.totalHits;
         }
-      }
-    });
+      });
 
-    (sessionStats ?? []).forEach((s: any) => {
-      if (s?.training_session?.date) {
-        const date = new Date(s.training_session.date);
-        const key = format(startOfDay(date), "yyyy-MM-dd");
-        if (map.has(key)) {
-          map.set(key, (map.get(key) ?? 0) + 3);
+      map.forEach((activity) => {
+        if (activity.totalShots > 0) {
+          activity.hitRatio = activity.totalHits / activity.totalShots;
         }
-      }
-    });
+      });
+    }
 
-    return Array.from(map.entries())
-      .map(([date, value]) => ({
-        date,
-        value,
-        day: format(new Date(date), "d"),
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date));
-  }, [ready, dateRange, trainings, sessionStats]);
+    return Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
+  }, [positionHeatmapData, dateRange]);
 
-  const getIntensityClass = (value: number) => {
-    if (value === 0) return "bg-zinc-800";
-    if (value <= 3) return "bg-emerald-900/30";
-    if (value <= 6) return "bg-emerald-700/50";
-    if (value <= 9) return "bg-emerald-600";
-    return "bg-emerald-500";
+  const getIntensityClass = (shots: number, hitRatio: number) => {
+    if (theme === "dark") {
+      if (shots === 0) return "bg-zinc-800 border-zinc-700/50";
+      
+      if (hitRatio >= 0.8) return "bg-emerald-600/80 border-emerald-500/50";
+      else if (hitRatio >= 0.6) return "bg-yellow-600/60 border-yellow-500/40";
+      else if (hitRatio >= 0.4) return "bg-orange-600/60 border-orange-500/40";
+      else return "bg-red-600/60 border-red-500/40";
+    } else {
+      if (shots === 0) return "bg-gray-100 border-gray-200";
+      
+      if (hitRatio >= 0.8) return "bg-emerald-400 border-emerald-500";
+      else if (hitRatio >= 0.6) return "bg-yellow-400 border-yellow-500";
+      else if (hitRatio >= 0.4) return "bg-orange-400 border-orange-500";
+      else return "bg-red-400 border-red-500";
+    }
   };
 
   return (
-    <div className="bg-zinc-900/30 rounded-lg border border-zinc-800/30 p-3">
-      <div className="mb-3">
-        <h3 className="text-sm font-medium text-white">Monthly Activity</h3>
-        <p className="text-xs text-zinc-500">Last 30 days</p>
+    <div className={theme === "dark" 
+      ? "bg-zinc-900/50 backdrop-blur-sm p-3" 
+      : "bg-white shadow-sm p-3"}>
+      {/* Compact Header */}
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className={`text-sm font-semibold ${
+          theme === "dark" ? "text-white" : "text-gray-900"
+        }`}>
+          Daily Performance
+        </h3>
+        <p className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+          30 days
+        </p>
       </div>
 
-      <div className="grid grid-cols-7 sm:grid-cols-10 gap-1 sm:gap-2">
-        {activityData.map((day, index) => (
-          <div key={index} className="relative group">
+      {/* Compact Heatmap Grid */}
+      {loading ? (
+        <div className="grid grid-cols-10 gap-1 mb-2">
+          {[...Array(30)].map((_, index) => (
             <div
-              className={`aspect-square rounded ${getIntensityClass(day.value)} hover:ring-1 hover:ring-zinc-400 transition-all cursor-pointer`}
-              title={`${format(new Date(day.date), "MMM dd")}: ${day.value} activities`}
-            >
-              <div className="text-xs sm:text-sm text-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center h-full font-normal">
-                {day.day}
+              key={index}
+              className={`aspect-square rounded animate-pulse ${
+                theme === "dark" ? "bg-zinc-800" : "bg-gray-200"
+              }`}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-10 gap-1 mb-2">
+          {activityData.map((day, index) => (
+            <div key={index} className="relative group">
+              <div
+                className={`aspect-square rounded border transition-all duration-200 cursor-pointer 
+                  relative overflow-hidden ${
+                  getIntensityClass(day.totalShots, day.hitRatio)
+                } hover:scale-110 hover:z-10`}
+              >
+                {/* Visual fill for hits/misses */}
+                {day.totalShots > 0 && (
+                  <div className="absolute inset-0 flex flex-col justify-end">
+                    <div 
+                      className={theme === "dark" ? "bg-emerald-400/30" : "bg-emerald-500/40"}
+                      style={{ height: `${day.hitRatio * 100}%` }}
+                    />
+                  </div>
+                )}
+                
+                {/* Day number */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className={`text-[10px] font-medium ${
+                    day.totalShots > 0 
+                      ? theme === "dark" ? "text-white/80" : "text-gray-800"
+                      : theme === "dark" ? "text-zinc-600" : "text-gray-400"
+                  }`}>
+                    {day.day}
+                  </div>
+                </div>
               </div>
+              
+              {/* Compact Tooltip */}
+              {day.totalShots > 0 && (
+                <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 
+                  rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 
+                  pointer-events-none whitespace-nowrap ${
+                  theme === "dark" 
+                    ? "bg-zinc-800 text-white" 
+                    : "bg-gray-800 text-white"
+                }`}>
+                  <div className="font-medium">{format(new Date(day.date), "MMM d")}</div>
+                  <div className="text-[10px] opacity-90">
+                    {day.totalHits}/{day.totalShots} ({Math.round(day.hitRatio * 100)}%)
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Compact Legend and Stats */}
+      <div className="flex items-center justify-between text-xs">
+        <div className="flex items-center gap-3">
+          {/* Hit Rate Scale */}
+          <div className="flex items-center gap-1">
+            <span className={theme === "dark" ? "text-zinc-500" : "text-gray-500"}>Rate:</span>
+            <div className="flex gap-0.5">
+              <div className={`w-2 h-2 rounded ${
+                theme === "dark" ? "bg-red-600/60" : "bg-red-400"
+              }`} title="<40%"></div>
+              <div className={`w-2 h-2 rounded ${
+                theme === "dark" ? "bg-yellow-600/60" : "bg-yellow-400"
+              }`} title="60-80%"></div>
+              <div className={`w-2 h-2 rounded ${
+                theme === "dark" ? "bg-emerald-600/80" : "bg-emerald-400"
+              }`} title="80%+"></div>
             </div>
           </div>
-        ))}
-      </div>
-
-      <div className="flex items-center justify-between mt-3 text-xs text-zinc-500">
-        <div className="flex items-center gap-2">
-          <span>Less</span>
-          <div className="flex gap-1">
-            <div className="w-2 h-2 rounded bg-zinc-800"></div>
-            <div className="w-2 h-2 rounded bg-emerald-900/30"></div>
-            <div className="w-2 h-2 rounded bg-emerald-700/50"></div>
-            <div className="w-2 h-2 rounded bg-emerald-600"></div>
-            <div className="w-2 h-2 rounded bg-emerald-500"></div>
-          </div>
-          <span>More</span>
         </div>
 
-        <div className="hidden sm:block text-xs text-zinc-500">Hover for details</div>
+        {/* Compact Stats */}
+        {!loading && (
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              <span className={theme === "dark" ? "text-zinc-500" : "text-gray-500"}>Shots:</span>
+              <span className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                {activityData.reduce((sum, day) => sum + day.totalShots, 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className={theme === "dark" ? "text-zinc-500" : "text-gray-500"}>Avg:</span>
+              <span className={`font-medium ${
+                theme === "dark" ? "text-emerald-400" : "text-emerald-600"
+              }`}>
+                {(() => {
+                  const totalShots = activityData.reduce((sum, day) => sum + day.totalShots, 0);
+                  const totalHits = activityData.reduce((sum, day) => sum + day.totalHits, 0);
+                  return totalShots > 0 ? `${Math.round((totalHits / totalShots) * 100)}%` : '0%';
+                })()}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

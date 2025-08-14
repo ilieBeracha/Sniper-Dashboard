@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface FirstShotData {
   position: "Lying" | "Sitting" | "Standing" | "Operational";
@@ -13,6 +14,7 @@ interface FirstShotData {
 
 export default function ChartMatrix() {
   const { firstShotMatrix, isLoading } = useStore(performanceStore);
+  const { theme } = useTheme();
 
   const matrixData = useMemo(() => {
     if (!firstShotMatrix || isLoading) return { positions: [], distances: [], grid: {} };
@@ -33,28 +35,22 @@ export default function ChartMatrix() {
     return { positions, distances, grid };
   }, [firstShotMatrix, isLoading]);
 
-  const getPerformanceColor = (rate: number) => {
-    if (rate === 0) return "bg-zinc-800/30 border-zinc-700/20";
-    if (rate < 0.5) return "bg-zinc-800/30 border-zinc-600/30";
-    if (rate < 0.8) return "bg-zinc-800/30 border-zinc-500/30";
-    return "bg-zinc-800/30 border-zinc-400/30";
-  };
-
-  const getPerformanceText = (rate: number) => {
-    if (rate === 0) return "text-zinc-500";
-    if (rate < 0.5) return "text-zinc-400";
-    if (rate < 0.8) return "text-zinc-300";
-    return "text-zinc-200";
-  };
+  // Dynamic grid columns based on number of distances
+  const gridCols = matrixData.distances.length + 1;
+  const gridColsClass = gridCols <= 4 ? `grid-cols-${gridCols}` 
+    : gridCols <= 6 ? 'grid-cols-6' 
+    : 'grid-cols-8';
 
   if (isLoading) {
     return (
-      <div className="bg-zinc-900/30 rounded-lg border border-zinc-800/30 p-4">
-        <div className="animate-pulse space-y-3">
-          <div className="h-4 bg-zinc-800 rounded w-1/3"></div>
-          <div className="grid grid-cols-5 gap-1">
+      <div className={theme === "dark" 
+        ? "bg-zinc-900/50 backdrop-blur-sm p-3" 
+        : "bg-white shadow-sm p-3"}>
+        <div className="animate-pulse space-y-2">
+          <div className={`h-3 rounded w-1/3 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+          <div className={`grid ${gridColsClass} gap-1`}>
             {[...Array(20)].map((_, i) => (
-              <div key={i} className="h-8 bg-zinc-800 rounded"></div>
+              <div key={i} className={`h-8 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
             ))}
           </div>
         </div>
@@ -64,52 +60,51 @@ export default function ChartMatrix() {
 
   if (!firstShotMatrix || matrixData.positions.length === 0) {
     return (
-      <div className="bg-zinc-900/20 rounded border border-zinc-800/20 p-3 text-center">
-        <p className="text-xs text-zinc-500">No first shot data available</p>
+      <div className={theme === "dark" 
+        ? "bg-zinc-900/50 backdrop-blur-sm p-3 text-center" 
+        : "bg-white shadow-sm p-3 text-center"}>
+        <p className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+          No first shot data available
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-zinc-900/40 to-zinc-800/30 rounded-xl border border-zinc-700/40 p-4 shadow-lg">
-      {/* Header Section */}
-      <div className="mb-3 pb-2 border-b border-zinc-700/40">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center border border-emerald-500/30">
-            <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-white">First Shot Matrix</h3>
-            <p className="text-xs text-zinc-400">Performance by position & distance</p>
-          </div>
-        </div>
+    <div className={theme === "dark" 
+      ? "bg-zinc-900/50 backdrop-blur-sm p-3" 
+      : "bg-white shadow-sm p-3"}>
+      {/* Compact Header */}
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className={`text-sm font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+          First Shot Matrix
+        </h3>
+        <p className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+          Hit rate by position/distance
+        </p>
       </div>
 
-      {/* Matrix Section */}
-      <div className="space-y-2 mb-4">
+      {/* Compact Matrix */}
+      <div className="mb-3">
         {/* Distance Header */}
-        <div className="grid grid-cols-5 gap-2 pb-2 border-b border-zinc-700/30">
+        <div className={`grid ${gridColsClass} gap-1 mb-1 text-center`}>
           <div></div>
           {matrixData.distances.map((distance) => (
-            <div key={distance} className="text-center">
-              <div className="inline-block px-2 py-0.5 bg-zinc-800/50 rounded border border-zinc-700/30">
-                <span className="text-xs font-medium text-zinc-300">{distance}m</span>
-              </div>
+            <div key={distance} className={`text-xs font-medium ${
+              theme === "dark" ? "text-zinc-400" : "text-gray-600"
+            }`}>
+              {distance}m
             </div>
           ))}
         </div>
 
         {/* Position Rows */}
-        {matrixData.positions.map((position, index) => (
-          <div
-            key={position}
-            className={`grid grid-cols-5 gap-2 items-center py-1 px-1 rounded transition-all duration-200 hover:bg-zinc-800/20 ${
-              index % 2 === 0 ? "bg-zinc-800/15" : "bg-zinc-800/8"
-            }`}
-          >
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-zinc-500"></div>
-              <span className="text-xs text-zinc-200 uppercase font-medium tracking-wide">{position}</span>
+        {matrixData.positions.map((position) => (
+          <div key={position} className={`grid ${gridColsClass} gap-1 items-center`}>
+            <div className={`text-xs font-medium truncate pr-1 ${
+              theme === "dark" ? "text-zinc-300" : "text-gray-700"
+            }`}>
+              {position.slice(0, 4)}
             </div>
 
             {matrixData.distances.map((distance) => {
@@ -117,10 +112,13 @@ export default function ChartMatrix() {
 
               if (!cellData || cellData.targets === 0) {
                 return (
-                  <div key={`${position}-${distance}`} className="text-center">
-                    <div className="w-6 h-6 rounded bg-zinc-800/40 border border-zinc-700/30 flex items-center justify-center">
-                      <span className="text-zinc-600 text-xs">—</span>
-                    </div>
+                  <div key={`${position}-${distance}`} 
+                    className={`aspect-square rounded flex items-center justify-center text-xs ${
+                    theme === "dark" 
+                      ? "bg-zinc-800/30 text-zinc-600" 
+                      : "bg-gray-100 text-gray-400"
+                  }`}>
+                    —
                   </div>
                 );
               }
@@ -129,25 +127,35 @@ export default function ChartMatrix() {
               const hitRatePercent = Math.round(hitRate * 100);
 
               return (
-                <div key={`${position}-${distance}`} className="text-center">
+                <div key={`${position}-${distance}`} className="relative group">
                   <div
-                    className={`w-6 h-6 rounded border flex items-center justify-center transition-all duration-200 hover:scale-105 ${
-                      hitRate === 0
-                        ? "bg-zinc-800/40 border-zinc-700/30"
-                        : hitRate < 0.5
-                          ? "bg-red-500/20 border-red-500/40"
-                          : hitRate < 0.8
-                            ? "bg-yellow-500/20 border-yellow-500/40"
-                            : "bg-emerald-500/20 border-emerald-500/40"
+                    className={`aspect-square rounded flex items-center justify-center
+                      transition-all duration-200 cursor-pointer hover:scale-110 hover:z-10
+                      text-xs font-bold ${
+                      hitRate >= 0.8 
+                        ? theme === "dark"
+                          ? "bg-emerald-600/70 text-emerald-100"
+                          : "bg-emerald-400 text-white"
+                        : hitRate >= 0.5
+                          ? theme === "dark"
+                            ? "bg-yellow-600/60 text-yellow-100"
+                            : "bg-yellow-400 text-gray-800"
+                          : theme === "dark"
+                            ? "bg-red-600/60 text-red-100"
+                            : "bg-red-400 text-white"
                     }`}
+                    title={`${cellData.targets} targets`}
                   >
-                    <span
-                      className={`text-xs font-bold ${
-                        hitRate === 0 ? "text-zinc-500" : hitRate < 0.5 ? "text-red-300" : hitRate < 0.8 ? "text-yellow-300" : "text-emerald-300"
-                      }`}
-                    >
-                      {hitRatePercent}%
-                    </span>
+                    {hitRatePercent}
+                  </div>
+                  
+                  {/* Compact tooltip */}
+                  <div className={`absolute -top-7 left-1/2 transform -translate-x-1/2 px-1.5 py-0.5 rounded
+                    text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity z-20
+                    pointer-events-none whitespace-nowrap ${
+                    theme === "dark" ? "bg-zinc-800 text-white" : "bg-gray-800 text-white"
+                  }`}>
+                    {cellData.targets} shots
                   </div>
                 </div>
               );
@@ -156,46 +164,63 @@ export default function ChartMatrix() {
         ))}
       </div>
 
-      {/* Chart Section */}
-      <div className="pt-3 border-t border-zinc-700/40">
-        <div className="mb-2">
-          <h4 className="text-xs font-medium text-zinc-300">Performance Overview</h4>
+      {/* Compact Chart Section */}
+      <div className={`pt-2 border-t ${theme === "dark" ? "border-zinc-700/40" : "border-gray-200"}`}>
+        <div className="mb-1">
+          <h4 className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+            Average by Position
+          </h4>
         </div>
-        <div className="h-28 bg-gradient-to-br from-zinc-800/20 to-zinc-700/10 rounded border border-zinc-700/30 p-2">
+        <div className="h-20">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={matrixData.positions.map((position) => {
-                const avgRate =
-                  matrixData.distances.reduce((sum, distance) => {
-                    const cellData = matrixData.grid[position]?.[distance];
-                    return sum + (cellData?.first_shot_hit_rate || 0);
-                  }, 0) / Math.max(matrixData.distances.length, 1);
+                const validCells = matrixData.distances.filter(distance => 
+                  matrixData.grid[position]?.[distance]?.targets > 0
+                );
+                const avgRate = validCells.length > 0
+                  ? validCells.reduce((sum, distance) => {
+                      const cellData = matrixData.grid[position]?.[distance];
+                      return sum + (cellData?.first_shot_hit_rate || 0);
+                    }, 0) / validCells.length
+                  : 0;
 
                 return {
-                  position,
+                  position: position.slice(0, 4),
                   rate: Math.round(avgRate * 100),
                 };
               })}
+              margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
             >
-              <XAxis dataKey="position" tick={{ fontSize: 11, fill: "#d4d4d8", fontWeight: 500 }} axisLine={{ stroke: "#52525b", strokeWidth: 1 }} />
-              <YAxis tick={{ fontSize: 10, fill: "#71717a" }} domain={[0, 100]} axisLine={{ stroke: "#52525b", strokeWidth: 1 }} />
-              <Tooltip
-                formatter={(value: number) => [`${value}%`, "Hit Rate"]}
-                labelStyle={{ color: "#d4d4d8", fontWeight: 600 }}
-                contentStyle={{
-                  backgroundColor: "#18181b",
-                  border: "1px solid #52525b",
-                  borderRadius: "8px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-                }}
+              <XAxis 
+                dataKey="position" 
+                tick={{ fontSize: 10, fill: theme === "dark" ? "#a1a1aa" : "#6b7280" }} 
+                axisLine={false}
+                tickLine={false}
               />
-              <Bar dataKey="rate" fill="url(#gradient)" radius={[4, 4, 0, 0]} stroke="#10b981" strokeWidth={1} />
-              <defs>
-                <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.8} />
-                  <stop offset="100%" stopColor="#059669" stopOpacity={0.6} />
-                </linearGradient>
-              </defs>
+              <YAxis 
+                tick={{ fontSize: 9, fill: theme === "dark" ? "#71717a" : "#9ca3af" }} 
+                domain={[0, 100]} 
+                axisLine={false}
+                tickLine={false}
+                width={25}
+              />
+              <Tooltip
+                formatter={(value: number) => `${value}%`}
+                contentStyle={{
+                  backgroundColor: theme === "dark" ? "#27272a" : "#ffffff",
+                  border: theme === "dark" ? "1px solid #3f3f46" : "1px solid #e5e7eb",
+                  borderRadius: "4px",
+                  padding: "4px 8px",
+                  fontSize: "11px",
+                }}
+                cursor={false}
+              />
+              <Bar 
+                dataKey="rate" 
+                fill={theme === "dark" ? "#10b981" : "#059669"}
+                radius={[2, 2, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -15,6 +15,7 @@ import {
   CommanderTeamDispersionEntry,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
+import { PositionHeatmapDay } from "@/types/positionHeatmap";
 import {
   getWeaponPerformanceBySquadAndWeapon,
   getTrainingEffectivenessByTeam,
@@ -36,6 +37,7 @@ import {
   getUserWeeklyActivitySummary,
   getSquadWeaponStats,
   SquadWeaponSessionRow,
+  fetchPositionHeatmap,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/user";
@@ -122,6 +124,10 @@ interface PerformanceStore {
   // squad weapon stats
   squadWeaponStats: SquadWeaponSessionRow[] | null;
   getSquadWeaponStats: (userId: string, weaponId: string, teamId: string, start: Date | null, end: Date | null) => Promise<void>;
+
+  // position heatmap
+  positionHeatmapData: PositionHeatmapDay[] | null;
+  fetchPositionHeatmap: (teamId: string, position: "Lying" | "Sitting" | "Standing" | "Operational", start?: Date, end?: Date) => Promise<void>;
 }
 
 export const performanceStore = create<PerformanceStore>((set) => ({
@@ -409,5 +415,17 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     console.log("end", end);
     const data = await getSquadWeaponStats({ userId, weaponId, teamId, start, end });
     set({ squadWeaponStats: data });
+  },
+
+  positionHeatmapData: null,
+  fetchPositionHeatmap: async (teamId: string, position: "Lying" | "Sitting" | "Standing" | "Operational", start?: Date, end?: Date) => {
+    set({ isLoading: true });
+    try {
+      const data = await fetchPositionHeatmap(teamId, position, start, end);
+      set({ positionHeatmapData: data, isLoading: false });
+    } catch (error) {
+      console.error("Error fetching position heatmap:", error);
+      set({ positionHeatmapData: null, isLoading: false });
+    }
   },
 }));
