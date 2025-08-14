@@ -29,3 +29,16 @@ dist-ssr
 
 ./CLAUDE.md
 .CLAUDE.md
+database_sync/complete_database_backup.sql
+database_sync/complete_database_export.sql
+database_sync/create_ilie_user_massive_data_fixed.sql
+database_sync/create_ilie_user_massive_data.sql
+database_sync/create_missing_rpc_functions.sql
+database_sync/CREATE_SQUAD_IMPACT_FUNCTION.sql
+database_sync/create_your_user.sql
+database_sync/export_custom_functions.sql
+database_sync/fix_position_functions.sql
+database_sync/generate_massive_training_data.sql
+database_sync/setup_local_database.sql
+.gitignore
+.claude/.mcp.json

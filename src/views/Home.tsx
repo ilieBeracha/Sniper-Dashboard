@@ -127,6 +127,14 @@ export default function AppRoutes() {
               }
             />
             <Route
+              path="/stats"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <Stats />
+                </Suspense>
+              }
+            />
+            <Route
               path="/rules"
               element={
                 <Suspense fallback={<LoadingFallback />}>
@@ -147,7 +155,6 @@ export default function AppRoutes() {
           <Route path="/rules" element={<RulesLayout />}>
             <Route path="/rules" element={<Rules />} />
           </Route>
-          <Route path="/stats" element={<Stats />} />
         </>
       ) : (
         <Route

@@ -13,6 +13,7 @@ import {
   GroupingStatsCommander,
   GetUserMediansInSquadQueryResult,
   CommanderTeamDispersionEntry,
+  SquadWeaponStats,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionHeatmapDay } from "@/types/positionHeatmap";
@@ -36,8 +37,7 @@ import {
   getFirstShotMatrix,
   getUserWeeklyActivitySummary,
   getSquadWeaponStats,
-  SquadWeaponSessionRow,
-  fetchPositionHeatmap,
+  getPositionHeatmap,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/user";
@@ -92,6 +92,8 @@ interface PerformanceStore {
   ) => Promise<{ total_groups: number; avg_dispersion: number; best_dispersion: number } | null>;
   bestGroupingByTraining: { total_groups: number; avg_dispersion: number; best_dispersion: number } | null;
 
+  squadWeaponStats: SquadWeaponStats[] | null;
+  getSquadWeaponStats: (teamId: string, startDate: Date | null, endDate: Date | null) => Promise<void>;
   commanderTeamDispersion: CommanderTeamDispersionEntry[] | null;
   fetchCommanderTeamDispersion: (
     teamId: string,
@@ -116,20 +118,21 @@ interface PerformanceStore {
   userMediansInSquadLoading: boolean;
 
   firstShotMatrix: any[] | null;
-  getFirstShotMatrix: (teamId: string, startDate: Date | null, endDate: Date | null, positions: string[] | null, bucketSize: number) => Promise<void>;
+  getFirstShotMatrix: (
+    teamId: string,
+    startDate: Date | null,
+    endDate: Date | null,
+    _positions: PositionScore[] | null,
+    bucketSize: number,
+  ) => Promise<void>;
 
   userWeeklyActivitySummary: any[] | null;
   getUserWeeklyActivitySummary: (ref: Date | null, teamId: string) => Promise<void>;
 
-  // squad weapon stats
-  squadWeaponStats: SquadWeaponSessionRow[] | null;
-  getSquadWeaponStats: (userId: string, weaponId: string, teamId: string, start: Date | null, end: Date | null) => Promise<void>;
-
   // position heatmap
   positionHeatmapData: PositionHeatmapDay[] | null;
-  fetchPositionHeatmap: (teamId: string, position: "Lying" | "Sitting" | "Standing" | "Operational", start?: Date, end?: Date) => Promise<void>;
+  fetchPositionHeatmap: (teamId: string, position: PositionScore, start?: Date, end?: Date) => Promise<void>;
 }
-
 export const performanceStore = create<PerformanceStore>((set) => ({
   squadWeaponPerformance: [],
   isLoading: false,
@@ -382,13 +385,14 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     }
   },
 
-  getFirstShotMatrix: async (teamId: string, startDate: Date | null, endDate: Date | null, positions: string[] | null, bucketSize: number) => {
+  // store action stays the same signature…
+  getFirstShotMatrix: async (teamId, startDate, endDate, _positions: PositionScore[] | null, bucketSize) => {
     try {
       set({ isLoading: true });
-      const data = await getFirstShotMatrix(teamId, startDate, endDate, positions, bucketSize);
+      const data = await getFirstShotMatrix(teamId, startDate, endDate, null, bucketSize); // 👈 force null
       set({ firstShotMatrix: data });
-    } catch (error) {
-      console.error("Failed to load first shot matrix:", error);
+    } catch (e) {
+      console.error("Failed to load first shot matrix:", e);
       set({ firstShotMatrix: null });
     } finally {
       set({ isLoading: false });
@@ -406,26 +410,27 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     }
   },
 
-  squadWeaponStats: null,
-      getSquadWeaponStats: async (userId: string, weaponId: string, teamId: string, start: Date | null, end: Date | null) => {
-    console.log("userId", userId);
-    console.log("weaponId", weaponId);
-    console.log("teamId", teamId);
-    console.log("start", start);
-    console.log("end", end);
-    const data = await getSquadWeaponStats({ userId, weaponId, teamId, start, end });
-    set({ squadWeaponStats: data });
-  },
-
   positionHeatmapData: null,
-  fetchPositionHeatmap: async (teamId: string, position: "Lying" | "Sitting" | "Standing" | "Operational", start?: Date, end?: Date) => {
+  fetchPositionHeatmap: async (teamId: string, position: PositionScore, start?: Date, end?: Date) => {
     set({ isLoading: true });
     try {
-      const data = await fetchPositionHeatmap(teamId, position, start, end);
+      const data = await getPositionHeatmap(teamId, position, start, end);
       set({ positionHeatmapData: data, isLoading: false });
     } catch (error) {
       console.error("Error fetching position heatmap:", error);
       set({ positionHeatmapData: null, isLoading: false });
+    }
+  },
+
+  squadWeaponStats: [],
+  getSquadWeaponStats: async (teamId: string, startDate: Date | null, endDate: Date | null) => {
+    set({ isLoading: true });
+    try {
+      const data = await getSquadWeaponStats(teamId, startDate, endDate);
+      set({ squadWeaponStats: data, isLoading: false });
+    } catch (error) {
+      console.error("Error fetching squad performance impact:", error);
+      set({ squadWeaponStats: null, isLoading: false });
     }
   },
 }));

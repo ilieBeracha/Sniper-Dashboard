@@ -68,6 +68,58 @@ export async function getCommanderTeamMedianDispersion(
   return data || [];
 }
 
+export interface SquadImpactData {
+  user_id: string;
+  user_name: string;
+  weapon_id: string;
+  weapon_name: string;
+  training_date: string;
+  user_hit_rate: number;
+  squad_hit_rate_before: number;
+  squad_hit_rate_after: number;
+  impact_percentage: number;
+  total_shots: number;
+  squad_members_count: number;
+}
+
+export async function getSquadPerformanceImpact(
+  teamId: string,
+  userId?: string,
+  weaponId?: string,
+  startDate?: string,
+  endDate?: string,
+): Promise<SquadImpactData[]> {
+  try {
+    // Try to call the RPC function
+    const { data, error } = await supabase.rpc("get_squad_performance_impact", {
+      p_team_id: teamId,
+      p_user_id: userId || null,
+      p_weapon_id: weaponId || null,
+      p_start_date: startDate || null,
+      p_end_date: endDate || null,
+    });
+
+    if (error) {
+      // If RPC doesn't exist, return mock data for demonstration
+      if (error.message.includes("Could not find the function")) {
+        console.warn("RPC function not deployed yet. Run the migration in supabase/migrations/squad_performance_impact.sql");
+
+        // Return empty array for now
+        return [];
+
+        // Or return mock data for testing:
+        // return getMockSquadImpactData(teamId, userId, weaponId, startDate, endDate);
+      }
+      throw error;
+    }
+
+    return data || [];
+  } catch (error: any) {
+    console.error("Error fetching squad performance impact:", error.message);
+    throw new Error("Failed to fetch squad performance impact");
+  }
+}
+
 export async function getSquadRoleHitPercentages(squadId: string, distance: string | null = null) {
   try {
     const { data, error } = await supabase.rpc("get_squad_hit_percentages_by_role", {
@@ -377,25 +429,15 @@ export async function getUserMediansInSquad(
 
   return data;
 }
-export async function getFirstShotMatrix(
-  teamId: string,
-  startDate: Date | null,
-  endDate: Date | null,
-  positions: string[] | null,
-  bucketSize: number,
-) {
+
+export async function getFirstShotMatrix(teamId: string, startDate: Date | null, endDate: Date | null, _positions: null, bucketSize: number) {
   const { data, error } = await supabase.rpc("get_first_shot_matrix", {
     p_team_id: teamId,
     p_start: startDate,
     p_end: endDate,
-    p_positions: positions ?? null,
     p_distance_bucket: bucketSize,
   });
-
-  if (error) {
-    console.error("Error fetching first shot matrix:", error);
-    throw error;
-  }
+  if (error) throw error;
   return data;
 }
 
@@ -410,27 +452,6 @@ export async function getUserWeeklyActivitySummary(ref: Date | null, teamId: str
   }
 
   return data;
-}
-
-const toIso = (d?: string | Date | null) => (d ? new Date(d).toISOString() : null);
-
-/** Calls RPC: get_squad_stats_when_user_holds_weapon */
-export async function getSquadWeaponStats({
-  userId,
-  weaponId,
-  teamId = null,
-  start = null,
-  end = null,
-}: GetSquadStatsArgs): Promise<SquadWeaponSessionRow[]> {
-  const { data, error } = await supabase.rpc("get_squad_stats_when_user_holds_weapon", {
-    p_user_id: userId,
-    p_weapon_id: weaponId,
-    p_team_id: teamId,
-    p_start: toIso(start),
-    p_end: toIso(end),
-  });
-  if (error) throw error;
-  return (data ?? []) as SquadWeaponSessionRow[];
 }
 
 export interface SquadWeaponSessionRow {
@@ -455,23 +476,11 @@ export interface SquadWeaponSessionRow {
   user_hit_ratio: number; // 0..1
 }
 
-export type GetSquadStatsArgs = {
-  userId: string;
-  weaponId: string;
-  teamId?: string | null;
-  start?: string | Date | null; // optional window
-  end?: string | Date | null; // optional window
-};
-
-export async function fetchPositionHeatmap(
-  teamId: string,
-  position: "Lying" | "Sitting" | "Standing" | "Operational",
-  start?: Date,
-  end?: Date
-): Promise<PositionHeatmapDay[]> {
+export async function getPositionHeatmap(teamId: string, position: PositionScore, start?: Date, end?: Date): Promise<PositionHeatmapDay[]> {
   const { data, error } = await supabase
     .from("target_engagements")
-    .select(`
+    .select(
+      `
       shots_fired,
       target_hits,
       target_stats!inner(
@@ -481,9 +490,10 @@ export async function fetchPositionHeatmap(
           session_participants!inner(position, user_duty)
         )
       )
-    `)
+    `,
+    )
     .eq("target_stats.session_stats.team_id", teamId)
-    .eq("target_stats.session_stats.session_participants.position", position)
+    .eq("target_stats.session_stats.session_participants.position", position.toString())
     .eq("target_stats.session_stats.session_participants.user_duty", "Sniper")
     .gte(start ? "target_stats.session_stats.created_at" : "", start ? start.toISOString() : undefined)
     .lte(end ? "target_stats.session_stats.created_at" : "", end ? end.toISOString() : undefined);
@@ -505,10 +515,21 @@ export async function fetchPositionHeatmap(
   // Shape into array
   return Array.from(dailyMap.entries()).map(([date, stats]) => ({
     date,
-    position,
+    position: position.toString() as "Lying" | "Sitting" | "Standing" | "Operational",
     engagements: stats.engagements,
     totalShots: stats.shots,
     totalHits: stats.hits,
     hitRatio: stats.shots > 0 ? stats.hits / stats.shots : 0,
   }));
+}
+
+export async function getSquadWeaponStats(teamId: string, startDate: Date | null, endDate: Date | null) {
+  const { data, error } = await supabase.rpc("get_team_stats_when_user_holds_weapon", {
+    p_team_id: teamId,
+    p_start: startDate,
+    p_end: endDate,
+  });
+
+  if (error) throw error;
+  return data;
 }
