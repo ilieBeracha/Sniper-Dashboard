@@ -1,6 +1,6 @@
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
-import { Calendar, Users, Target, Crosshair, TrendingUp, ArrowUpRight, ArrowDownRight, Activity } from "lucide-react";
+import { Users, Target, Crosshair, TrendingUp, ArrowUpRight, ArrowDownRight, Activity } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function StatsUserKPI() {
