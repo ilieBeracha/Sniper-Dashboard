@@ -22,8 +22,15 @@ export default function SquadImpactStats() {
 
     const totalShots = squadWeaponStats.reduce((acc: number, d: any) => acc + (d.total_shots || 0), 0);
     const totalHits = squadWeaponStats.reduce((acc: number, d: any) => acc + (d.total_hits || 0), 0);
-    const avgImpact = squadWeaponStats.reduce((acc: number, d: any) => acc + (d.hit_rate || 0), 0) / squadWeaponStats.length;
+    
+    // Calculate overall squad hit rate
     const hitRate = totalShots > 0 ? (totalHits / totalShots) * 100 : 0;
+    
+    // Calculate squad impact as the difference between current hit rate and baseline (50%)
+    // Positive impact means performing above baseline, negative means below
+    const baselineHitRate = 50; // 50% is considered baseline performance
+    const squadImpact = hitRate - baselineHitRate;
+    
     const activeUsers = new Set(squadWeaponStats.map((d: any) => d.user_id)).size;
 
     const userPerformance: { [key: string]: any } = {};
@@ -45,13 +52,13 @@ export default function SquadImpactStats() {
       .sort((a, b) => b.accuracy - a.accuracy)
       .slice(0, 5);
 
-    return { totalShots, totalHits, avgImpact, hitRate, activeUsers, topPerformers };
+    return { totalShots, totalHits, squadImpact, hitRate, activeUsers, topPerformers };
   }, [squadWeaponStats]);
 
   const radialData = stats
     ? [
         { name: "Hit Rate", value: Math.round(stats.hitRate), fill: theme === "dark" ? "#10b981" : "#059669" },
-        { name: "Impact", value: Math.round(Math.abs(stats.avgImpact) * 10), fill: theme === "dark" ? "#3b82f6" : "#2563eb" },
+        { name: "Impact", value: Math.round(Math.min(Math.abs(stats.squadImpact), 100)), fill: theme === "dark" ? "#3b82f6" : "#2563eb" },
         { name: "Activity", value: Math.min(stats.activeUsers * 20, 100), fill: theme === "dark" ? "#f59e0b" : "#d97706" },
       ]
     : [];
@@ -92,7 +99,7 @@ export default function SquadImpactStats() {
             <StatCard icon={Target} color="emerald" value={stats.totalShots.toLocaleString()} label="Total Shots" theme={theme} />
             <StatCard icon={Target} color="blue" value={`${Math.round(stats.hitRate)}%`} label="Hit Rate" theme={theme} />
             <StatCard icon={Users} color="amber" value={stats.activeUsers.toString()} label="Active Users" theme={theme} />
-            <ImpactCard avgImpact={stats.avgImpact} theme={theme} />
+            <ImpactCard squadImpact={stats.squadImpact} theme={theme} />
           </div>
 
           {/* Compact Charts Row */}
@@ -179,14 +186,14 @@ function StatCard({ icon, color, value, label, theme }: { icon: React.ElementTyp
   );
 }
 
-function ImpactCard({ avgImpact, theme }: { avgImpact: number; theme: string }) {
+function ImpactCard({ squadImpact, theme }: { squadImpact: number; theme: string }) {
   const getImpactColor = (impact: number) => {
     if (impact > 0) return "emerald";
     if (impact < 0) return "rose";
     return "gray";
   };
 
-  const color = getImpactColor(avgImpact);
+  const color = getImpactColor(squadImpact);
 
   return (
     <div
@@ -207,16 +214,16 @@ function ImpactCard({ avgImpact, theme }: { avgImpact: number; theme: string }) 
         <div className={`w-1.5 h-1.5 rounded-full bg-${color}-500 animate-pulse`} />
       </div>
       <div className={`text-sm font-bold flex items-center gap-0.5 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-        {avgImpact > 0 ? (
+        {squadImpact > 0 ? (
           <TrendingUp className="w-3 h-3 text-emerald-500" />
-        ) : avgImpact < 0 ? (
+        ) : squadImpact < 0 ? (
           <TrendingDown className="w-3 h-3 text-rose-500" />
         ) : (
           <Minus className="w-3 h-3 text-gray-500" />
         )}
-        {Math.abs(avgImpact).toFixed(1)}%
+        {squadImpact > 0 ? '+' : ''}{squadImpact.toFixed(1)}%
       </div>
-      <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Avg Impact</div>
+      <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Squad Impact</div>
     </div>
   );
 }
