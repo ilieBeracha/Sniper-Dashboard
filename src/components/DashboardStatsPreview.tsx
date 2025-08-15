@@ -5,17 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { BarChart2, TrendingUp, Target, Activity, ArrowUpRight, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-} from "chart.js";
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler);
 
 export default function DashboardStatsPreview() {
   const navigate = useNavigate();
@@ -43,7 +32,6 @@ export default function DashboardStatsPreview() {
   const weeklyData = userWeeklyKpisForUser?.[0] || {};
   const avgAccuracy = weeklyData.avg_hit_ratio_last_week ? Math.round(weeklyData.avg_hit_ratio_last_week * 100) : 0;
   const targetsEngaged = weeklyData.targets_last_week || 0;
-  const trainingSessions = weeklyData.trainings_last_week || 0;
 
   const metrics = [
     {
@@ -82,34 +70,22 @@ export default function DashboardStatsPreview() {
 
   const currentMetric = metrics[activeMetric];
 
-  // Mini chart data
-  const chartData = {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    datasets: [
-      {
-        data: [65, 72, 68, 75, 82, 79, 85], // Mock data for now
-        fill: true,
-        backgroundColor: theme === "dark" ? "rgba(147, 51, 234, 0.1)" : "rgba(147, 51, 234, 0.1)",
-        borderColor: "rgba(147, 51, 234, 0.8)",
-        borderWidth: 2,
-        tension: 0.4,
-        pointRadius: 0,
-        pointHoverRadius: 0,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: { enabled: false },
-    },
-    scales: {
-      x: { display: false },
-      y: { display: false },
-    },
+  // Sparkline data
+  const sparklineData = [65, 72, 68, 75, 82, 79, 85];
+  const maxValue = Math.max(...sparklineData);
+  const minValue = Math.min(...sparklineData);
+  const range = maxValue - minValue;
+  
+  // Create SVG path for sparkline
+  const createSparklinePath = () => {
+    const width = 100;
+    const height = 40;
+    const points = sparklineData.map((value, index) => {
+      const x = (index / (sparklineData.length - 1)) * width;
+      const y = height - ((value - minValue) / range) * height;
+      return `${x},${y}`;
+    });
+    return `M ${points.join(' L ')}`;
   };
 
   return (
@@ -227,11 +203,29 @@ export default function DashboardStatsPreview() {
 
         {/* Mini Sparkline Chart */}
         <motion.div
-          className="h-12 mt-3 mb-3"
+          className="h-12 mt-3 mb-3 relative"
           animate={{ opacity: isHovered ? 1 : 0.7 }}
           transition={{ duration: 0.3 }}
         >
-          <Line data={chartData} options={chartOptions} />
+          <svg className="w-full h-full" viewBox="0 0 100 40" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="sparklineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="rgba(147, 51, 234, 0.3)" />
+                <stop offset="100%" stopColor="rgba(147, 51, 234, 0)" />
+              </linearGradient>
+            </defs>
+            <path
+              d={createSparklinePath()}
+              fill="none"
+              stroke="rgba(147, 51, 234, 0.8)"
+              strokeWidth="2"
+              vectorEffect="non-scaling-stroke"
+            />
+            <path
+              d={`${createSparklinePath()} L 100,40 L 0,40 Z`}
+              fill="url(#sparklineGradient)"
+            />
+          </svg>
         </motion.div>
 
         {/* Progress Indicators */}
