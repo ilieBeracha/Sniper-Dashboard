@@ -8,11 +8,14 @@ import { Clock, Sunrise, Sun, Sunset, Moon } from "lucide-react";
 
 interface HourlyData {
   hour: number;
-  days: Map<string, {
-    count: number;
-    types: Set<string>;
-    users: Set<string>;
-  }>;
+  days: Map<
+    string,
+    {
+      count: number;
+      types: Set<string>;
+      users: Set<string>;
+    }
+  >;
   totalCount: number;
 }
 
@@ -36,10 +39,10 @@ export default function HourlyActivityMatrix() {
     // Initialize days for each hour
     const end = new Date();
     const start = subDays(end, 7); // Last 7 days
-    
+
     eachDayOfInterval({ start: startOfDay(start), end: startOfDay(end) }).forEach((date) => {
       const dateKey = format(date, "yyyy-MM-dd");
-      hours.forEach(h => {
+      hours.forEach((h) => {
         h.days.set(dateKey, { count: 0, types: new Set(), users: new Set() });
       });
     });
@@ -48,15 +51,15 @@ export default function HourlyActivityMatrix() {
     feed.forEach((item) => {
       const hour = getHours(new Date(item.created_at));
       const dateKey = format(new Date(item.created_at), "yyyy-MM-dd");
-      
+
       if (hour >= 0 && hour < 24) {
         const hourData = hours[hour];
         const dayData = hourData.days.get(dateKey);
-        
+
         if (dayData) {
           dayData.count++;
           dayData.types.add(item.action_type);
-          dayData.users.add(item.actor_id.id);
+          dayData.users.add(item.actor_id);
           hourData.totalCount++;
         }
       }
@@ -65,7 +68,6 @@ export default function HourlyActivityMatrix() {
     return hours;
   }, [feed]);
 
-  const maxPerHour = Math.max(...hourlyData.map(h => h.totalCount), 1);
   const days = Array.from(hourlyData[0].days.keys()).sort();
 
   const getHourIcon = (hour: number) => {
@@ -76,12 +78,12 @@ export default function HourlyActivityMatrix() {
   };
 
   const getHourLabel = (hour: number) => {
-    return `${hour.toString().padStart(2, '0')}:00`;
+    return `${hour.toString().padStart(2, "0")}:00`;
   };
 
   const getCellIntensity = (count: number, maxCount: number) => {
     if (count === 0) return theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50";
-    
+
     const ratio = count / maxCount;
     if (theme === "dark") {
       if (ratio > 0.75) return "bg-gradient-to-br from-purple-600 to-blue-600";
@@ -96,23 +98,17 @@ export default function HourlyActivityMatrix() {
     }
   };
 
-  const peakHour = hourlyData.reduce((max, h) => h.totalCount > max.totalCount ? h : max);
+  const peakHour = hourlyData.reduce((max, h) => (h.totalCount > max.totalCount ? h : max));
 
   return (
-    <div className={`rounded-lg p-4 border ${
-      theme === "dark" ? "bg-zinc-900/90 border-zinc-700" : "bg-white border-gray-200"
-    }`}>
+    <div className={`rounded-lg p-4 border ${theme === "dark" ? "bg-zinc-900/90 border-zinc-700" : "bg-white border-gray-200"}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Clock className="w-4 h-4 opacity-50" />
-          <h4 className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-            24-Hour Activity Pattern
-          </h4>
+          <h4 className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>24-Hour Activity Pattern</h4>
         </div>
-        <div className={`text-xs px-2 py-1 rounded-full ${
-          theme === "dark" ? "bg-zinc-800" : "bg-gray-100"
-        }`}>
+        <div className={`text-xs px-2 py-1 rounded-full ${theme === "dark" ? "bg-zinc-800" : "bg-gray-100"}`}>
           Peak: {getHourLabel(peakHour.hour)}
         </div>
       </div>
@@ -123,10 +119,8 @@ export default function HourlyActivityMatrix() {
           {/* Day headers */}
           <div className="flex gap-1 mb-1">
             <div className="w-12"></div>
-            {days.map(day => (
-              <div key={day} className={`w-10 text-center text-xs ${
-                theme === "dark" ? "text-zinc-500" : "text-gray-500"
-              }`}>
+            {days.map((day) => (
+              <div key={day} className={`w-10 text-center text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
                 {format(new Date(day), "EEE")}
               </div>
             ))}
@@ -136,16 +130,11 @@ export default function HourlyActivityMatrix() {
           <div className="space-y-1">
             {hourlyData.map((hourData) => {
               const isSelected = selectedHour === hourData.hour;
-              
+
               return (
-                <div 
-                  key={hourData.hour} 
-                  className={`flex gap-1 items-center transition-all ${
-                    isSelected ? "scale-105" : ""
-                  }`}
-                >
+                <div key={hourData.hour} className={`flex gap-1 items-center transition-all ${isSelected ? "scale-105" : ""}`}>
                   {/* Hour label */}
-                  <div 
+                  <div
                     className={`w-12 flex items-center gap-1 text-xs cursor-pointer ${
                       theme === "dark" ? "text-zinc-400" : "text-gray-600"
                     } ${isSelected ? "font-bold" : ""}`}
@@ -156,33 +145,34 @@ export default function HourlyActivityMatrix() {
                   </div>
 
                   {/* Day cells */}
-                  {days.map(day => {
+                  {days.map((day) => {
                     const dayData = hourData.days.get(day) || { count: 0, types: new Set(), users: new Set() };
-                    const maxForDay = Math.max(...Array.from(hourData.days.values()).map(d => d.count), 1);
-                    
+                    const maxForDay = Math.max(...Array.from(hourData.days.values()).map((d) => d.count), 1);
+
                     return (
                       <div key={day} className="relative group">
-                        <div className={`w-10 h-6 rounded transition-all cursor-pointer ${
-                          getCellIntensity(dayData.count, maxForDay)
-                        } hover:scale-110 hover:z-10`}>
+                        <div
+                          className={`w-10 h-6 rounded transition-all cursor-pointer ${getCellIntensity(
+                            dayData.count,
+                            maxForDay,
+                          )} hover:scale-110 hover:z-10`}
+                        >
                           {dayData.count > 0 && (
                             <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-[10px] font-semibold text-white/80">
-                                {dayData.count}
-                              </span>
+                              <span className="text-[10px] font-semibold text-white/80">{dayData.count}</span>
                             </div>
                           )}
                         </div>
 
                         {/* Tooltip */}
                         {dayData.count > 0 && (
-                          <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 
+                          <div
+                            className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 
                             rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 
                             transition-all z-20 pointer-events-none ${
-                            theme === "dark" 
-                              ? "bg-zinc-800 text-white border border-zinc-600" 
-                              : "bg-gray-900 text-white"
-                          }`}>
+                              theme === "dark" ? "bg-zinc-800 text-white border border-zinc-600" : "bg-gray-900 text-white"
+                            }`}
+                          >
                             <div className="font-semibold mb-1">
                               {format(new Date(day), "MMM d")} at {getHourLabel(hourData.hour)}
                             </div>
@@ -198,11 +188,7 @@ export default function HourlyActivityMatrix() {
                   })}
 
                   {/* Hour total */}
-                  <div className={`ml-2 text-xs font-medium ${
-                    theme === "dark" ? "text-zinc-400" : "text-gray-600"
-                  }`}>
-                    {hourData.totalCount}
-                  </div>
+                  <div className={`ml-2 text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>{hourData.totalCount}</div>
                 </div>
               );
             })}
@@ -219,31 +205,19 @@ export default function HourlyActivityMatrix() {
           { label: "Night", hours: [21, 4], icon: Moon },
         ].map(({ label, hours, icon: Icon }) => {
           const count = hourlyData
-            .filter(h => {
+            .filter((h) => {
               if (hours[0] > hours[1]) {
                 return h.hour >= hours[0] || h.hour <= hours[1];
               }
               return h.hour >= hours[0] && h.hour <= hours[1];
             })
             .reduce((sum, h) => sum + h.totalCount, 0);
-          
+
           return (
-            <div key={label} className={`text-center p-2 rounded ${
-              theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"
-            }`}>
-              <Icon className={`w-4 h-4 mx-auto mb-1 ${
-                theme === "dark" ? "text-zinc-400" : "text-gray-500"
-              }`} />
-              <div className={`text-xs ${
-                theme === "dark" ? "text-zinc-500" : "text-gray-600"
-              }`}>
-                {label}
-              </div>
-              <div className={`text-sm font-bold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}>
-                {count}
-              </div>
+            <div key={label} className={`text-center p-2 rounded ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+              <Icon className={`w-4 h-4 mx-auto mb-1 ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`} />
+              <div className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-600"}`}>{label}</div>
+              <div className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{count}</div>
             </div>
           );
         })}
