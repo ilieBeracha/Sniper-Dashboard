@@ -4,7 +4,7 @@ import { feedStore } from "@/store/feedStore";
 import { userStore } from "@/store/userStore";
 import { subDays, startOfDay, format, eachDayOfInterval, getHours } from "date-fns";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Activity, TrendingUp, Users, Calendar, Clock, Zap, Crosshair, Trophy } from "lucide-react";
+import { Activity, TrendingUp, Users, Calendar, Clock, Zap, Crosshair, Trophy, Target, Wind, Percent, Eye, AlertCircle, BarChart3 } from "lucide-react";
 
 interface ActivityDay {
   date: string;
@@ -23,12 +23,26 @@ interface ActivityCategory {
   description: string;
 }
 
+interface ShotMetrics {
+  totalShots: number;
+  totalHits: number;
+  accuracy: number;
+  avgDistance: number;
+  maxDistance: number;
+  minDistance: number;
+  windConditions: Map<string, number>;
+  userPerformance: Map<string, { shots: number; hits: number; accuracy: number }>;
+  hourlyPerformance: number[];
+  distanceRanges: { close: number; medium: number; long: number };
+}
+
 export default function ActivityLogHeatmap() {
   const { feed, fetchFeedLog } = useStore(feedStore);
   const { user } = useStore(userStore);
   const { theme } = useTheme();
   const [loading, setLoading] = useState(false);
-  const [viewMode, setViewMode] = useState<"daily" | "hourly" | "type">("type");
+  const [viewMode, setViewMode] = useState<"daily" | "hourly" | "type" | "performance">("type");
+  const [selectedMetric, setSelectedMetric] = useState<"accuracy" | "distance" | "wind">("accuracy");
 
   useEffect(() => {
     if (!user?.team_id) return;
@@ -36,7 +50,7 @@ export default function ActivityLogHeatmap() {
     const loadData = async () => {
       setLoading(true);
       try {
-        await fetchFeedLog(user.team_id || "");
+        fetchFeedLog(user.team_id || "");
       } catch (error) {
         console.error("Error loading activity feed:", error);
       } finally {
@@ -196,6 +210,83 @@ export default function ActivityLogHeatmap() {
 
   const categoryData = getCategoryData();
 
+  // Calculate shot metrics from target_engaged events
+  const shotMetrics = useMemo((): ShotMetrics => {
+    const metrics: ShotMetrics = {
+      totalShots: 0,
+      totalHits: 0,
+      accuracy: 0,
+      avgDistance: 0,
+      maxDistance: 0,
+      minDistance: Number.MAX_VALUE,
+      windConditions: new Map(),
+      userPerformance: new Map(),
+      hourlyPerformance: new Array(24).fill(0),
+      distanceRanges: { close: 0, medium: 0, long: 0 }
+    };
+
+    const targetEngagedEvents = feed.filter(item => item.action_type === 'target_engaged');
+    const distances: number[] = [];
+
+    targetEngagedEvents.forEach(event => {
+      if (event.context) {
+        const ctx = typeof event.context === 'string' ? JSON.parse(event.context) : event.context;
+        
+        // Aggregate shots and hits
+        const shots = ctx.shots_fired || 0;
+        const hits = ctx.target_hits || 0;
+        metrics.totalShots += shots;
+        metrics.totalHits += hits;
+
+        // Distance metrics
+        if (ctx.distance_m) {
+          const distance = ctx.distance_m;
+          distances.push(distance);
+          metrics.maxDistance = Math.max(metrics.maxDistance, distance);
+          metrics.minDistance = Math.min(metrics.minDistance, distance);
+          
+          // Categorize distance ranges
+          if (distance <= 100) metrics.distanceRanges.close++;
+          else if (distance <= 300) metrics.distanceRanges.medium++;
+          else metrics.distanceRanges.long++;
+        }
+
+        // Wind conditions tracking
+        if (ctx.wind_speed) {
+          const windCategory = ctx.wind_speed < 5 ? 'Low' : ctx.wind_speed < 15 ? 'Medium' : 'High';
+          metrics.windConditions.set(windCategory, (metrics.windConditions.get(windCategory) || 0) + 1);
+        }
+
+        // User performance tracking
+        const userId = event.actor_id;
+        const userPerf = metrics.userPerformance.get(userId) || { shots: 0, hits: 0, accuracy: 0 };
+        userPerf.shots += shots;
+        userPerf.hits += hits;
+        userPerf.accuracy = userPerf.shots > 0 ? (userPerf.hits / userPerf.shots) * 100 : 0;
+        metrics.userPerformance.set(userId, userPerf);
+
+        // Hourly performance
+        const hour = getHours(new Date(event.created_at));
+        metrics.hourlyPerformance[hour] += hits;
+      }
+    });
+
+    // Calculate overall accuracy
+    metrics.accuracy = metrics.totalShots > 0 ? (metrics.totalHits / metrics.totalShots) * 100 : 0;
+    
+    // Calculate average distance
+    if (distances.length > 0) {
+      metrics.avgDistance = distances.reduce((sum, d) => sum + d, 0) / distances.length;
+    }
+
+    // Fix min distance if no data
+    if (metrics.minDistance === Number.MAX_VALUE) {
+      metrics.minDistance = 0;
+    }
+
+    return metrics;
+  }, [feed]);
+
   return (
     <div className={`rounded-xl p-4 border shadow-sm ${theme === "dark" ? "bg-zinc-900/90 border-zinc-700" : "bg-white border-gray-200"}`}>
       {/* Header */}
@@ -209,7 +300,7 @@ export default function ActivityLogHeatmap() {
             </div>
           </div>
           <div className="flex gap-2">
-            {["type", "daily", "hourly"].map((mode) => (
+            {["type", "performance", "daily", "hourly"].map((mode) => (
               <button
                 key={mode}
                 onClick={() => setViewMode(mode as any)}
@@ -223,7 +314,7 @@ export default function ActivityLogHeatmap() {
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
-                {mode === "type" ? "Categories" : mode.charAt(0).toUpperCase() + mode.slice(1)}
+                {mode === "type" ? "Categories" : mode === "performance" ? "Analytics" : mode.charAt(0).toUpperCase() + mode.slice(1)}
               </button>
             ))}
           </div>
@@ -471,6 +562,324 @@ export default function ActivityLogHeatmap() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Performance Analytics View */}
+          {viewMode === "performance" && (
+            <div className="space-y-4">
+              {/* Performance Tabs */}
+              <div className="flex gap-2 mb-3">
+                {(['accuracy', 'distance', 'wind'] as const).map((metric) => (
+                  <button
+                    key={metric}
+                    onClick={() => setSelectedMetric(metric)}
+                    className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                      selectedMetric === metric
+                        ? theme === "dark"
+                          ? "bg-emerald-600 text-white shadow-sm"
+                          : "bg-emerald-500 text-white shadow-sm"
+                        : theme === "dark"
+                          ? "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {metric.charAt(0).toUpperCase() + metric.slice(1)}
+                  </button>
+                ))}
+              </div>
+
+              {/* Accuracy Metrics */}
+              {selectedMetric === "accuracy" && (
+                <div className="space-y-4">
+                  {/* Main Accuracy Stats */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Target className="w-4 h-4 text-emerald-500" />
+                        <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Total Shots</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>
+                        {shotMetrics.totalShots.toLocaleString()}
+                      </div>
+                    </div>
+                    <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Crosshair className="w-4 h-4 text-blue-500" />
+                        <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Total Hits</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>
+                        {shotMetrics.totalHits.toLocaleString()}
+                      </div>
+                    </div>
+                    <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Percent className="w-4 h-4 text-purple-500" />
+                        <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Accuracy Rate</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>
+                        {shotMetrics.accuracy.toFixed(1)}%
+                      </div>
+                    </div>
+                    <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Users className="w-4 h-4 text-amber-500" />
+                        <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Active Shooters</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>
+                        {shotMetrics.userPerformance.size}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* User Performance Breakdown */}
+                  <div className={`p-4 rounded-xl border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"}`}>
+                    <h6 className={`text-sm font-semibold mb-3 ${theme === "dark" ? "text-zinc-200" : "text-gray-700"}`}>
+                      Individual Performance Analysis
+                    </h6>
+                    <div className="space-y-2">
+                      {Array.from(shotMetrics.userPerformance.entries())
+                        .sort((a, b) => b[1].accuracy - a[1].accuracy)
+                        .slice(0, 5)
+                        .map(([userId, perf]) => (
+                          <div key={userId} className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                                theme === "dark" ? "bg-zinc-700 text-zinc-300" : "bg-gray-200 text-gray-700"
+                              }`}>
+                                {userId.substring(0, 2).toUpperCase()}
+                              </div>
+                              <div>
+                                <div className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                                  User {userId.substring(0, 8)}
+                                </div>
+                                <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+                                  {perf.shots} shots • {perf.hits} hits
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className={`text-lg font-bold ${
+                                perf.accuracy >= 80 ? "text-emerald-500" :
+                                perf.accuracy >= 60 ? "text-blue-500" :
+                                perf.accuracy >= 40 ? "text-amber-500" : "text-red-500"
+                              }`}>
+                                {perf.accuracy.toFixed(1)}%
+                              </div>
+                              <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+                                accuracy
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+
+                  {/* Hourly Hit Distribution */}
+                  <div className={`p-4 rounded-xl border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"}`}>
+                    <h6 className={`text-sm font-semibold mb-3 ${theme === "dark" ? "text-zinc-200" : "text-gray-700"}`}>
+                      Hourly Hit Distribution
+                    </h6>
+                    <div className="flex items-end gap-1" style={{ height: '100px' }}>
+                      {shotMetrics.hourlyPerformance.map((hits, hour) => {
+                        const maxHits = Math.max(...shotMetrics.hourlyPerformance);
+                        const height = maxHits > 0 ? (hits / maxHits) * 100 : 0;
+                        return (
+                          <div key={hour} className="flex-1 relative group">
+                            <div
+                              className={`absolute bottom-0 w-full rounded-t transition-all ${
+                                hits > 0
+                                  ? `bg-gradient-to-t ${getHourlyColor(hour)}`
+                                  : theme === "dark" ? "bg-zinc-800" : "bg-gray-200"
+                              }`}
+                              style={{ height: `${height}%` }}
+                            >
+                              {hits > 0 && (
+                                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <div className={`text-[10px] font-bold px-1 py-0.5 rounded ${
+                                    theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-800 text-gray-100"
+                                  }`}>
+                                    {hits}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            {hour % 6 === 0 && (
+                              <div className={`absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-[9px] ${
+                                theme === "dark" ? "text-zinc-500" : "text-gray-500"
+                              }`}>
+                                {hour}h
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Distance Analytics */}
+              {selectedMetric === "distance" && (
+                <div className="space-y-4">
+                  {/* Distance Stats */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Eye className="w-4 h-4 text-blue-500" />
+                        <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Avg Distance</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>
+                        {Math.round(shotMetrics.avgDistance)}m
+                      </div>
+                    </div>
+                    <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <TrendingUp className="w-4 h-4 text-emerald-500" />
+                        <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Max Distance</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>
+                        {shotMetrics.maxDistance}m
+                      </div>
+                    </div>
+                    <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <BarChart3 className="w-4 h-4 text-purple-500" />
+                        <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Min Distance</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>
+                        {shotMetrics.minDistance}m
+                      </div>
+                    </div>
+                    <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Target className="w-4 h-4 text-amber-500" />
+                        <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Total Engagements</span>
+                      </div>
+                      <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>
+                        {Object.values(shotMetrics.distanceRanges).reduce((a, b) => a + b, 0)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Distance Range Distribution */}
+                  <div className={`p-4 rounded-xl border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"}`}>
+                    <h6 className={`text-sm font-semibold mb-3 ${theme === "dark" ? "text-zinc-200" : "text-gray-700"}`}>
+                      Distance Range Distribution
+                    </h6>
+                    <div className="space-y-3">
+                      {[
+                        { label: 'Close Range (0-100m)', value: shotMetrics.distanceRanges.close, color: 'emerald' },
+                        { label: 'Medium Range (100-300m)', value: shotMetrics.distanceRanges.medium, color: 'blue' },
+                        { label: 'Long Range (300m+)', value: shotMetrics.distanceRanges.long, color: 'purple' }
+                      ].map((range) => {
+                        const total = Object.values(shotMetrics.distanceRanges).reduce((a, b) => a + b, 0);
+                        const percentage = total > 0 ? (range.value / total) * 100 : 0;
+                        return (
+                          <div key={range.label}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                                {range.label}
+                              </span>
+                              <span className={`text-xs font-bold ${theme === "dark" ? `text-${range.color}-400` : `text-${range.color}-600`}`}>
+                                {range.value} ({percentage.toFixed(1)}%)
+                              </span>
+                            </div>
+                            <div className={`h-3 rounded-full ${theme === "dark" ? "bg-zinc-700" : "bg-gray-200"}`}>
+                              <div
+                                className={`h-full rounded-full bg-gradient-to-r from-${range.color}-500 to-${range.color}-600 transition-all`}
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Wind Conditions Analysis */}
+              {selectedMetric === "wind" && (
+                <div className="space-y-4">
+                  {/* Wind Impact Overview */}
+                  <div className={`p-4 rounded-xl border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"}`}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Wind className={`w-5 h-5 ${theme === "dark" ? "text-cyan-400" : "text-cyan-600"}`} />
+                      <h6 className={`text-sm font-semibold ${theme === "dark" ? "text-zinc-200" : "text-gray-700"}`}>
+                        Wind Conditions Impact Analysis
+                      </h6>
+                    </div>
+                    
+                    {shotMetrics.windConditions.size > 0 ? (
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        {Array.from(shotMetrics.windConditions.entries()).map(([condition, count]) => {
+                          const total = Array.from(shotMetrics.windConditions.values()).reduce((a, b) => a + b, 0);
+                          const percentage = (count / total) * 100;
+                          const colorMap = {
+                            'Low': 'emerald',
+                            'Medium': 'amber',
+                            'High': 'red'
+                          };
+                          const color = colorMap[condition as keyof typeof colorMap] || 'gray';
+                          
+                          return (
+                            <div
+                              key={condition}
+                              className={`p-3 rounded-lg border ${
+                                theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-white border-gray-200"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                                  {condition} Wind
+                                </span>
+                                <Wind className={`w-4 h-4 text-${color}-500`} />
+                              </div>
+                              <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>
+                                {count}
+                              </div>
+                              <div className={`text-xs ${theme === "dark" ? `text-${color}-400` : `text-${color}-600`}`}>
+                                {percentage.toFixed(1)}% of sessions
+                              </div>
+                              <div className="mt-2 h-1 bg-gray-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full bg-gradient-to-r from-${color}-500 to-${color}-600 transition-all`}
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Wind className={`w-8 h-8 mx-auto mb-2 ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`} />
+                        <p className={`text-sm ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                          No wind condition data available
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Wind Advisory */}
+                  <div className={`p-4 rounded-xl border ${theme === "dark" ? "bg-amber-900/20 border-amber-700/50" : "bg-amber-50 border-amber-200"}`}>
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className={`w-5 h-5 mt-0.5 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
+                      <div>
+                        <h6 className={`text-sm font-semibold mb-1 ${theme === "dark" ? "text-amber-300" : "text-amber-800"}`}>
+                          Wind Impact Tips
+                        </h6>
+                        <ul className={`text-xs space-y-1 ${theme === "dark" ? "text-amber-400/80" : "text-amber-700"}`}>
+                          <li>• Low wind (0-5 mph): Minimal adjustment needed</li>
+                          <li>• Medium wind (5-15 mph): Consider 1-2 MOA windage adjustment</li>
+                          <li>• High wind (15+ mph): Significant compensation required, consider postponing</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
