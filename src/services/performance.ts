@@ -12,6 +12,7 @@ import {
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/user";
 import { PositionHeatmapDay } from "@/types/positionHeatmap";
+import { buildDateRange } from "@/utils/buildDayRange";
 
 export async function getUserHitStatsFull(userId: string): Promise<UserHitsData> {
   try {
@@ -430,27 +431,32 @@ export async function getUserMediansInSquad(
   return data;
 }
 
-export async function getFirstShotMatrix(teamId: string, startDate: Date | null, endDate: Date | null, _positions: null, bucketSize: number) {
+export async function getFirstShotMatrix(teamId: string, rangeDays: number = 7) {
+  const { p_start, p_end } = buildDateRange(rangeDays);
+
   const { data, error } = await supabase.rpc("get_first_shot_matrix", {
     p_team_id: teamId,
-    p_start: startDate,
-    p_end: endDate,
-    p_distance_bucket: bucketSize,
+    p_start: p_start,
+    p_end: p_end,
+    p_min_targets: 1,
   });
   if (error) throw error;
   return data;
 }
 
-export async function getUserWeeklyActivitySummary(ref: Date | null, teamId: string) {
-  const { data, error } = await supabase.rpc("get_user_weekly_activity_summary", {
-    p_ref: ref,
-    p_team_id: teamId,
+export async function getUserWeeklyKpisForUser(userId: string, rangeDays: number = 7) {
+  const { p_start, p_end } = buildDateRange(rangeDays);
+  const { data, error } = await supabase.rpc("get_user_weekly_kpis_for_user", {
+    p_user_id: userId,
+    p_start: p_start,
+    p_end: p_end,
   });
+
   if (error) {
     console.error("Error fetching user weekly activity summary:", error);
     throw error;
   }
-
+  console.log("data", data);
   return data;
 }
 

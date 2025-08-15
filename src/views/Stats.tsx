@@ -1,7 +1,6 @@
-// Components…
-import HeatmapAllActions from "@/components/HeatMap";
+// Components
 import ChartMatrix from "@/components/ChartMatrix";
-import WeeklyKPIs from "@/components/WeeklyKPIs";
+import WeeklyKPIs from "@/components/StatsUserKPI";
 import SquadImpactStats from "@/components/SquadImpactStats";
 import Header from "@/Headers/Header";
 import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
@@ -12,38 +11,36 @@ import { useEffect } from "react";
 
 // Stores
 import { performanceStore } from "@/store/performance";
+import WeeklyActivityBars from "@/components/WeeklyActivityBars";
 
 export default function Stats() {
-  const user = useStore(userStore);
-  const { getFirstShotMatrix, getUserWeeklyActivitySummary } = useStore(performanceStore);
+  const { user } = useStore(userStore);
+  const { getFirstShotMatrix, getUserWeeklyKpisForUser } = useStore(performanceStore);
 
   useEffect(() => {
-    if (user?.user?.team_id) {
-      getFirstShotMatrix(user.user.team_id, new Date(), new Date(), null, 100);
-      getUserWeeklyActivitySummary(new Date(), user.user.team_id);
+    if (user?.team_id) {
+      getFirstShotMatrix(user.team_id, 7);
+      getUserWeeklyKpisForUser(user.id, 7);
     }
-  }, [user?.user?.team_id, getFirstShotMatrix, getUserWeeklyActivitySummary]);
+  }, [user?.team_id, getFirstShotMatrix, getUserWeeklyKpisForUser]);
 
   return (
     <SpPage>
       <Header breadcrumbs={[{ label: "Stats", link: "/stats" }]} />
       <SpPageHeader title="Stats" subtitle="KPIs, impact and trends" icon={BarChart2} />
       <SpPageBody>
-        <div className="space-y-3 pb-3">
+        <div className="space-y-2 pb-2">
+          <div className="lg:col-span-2">
+            <WeeklyActivityBars />
+          </div>
           <div className="w-full">
             <WeeklyKPIs />
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
             <div className="lg:col-span-2">
               <ChartMatrix />
             </div>
-            <div></div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            <div className="lg:col-span-2">
-              <HeatmapAllActions />
-            </div>
-            <div>
+            <div className="lg:col-span-1">
               <SquadImpactStats />
             </div>
           </div>

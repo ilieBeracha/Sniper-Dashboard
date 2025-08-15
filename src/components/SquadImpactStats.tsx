@@ -1,48 +1,21 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
 import { userStore } from "@/store/userStore";
-import { weaponsStore } from "@/store/weaponsStore";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TrendingUp, TrendingDown, Minus, Target, Users, Zap, Activity, Trophy, Medal, Award } from "lucide-react";
-import { RadialBarChart, RadialBar, Legend, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { RadialBarChart, RadialBar, Legend, ResponsiveContainer, Tooltip } from "recharts";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function SquadImpactStats() {
-  const { user, teamMembers } = useStore(userStore);
-  const { weapons } = useStore(weaponsStore);
+  const { user } = useStore(userStore);
   const { squadWeaponStats, isLoading, getSquadWeaponStats } = useStore(performanceStore);
   const { theme } = useTheme();
 
-  const [selectedUser, setSelectedUser] = useState<string>("all");
-  const [selectedWeapon, setSelectedWeapon] = useState<string>("all");
-  const didInitDefaults = useRef(false);
-
-  // Set default selected user/weapon once
-  useEffect(() => {
-    if (!user || didInitDefaults.current) return;
-
-    if (user?.id) {
-      setSelectedUser(user?.id || "all");
-    }
-    if (user?.user_default_weapon) {
-      setSelectedWeapon(user?.user_default_weapon || "all");
-    }
-    didInitDefaults.current = true;
-  }, [user]);
-
-  // Fetch squad impact stats when filters change
+  // Fetch squad impact stats on mount
   useEffect(() => {
     if (!user?.team_id) return;
-
-    const userId = selectedUser === "all" ? null : selectedUser;
-    const weaponId = selectedWeapon === "all" ? null : selectedWeapon;
-
-    // Only call if we have valid IDs
-    if (userId && weaponId) {
-      getSquadWeaponStats(user.team_id, null, null);
-    }
-  }, [user?.team_id, selectedUser, selectedWeapon, getSquadWeaponStats]);
+    getSquadWeaponStats(user.team_id, null, null);
+  }, [user?.team_id, getSquadWeaponStats]);
 
   const stats = useMemo(() => {
     if (!squadWeaponStats || squadWeaponStats.length === 0) return null;
@@ -85,82 +58,37 @@ export default function SquadImpactStats() {
 
   return (
     <div
-      className={`rounded-xl p-4 border shadow-sm h-full transition-all duration-300 ${
+      className={`rounded-xl p-3 border shadow-sm h-full transition-all duration-300 ${
         theme === "dark" ? "bg-zinc-900/50 backdrop-blur-sm border-zinc-700/50" : "bg-white border-gray-200/80"
       }`}
     >
-      <div className="mb-3">
-        <div className="flex items-center gap-2 mb-2">
+      <div className="mb-2">
+        <div className="flex items-center gap-2 mb-1">
           <div
-            className={`p-2 rounded-lg ${
+            className={`p-1.5 rounded-lg ${
               theme === "dark" ? "bg-emerald-500/20 border border-emerald-500/30" : "bg-emerald-100 border border-emerald-300/50"
             }`}
           >
-            <Activity className={`w-4 h-4 ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`} />
+            <Activity className={`w-3 h-3 ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`} />
           </div>
           <div>
-            <h4 className={`text-base font-semibold ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>Squad Impact Analysis</h4>
-            <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Performance impact & statistics</p>
+            <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>Squad Impact Analysis</h4>
+            <p className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Team-wide performance metrics</p>
           </div>
-        </div>
-      </div>
-
-      {/* Compact Filters */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <div className="flex-1 min-w-[160px]">
-          <label className={`block text-xs font-medium mb-1 ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>User</label>
-          <Select value={selectedUser} onValueChange={setSelectedUser}>
-            <SelectTrigger
-              className={`h-8 text-xs transition-all duration-200 ${
-                theme === "dark" ? "bg-zinc-800/80 border-zinc-600/50 hover:border-zinc-500/70" : "bg-white border-gray-300 hover:border-gray-400"
-              }`}
-            >
-              <SelectValue placeholder="All users" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All users</SelectItem>
-              {teamMembers?.map((member) => (
-                <SelectItem key={member.id} value={member.id}>
-                  {member.first_name} {member.last_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex-1 min-w-[160px]">
-          <label className={`block text-xs font-medium mb-1 ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>Weapon</label>
-          <Select value={selectedWeapon} onValueChange={setSelectedWeapon}>
-            <SelectTrigger
-              className={`h-8 text-xs transition-all duration-200 ${
-                theme === "dark" ? "bg-zinc-800/80 border-zinc-600/50 hover:border-zinc-500/70" : "bg-white border-gray-300 hover:border-gray-400"
-              }`}
-            >
-              <SelectValue placeholder="All weapons" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All weapons</SelectItem>
-              {weapons?.map((weapon) => (
-                <SelectItem key={weapon.id} value={weapon.id || ""}>
-                  {weapon.weapon_type} - {weapon.serial_number}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8">
+        <div className="text-center py-6">
           <div className="relative">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-emerald-200 border-t-emerald-600 mx-auto mb-3"></div>
+            <div className="animate-spin rounded-full h-6 w-6 border-2 border-emerald-200 border-t-emerald-600 mx-auto mb-2"></div>
           </div>
-          <p className={`text-sm font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Loading squad impact data...</p>
+          <p className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Loading squad impact data...</p>
         </div>
       ) : stats ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Compact Key Metrics */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             <StatCard icon={Target} color="emerald" value={stats.totalShots.toLocaleString()} label="Total Shots" theme={theme} />
             <StatCard icon={Target} color="blue" value={`${Math.round(stats.hitRate)}%`} label="Hit Rate" theme={theme} />
             <StatCard icon={Users} color="amber" value={stats.activeUsers.toString()} label="Active Users" theme={theme} />
@@ -168,53 +96,36 @@ export default function SquadImpactStats() {
           </div>
 
           {/* Compact Charts Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="">
             {/* Radial Chart */}
-            <div className={`p-3 rounded-lg border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}>
-              <h5 className={`text-sm font-medium mb-2 text-center ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>Performance Overview</h5>
-              <div className="h-48">
+            <div
+              className={`rounded-lg border overflow-hidden ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}
+            >
+              <h5
+                className={`text-xs font-medium py-1 text-center border-b ${theme === "dark" ? "text-zinc-300 border-zinc-700" : "text-gray-700 border-gray-200"}`}
+              >
+                Performance Overview
+              </h5>
+              <div className="h-32">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadialBarChart cx="50%" cy="50%" innerRadius="20%" outerRadius="70%" data={radialData}>
-                    <RadialBar dataKey="value" cornerRadius={8} />
-                    <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: "10px" }} />
+                  <RadialBarChart
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="15%"
+                    outerRadius="90%"
+                    data={radialData}
+                  >
+                    <RadialBar dataKey="value" cornerRadius={4} />
+                    <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: "9px" }} />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
                         border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
                         borderRadius: "8px",
-                        fontSize: "10px",
+                        fontSize: "9px",
                       }}
                     />
                   </RadialBarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Bar Chart */}
-            <div className={`p-3 rounded-lg border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}>
-              <h5 className={`text-sm font-medium mb-2 text-center ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>Top Performers</h5>
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={stats.topPerformers.slice(0, 5)} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#27272a" : "#e5e7eb"} opacity={0.6} />
-                    <XAxis dataKey="name" tick={{ fontSize: 9, fill: theme === "dark" ? "#a1a1aa" : "#525252" }} axisLine={false} tickLine={false} />
-                    <YAxis
-                      tick={{ fontSize: 9, fill: theme === "dark" ? "#a1a1aa" : "#525252" }}
-                      domain={[0, 100]}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
-                        border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
-                        borderRadius: "8px",
-                        fontSize: "10px",
-                      }}
-                      formatter={(value: number) => [`${value}%`, "Accuracy"]}
-                    />
-                    <Bar dataKey="accuracy" fill={theme === "dark" ? "#10b981" : "#059669"} radius={[3, 3, 0, 0]} />
-                  </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
@@ -224,15 +135,15 @@ export default function SquadImpactStats() {
           <TopPerformers topPerformers={stats.topPerformers} theme={theme} />
         </div>
       ) : (
-        <div className="text-center py-8">
+        <div className="text-center py-6">
           <div
-            className={`p-3 rounded-full mx-auto mb-3 w-12 h-12 flex items-center justify-center ${
+            className={`p-2 rounded-full mx-auto mb-2 w-10 h-10 flex items-center justify-center ${
               theme === "dark" ? "bg-zinc-800/50 border border-zinc-700/50" : "bg-gray-100 border border-gray-200"
             }`}
           >
-            <Target className={`h-6 w-6 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />
+            <Target className={`h-5 w-5 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />
           </div>
-          <p className={`text-sm font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>No training data available</p>
+          <p className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>No training data available</p>
         </div>
       )}
     </div>
@@ -252,18 +163,18 @@ function StatCard({ icon, color, value, label, theme }: { icon: React.ElementTyp
 
   return (
     <div
-      className={`p-3 rounded-lg border transition-all duration-200 hover:scale-102 ${
+      className={`p-2 rounded-lg border transition-all duration-200 hover:scale-102 ${
         theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"
       }`}
     >
-      <div className="flex items-center justify-between mb-2">
-        <div className={`p-2 rounded-lg bg-gradient-to-br ${colorClasses[color as keyof typeof colorClasses]}`}>
-          <Icon className={`w-4 h-4 ${theme === "dark" ? `text-${color}-400` : `text-${color}-600`}`} />
+      <div className="flex items-center justify-between mb-1">
+        <div className={`p-1 rounded-md bg-gradient-to-br ${colorClasses[color as keyof typeof colorClasses]}`}>
+          <Icon className={`w-3 h-3 ${theme === "dark" ? `text-${color}-400` : `text-${color}-600`}`} />
         </div>
-        <div className={`w-2 h-2 rounded-full bg-${color}-500 animate-pulse`} />
+        <div className={`w-1.5 h-1.5 rounded-full bg-${color}-500 animate-pulse`} />
       </div>
-      <div className={`text-lg font-bold mb-1 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{value}</div>
-      <div className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>{label}</div>
+      <div className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{value}</div>
+      <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>{label}</div>
     </div>
   );
 }
@@ -279,33 +190,33 @@ function ImpactCard({ avgImpact, theme }: { avgImpact: number; theme: string }) 
 
   return (
     <div
-      className={`p-3 rounded-lg border transition-all duration-200 hover:scale-102 ${
+      className={`p-2 rounded-lg border transition-all duration-200 hover:scale-102 ${
         theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"
       }`}
     >
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-1">
         <div
-          className={`p-2 rounded-lg ${
+          className={`p-1 rounded-md ${
             theme === "dark"
               ? `bg-gradient-to-br from-${color}-500/20 to-${color}-600/20 border border-${color}-500/30`
               : `bg-gradient-to-br from-${color}-100 to-${color}-200 border border-${color}-300/50`
           }`}
         >
-          <Zap className={`w-4 h-4 ${theme === "dark" ? `text-${color}-400` : `text-${color}-600`}`} />
+          <Zap className={`w-3 h-3 ${theme === "dark" ? `text-${color}-400` : `text-${color}-600`}`} />
         </div>
-        <div className={`w-2 h-2 rounded-full bg-${color}-500 animate-pulse`} />
+        <div className={`w-1.5 h-1.5 rounded-full bg-${color}-500 animate-pulse`} />
       </div>
-      <div className={`text-lg font-bold mb-1 flex items-center gap-1 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+      <div className={`text-sm font-bold flex items-center gap-0.5 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
         {avgImpact > 0 ? (
-          <TrendingUp className="w-4 h-4 text-emerald-500" />
+          <TrendingUp className="w-3 h-3 text-emerald-500" />
         ) : avgImpact < 0 ? (
-          <TrendingDown className="w-4 h-4 text-rose-500" />
+          <TrendingDown className="w-3 h-3 text-rose-500" />
         ) : (
-          <Minus className="w-4 h-4 text-gray-500" />
+          <Minus className="w-3 h-3 text-gray-500" />
         )}
         {Math.abs(avgImpact).toFixed(1)}%
       </div>
-      <div className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Avg Impact</div>
+      <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Avg Impact</div>
     </div>
   );
 }
@@ -319,22 +230,22 @@ function TopPerformers({ topPerformers, theme }: { topPerformers: any[]; theme: 
   };
 
   return (
-    <div className={`p-3 rounded-lg border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}>
-      <h5 className={`text-sm font-semibold mb-3 text-center ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>🏆 Top Performers</h5>
-      <div className="space-y-2">
+    <div className={`p-2 rounded-lg border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}>
+      <h5 className={`text-xs font-semibold mb-2 text-center ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>🏆 Top Performers</h5>
+      <div className="space-y-1.5">
         {topPerformers.map((performer, index) => {
           const RankIcon = getRankIcon(index);
           return (
             <div
               key={performer.name}
-              className={`p-2 rounded-lg border transition-all duration-200 hover:scale-102 ${
+              className={`p-1.5 rounded-md border transition-all duration-200 hover:scale-102 ${
                 theme === "dark" ? "bg-zinc-800/20 border-zinc-700/30 hover:border-zinc-600/50" : "bg-white border-gray-200/80 hover:border-gray-300"
               }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
                       index === 0
                         ? theme === "dark"
                           ? "bg-amber-500/30 text-amber-400 border border-amber-500/50"
@@ -352,17 +263,17 @@ function TopPerformers({ topPerformers, theme }: { topPerformers: any[]; theme: 
                               : "bg-gray-100 text-gray-700 border border-gray-300"
                     }`}
                   >
-                    {RankIcon && <RankIcon className="w-3 h-3" />}
+                    {RankIcon && <RankIcon className="w-2.5 h-2.5" />}
                     {!RankIcon && index + 1}
                   </div>
                   <div>
-                    <div className={`text-sm font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>{performer.name}</div>
-                    <div className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{performer.sessions} sessions</div>
+                    <div className={`text-xs font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>{performer.name}</div>
+                    <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{performer.sessions} sessions</div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className={`text-lg font-bold ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>{performer.accuracy}%</div>
-                  <div className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{performer.shots} shots</div>
+                  <div className={`text-sm font-bold ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>{performer.accuracy}%</div>
+                  <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{performer.shots} shots</div>
                 </div>
               </div>
             </div>

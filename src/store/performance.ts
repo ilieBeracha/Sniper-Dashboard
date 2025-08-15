@@ -35,7 +35,7 @@ import {
   getUserMediansInSquad,
   getCommanderTeamMedianDispersion,
   getFirstShotMatrix,
-  getUserWeeklyActivitySummary,
+  getUserWeeklyKpisForUser,
   getSquadWeaponStats,
   getPositionHeatmap,
 } from "@/services/performance";
@@ -118,16 +118,10 @@ interface PerformanceStore {
   userMediansInSquadLoading: boolean;
 
   firstShotMatrix: any[] | null;
-  getFirstShotMatrix: (
-    teamId: string,
-    startDate: Date | null,
-    endDate: Date | null,
-    _positions: PositionScore[] | null,
-    bucketSize: number,
-  ) => Promise<void>;
+  getFirstShotMatrix: (teamId: string, rangeDays: number) => Promise<void>;
 
-  userWeeklyActivitySummary: any[] | null;
-  getUserWeeklyActivitySummary: (ref: Date | null, teamId: string) => Promise<void>;
+  userWeeklyKpisForUser: any[] | null;
+  getUserWeeklyKpisForUser: (userId: string, rangeDays: number) => Promise<void>;
 
   // position heatmap
   positionHeatmapData: PositionHeatmapDay[] | null;
@@ -385,11 +379,10 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     }
   },
 
-  // store action stays the same signature…
-  getFirstShotMatrix: async (teamId, startDate, endDate, _positions: PositionScore[] | null, bucketSize) => {
+  getFirstShotMatrix: async (teamId: string, rangeDays: number) => {
     try {
       set({ isLoading: true });
-      const data = await getFirstShotMatrix(teamId, startDate, endDate, null, bucketSize); // 👈 force null
+      const data = await getFirstShotMatrix(teamId, rangeDays);
       set({ firstShotMatrix: data });
     } catch (e) {
       console.error("Failed to load first shot matrix:", e);
@@ -399,14 +392,14 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     }
   },
 
-  userWeeklyActivitySummary: null,
-  getUserWeeklyActivitySummary: async (ref: Date | null, teamId: string) => {
+  userWeeklyKpisForUser: null,
+  getUserWeeklyKpisForUser: async (userId: string, rangeDays: number) => {
     try {
-      const data = await getUserWeeklyActivitySummary(ref, teamId);
-      set({ userWeeklyActivitySummary: data });
+      const data = await getUserWeeklyKpisForUser(userId, rangeDays);
+      set({ userWeeklyKpisForUser: data });
     } catch (error) {
       console.error("Failed to load user weekly activity summary:", error);
-      set({ userWeeklyActivitySummary: null });
+      set({ userWeeklyKpisForUser: null });
     }
   },
 

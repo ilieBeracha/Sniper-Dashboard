@@ -42,3 +42,4 @@ database_sync/generate_massive_training_data.sql
 database_sync/setup_local_database.sql
 .gitignore
 .claude/.mcp.json
+.env.development.local.backup
