@@ -5,7 +5,6 @@ import { userStore } from "@/store/userStore";
 import { teamStore } from "@/store/teamStore";
 import { squadStore } from "@/store/squadStore";
 import { useEffect } from "react";
-import { useIsMobile } from "@/hooks/useIsMobile";
 import DashboardCalendar from "./DashboardCalendar";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -17,7 +16,6 @@ export default function DashboardOverview({ loading }: { loading: boolean }) {
   const { theme } = useTheme();
   const { fetchMembers } = useStore(teamStore);
   const { getSquadsWithUsersByTeamId } = useStore(squadStore);
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     const loadTeamData = async () => {

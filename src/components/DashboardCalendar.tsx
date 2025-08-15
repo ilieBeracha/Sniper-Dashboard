@@ -2,7 +2,7 @@ import { TrainingStore } from "@/store/trainingStore";
 import { useStore } from "zustand";
 import { format, differenceInDays, differenceInHours, isToday, isTomorrow, isYesterday } from "date-fns";
 import { TrainingSessionChart } from "@/types/training";
-import { Calendar, Clock, ArrowRight, MapPin, Users } from "lucide-react";
+import { Calendar, Clock, ArrowRight, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
 import { primitives } from "@/styles/core";
@@ -212,7 +212,7 @@ function TimelineCard({
         <h4 className={`text-sm font-medium mb-1 ${
           isDark ? "text-white" : "text-gray-900"
         }`}>
-          {session!.name || "Training Session"}
+          {session!.session_name || "Training Session"}
         </h4>
 
         <div className="flex items-center gap-3 text-xs">
@@ -224,17 +224,6 @@ function TimelineCard({
               {format(sessionDate, "h:mm a")}
             </span>
           </div>
-          
-          {session!.location && (
-            <div className="flex items-center gap-1">
-              <MapPin className={`w-3 h-3 ${
-                isDark ? "text-zinc-500" : "text-gray-400"
-              }`} />
-              <span className={isDark ? "text-zinc-400" : "text-gray-600"}>
-                {session!.location}
-              </span>
-            </div>
-          )}
         </div>
       </div>
     </div>

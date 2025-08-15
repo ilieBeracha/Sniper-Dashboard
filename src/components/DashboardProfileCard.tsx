@@ -7,7 +7,7 @@ import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
 import { useEffect } from "react";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { Users, Shield, Calendar, TrendingUp } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 
 export default function DashboardProfileCard() {
   const { theme } = useTheme();
@@ -94,7 +94,7 @@ export default function DashboardProfileCard() {
                 ? "bg-gradient-to-br from-zinc-700 to-zinc-800 text-white" 
                 : "bg-gradient-to-br from-gray-200 to-gray-300 text-gray-700"
             } shadow-lg`}>
-              {user?.full_name?.split(" ").map((n) => n[0]).join("").toUpperCase() || "U"}
+              {user?.first_name?.[0]?.toUpperCase()}{user?.last_name?.[0]?.toUpperCase() || "U"}
               <div className="absolute -bottom-1 -right-1 text-base">
                 {getRoleIcon(user?.user_role || "")}
               </div>
@@ -106,12 +106,12 @@ export default function DashboardProfileCard() {
                 <h2 className={`text-base sm:text-lg font-semibold ${
                   theme === "dark" ? "text-white" : "text-gray-900"
                 }`}>
-                  {greeting}, {user?.full_name?.split(" ")[0]}! {emoji}
+                  {greeting}, {user?.first_name}! {emoji}
                 </h2>
               </div>
               <div className="flex items-center gap-3 mt-1">
                 <span className={`text-xs sm:text-sm font-medium ${getRoleColor(user?.user_role || "")}`}>
-                  {user?.user_role?.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                  {user?.user_role?.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}
                 </span>
                 {user?.team_name && (
                   <>
