@@ -4,7 +4,7 @@ import { feedStore } from "@/store/feedStore";
 import { userStore } from "@/store/userStore";
 import { format, subDays, startOfDay } from "date-fns";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Activity, Target, Calendar, BarChart3, UserPlus, Crosshair, Users, TrendingUp } from "lucide-react";
+import { Activity, Target, Calendar, BarChart3, UserPlus, Crosshair, TrendingUp } from "lucide-react";
 
 export default function WeeklyActivityBars() {
   const { feed, fetchFeedLog } = useStore(feedStore);

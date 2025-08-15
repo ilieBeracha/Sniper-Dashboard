@@ -1,6 +1,7 @@
 import { useMemo, useEffect } from "react";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
+import { userStore } from "@/store/userStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import { Users, Trophy, TrendingUp, RefreshCw } from "lucide-react";
@@ -8,14 +9,19 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function SquadImpactStats() {
   const { squadWeaponStats, getSquadWeaponStats, isLoading } = useStore(performanceStore);
+  const { user } = useStore(userStore);
   const { theme } = useTheme();
 
   useEffect(() => {
-    getSquadWeaponStats();
-  }, [getSquadWeaponStats]);
+    if (user?.team_id) {
+      getSquadWeaponStats(user.team_id, null, null);
+    }
+  }, [user?.team_id, getSquadWeaponStats]);
 
   const handleRefresh = () => {
-    getSquadWeaponStats();
+    if (user?.team_id) {
+      getSquadWeaponStats(user.team_id, null, null);
+    }
   };
 
   const { totalHits, totalMisses, topPerformers, weaponPerformance, overallAccuracy } = useMemo(() => {
