@@ -3,7 +3,7 @@ import { performanceStore } from "@/store/performance";
 import { teamStore } from "@/store/teamStore";
 import { squadStore } from "@/store/squadStore";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Users, Target, TrendingUp, Shield, Activity, Zap, Award, AlertTriangle } from "lucide-react";
+import { Users, Target, TrendingUp, Shield, Activity, Award, AlertTriangle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface StatCardProps {
@@ -65,7 +65,6 @@ const StatCard = ({ title, value, subtitle, icon: Icon, trend, color, bgColor }:
 };
 
 export default function CommanderStatsOverview() {
-  const { theme } = useTheme();
   const { commanderUserRoleBreakdown, commanderTeamDispersion } = useStore(performanceStore);
   const { members } = useStore(teamStore);
   const { squads } = useStore(squadStore);

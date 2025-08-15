@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Users, User, ChevronDown, ChevronRight, TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
+import { Users, User, ChevronDown, ChevronRight, TrendingUp } from "lucide-react";
 import BaseDashboardCard from "./base/BaseDashboardCard";
 import { CommanderTeamDispersionEntry } from "@/types/performance";
 import { getEnumValues } from "@/services/supabaseEnums";
@@ -290,8 +290,17 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
 
   return (
     <BaseDashboardCard
-      title="Team Dispersion Analysis"
-      subtitle="Detailed performance metrics by squad and individual"
+      header={
+        <div className="flex items-center gap-2">
+          <Users className="w-5 h-5 text-blue-500" />
+          <div>
+            <h3 className="font-semibold text-lg">Team Dispersion Analysis</h3>
+            <p className="text-sm text-gray-600 dark:text-zinc-400">
+              Detailed performance metrics by squad and individual
+            </p>
+          </div>
+        </div>
+      }
       tooltipContent="Track shooting dispersion patterns across different conditions and effort levels"
       withFilter={[
         {

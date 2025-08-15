@@ -7,11 +7,10 @@ import { squadStore } from "@/store/squadStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import UserRoleAccuracyTable from "./UserRoleAccuracyTable";
 import { getSquads } from "@/services/squadService";
-import CommanderTeamDispersionTable from "./CommanderTeamDispersionTable";
 import CommanderTeamDispersionEnhanced from "./CommanderTeamDispersionEnhanced";
 import CommanderStatsOverview from "./CommanderStatsOverview";
 import CommanderPerformanceGrid from "./CommanderPerformanceGrid";
-import { Calendar, Filter, Download, RefreshCw } from "lucide-react";
+import { Calendar, Download, RefreshCw } from "lucide-react";
 
 const CommanderView = () => {
   const { theme } = useTheme();
