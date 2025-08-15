@@ -31,7 +31,7 @@ export interface Target {
   windStrength: number | null;
   windDirection: number | null;
   mistakeCode: string;
-  firstShotHit: boolean;
+  firstShotHit: boolean | null;
   engagements: TargetEngagement[];
 }
 

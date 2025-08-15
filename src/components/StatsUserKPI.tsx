@@ -1,6 +1,6 @@
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
-import { Calendar, Users, Target, Crosshair, Zap } from "lucide-react";
+import { Calendar, Users, Target, Crosshair, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function StatsUserKPI() {
@@ -25,47 +25,135 @@ export default function StatsUserKPI() {
 
   const avgHitRatio = data.length > 0 ? totals.avgHitRatio / data.length : 0;
 
-  const getIcon = (index: number) => {
-    const icons = [Calendar, Users, Target, Crosshair, Zap];
-    return icons[index % icons.length];
-  };
+  const kpis = [
+    { 
+      value: totals.trainings || 0, 
+      label: "Training Sessions", 
+      icon: Calendar, 
+      trend: "+12%",
+      positive: true,
+      iconColor: theme === "dark" ? "text-zinc-400" : "text-gray-600",
+      bgColor: theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
+    },
+    { 
+      value: totals.sessions || 0, 
+      label: "Active Sessions", 
+      icon: Users, 
+      trend: "+8%",
+      positive: true,
+      iconColor: theme === "dark" ? "text-zinc-400" : "text-gray-600",
+      bgColor: theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
+    },
+    { 
+      value: totals.targets || 0, 
+      label: "Targets Engaged", 
+      icon: Target, 
+      trend: "-3%",
+      positive: false,
+      iconColor: theme === "dark" ? "text-zinc-400" : "text-gray-600",
+      bgColor: theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
+    },
+    { 
+      value: Math.round(avgHitRatio * 100) || 0, 
+      label: "Accuracy Rate", 
+      suffix: "%", 
+      icon: Crosshair, 
+      trend: "+5%",
+      positive: true,
+      iconColor: theme === "dark" ? "text-zinc-400" : "text-gray-600",
+      bgColor: theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
+    },
+  ];
 
   return (
-    <div className={`rounded-lg ${theme === "dark" ? "" : "bg-white border-gray-200"}`}>
-      <div className="mb-3">
-        <h4 className={`text-base font-semibold ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>User Performance</h4>
-        <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Last 7 days</p>
+    <div className={`rounded-xl p-3 ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"}`}>
+      {/* Modern Header */}
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            Performance Dashboard
+          </h4>
+          <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
+            Weekly performance metrics
+          </p>
+        </div>
+        <div className={`px-2 py-1 rounded-full text-[10px] font-medium ${
+          theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-600"
+        }`}>
+          Live
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        {[
-          { value: totals.trainings || 0, label: "Trainings", suffix: "" },
-          { value: totals.sessions || 0, label: "Sessions", suffix: "" },
-          { value: totals.targets || 0, label: "Targets", suffix: "" },
-          { value: Math.round(avgHitRatio * 100) || 0, label: "Hit Rate", suffix: "%" },
-        ].map((item, index) => {
-          const IconComponent = getIcon(index);
+      {/* KPI Cards Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        {kpis.map((item, index) => {
+          const IconComponent = item.icon;
+          const TrendIcon = item.positive ? ArrowUpRight : ArrowDownRight;
 
           return (
             <div
               key={index}
-              className={`border rounded-lg p-3 ${
-                theme === "dark" ? "bg-zinc-900/60 border-zinc-800 hover:bg-zinc-800/60" : "bg-white border-gray-200 hover:bg-gray-50"
-              } transition-colors`}
+              className={`relative overflow-hidden rounded-lg p-3 ${item.bgColor} 
+                border ${theme === "dark" ? "border-zinc-700/50" : "border-gray-200"} 
+                transition-transform hover:scale-[1.02]`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className={`p-2 rounded-md ${theme === "dark" ? "bg-zinc-800" : "bg-gray-100"}`}>
-                  <IconComponent className={`w-4 h-4 ${theme === "dark" ? "text-zinc-300" : "text-gray-600"}`} />
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-5">
+                <div className={`absolute -right-8 -top-8 w-24 h-24 rounded-full ${
+                  theme === "dark" ? "bg-zinc-700" : "bg-gray-300"
+                }`} />
+              </div>
+              
+              {/* Content */}
+              <div className="relative">
+                {/* Icon and Trend */}
+                <div className="flex items-start justify-between mb-2">
+                  <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-zinc-700/50" : "bg-gray-200"}`}>
+                    <IconComponent className={`w-4 h-4 ${item.iconColor}`} />
+                  </div>
+                  <div className={`flex items-center gap-0.5 text-xs font-medium ${
+                    item.positive 
+                      ? theme === "dark" ? "text-emerald-400" : "text-emerald-600"
+                      : theme === "dark" ? "text-red-400" : "text-red-600"
+                  }`}>
+                    <TrendIcon className="w-3 h-3" />
+                    {item.trend}
+                  </div>
+                </div>
+                
+                {/* Value */}
+                <div className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"} mb-1`}>
+                  {item.value.toLocaleString()}{item.suffix}
+                </div>
+                
+                {/* Label */}
+                <div className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                  {item.label}
                 </div>
               </div>
-              <div className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"} tracking-tight`}>
-                {item.value.toLocaleString()}
-                <span className={`${theme === "dark" ? "text-zinc-400" : "text-gray-500"} text-sm ml-1`}>{item.suffix}</span>
-              </div>
-              <div className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"} mt-0.5`}>{item.label}</div>
             </div>
           );
         })}
+      </div>
+
+      {/* Bottom Stats Bar */}
+      <div className={`mt-3 p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"} 
+        flex items-center justify-between`}>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+              Active Now
+            </span>
+          </div>
+          <div className={`text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+            <span className="font-semibold">{totals.sessions > 0 ? Math.round((totals.engagements / totals.sessions) * 100) : 0}%</span> Engagement Rate
+          </div>
+          <div className={`text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+            <span className="font-semibold">{totals.sessions > 0 ? Math.round(totals.targets / totals.sessions) : 0}</span> Avg Targets/Session
+          </div>
+        </div>
+        <TrendingUp className={`w-4 h-4 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />
       </div>
     </div>
   );

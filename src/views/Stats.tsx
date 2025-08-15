@@ -17,33 +17,66 @@ export default function Stats() {
   const { user } = useStore(userStore);
   const { getFirstShotMatrix, getUserWeeklyKpisForUser } = useStore(performanceStore);
 
-  useEffect(() => {
+  // Function to refresh all data
+  const refreshData = () => {
     if (user?.team_id) {
+      console.log("Refreshing stats page data...");
       getFirstShotMatrix(user.team_id, 7);
       getUserWeeklyKpisForUser(user.id, 7);
     }
-  }, [user?.team_id, getFirstShotMatrix, getUserWeeklyKpisForUser]);
+  };
+
+  useEffect(() => {
+    refreshData();
+  }, [user?.team_id]);
+
+  // Refresh data when page becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && user?.team_id) {
+        console.log("Page became visible, refreshing data...");
+        refreshData();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Also refresh when window gains focus
+    const handleFocus = () => {
+      if (user?.team_id) {
+        console.log("Window gained focus, refreshing data...");
+        refreshData();
+      }
+    };
+    
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [user?.team_id]);
 
   return (
     <SpPage>
       <Header breadcrumbs={[{ label: "Stats", link: "/stats" }]} />
       <SpPageHeader title="Stats" subtitle="KPIs, impact and trends" icon={BarChart2} />
       <SpPageBody>
-        <div className="space-y-2 pb-2">
-          <div className="lg:col-span-2">
+        <div className="space-y-2">
+          {/* User Performance KPIs - Full width */}
+          <WeeklyKPIs />
+          
+          {/* Activity and Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            {/* Weekly Activity */}
             <WeeklyActivityBars />
+            
+            {/* Squad Impact Stats */}
+            <SquadImpactStats />
           </div>
-          <div className="w-full">
-            <WeeklyKPIs />
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
-            <div className="lg:col-span-2">
-              <ChartMatrix />
-            </div>
-            <div className="lg:col-span-1">
-              <SquadImpactStats />
-            </div>
-          </div>
+          
+          {/* First Shot Matrix - Full width */}
+          <ChartMatrix />
         </div>
       </SpPageBody>
     </SpPage>

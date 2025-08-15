@@ -17,7 +17,7 @@ export default function DashboardCalendar() {
     <div className="relative">
       {/* Timeline line */}
       <div
-        className="absolute left-4 top-0 bottom-0 w-0.5 rounded-full"
+        className="absolute left-3 top-0 bottom-0 w-0.5 rounded-full"
         style={{
           background:
             theme === "dark"
@@ -26,7 +26,7 @@ export default function DashboardCalendar() {
         }}
       />
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         {/* Last Training */}
         <TimelineCard session={last} type="last" onClick={last ? () => navigate(`/training/${last.id}`) : undefined} isEmpty={!last} />
 
@@ -53,28 +53,28 @@ function TimelineCard({
 
   if (isEmpty) {
     return (
-      <div className="relative pl-10">
+      <div className="relative pl-8">
         {/* Timeline dot */}
         <div
-          className="absolute left-0 w-8 h-8 rounded-full border-2 flex items-center justify-center"
+          className="absolute left-0 w-6 h-6 rounded-full border-2 flex items-center justify-center"
           style={{
             backgroundColor: isDark ? primitives.grey.grey900 : primitives.white.white,
             borderColor: isDark ? primitives.grey.grey700 : primitives.grey.grey300,
           }}
         >
-          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: isDark ? primitives.grey.grey700 : primitives.grey.grey300 }} />
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: isDark ? primitives.grey.grey700 : primitives.grey.grey300 }} />
         </div>
 
         <div
-          className="p-4 rounded-xl border border-dashed"
+          className="p-2.5 rounded-lg border border-dashed"
           style={{
             backgroundColor: isDark ? `${primitives.grey.grey900}40` : primitives.grey.grey50,
             borderColor: isDark ? primitives.grey.grey800 : primitives.grey.grey300,
           }}
         >
-          <div className="flex items-center gap-2">
-            <Calendar size={16} className="opacity-30" />
-            <span className="text-sm opacity-50">No {type} training scheduled</span>
+          <div className="flex items-center gap-1.5">
+            <Calendar size={12} className="opacity-30" />
+            <span className="text-xs opacity-50">No {type} training scheduled</span>
           </div>
         </div>
       </div>
@@ -107,17 +107,17 @@ function TimelineCard({
   const isUrgent = type === "next" && isToday(sessionDate) && hoursUntil < 3;
 
   return (
-    <div className="relative pl-10">
+    <div className="relative pl-8">
       {/* Timeline dot */}
       <div
-        className="absolute left-0 w-8 h-8 rounded-full border-3 flex items-center justify-center"
+        className="absolute left-0 w-6 h-6 rounded-full border-2 flex items-center justify-center"
         style={{
           backgroundColor: isDark ? primitives.grey.grey900 : primitives.white.white,
           borderColor: type === "last" ? primitives.green.green500 : primitives.blue.blue500,
         }}
       >
         <div
-          className="w-3 h-3 rounded-full"
+          className="w-2 h-2 rounded-full"
           style={{
             backgroundColor: type === "last" ? primitives.green.green500 : primitives.blue.blue500,
           }}
@@ -128,14 +128,14 @@ function TimelineCard({
       <div
         onClick={onClick}
         className={`
-          group relative overflow-hidden rounded-xl border p-4 cursor-pointer
-          transition-all duration-200 hover:shadow-lg
+          group relative overflow-hidden rounded-lg border p-2.5 cursor-pointer
+          transition-all duration-200 hover:shadow-md
           ${
             isDark
               ? "bg-zinc-900/50 border-zinc-800 hover:bg-zinc-800/50 hover:border-zinc-700"
               : "bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300"
           }
-          ${isUrgent ? "ring-2 ring-orange-500/50" : ""}
+          ${isUrgent ? "ring-1 ring-orange-500/50" : ""}
         `}
       >
         {/* Background pattern */}
@@ -148,11 +148,11 @@ function TimelineCard({
 
         <div className="relative z-10">
           {/* Header */}
-          <div className="flex items-start justify-between mb-3">
+          <div className="flex items-start justify-between mb-2">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-1.5 mb-0.5">
                 <span
-                  className="text-xs font-medium uppercase tracking-wider"
+                  className="text-[10px] font-medium uppercase tracking-wider"
                   style={{
                     color:
                       type === "last"
@@ -166,28 +166,28 @@ function TimelineCard({
                 >
                   {type === "last" ? "Previous Session" : "Upcoming Session"}
                 </span>
-                {isUrgent && <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-500">Starting soon</span>}
+                {isUrgent && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-500">Starting soon</span>}
               </div>
-              <h3 className="text-base font-semibold mb-2 pr-8">{session!.session_name}</h3>
+              <h3 className="text-sm font-semibold mb-1 pr-6">{session!.session_name}</h3>
             </div>
             <ArrowRight
-              size={16}
-              className="opacity-0 group-hover:opacity-100 transition-opacity mt-1"
+              size={12}
+              className="opacity-0 group-hover:opacity-100 transition-opacity mt-0.5"
               style={{ color: isDark ? primitives.grey.grey400 : primitives.grey.grey600 }}
             />
           </div>
 
           {/* Date/Time info */}
-          <div className="flex items-center gap-4 mb-3 text-sm">
-            <div className="flex items-center gap-2">
-              <Calendar size={14} className="opacity-50" />
+          <div className="flex items-center gap-3 mb-2 text-xs">
+            <div className="flex items-center gap-1">
+              <Calendar size={10} className="opacity-50" />
               <span className="font-medium">{format(sessionDate, "EEE, MMM d")}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock size={14} className="opacity-50" />
+            <div className="flex items-center gap-1">
+              <Clock size={10} className="opacity-50" />
               <span>{format(sessionDate, "HH:mm")}</span>
             </div>
-            <span className="text-xs opacity-60">({getRelativeTime()})</span>
+            <span className="text-[10px] opacity-60">({getRelativeTime()})</span>
           </div>
 
           {/* Metrics */}
