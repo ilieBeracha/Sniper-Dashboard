@@ -10,11 +10,13 @@ export function ModernLogin({
   onRegisterClick,
   onSignInWithEmail,
   handleSignInWithGoogle,
+  showRegistrationOptions = false,
 }: {
   AuthSubmit: any;
   onRegisterClick?: (type: string) => any;
   onSignInWithEmail?: (email: string) => void;
   handleSignInWithGoogle?: (response: any) => void;
+  showRegistrationOptions?: boolean;
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +29,24 @@ export function ModernLogin({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
+    // Explicitly tell the browser this is a login action
+    if ('PasswordCredential' in window) {
+      const form = e.target as HTMLFormElement;
+      const cred = new (window as any).PasswordCredential({
+        id: email,
+        password: password,
+        name: email,
+      });
+      
+      if (navigator.credentials && navigator.credentials.store) {
+        navigator.credentials.store(cred).catch(() => {
+          // Silently fail if credentials can't be stored
+        });
+      }
+    }
+    
     setError("");
     setIsLoading(true);
 
@@ -128,9 +148,20 @@ export function ModernLogin({
   );
 
   return (
-    <form className="space-y-6 " onSubmit={handleSubmit} name="loginForm" autoComplete="on">
+    <form 
+      className="space-y-6" 
+      onSubmit={handleSubmit} 
+      name="loginForm" 
+      autoComplete="on"
+      data-form-type="login"
+      action="/login"
+      method="post"
+      role="form"
+      aria-label="Login form"
+    >
       {/* Hidden field to help browsers understand this is a login form */}
       <input type="hidden" name="form-type" value="login" />
+      <input type="hidden" name="action" value="login" />
       
       {magicLinkSent ? (
         <div
@@ -215,13 +246,14 @@ export function ModernLogin({
             label="Email address"
             type="email"
             id="email"
+            name="username"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
             className="text-sm"
             leftIcon={emailIcon}
-            autoComplete="username email"
+            autoComplete="username webauthn"
           />
 
           {loginMethod === "password" && (
@@ -229,6 +261,7 @@ export function ModernLogin({
               label="Password"
               type={showPassword ? "text" : "password"}
               id="password"
+              name="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -263,6 +296,8 @@ export function ModernLogin({
           <button
             type="submit"
             disabled={isLoading}
+            name="submit"
+            value="login"
             className={`w-full flex justify-center items-center px-4 py-4 rounded-2xl font-semibold focus:outline-none focus:ring-2 transition-all duration-200 ${
               theme === "dark"
                 ? "bg-white text-[#0A0A0A] hover:bg-gray-100 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] disabled:opacity-50 disabled:cursor-not-allowed"
@@ -285,7 +320,7 @@ export function ModernLogin({
             )}
           </button>
 
-          {onRegisterClick && (
+          {onRegisterClick && showRegistrationOptions && (
             <div className={`mt-8 pt-6 border-t-2 transition-colors duration-200 ${theme === "dark" ? "border-[#2A2A2A]" : "border-gray-200"}`}>
               <p className={`text-sm text-center mb-4 font-medium transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                 New to the platform? Create an account:

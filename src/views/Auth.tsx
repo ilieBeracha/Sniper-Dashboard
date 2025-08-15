@@ -146,6 +146,7 @@ export default function Auth() {
                     onRegisterClick={(type) => setAuthType(type as AuthType)}
                     onSignInWithEmail={(email) => signInWithEmail(email)}
                     handleSignInWithGoogle={handleSignInWithGoogle}
+                    showRegistrationOptions={true}
                   />
                 )}
                 {authType !== "login" && (
