@@ -62,17 +62,6 @@ export default function WeeklyActivityBars() {
     return totals;
   }, [weekData]);
 
-  // Calculate most active users
-  const userActivity = useMemo(() => {
-    const userMap: Record<string, number> = {};
-    feed.forEach(item => {
-      userMap[item.actor_id] = (userMap[item.actor_id] || 0) + 1;
-    });
-    return Object.entries(userMap)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 3);
-  }, [feed]);
-
   const getActionIcon = (actionType: string) => {
     const icons: Record<string, any> = {
       score_submit: Target,
