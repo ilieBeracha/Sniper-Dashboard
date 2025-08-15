@@ -7,7 +7,7 @@ import { squadStore } from "@/store/squadStore";
 import { useEffect } from "react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import DashboardCalendar from "./DashboardCalendar";
-import DashboardStatsPreview from "./DashboardStatsPreview";
+import DashboardStatsLink from "./DashboardStatsLink";
 import { performanceStore } from "@/store/performance";
 
 export default function DashboardOverview({ loading }: { loading: boolean }) {
@@ -35,19 +35,23 @@ export default function DashboardOverview({ loading }: { loading: boolean }) {
   }, [user?.team_id, user?.user_role]);
 
   return (
-    <div className="grid gap-2 auto-rows-max grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-      <div className="col-span-1 md:col-span-2 xl:col-span-3 space-y-2">
+    <div className="space-y-2">
+      {/* Profile and Stats Link */}
+      <div className="space-y-2">
         <DashboardProfileCard />
-        <DashboardStatsPreview />
+        <DashboardStatsLink />
       </div>
 
-      {isMobile && (
-        <div className="col-span-1">
-          <DashboardCalendar />
+      {/* Main Content Grid */}
+      <div className="grid gap-2 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+        {isMobile && (
+          <div className="col-span-1">
+            <DashboardCalendar />
+          </div>
+        )}
+        <div className="col-span-1 md:col-span-2 xl:col-span-3">
+          <CyCharts loading={loading} />
         </div>
-      )}
-      <div className="col-span-1 md:col-span-2 xl:col-span-3">
-        <CyCharts loading={loading} />
       </div>
     </div>
   );
