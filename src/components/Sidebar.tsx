@@ -10,6 +10,7 @@ import { FaCrosshairs } from "react-icons/fa";
 import { useSidebarStore } from "@/store/sidebarStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { BiTime } from "react-icons/bi";
 
 const navSections = [
   {
@@ -17,6 +18,7 @@ const navSections = [
     items: [
       { name: "Dashboard", href: "/", icon: <BiSolidDashboard className="w-5 h-5" /> },
       { name: "Trainings", href: "/trainings", icon: <BsBarChartFill className="w-5 h-5" /> },
+      { name: "Screen Time", href: "/screen-time", icon: <BiTime className="w-5 h-5" /> },
     ],
   },
   {
