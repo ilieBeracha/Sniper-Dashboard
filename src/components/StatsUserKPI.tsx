@@ -32,8 +32,8 @@ export default function StatsUserKPI() {
       icon: Calendar, 
       trend: "+12%",
       positive: true,
-      gradient: "from-blue-500 to-cyan-500",
-      bgGradient: theme === "dark" ? "from-blue-500/20 to-cyan-500/20" : "from-blue-50 to-cyan-50"
+      iconColor: theme === "dark" ? "text-zinc-400" : "text-gray-600",
+      bgColor: theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
     },
     { 
       value: totals.sessions || 0, 
@@ -41,8 +41,8 @@ export default function StatsUserKPI() {
       icon: Users, 
       trend: "+8%",
       positive: true,
-      gradient: "from-emerald-500 to-green-500",
-      bgGradient: theme === "dark" ? "from-emerald-500/20 to-green-500/20" : "from-emerald-50 to-green-50"
+      iconColor: theme === "dark" ? "text-zinc-400" : "text-gray-600",
+      bgColor: theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
     },
     { 
       value: totals.targets || 0, 
@@ -50,8 +50,8 @@ export default function StatsUserKPI() {
       icon: Target, 
       trend: "-3%",
       positive: false,
-      gradient: "from-purple-500 to-pink-500",
-      bgGradient: theme === "dark" ? "from-purple-500/20 to-pink-500/20" : "from-purple-50 to-pink-50"
+      iconColor: theme === "dark" ? "text-zinc-400" : "text-gray-600",
+      bgColor: theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
     },
     { 
       value: Math.round(avgHitRatio * 100) || 0, 
@@ -60,8 +60,8 @@ export default function StatsUserKPI() {
       icon: Crosshair, 
       trend: "+5%",
       positive: true,
-      gradient: "from-orange-500 to-red-500",
-      bgGradient: theme === "dark" ? "from-orange-500/20 to-red-500/20" : "from-orange-50 to-red-50"
+      iconColor: theme === "dark" ? "text-zinc-400" : "text-gray-600",
+      bgColor: theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
     },
   ];
 
@@ -78,7 +78,7 @@ export default function StatsUserKPI() {
           </p>
         </div>
         <div className={`px-2 py-1 rounded-full text-[10px] font-medium ${
-          theme === "dark" ? "bg-green-500/20 text-green-400" : "bg-green-100 text-green-700"
+          theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-600"
         }`}>
           Live
         </div>
@@ -93,25 +93,28 @@ export default function StatsUserKPI() {
           return (
             <div
               key={index}
-              className={`relative overflow-hidden rounded-lg p-3 bg-gradient-to-br ${item.bgGradient} 
+              className={`relative overflow-hidden rounded-lg p-3 ${item.bgColor} 
                 border ${theme === "dark" ? "border-zinc-700/50" : "border-gray-200"} 
                 transition-transform hover:scale-[1.02]`}
             >
               {/* Background Pattern */}
               <div className="absolute inset-0 opacity-5">
-                <div className={`absolute -right-8 -top-8 w-24 h-24 rounded-full bg-gradient-to-br ${item.gradient}`} />
-                <div className={`absolute -left-4 -bottom-4 w-16 h-16 rounded-full bg-gradient-to-br ${item.gradient}`} />
+                <div className={`absolute -right-8 -top-8 w-24 h-24 rounded-full ${
+                  theme === "dark" ? "bg-zinc-700" : "bg-gray-300"
+                }`} />
               </div>
               
               {/* Content */}
               <div className="relative">
                 {/* Icon and Trend */}
                 <div className="flex items-start justify-between mb-2">
-                  <div className={`p-2 rounded-lg bg-gradient-to-br ${item.gradient} shadow-lg`}>
-                    <IconComponent className="w-4 h-4 text-white" />
+                  <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-zinc-700/50" : "bg-gray-200"}`}>
+                    <IconComponent className={`w-4 h-4 ${item.iconColor}`} />
                   </div>
                   <div className={`flex items-center gap-0.5 text-xs font-medium ${
-                    item.positive ? "text-green-500" : "text-red-500"
+                    item.positive 
+                      ? theme === "dark" ? "text-emerald-400" : "text-emerald-600"
+                      : theme === "dark" ? "text-red-400" : "text-red-600"
                   }`}>
                     <TrendIcon className="w-3 h-3" />
                     {item.trend}
@@ -138,7 +141,7 @@ export default function StatsUserKPI() {
         flex items-center justify-between`}>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
               Active Now
             </span>

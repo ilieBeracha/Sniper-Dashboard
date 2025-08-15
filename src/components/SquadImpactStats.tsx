@@ -85,7 +85,7 @@ export default function SquadImpactStats() {
   }
 
   const chartData = [
-    { name: 'Accuracy', value: overallAccuracy, fill: theme === "dark" ? '#10b981' : '#059669' },
+    { name: 'Accuracy', value: overallAccuracy, fill: theme === "dark" ? '#71717a' : '#6b7280' },
     { name: 'Remaining', value: 100 - overallAccuracy, fill: theme === "dark" ? '#27272a' : '#f3f4f6' }
   ];
 
@@ -119,7 +119,7 @@ export default function SquadImpactStats() {
       <div className="grid grid-cols-2 gap-3 mb-3">
         {/* Accuracy Ring Chart */}
         <div className={`relative rounded-lg p-3 ${
-          theme === "dark" ? "bg-gradient-to-br from-zinc-800 to-zinc-900" : "bg-gradient-to-br from-gray-50 to-gray-100"
+          theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"
         }`}>
           <div className="relative h-28">
             <ResponsiveContainer width="100%" height="100%">
@@ -160,16 +160,16 @@ export default function SquadImpactStats() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
             className={`flex items-center justify-between p-2 rounded-lg ${
-              theme === "dark" ? "bg-emerald-500/10" : "bg-emerald-50"
+              theme === "dark" ? "bg-zinc-800/30" : "bg-gray-100"
             }`}
           >
             <div className="flex items-center gap-2">
-              <Target className="w-3.5 h-3.5 text-emerald-500" />
+              <Target className={`w-3.5 h-3.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
               <span className={`text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
                 Total Hits
               </span>
             </div>
-            <span className={`text-sm font-bold text-emerald-500`}>
+            <span className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
               {totalHits.toLocaleString()}
             </span>
           </motion.div>
@@ -179,16 +179,16 @@ export default function SquadImpactStats() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
             className={`flex items-center justify-between p-2 rounded-lg ${
-              theme === "dark" ? "bg-blue-500/10" : "bg-blue-50"
+              theme === "dark" ? "bg-zinc-800/30" : "bg-gray-100"
             }`}
           >
             <div className="flex items-center gap-2">
-              <Users className="w-3.5 h-3.5 text-blue-500" />
+              <Users className={`w-3.5 h-3.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
               <span className={`text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
                 Active Squad
               </span>
             </div>
-            <span className={`text-sm font-bold text-blue-500`}>
+            <span className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
               {squadStats?.activeMembers || 0}
             </span>
           </motion.div>
@@ -198,16 +198,16 @@ export default function SquadImpactStats() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
             className={`flex items-center justify-between p-2 rounded-lg ${
-              theme === "dark" ? "bg-purple-500/10" : "bg-purple-50"
+              theme === "dark" ? "bg-zinc-800/30" : "bg-gray-100"
             }`}
           >
             <div className="flex items-center gap-2">
-              <Shield className="w-3.5 h-3.5 text-purple-500" />
+              <Shield className={`w-3.5 h-3.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
               <span className={`text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
                 Total Shots
               </span>
             </div>
-            <span className={`text-sm font-bold text-purple-500`}>
+            <span className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
               {squadStats?.totalShots.toLocaleString() || 0}
             </span>
           </motion.div>
@@ -217,7 +217,7 @@ export default function SquadImpactStats() {
       {/* Top Performers Section */}
       <div className={`rounded-lg p-2.5 ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
         <div className="flex items-center gap-2 mb-2">
-          <Trophy className="w-3.5 h-3.5 text-yellow-500" />
+          <Trophy className={`w-3.5 h-3.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
           <h5 className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
             Top Performers
           </h5>
@@ -251,11 +251,7 @@ export default function SquadImpactStats() {
                           animate={{ width: `${performer.accuracy}%` }}
                           transition={{ duration: 0.5, delay: index * 0.1 }}
                           className={`h-full rounded-full ${
-                            performer.accuracy >= 80 
-                              ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
-                              : performer.accuracy >= 60
-                                ? "bg-gradient-to-r from-blue-500 to-blue-400"
-                                : "bg-gradient-to-r from-orange-500 to-orange-400"
+                            theme === "dark" ? "bg-zinc-600" : "bg-gray-500"
                           }`}
                         />
                       </div>
@@ -268,7 +264,7 @@ export default function SquadImpactStats() {
                   </div>
                   <div className="text-right">
                     <div className={`text-xs font-semibold ${
-                      theme === "dark" ? "text-emerald-400" : "text-emerald-600"
+                      theme === "dark" ? "text-zinc-300" : "text-gray-700"
                     }`}>
                       {performer.hits}
                     </div>

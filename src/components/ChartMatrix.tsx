@@ -103,13 +103,13 @@ export default function ChartMatrix() {
           </h4>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-0.5 bg-emerald-500 rounded" />
+              <div className={`w-3 h-0.5 rounded ${theme === "dark" ? "bg-zinc-500" : "bg-gray-500"}`} />
               <span className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
                 Hit Rate
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-0.5 bg-blue-500 rounded" />
+              <div className={`w-3 h-0.5 rounded ${theme === "dark" ? "bg-zinc-600" : "bg-gray-600"}`} />
               <span className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
                 Volume
               </span>
@@ -127,11 +127,11 @@ export default function ChartMatrix() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className={`p-2.5 rounded-lg text-center ${
-            theme === "dark" ? "bg-gradient-to-br from-emerald-500/10 to-emerald-600/10" : "bg-gradient-to-br from-emerald-50 to-emerald-100"
+            theme === "dark" ? "bg-zinc-800/30" : "bg-gray-100"
           }`}
         >
-          <Crosshair className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
-          <div className={`text-xl font-bold text-emerald-500`}>
+          <Crosshair className={`w-4 h-4 mx-auto mb-1 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
+          <div className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
             {Math.round(weightedHitRate)}%
           </div>
           <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
@@ -144,11 +144,11 @@ export default function ChartMatrix() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={`p-2.5 rounded-lg text-center ${
-            theme === "dark" ? "bg-gradient-to-br from-blue-500/10 to-blue-600/10" : "bg-gradient-to-br from-blue-50 to-blue-100"
+            theme === "dark" ? "bg-zinc-800/30" : "bg-gray-100"
           }`}
         >
-          <Target className="w-4 h-4 text-blue-500 mx-auto mb-1" />
-          <div className={`text-xl font-bold text-blue-500`}>
+          <Target className={`w-4 h-4 mx-auto mb-1 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
+          <div className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
             {bestDistance.bucket}
           </div>
           <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
@@ -161,11 +161,11 @@ export default function ChartMatrix() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className={`p-2.5 rounded-lg text-center ${
-            theme === "dark" ? "bg-gradient-to-br from-purple-500/10 to-purple-600/10" : "bg-gradient-to-br from-purple-50 to-purple-100"
+            theme === "dark" ? "bg-zinc-800/30" : "bg-gray-100"
           }`}
         >
-          <Activity className="w-4 h-4 text-purple-500 mx-auto mb-1" />
-          <div className={`text-xl font-bold text-purple-500`}>
+          <Activity className={`w-4 h-4 mx-auto mb-1 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
+          <div className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
             {totalTargets}
           </div>
           <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
@@ -178,11 +178,11 @@ export default function ChartMatrix() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className={`p-2.5 rounded-lg text-center ${
-            theme === "dark" ? "bg-gradient-to-br from-orange-500/10 to-orange-600/10" : "bg-gradient-to-br from-orange-50 to-orange-100"
+            theme === "dark" ? "bg-zinc-800/30" : "bg-gray-100"
           }`}
         >
-          <TrendingUp className="w-4 h-4 text-orange-500 mx-auto mb-1" />
-          <div className={`text-xl font-bold text-orange-500`}>
+          <TrendingUp className={`w-4 h-4 mx-auto mb-1 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
+          <div className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
             {mostEngaged.bucket}
           </div>
           <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
@@ -197,12 +197,12 @@ export default function ChartMatrix() {
           <AreaChart data={matrixData.buckets} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorAccuracy" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
+                <stop offset="5%" stopColor={theme === "dark" ? "#71717a" : "#6b7280"} stopOpacity={0.8}/>
+                <stop offset="95%" stopColor={theme === "dark" ? "#71717a" : "#6b7280"} stopOpacity={0.1}/>
               </linearGradient>
               <linearGradient id="colorTargets" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                <stop offset="5%" stopColor={theme === "dark" ? "#52525b" : "#4b5563"} stopOpacity={0.8}/>
+                <stop offset="95%" stopColor={theme === "dark" ? "#52525b" : "#4b5563"} stopOpacity={0.1}/>
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#3f3f46" : "#e5e7eb"} opacity={0.3} />
@@ -241,7 +241,7 @@ export default function ChartMatrix() {
               yAxisId="left"
               type="monotone" 
               dataKey="ratePct" 
-              stroke="#10b981" 
+              stroke={theme === "dark" ? "#71717a" : "#6b7280"}
               fillOpacity={1} 
               fill="url(#colorAccuracy)"
               strokeWidth={2}
@@ -250,7 +250,7 @@ export default function ChartMatrix() {
               yAxisId="right"
               type="monotone" 
               dataKey="targets" 
-              stroke="#3b82f6" 
+              stroke={theme === "dark" ? "#52525b" : "#4b5563"}
               fillOpacity={1} 
               fill="url(#colorTargets)"
               strokeWidth={2}
@@ -267,10 +267,10 @@ export default function ChartMatrix() {
         <div className="grid grid-cols-4 gap-1.5">
           {matrixData.buckets.map((b, index) => {
             const bgColor = b.ratePct >= 75 
-              ? theme === "dark" ? "from-emerald-600/30 to-emerald-500/20" : "from-emerald-200 to-emerald-100"
+              ? theme === "dark" ? "bg-zinc-700/50" : "bg-gray-200"
               : b.ratePct >= 50 
-                ? theme === "dark" ? "from-blue-600/30 to-blue-500/20" : "from-blue-200 to-blue-100"
-                : theme === "dark" ? "from-red-600/30 to-red-500/20" : "from-red-200 to-red-100";
+                ? theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
+                : theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50";
             
             return (
               <motion.div 
@@ -278,18 +278,14 @@ export default function ChartMatrix() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
-                className={`relative p-3 rounded-lg bg-gradient-to-br ${bgColor} 
+                className={`relative p-3 rounded-lg ${bgColor} 
                   border ${theme === "dark" ? "border-zinc-700/30" : "border-gray-200"} 
                   hover:scale-105 transition-transform cursor-default`}
               >
                 <div className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
                   {b.bucket}
                 </div>
-                <div className={`text-lg font-bold ${
-                  b.ratePct >= 75 ? "text-emerald-500" : 
-                  b.ratePct >= 50 ? "text-blue-500" : 
-                  "text-red-500"
-                }`}>
+                <div className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                   {b.ratePct}%
                 </div>
                 <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
@@ -298,9 +294,9 @@ export default function ChartMatrix() {
                 {/* Efficiency indicator */}
                 <div className="absolute top-1 right-1">
                   <div className={`w-1.5 h-1.5 rounded-full ${
-                    b.efficiency > 50 ? "bg-emerald-400" : 
-                    b.efficiency > 25 ? "bg-yellow-400" : 
-                    "bg-gray-400"
+                    b.efficiency > 50 ? theme === "dark" ? "bg-zinc-400" : "bg-gray-600" : 
+                    b.efficiency > 25 ? theme === "dark" ? "bg-zinc-500" : "bg-gray-500" : 
+                    theme === "dark" ? "bg-zinc-600" : "bg-gray-400"
                   }`} />
                 </div>
               </motion.div>

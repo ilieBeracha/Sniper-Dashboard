@@ -87,7 +87,7 @@ export default function WeeklyActivityBars() {
   const avgPerDay = Math.round(feed.length / 7);
 
   return (
-    <div className={`rounded-xl p-3 ${theme === "dark" ? "bg-gradient-to-br from-zinc-900 to-zinc-800" : "bg-gradient-to-br from-gray-50 to-white"} 
+    <div className={`rounded-xl p-3 ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"} 
       border ${theme === "dark" ? "border-zinc-700/50" : "border-gray-200"}`}>
       
       {/* Minimalist Header */}
@@ -99,7 +99,7 @@ export default function WeeklyActivityBars() {
           <div className={`flex items-center gap-1 px-2 py-1 rounded-md ${
             theme === "dark" ? "bg-zinc-800" : "bg-gray-100"
           }`}>
-            <Zap className="w-3 h-3 text-yellow-500" />
+            <Zap className={`w-3 h-3 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
             <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
               {feed.length} Total
             </span>
@@ -125,28 +125,28 @@ export default function WeeklyActivityBars() {
                     <div
                       className={`w-full rounded-t-lg transition-all duration-500 ease-out relative overflow-hidden ${
                         day.isToday
-                          ? "bg-gradient-to-t from-blue-600 to-blue-400"
+                          ? theme === "dark"
+                            ? "bg-zinc-600"
+                            : "bg-gray-600"
                           : isHighActivity
                             ? theme === "dark"
-                              ? "bg-gradient-to-t from-emerald-600 to-emerald-400"
-                              : "bg-gradient-to-t from-emerald-500 to-emerald-300"
+                              ? "bg-zinc-700"
+                              : "bg-gray-500"
                             : theme === "dark"
-                              ? "bg-gradient-to-t from-zinc-700 to-zinc-600"
-                              : "bg-gradient-to-t from-gray-300 to-gray-200"
-                      } hover:opacity-90 cursor-pointer`}
+                              ? "bg-zinc-800"
+                              : "bg-gray-300"
+                      } hover:opacity-80 cursor-pointer`}
                       style={{ 
                         height: `${height}%`, 
                         minHeight: "8px",
-                        transform: `scaleY(${index === weekData.length - 1 ? 1.1 : 1})` 
                       }}
                     >
-                      {/* Inner glow effect */}
-                      <div className="absolute inset-0 bg-white/10" />
-                      
                       {/* Count label */}
                       {day.count > 0 && (
                         <div className={`absolute -top-5 left-1/2 -translate-x-1/2 text-xs font-semibold
-                          ${day.isToday ? "text-blue-500" : theme === "dark" ? "text-zinc-300" : "text-gray-700"}
+                          ${day.isToday 
+                            ? theme === "dark" ? "text-zinc-400" : "text-gray-700" 
+                            : theme === "dark" ? "text-zinc-500" : "text-gray-600"}
                           opacity-0 group-hover:opacity-100 transition-opacity duration-200`}>
                           {day.count}
                         </div>
@@ -177,8 +177,8 @@ export default function WeeklyActivityBars() {
                 {/* Day label */}
                 <div className={`text-xs font-medium ${
                   day.isToday 
-                    ? "text-blue-500" 
-                    : theme === "dark" ? "text-zinc-400" : "text-gray-600"
+                    ? theme === "dark" ? "text-zinc-400" : "text-gray-700"
+                    : theme === "dark" ? "text-zinc-500" : "text-gray-600"
                 }`}>
                   {day.day}
                 </div>
@@ -202,7 +202,7 @@ export default function WeeklyActivityBars() {
           </div>
         </div>
         <div className={`p-2.5 rounded-lg text-center ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"}`}>
-          <div className={`text-xl font-bold ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>
+          <div className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
             {peakDay.count}
           </div>
           <div className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
@@ -210,7 +210,7 @@ export default function WeeklyActivityBars() {
           </div>
         </div>
         <div className={`p-2.5 rounded-lg text-center ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"}`}>
-          <div className={`text-xl font-bold ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
+          <div className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
             {totalUniqueUsers}
           </div>
           <div className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
