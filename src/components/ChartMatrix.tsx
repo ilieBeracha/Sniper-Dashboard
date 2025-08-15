@@ -75,7 +75,7 @@ export default function ChartMatrix() {
       <div className={`rounded-lg p-2 border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
         <div className="animate-pulse space-y-2">
           <div className={`h-3 rounded w-1/3 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
-          <div className="h-24 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}"></div>
+          <div className={`h-24 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
         </div>
       </div>
     );
