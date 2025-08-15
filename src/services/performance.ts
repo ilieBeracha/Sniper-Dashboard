@@ -530,12 +530,19 @@ export async function getPositionHeatmap(teamId: string, position: PositionScore
 }
 
 export async function getSquadWeaponStats(teamId: string, startDate: Date | null, endDate: Date | null) {
+  console.log("Fetching squad weapon stats with params:", { teamId, startDate, endDate });
+  
   const { data, error } = await supabase.rpc("get_team_stats_when_user_holds_weapon", {
     p_team_id: teamId,
     p_start: startDate,
     p_end: endDate,
   });
 
-  if (error) throw error;
-  return data;
+  if (error) {
+    console.error("Error fetching squad weapon stats:", error);
+    throw error;
+  }
+  
+  console.log("Squad weapon stats response:", data);
+  return data || [];
 }

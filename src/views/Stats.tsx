@@ -17,12 +17,45 @@ export default function Stats() {
   const { user } = useStore(userStore);
   const { getFirstShotMatrix, getUserWeeklyKpisForUser } = useStore(performanceStore);
 
-  useEffect(() => {
+  // Function to refresh all data
+  const refreshData = () => {
     if (user?.team_id) {
+      console.log("Refreshing stats page data...");
       getFirstShotMatrix(user.team_id, 7);
       getUserWeeklyKpisForUser(user.id, 7);
     }
-  }, [user?.team_id, getFirstShotMatrix, getUserWeeklyKpisForUser]);
+  };
+
+  useEffect(() => {
+    refreshData();
+  }, [user?.team_id]);
+
+  // Refresh data when page becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && user?.team_id) {
+        console.log("Page became visible, refreshing data...");
+        refreshData();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Also refresh when window gains focus
+    const handleFocus = () => {
+      if (user?.team_id) {
+        console.log("Window gained focus, refreshing data...");
+        refreshData();
+      }
+    };
+    
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [user?.team_id]);
 
   return (
     <SpPage>

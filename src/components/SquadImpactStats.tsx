@@ -2,8 +2,8 @@ import { useEffect, useMemo } from "react";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
 import { userStore } from "@/store/userStore";
-import { TrendingUp, TrendingDown, Minus, Target, Users, Zap, Activity, Trophy, Medal, Award } from "lucide-react";
-import { RadialBarChart, RadialBar, Legend, ResponsiveContainer, Tooltip } from "recharts";
+import { TrendingUp, TrendingDown, Minus, Target, Users, Zap, Activity, Trophy, Medal, Award, RefreshCw } from "lucide-react";
+import { RadialBarChart, RadialBar, Legend, ResponsiveContainer, Tooltip, PieChart, Pie, Cell } from "recharts";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function SquadImpactStats() {
@@ -11,11 +11,21 @@ export default function SquadImpactStats() {
   const { squadWeaponStats, isLoading, getSquadWeaponStats } = useStore(performanceStore);
   const { theme } = useTheme();
 
-  // Fetch squad impact stats on mount
-  useEffect(() => {
+  // Fetch squad impact stats on mount and add refresh capability
+  const refreshData = async () => {
     if (!user?.team_id) return;
-    getSquadWeaponStats(user.team_id, null, null);
-  }, [user?.team_id, getSquadWeaponStats]);
+    console.log("Refreshing squad weapon stats...");
+    await getSquadWeaponStats(user.team_id, null, null);
+  };
+
+  useEffect(() => {
+    refreshData();
+  }, [user?.team_id]);
+
+  // Add debug logging
+  useEffect(() => {
+    console.log("Squad weapon stats updated:", squadWeaponStats);
+  }, [squadWeaponStats]);
 
   const stats = useMemo(() => {
     if (!squadWeaponStats || squadWeaponStats.length === 0) return null;
@@ -43,90 +53,149 @@ export default function SquadImpactStats() {
         accuracy: u.shots > 0 ? Math.round((u.hits / u.shots) * 100) : 0,
       }))
       .sort((a, b) => b.accuracy - a.accuracy)
-      .slice(0, 5);
+      .slice(0, 3); // Reduced to 3 for more compact display
 
+    console.log("Calculated stats:", { totalShots, totalHits, hitRate, activeUsers });
     return { totalShots, totalHits, avgImpact, hitRate, activeUsers, topPerformers };
   }, [squadWeaponStats]);
 
-  const radialData = stats
+  const pieData = stats
     ? [
-        { name: "Hit Rate", value: Math.round(stats.hitRate), fill: theme === "dark" ? "#10b981" : "#059669" },
-        { name: "Impact", value: Math.round(Math.abs(stats.avgImpact) * 10), fill: theme === "dark" ? "#3b82f6" : "#2563eb" },
-        { name: "Activity", value: Math.min(stats.activeUsers * 20, 100), fill: theme === "dark" ? "#f59e0b" : "#d97706" },
+        { name: "Hits", value: stats.totalHits, fill: theme === "dark" ? "#10b981" : "#059669" },
+        { name: "Misses", value: stats.totalShots - stats.totalHits, fill: theme === "dark" ? "#374151" : "#e5e7eb" },
       ]
     : [];
 
   return (
     <div
-      className={`rounded-xl p-3 border shadow-sm h-full transition-all duration-300 ${
+      className={`rounded-lg p-2 border shadow-sm h-full transition-all duration-300 ${
         theme === "dark" ? "bg-zinc-900/50 backdrop-blur-sm border-zinc-700/50" : "bg-white border-gray-200/80"
       }`}
     >
-      <div className="mb-2">
-        <div className="flex items-center gap-2 mb-1">
-          <div
-            className={`p-1.5 rounded-lg ${
-              theme === "dark" ? "bg-emerald-500/20 border border-emerald-500/30" : "bg-emerald-100 border border-emerald-300/50"
+      <div className="mb-1.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <div
+              className={`p-1 rounded ${
+                theme === "dark" ? "bg-emerald-500/20 border border-emerald-500/30" : "bg-emerald-100 border border-emerald-300/50"
+              }`}
+            >
+              <Activity className={`w-3 h-3 ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`} />
+            </div>
+            <div>
+              <h4 className={`text-xs font-semibold ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>Squad Impact</h4>
+              <p className={`text-[9px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Team performance metrics</p>
+            </div>
+          </div>
+          <button
+            onClick={refreshData}
+            disabled={isLoading}
+            className={`p-1 rounded transition-all duration-200 ${
+              theme === "dark" 
+                ? "hover:bg-zinc-800 disabled:opacity-50" 
+                : "hover:bg-gray-100 disabled:opacity-50"
             }`}
           >
-            <Activity className={`w-3 h-3 ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`} />
-          </div>
-          <div>
-            <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>Squad Impact Analysis</h4>
-            <p className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Team-wide performance metrics</p>
-          </div>
+            <RefreshCw className={`w-3 h-3 ${isLoading ? "animate-spin" : ""} ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`} />
+          </button>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="text-center py-6">
+        <div className="text-center py-4">
           <div className="relative">
-            <div className="animate-spin rounded-full h-6 w-6 border-2 border-emerald-200 border-t-emerald-600 mx-auto mb-2"></div>
+            <div className="animate-spin rounded-full h-5 w-5 border-2 border-emerald-200 border-t-emerald-600 mx-auto mb-1"></div>
           </div>
-          <p className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Loading squad impact data...</p>
+          <p className={`text-[10px] font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Loading squad data...</p>
         </div>
       ) : stats ? (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {/* Compact Key Metrics */}
-          <div className="grid grid-cols-2 gap-2">
-            <StatCard icon={Target} color="emerald" value={stats.totalShots.toLocaleString()} label="Total Shots" theme={theme} />
-            <StatCard icon={Target} color="blue" value={`${Math.round(stats.hitRate)}%`} label="Hit Rate" theme={theme} />
-            <StatCard icon={Users} color="amber" value={stats.activeUsers.toString()} label="Active Users" theme={theme} />
+          <div className="grid grid-cols-4 gap-1">
+            <StatCard icon={Target} value={stats.totalShots.toLocaleString()} label="Shots" theme={theme} />
+            <StatCard icon={Target} value={`${Math.round(stats.hitRate)}%`} label="Hit%" theme={theme} accent="emerald" />
+            <StatCard icon={Users} value={stats.activeUsers.toString()} label="Active" theme={theme} />
             <ImpactCard avgImpact={stats.avgImpact} theme={theme} />
           </div>
 
-          {/* Compact Charts Row */}
-          <div className="">
-            {/* Radial Chart */}
+          {/* Compact Chart */}
+          <div className="grid grid-cols-2 gap-1.5">
+            {/* Pie Chart */}
             <div
-              className={`rounded-lg border overflow-hidden ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}
+              className={`rounded border p-1 ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}
             >
               <h5
-                className={`text-xs font-medium py-1 text-center border-b ${theme === "dark" ? "text-zinc-300 border-zinc-700" : "text-gray-700 border-gray-200"}`}
+                className={`text-[9px] font-medium text-center mb-0.5 ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}
               >
-                Performance Overview
+                Hit Distribution
               </h5>
-              <div className="h-32">
+              <div className="h-20">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadialBarChart
-                    cx="50%"
-                    cy="50%"
-                    innerRadius="15%"
-                    outerRadius="90%"
-                    data={radialData}
-                  >
-                    <RadialBar dataKey="value" cornerRadius={4} />
-                    <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: "9px" }} />
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={15}
+                      outerRadius={30}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
                     <Tooltip
                       contentStyle={{
                         backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
                         border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
-                        borderRadius: "8px",
+                        borderRadius: "6px",
                         fontSize: "9px",
+                        padding: "4px 8px",
                       }}
                     />
-                  </RadialBarChart>
+                  </PieChart>
                 </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Stats Summary */}
+            <div
+              className={`rounded border p-1.5 ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}
+            >
+              <h5
+                className={`text-[9px] font-medium text-center mb-1 ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}
+              >
+                Performance Stats
+              </h5>
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <span className={`text-[9px] ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Total Hits</span>
+                  <span className={`text-[10px] font-medium ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>
+                    {stats.totalHits.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className={`text-[9px] ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Accuracy</span>
+                  <span className={`text-[10px] font-medium ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
+                    {stats.hitRate.toFixed(1)}%
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className={`text-[9px] ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Avg Impact</span>
+                  <span className={`text-[10px] font-medium flex items-center gap-0.5`}>
+                    {stats.avgImpact > 0 ? (
+                      <TrendingUp className="w-2.5 h-2.5 text-emerald-500" />
+                    ) : stats.avgImpact < 0 ? (
+                      <TrendingDown className="w-2.5 h-2.5 text-rose-500" />
+                    ) : (
+                      <Minus className="w-2.5 h-2.5 text-gray-500" />
+                    )}
+                    <span className={stats.avgImpact > 0 ? "text-emerald-500" : stats.avgImpact < 0 ? "text-rose-500" : "text-gray-500"}>
+                      {Math.abs(stats.avgImpact).toFixed(1)}%
+                    </span>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -135,15 +204,25 @@ export default function SquadImpactStats() {
           <TopPerformers topPerformers={stats.topPerformers} theme={theme} />
         </div>
       ) : (
-        <div className="text-center py-6">
+        <div className="text-center py-4">
           <div
-            className={`p-2 rounded-full mx-auto mb-2 w-10 h-10 flex items-center justify-center ${
+            className={`p-1.5 rounded-full mx-auto mb-1 w-8 h-8 flex items-center justify-center ${
               theme === "dark" ? "bg-zinc-800/50 border border-zinc-700/50" : "bg-gray-100 border border-gray-200"
             }`}
           >
-            <Target className={`h-5 w-5 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />
+            <Target className={`h-4 w-4 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />
           </div>
-          <p className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>No training data available</p>
+          <p className={`text-[10px] font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>No training data available</p>
+          <button
+            onClick={refreshData}
+            className={`mt-2 text-[9px] px-2 py-1 rounded border transition-all ${
+              theme === "dark" 
+                ? "border-zinc-700 hover:bg-zinc-800 text-zinc-400" 
+                : "border-gray-300 hover:bg-gray-100 text-gray-600"
+            }`}
+          >
+            Load Data
+          </button>
         </div>
       )}
     </div>
@@ -152,71 +231,51 @@ export default function SquadImpactStats() {
 
 /* ===== Compact Helper Components ===== */
 
-function StatCard({ icon, color, value, label, theme }: { icon: React.ElementType; color: string; value: string; label: string; theme: string }) {
+function StatCard({ icon, value, label, theme, accent }: { icon: React.ElementType; value: string; label: string; theme: string; accent?: string }) {
   const Icon = icon;
-  const colorClasses = {
-    emerald:
-      theme === "dark" ? "from-emerald-500/20 to-emerald-600/20 border-emerald-500/30" : "from-emerald-100 to-emerald-200 border-emerald-300/50",
-    blue: theme === "dark" ? "from-blue-500/20 to-blue-600/20 border-blue-500/30" : "from-blue-100 to-blue-200 border-blue-300/50",
-    amber: theme === "dark" ? "from-amber-500/20 to-amber-600/20 border-amber-500/30" : "from-amber-100 to-amber-200 border-amber-300/50",
-  };
-
+  
   return (
     <div
-      className={`p-2 rounded-lg border transition-all duration-200 hover:scale-102 ${
+      className={`p-1 rounded-md border transition-all duration-200 ${
         theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"
       }`}
     >
-      <div className="flex items-center justify-between mb-1">
-        <div className={`p-1 rounded-md bg-gradient-to-br ${colorClasses[color as keyof typeof colorClasses]}`}>
-          <Icon className={`w-3 h-3 ${theme === "dark" ? `text-${color}-400` : `text-${color}-600`}`} />
-        </div>
-        <div className={`w-1.5 h-1.5 rounded-full bg-${color}-500 animate-pulse`} />
-      </div>
-      <div className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{value}</div>
-      <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>{label}</div>
+      <Icon className={`w-2.5 h-2.5 mx-auto mb-0.5 ${
+        accent === "emerald" 
+          ? theme === "dark" ? "text-emerald-400" : "text-emerald-600"
+          : theme === "dark" ? "text-zinc-400" : "text-gray-600"
+      }`} />
+      <div className={`text-[10px] font-bold text-center ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{value}</div>
+      <div className={`text-[8px] text-center ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{label}</div>
     </div>
   );
 }
 
 function ImpactCard({ avgImpact, theme }: { avgImpact: number; theme: string }) {
-  const getImpactColor = (impact: number) => {
-    if (impact > 0) return "emerald";
-    if (impact < 0) return "rose";
-    return "gray";
-  };
-
-  const color = getImpactColor(avgImpact);
-
   return (
     <div
-      className={`p-2 rounded-lg border transition-all duration-200 hover:scale-102 ${
+      className={`p-1 rounded-md border transition-all duration-200 ${
         theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"
       }`}
     >
-      <div className="flex items-center justify-between mb-1">
-        <div
-          className={`p-1 rounded-md ${
-            theme === "dark"
-              ? `bg-gradient-to-br from-${color}-500/20 to-${color}-600/20 border border-${color}-500/30`
-              : `bg-gradient-to-br from-${color}-100 to-${color}-200 border border-${color}-300/50`
-          }`}
-        >
-          <Zap className={`w-3 h-3 ${theme === "dark" ? `text-${color}-400` : `text-${color}-600`}`} />
-        </div>
-        <div className={`w-1.5 h-1.5 rounded-full bg-${color}-500 animate-pulse`} />
-      </div>
-      <div className={`text-sm font-bold flex items-center gap-0.5 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+      <Zap className={`w-2.5 h-2.5 mx-auto mb-0.5 ${
+        avgImpact > 0 
+          ? theme === "dark" ? "text-emerald-400" : "text-emerald-600"
+          : avgImpact < 0
+            ? theme === "dark" ? "text-rose-400" : "text-rose-600"
+            : theme === "dark" ? "text-zinc-400" : "text-gray-600"
+      }`} />
+      <div className={`text-[10px] font-bold text-center flex items-center justify-center gap-0.5 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
         {avgImpact > 0 ? (
-          <TrendingUp className="w-3 h-3 text-emerald-500" />
+          <TrendingUp className="w-2 h-2 text-emerald-500" />
         ) : avgImpact < 0 ? (
-          <TrendingDown className="w-3 h-3 text-rose-500" />
+          <TrendingDown className="w-2 h-2 text-rose-500" />
         ) : (
-          <Minus className="w-3 h-3 text-gray-500" />
+          <Minus className="w-2 h-2 text-gray-500" />
         )}
         {Math.abs(avgImpact).toFixed(1)}%
       </div>
-      <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Avg Impact</div>
+      <div className={`text-[8px] text-center ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Impact</div>
     </div>
   );
 }
@@ -230,22 +289,22 @@ function TopPerformers({ topPerformers, theme }: { topPerformers: any[]; theme: 
   };
 
   return (
-    <div className={`p-2 rounded-lg border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}>
-      <h5 className={`text-xs font-semibold mb-2 text-center ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>🏆 Top Performers</h5>
-      <div className="space-y-1.5">
+    <div className={`p-1.5 rounded-lg border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}>
+      <h5 className={`text-[9px] font-semibold mb-1 text-center ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>🏆 Top Performers</h5>
+      <div className="space-y-1">
         {topPerformers.map((performer, index) => {
           const RankIcon = getRankIcon(index);
           return (
             <div
               key={performer.name}
-              className={`p-1.5 rounded-md border transition-all duration-200 hover:scale-102 ${
+              className={`p-1 rounded-md border transition-all duration-200 hover:scale-102 ${
                 theme === "dark" ? "bg-zinc-800/20 border-zinc-700/30 hover:border-zinc-600/50" : "bg-white border-gray-200/80 hover:border-gray-300"
               }`}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold ${
                       index === 0
                         ? theme === "dark"
                           ? "bg-amber-500/30 text-amber-400 border border-amber-500/50"
@@ -263,17 +322,17 @@ function TopPerformers({ topPerformers, theme }: { topPerformers: any[]; theme: 
                               : "bg-gray-100 text-gray-700 border border-gray-300"
                     }`}
                   >
-                    {RankIcon && <RankIcon className="w-2.5 h-2.5" />}
+                    {RankIcon && <RankIcon className="w-2 h-2" />}
                     {!RankIcon && index + 1}
                   </div>
                   <div>
-                    <div className={`text-xs font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>{performer.name}</div>
-                    <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{performer.sessions} sessions</div>
+                    <div className={`text-[9px] font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>{performer.name}</div>
+                    <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{performer.sessions} sessions</div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className={`text-sm font-bold ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>{performer.accuracy}%</div>
-                  <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{performer.shots} shots</div>
+                  <div className={`text-xs font-bold ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>{performer.accuracy}%</div>
+                  <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{performer.shots} shots</div>
                 </div>
               </div>
             </div>
