@@ -146,38 +146,38 @@ export default function DashboardGroupingChart({ className }: DashboardGroupingC
               </p>
             </div>
           ) : (
-            <div className="flex flex-col justify-between h-full gap-2">
+            <div className="flex flex-col justify-between h-full gap-1">
               {/* Summary Grid */}
-              <div className="grid grid-cols-4 gap-2 mb-4">
+              <div className="grid grid-cols-4 gap-1.5 mb-2">
                 <div className="text-center">
-                  <div className="text-lg font-semibold" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
+                  <div className="text-sm font-semibold" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
                     {groupingSummary.avg_dispersion ?? "-"}
                   </div>
-                  <div className="text-xs" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
+                  <div className="text-[10px]" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
                     Average CM
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-semibold" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
+                  <div className="text-sm font-semibold" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
                     {groupingSummary.best_dispersion ?? "-"}
                   </div>
-                  <div className="text-xs" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
+                  <div className="text-[10px]" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
                     Best CM
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-semibold" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
+                  <div className="text-sm font-semibold" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
                     {groupingSummary.avg_time_to_group ?? "-"}
                   </div>
-                  <div className="text-xs" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
+                  <div className="text-[10px]" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
                     Avg Time
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-semibold" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
+                  <div className="text-sm font-semibold" style={{ color: theme === "dark" ? primitives.white.white : primitives.grey.grey900 }}>
                     {groupingSummary.total_groupings ?? 0}
                   </div>
-                  <div className="text-xs" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
+                  <div className="text-[10px]" style={{ color: theme === "dark" ? primitives.grey.grey400 : primitives.grey.grey600 }}>
                     Total
                   </div>
                 </div>
@@ -185,7 +185,7 @@ export default function DashboardGroupingChart({ className }: DashboardGroupingC
 
               {/* Chart */}
               <div className="flex-1">
-                <ResponsiveContainer width="100%" minHeight={200} maxHeight={350}>
+                <ResponsiveContainer width="100%" minHeight={120} maxHeight={200}>
                   <LineChart
                     data={
                       groupingSummary.last_five_groups
@@ -206,7 +206,7 @@ export default function DashboardGroupingChart({ className }: DashboardGroupingC
                           }),
                         })) || []
                     }
-                    margin={{ top: 0, right: 20, left: -30, bottom: 0 }}
+                    margin={{ top: 0, right: 10, left: -35, bottom: 0 }}
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
@@ -216,13 +216,13 @@ export default function DashboardGroupingChart({ className }: DashboardGroupingC
                     <XAxis
                       dataKey="label"
                       stroke={theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey400}
-                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 10 }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
                       stroke={theme === "dark" ? primitives.grey.grey600 : primitives.grey.grey400}
-                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 10 }}
                       axisLine={false}
                       tickLine={false}
                     />
@@ -231,9 +231,9 @@ export default function DashboardGroupingChart({ className }: DashboardGroupingC
                       type="monotone"
                       dataKey="cm_dispersion"
                       stroke={primitives.grey.grey500}
-                      strokeWidth={3.5}
-                      dot={{ fill: primitives.grey.grey500, strokeWidth: 0, r: 3.5 }}
-                      activeDot={{ r: 6, strokeWidth: 2, stroke: primitives.grey.grey500 }}
+                      strokeWidth={2}
+                      dot={{ fill: primitives.grey.grey500, strokeWidth: 0, r: 2 }}
+                      activeDot={{ r: 4, strokeWidth: 1, stroke: primitives.grey.grey500 }}
                       name="Dispersion"
                       unit=" cm"
                     />
@@ -241,10 +241,10 @@ export default function DashboardGroupingChart({ className }: DashboardGroupingC
                       type="monotone"
                       dataKey="avg_dispersion"
                       stroke={primitives.purple.purple100}
-                      strokeWidth={2}
+                      strokeWidth={1.5}
                       strokeDasharray="5 5"
                       dot={false}
-                      activeDot={{ r: 4, strokeWidth: 0 }}
+                      activeDot={{ r: 3, strokeWidth: 0 }}
                       name="Average"
                       unit=" cm"
                     />

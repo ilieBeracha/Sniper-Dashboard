@@ -101,10 +101,10 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
             <UserHitPercentage distance={hitPercentageDistance} position={hitPercentagePosition} weaponType={hitPercentageWeaponType} />
           </BaseDashboardCard>
         </div>
-        <div className="grid grid-cols-1 gap-6 lg:col-span-1 xl:col-span-2">
+        <div className="grid grid-cols-1 gap-3 lg:col-span-1 xl:col-span-2">
           <DashboardGroupingChart />
         </div>
-        <div className="grid grid-cols-1 gap-6 lg:col-span-1 xl:col-span-2">
+        <div className="grid grid-cols-1 gap-3 lg:col-span-1 xl:col-span-2">
           {isSquadCommander(user?.user_role as UserRole) ? (
             <div className="flex flex-col gap-4 text-2xl">Team Members</div>
           ) : (
