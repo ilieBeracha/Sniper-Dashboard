@@ -46,9 +46,9 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg ">
-      <div className="flex flex-col gap-4 text-2xl pt-4 pb-2">Overall Performance</div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div className="flex flex-col gap-2 rounded-lg ">
+      <div className="flex flex-col gap-2 text-lg pt-2 pb-1">Overall Performance</div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
         <div className="w-full row-span-1">
           <BaseDashboardCard
             header="Performance Overview"
