@@ -4,6 +4,7 @@ import { performanceStore } from "@/store/performance";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { ComposedChart, Line, Legend } from "recharts";
+import { Target, TrendingUp } from "lucide-react";
 
 export default function ChartMatrix() {
   const { firstShotMatrix, isLoading } = useStore(performanceStore);
@@ -71,14 +72,10 @@ export default function ChartMatrix() {
 
   if (isLoading) {
     return (
-      <div className={theme === "dark" ? "bg-zinc-900/50 backdrop-blur-sm p-3" : "bg-white shadow-sm p-3"}>
+      <div className={`rounded-lg p-3 border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
         <div className="animate-pulse space-y-2">
           <div className={`h-3 rounded w-1/3 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
-          <div className="grid grid-cols-4 gap-1">
-            {[...Array(20)].map((_, i) => (
-              <div key={i} className={`h-8 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
-            ))}
-          </div>
+          <div className="h-32 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}"></div>
         </div>
       </div>
     );
@@ -86,24 +83,52 @@ export default function ChartMatrix() {
 
   if (!firstShotMatrix || !matrixData?.buckets || matrixData?.buckets?.length === 0) {
     return (
-      <div className={theme === "dark" ? "bg-zinc-900/50 backdrop-blur-sm p-3 text-center" : "bg-white shadow-sm p-3 text-center"}>
+      <div className={`rounded-lg p-3 border text-center ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
         <p className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>No first shot data available</p>
       </div>
     );
   }
 
-  return (
-    <div className="space-y-8">
-      {/* Distance Bucket Performance */}
-      <div className={`rounded-xl p-4 border shadow-sm h-full ${theme === "dark" ? "bg-zinc-900/40 border-zinc-700" : "bg-white border-gray-200"}`}>
-        <div className="mb-6">
-          <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>First-Shot Hit Rate by Distance</h4>
-          <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Bars = Hit rate (%), line = Targets (volume)</p>
-        </div>
+  // Calculate summary stats
+  const totalTargets = matrixData.buckets.reduce((sum, b) => sum + b.targets, 0);
+  const weightedHitRate = matrixData.buckets.reduce((sum, b) => sum + (b.ratePct * b.targets), 0) / totalTargets;
+  const bestDistance = matrixData.buckets.reduce((best, b) => b.ratePct > best.ratePct ? b : best);
 
-        <ResponsiveContainer width="100%" height={200}>
-          <ComposedChart data={matrixData.buckets} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#3f3f46" : "#e5e7eb"} opacity={0.6} />
+  return (
+    <div className={`rounded-lg p-3 border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Target className={`w-4 h-4 ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`} />
+          <div>
+            <h4 className={`text-sm font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-900"}`}>First-Shot Hit Rate by Distance</h4>
+            <p className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Accuracy distribution across engagement ranges</p>
+          </div>
+        </div>
+        <TrendingUp className={`w-3 h-3 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />
+      </div>
+
+      {/* Summary Stats */}
+      <div className="grid grid-cols-3 gap-2 mb-3">
+        <div className={`text-center p-2 rounded ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+          <div className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{Math.round(weightedHitRate)}%</div>
+          <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Overall</div>
+        </div>
+        <div className={`text-center p-2 rounded ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+          <div className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{bestDistance.bucket}</div>
+          <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Best Range</div>
+        </div>
+        <div className={`text-center p-2 rounded ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+          <div className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{totalTargets}</div>
+          <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Targets</div>
+        </div>
+      </div>
+
+      {/* Chart */}
+      <div className="mb-3">
+        <ResponsiveContainer width="100%" height={160}>
+          <ComposedChart data={matrixData.buckets} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#3f3f46" : "#e5e7eb"} opacity={0.3} />
             <XAxis
               dataKey="bucket"
               tick={{ fontSize: 10, fill: theme === "dark" ? "#a1a1aa" : "#525252" }}
@@ -126,42 +151,60 @@ export default function ChartMatrix() {
             />
             <Tooltip
               formatter={(v: any, n: string) => {
-                if (n === "ratePct") return [`${v}%`, "Hit rate"];
-                if (n === "targets") return [v, "Targets"];
+                if (n === "Hit Rate") return [`${v}%`, "Hit Rate"];
+                if (n === "Targets") return [v, "Targets"];
                 return [v, n];
               }}
-              labelFormatter={(label) => `${label}`}
+              labelFormatter={(label) => `Distance: ${label}`}
               contentStyle={{
                 backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
                 border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
-                borderRadius: 8,
+                borderRadius: 6,
                 fontSize: 11,
+                padding: "6px 8px",
               }}
             />
-            <Legend verticalAlign="bottom" align="center" wrapperStyle={{ fontSize: 12 }} />
-            <Bar yAxisId="left" dataKey="ratePct" name="Hit rate" fill={theme === "dark" ? "#34d399" : "#10b981"} radius={[3, 3, 0, 0]} />
+            <Bar 
+              yAxisId="left" 
+              dataKey="ratePct" 
+              name="Hit Rate" 
+              fill={theme === "dark" ? "#10b981" : "#059669"} 
+              radius={[3, 3, 0, 0]}
+              opacity={0.8}
+            />
             <Line
               yAxisId="right"
               type="monotone"
               dataKey="targets"
               name="Targets"
               dot={false}
-              stroke={theme === "dark" ? "#60a5fa" : "#2563eb"}
+              stroke={theme === "dark" ? "#3b82f6" : "#2563eb"}
               strokeWidth={2}
             />
           </ComposedChart>
         </ResponsiveContainer>
+      </div>
 
-        {/* Tiny chips row */}
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          {matrixData.buckets.slice(0, 3).map((b) => (
-            <div key={b.bucket} className={`${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"} rounded-md p-2 text-center`}>
-              <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>{b.bucket}</div>
-              <div className={`text-base font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{b.ratePct}%</div>
-              <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{b.targets} targets</div>
+      {/* Distance Breakdown */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+        {matrixData.buckets.slice(0, 8).map((b) => (
+          <div 
+            key={b.bucket} 
+            className={`p-2 rounded text-center ${
+              theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"
+            }`}
+          >
+            <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{b.bucket}</div>
+            <div className={`text-sm font-semibold ${
+              b.ratePct >= 75 ? "text-green-500" : 
+              b.ratePct >= 50 ? "text-yellow-500" : 
+              "text-red-500"
+            }`}>
+              {b.ratePct}%
             </div>
-          ))}
-        </div>
+            <div className={`text-[9px] ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`}>{b.targets} tgts</div>
+          </div>
+        ))}
       </div>
     </div>
   );

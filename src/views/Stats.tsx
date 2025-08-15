@@ -62,21 +62,21 @@ export default function Stats() {
       <Header breadcrumbs={[{ label: "Stats", link: "/stats" }]} />
       <SpPageHeader title="Stats" subtitle="KPIs, impact and trends" icon={BarChart2} />
       <SpPageBody>
-        <div className="space-y-2 pb-2">
-          <div className="lg:col-span-2">
+        <div className="space-y-3">
+          {/* User Performance KPIs - Full width */}
+          <WeeklyKPIs />
+          
+          {/* Activity and Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            {/* Weekly Activity */}
             <WeeklyActivityBars />
+            
+            {/* Squad Impact Stats */}
+            <SquadImpactStats />
           </div>
-          <div className="w-full">
-            <WeeklyKPIs />
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
-            <div className="lg:col-span-2">
-              <ChartMatrix />
-            </div>
-            <div className="lg:col-span-1">
-              <SquadImpactStats />
-            </div>
-          </div>
+          
+          {/* First Shot Matrix - Full width */}
+          <ChartMatrix />
         </div>
       </SpPageBody>
     </SpPage>

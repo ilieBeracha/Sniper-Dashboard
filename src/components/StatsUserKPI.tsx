@@ -25,47 +25,90 @@ export default function StatsUserKPI() {
 
   const avgHitRatio = data.length > 0 ? totals.avgHitRatio / data.length : 0;
 
-  const getIcon = (index: number) => {
-    const icons = [Calendar, Users, Target, Crosshair, Zap];
-    return icons[index % icons.length];
-  };
+  const kpis = [
+    { value: totals.trainings || 0, label: "Trainings", suffix: "", icon: Calendar, color: "blue" },
+    { value: totals.sessions || 0, label: "Sessions", suffix: "", icon: Users, color: "green" },
+    { value: totals.targets || 0, label: "Targets", suffix: "", icon: Target, color: "purple" },
+    { value: Math.round(avgHitRatio * 100) || 0, label: "Hit Rate", suffix: "%", icon: Crosshair, color: "orange" },
+  ];
 
   return (
-    <div className={`rounded-lg ${theme === "dark" ? "" : "bg-white border-gray-200"}`}>
-      <div className="mb-3">
-        <h4 className={`text-base font-semibold ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>User Performance</h4>
-        <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Last 7 days</p>
+    <div className={`rounded-lg p-3 border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Zap className={`w-4 h-4 ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`} />
+          <h4 className={`text-sm font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-900"}`}>Performance Overview</h4>
+        </div>
+        <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Last 7 days</span>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        {[
-          { value: totals.trainings || 0, label: "Trainings", suffix: "" },
-          { value: totals.sessions || 0, label: "Sessions", suffix: "" },
-          { value: totals.targets || 0, label: "Targets", suffix: "" },
-          { value: Math.round(avgHitRatio * 100) || 0, label: "Hit Rate", suffix: "%" },
-        ].map((item, index) => {
-          const IconComponent = getIcon(index);
+      {/* KPI Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {kpis.map((item, index) => {
+          const IconComponent = item.icon;
+          const colorClasses = {
+            blue: { 
+              bg: theme === "dark" ? "bg-blue-500/10" : "bg-blue-50",
+              icon: theme === "dark" ? "text-blue-400" : "text-blue-600",
+              value: theme === "dark" ? "text-blue-400" : "text-blue-700"
+            },
+            green: { 
+              bg: theme === "dark" ? "bg-green-500/10" : "bg-green-50",
+              icon: theme === "dark" ? "text-green-400" : "text-green-600",
+              value: theme === "dark" ? "text-green-400" : "text-green-700"
+            },
+            purple: { 
+              bg: theme === "dark" ? "bg-purple-500/10" : "bg-purple-50",
+              icon: theme === "dark" ? "text-purple-400" : "text-purple-600",
+              value: theme === "dark" ? "text-purple-400" : "text-purple-700"
+            },
+            orange: { 
+              bg: theme === "dark" ? "bg-orange-500/10" : "bg-orange-50",
+              icon: theme === "dark" ? "text-orange-400" : "text-orange-600",
+              value: theme === "dark" ? "text-orange-400" : "text-orange-700"
+            },
+          };
+          const colors = colorClasses[item.color as keyof typeof colorClasses];
 
           return (
             <div
               key={index}
-              className={`border rounded-lg p-3 ${
-                theme === "dark" ? "bg-zinc-900/60 border-zinc-800 hover:bg-zinc-800/60" : "bg-white border-gray-200 hover:bg-gray-50"
-              } transition-colors`}
+              className={`relative overflow-hidden rounded-lg p-3 ${
+                theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"
+              }`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className={`p-2 rounded-md ${theme === "dark" ? "bg-zinc-800" : "bg-gray-100"}`}>
-                  <IconComponent className={`w-4 h-4 ${theme === "dark" ? "text-zinc-300" : "text-gray-600"}`} />
+              {/* Icon Background */}
+              <div className={`absolute top-0 right-0 p-2 ${colors.bg} rounded-bl-2xl`}>
+                <IconComponent className={`w-3.5 h-3.5 ${colors.icon}`} />
+              </div>
+              
+              {/* Content */}
+              <div className="relative">
+                <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"} mb-1`}>{item.label}</div>
+                <div className={`text-xl font-bold ${colors.value} tracking-tight`}>
+                  {item.value.toLocaleString()}{item.suffix && <span className="text-sm ml-0.5">{item.suffix}</span>}
                 </div>
               </div>
-              <div className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"} tracking-tight`}>
-                {item.value.toLocaleString()}
-                <span className={`${theme === "dark" ? "text-zinc-400" : "text-gray-500"} text-sm ml-1`}>{item.suffix}</span>
-              </div>
-              <div className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"} mt-0.5`}>{item.label}</div>
             </div>
           );
         })}
+      </div>
+
+      {/* Bottom Stats Bar */}
+      <div className={`mt-3 pt-3 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} flex items-center justify-between`}>
+        <div className="flex items-center gap-4 text-[10px]">
+          <div className={theme === "dark" ? "text-zinc-500" : "text-gray-500"}>
+            Engagement Rate: <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+              {totals.sessions > 0 ? Math.round((totals.engagements / totals.sessions) * 100) : 0}%
+            </span>
+          </div>
+          <div className={theme === "dark" ? "text-zinc-500" : "text-gray-500"}>
+            Targets/Session: <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+              {totals.sessions > 0 ? Math.round(totals.targets / totals.sessions) : 0}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
