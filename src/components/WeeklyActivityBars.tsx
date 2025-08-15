@@ -113,7 +113,7 @@ export default function WeeklyActivityBars() {
       {/* Modern Bar Chart */}
       <div className="mb-4">
         <div className="flex items-end gap-1.5 h-24">
-          {weekData.map((day, index) => {
+          {weekData.map((day) => {
             const height = day.count > 0 ? (day.count / maxCount) * 100 : 10;
             const isHighActivity = day.count > avgPerDay;
 
