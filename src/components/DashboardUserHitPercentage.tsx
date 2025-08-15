@@ -49,88 +49,96 @@ export default function UserHitPercentage({ distance = null, position = null, we
   const hitColor = getColor(percentage);
 
   return (
-    <div className="flex w-full flex-col h-full justify-evenly col-auto text-xs p-2 rounded-lg shadow-sm ">
-      <div className=" relative justify-between flex h-full flex-col gap-1">
+    <div className="flex w-full h-full justify-evenly col-auto text-xs p-2 rounded-lg shadow-sm">
+      <div className="relative flex h-full w-full gap-4">
         {!userHitsStats.hit_percentage && userHitsStats.shots_fired === 0 ? (
           <NoDataDisplay />
         ) : (
-          <>
-            <ResponsiveContainer width="100%" height={isMobile ? 120 : 150} minWidth={isMobile ? 120 : 150} className="text-xs ">
-              <PieChart>
-                <Pie
-                  data={gaugeData}
-                  cx="50%"
-                  cy="80%"
-                  startAngle={180}
-                  endAngle={0}
-                  innerRadius="60%"
-                  outerRadius="90%"
-                  paddingAngle={0}
-                  dataKey="value"
-                  cornerRadius={4}
-                >
-                  <Cell fill={hitColor} />
-                  <Cell fill={theme === "dark" ? "#333" : " #e5e7eb"} />
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-
-            <div className="absolute inset-0 flex flex-col mt-0.5 h-6">
-              <span className={`px-1 text-lg font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                {percentage ? percentage.toFixed(1) : 0}%
-              </span>
-              <span
-                className={`text-xs uppercase tracking-wider transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
-              >
-                Accuracy
-              </span>
-            </div>
-            <div className="grid grid-cols-1 gap-1.5 mt-1">
-              <div className={`p-1.5 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
-                <div className="flex justify-between">
-                  <span className={`text-xs transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                    Total Shots
-                  </span>
-                  <span
-                    className={`text-[10px] px-1 py-0.5 rounded transition-colors duration-200 ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
+          <div className="flex flex-col md:flex-row w-full gap-4 items-center justify-center">
+            {/* Chart Section */}
+            <div className="relative flex-shrink-0">
+              <ResponsiveContainer width={isMobile ? 150 : 200} height={isMobile ? 120 : 180} className="text-xs">
+                <PieChart>
+                  <Pie
+                    data={gaugeData}
+                    cx="50%"
+                    cy="80%"
+                    startAngle={180}
+                    endAngle={0}
+                    innerRadius="60%"
+                    outerRadius="90%"
+                    paddingAngle={0}
+                    dataKey="value"
+                    cornerRadius={4}
                   >
-                    {userHitsStats.shots_fired}
-                  </span>
-                </div>
-                <div
-                  className={`mt-0.5 h-0.5 w-full rounded-full overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-gray-800" : "bg-gray-300"}`}
+                    <Cell fill={hitColor} />
+                    <Cell fill={theme === "dark" ? "#333" : " #e5e7eb"} />
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              
+              <div className="absolute inset-0 flex flex-col items-center justify-center mt-2">
+                <span className={`px-1 text-2xl font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  {percentage ? percentage.toFixed(1) : 0}%
+                </span>
+                <span
+                  className={`text-sm uppercase tracking-wider transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
                 >
-                  <div className="h-full rounded-full bg-purple-600" style={{ width: `100%` }}></div>
-                </div>
+                  Accuracy
+                </span>
               </div>
+            </div>
 
-              <div className={`p-1.5 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
-                <div className="flex justify-between">
-                  <span className={`text-[10px] transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                    Confirmed Hits
-                  </span>
-                  <span
-                    className={`text-[10px] px-1 py-0.5 rounded transition-colors duration-200 ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
-                  >
-                    {userHitsStats.confirmed_hits}
-                  </span>
-                </div>
-                <div
-                  className={`mt-0.5 h-0.5 w-full rounded-full overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-gray-800" : "bg-gray-300"}`}
-                >
+            {/* Stats Section */}
+            <div className="flex flex-col gap-3 flex-1 max-w-sm">
+              <div className="grid grid-cols-1 gap-2">
+                <div className={`p-2 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
+                  <div className="flex justify-between items-center">
+                    <span className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                      Total Shots
+                    </span>
+                    <span
+                      className={`text-sm px-2 py-1 rounded transition-colors duration-200 font-medium ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
+                    >
+                      {userHitsStats.shots_fired}
+                    </span>
+                  </div>
                   <div
-                    className="h-full rounded-full"
-                    style={{ width: `${(userHitsStats.confirmed_hits / userHitsStats.shots_fired) * 100}%`, backgroundColor: hitColor }}
-                  ></div>
+                    className={`mt-1 h-1 w-full rounded-full overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-gray-800" : "bg-gray-300"}`}
+                  >
+                    <div className="h-full rounded-full bg-purple-600" style={{ width: `100%` }}></div>
+                  </div>
+                </div>
+
+                <div className={`p-2 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
+                  <div className="flex justify-between items-center">
+                    <span className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                      Confirmed Hits
+                    </span>
+                    <span
+                      className={`text-sm px-2 py-1 rounded transition-colors duration-200 font-medium ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
+                    >
+                      {userHitsStats.confirmed_hits}
+                    </span>
+                  </div>
+                  <div
+                    className={`mt-1 h-1 w-full rounded-full overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-gray-800" : "bg-gray-300"}`}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${(userHitsStats.confirmed_hits / userHitsStats.shots_fired) * 100}%`, backgroundColor: hitColor }}
+                    ></div>
+                  </div>
                 </div>
               </div>
+              
+              <div className={`text-center text-xs transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                <span className={`px-3 py-1 rounded transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
+                  {userHitsStats.session_count} Training Sessions Completed
+                </span>
+              </div>
             </div>
-            <div className={`mt-1.5 text-center text-[10px] transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-              <span className={`px-1.5 py-0.5 rounded transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
-                {userHitsStats.session_count} Training Sessions Completed
-              </span>
-            </div>
-          </>
+          </div>
         )}
       </div>
     </div>
