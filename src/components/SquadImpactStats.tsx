@@ -3,7 +3,7 @@ import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
 import { userStore } from "@/store/userStore";
 import { TrendingUp, TrendingDown, Minus, Target, Users, Zap, Activity, Trophy, Medal, Award, RefreshCw } from "lucide-react";
-import { RadialBarChart, RadialBar, Legend, ResponsiveContainer, Tooltip, PieChart, Pie, Cell } from "recharts";
+import { ResponsiveContainer, Tooltip, PieChart, Pie, Cell } from "recharts";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function SquadImpactStats() {
