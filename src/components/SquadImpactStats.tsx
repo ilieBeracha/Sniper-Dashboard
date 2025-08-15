@@ -97,10 +97,10 @@ export default function SquadImpactStats() {
       <div className="flex items-center justify-between mb-3">
         <div>
           <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-            Squad Performance
+            🎯 Squad Performance
           </h4>
           <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
-            Team shooting statistics
+            Team shooting stats
           </p>
         </div>
         <motion.button
@@ -148,6 +148,13 @@ export default function SquadImpactStats() {
                 <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
                   Accuracy
                 </div>
+                <div className={`text-[9px] font-medium mt-0.5 ${
+                  overallAccuracy > 70 ? "text-green-500" : 
+                  overallAccuracy > 40 ? "text-yellow-500" : "text-red-500"
+                }`}>
+                  {overallAccuracy > 70 ? "Sharp!" : 
+                   overallAccuracy > 40 ? "Improving" : "Practice needed"}
+                </div>
               </div>
             </div>
           </div>
@@ -169,9 +176,14 @@ export default function SquadImpactStats() {
                 Total Hits
               </span>
             </div>
-            <span className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-              {totalHits.toLocaleString()}
-            </span>
+            <div className="text-right">
+              <span className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                {totalHits.toLocaleString()}
+              </span>
+              <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+                {totalHits > 1000 ? "Active squad" : "More practice"}
+              </div>
+            </div>
           </motion.div>
 
           <motion.div 
@@ -219,7 +231,7 @@ export default function SquadImpactStats() {
         <div className="flex items-center gap-2 mb-2">
           <Trophy className={`w-3.5 h-3.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
           <h5 className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
-            Top Performers
+            Top Performers:
           </h5>
         </div>
         
@@ -281,7 +293,7 @@ export default function SquadImpactStats() {
             <div className={`text-center py-3 text-xs ${
               theme === "dark" ? "text-zinc-500" : "text-gray-500"
             }`}>
-              No data available yet
+              No data yet
             </div>
           )}
         </div>

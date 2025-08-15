@@ -46,44 +46,41 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
   }
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg ">
-      <div className="flex flex-col gap-2 text-lg pt-2 pb-1">Overall Performance</div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-        <div className="w-full row-span-1">
+    <div className="space-y-4">
+      {/* Performance Overview Section */}
+      <div>
+        <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">📊 Performance Overview</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          {/* Hit Percentage Card - Smaller and Sharper */}
           <BaseDashboardCard
-            header="Performance Overview"
-            tooltipContent="Current performance metrics"
+            header="Hit Rate Analysis"
+            tooltipContent="Accuracy metrics by distance, position, and weapon"
+            height="h-[300px]"
             withFilter={[
               {
                 label: "Distance",
                 value: "distance",
-                onChange: (val) => {
-                  setHitPercentageDistance(val || null);
-                },
+                onChange: (val) => setHitPercentageDistance(val || null),
                 options: [
-                  { label: "All Distances", value: "" },
-                  { label: "Short (0-300m)", value: "short" },
-                  { label: "Mid (300-600m)", value: "medium" },
-                  { label: "Long (600-900m)", value: "long" },
+                  { label: "All", value: "" },
+                  { label: "Short", value: "short" },
+                  { label: "Mid", value: "medium" },
+                  { label: "Long", value: "long" },
                 ],
                 type: "select",
               },
               {
                 label: "Position",
                 value: "position",
-                onChange: (val) => {
-                  setHitPercentagePosition(val || null);
-                },
-                options: [{ label: "All Positions", value: "" }, ...positions.map((pos) => ({ label: formatEnumLabel(pos), value: pos }))],
+                onChange: (val) => setHitPercentagePosition(val || null),
+                options: [{ label: "All", value: "" }, ...positions.map((pos) => ({ label: formatEnumLabel(pos), value: pos }))],
                 type: "select",
               },
               {
-                label: "Weapon Type",
+                label: "Weapon",
                 value: "weapon_type",
-                onChange: (val) => {
-                  setHitPercentageWeaponType(val || null);
-                },
-                options: [{ label: "All Weapons", value: "" }, ...weaponTypes.map((type) => ({ label: formatEnumLabel(type), value: type }))],
+                onChange: (val) => setHitPercentageWeaponType(val || null),
+                options: [{ label: "All", value: "" }, ...weaponTypes.map((type) => ({ label: formatEnumLabel(type), value: type }))],
                 type: "select",
               },
             ]}
@@ -100,21 +97,20 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
           >
             <UserHitPercentage distance={hitPercentageDistance} position={hitPercentagePosition} weaponType={hitPercentageWeaponType} />
           </BaseDashboardCard>
+
+          {/* Grouping Chart - Matching Height */}
+          <div className="h-[300px]">
+            <DashboardGroupingChart />
+          </div>
         </div>
-        <div className="grid grid-cols-1 gap-3 lg:col-span-1 xl:col-span-2">
-          <DashboardGroupingChart />
-        </div>
-        <div className="grid grid-cols-1 gap-3 lg:col-span-1 xl:col-span-2">
-          {isSquadCommander(user?.user_role as UserRole) ? (
-            <div className="flex flex-col gap-4 text-2xl">Team Members</div>
-          ) : (
-            <div className="flex flex-col gap-4 text-2xl ">Squad Members</div>
-          )}
-        </div>
-        <div className="w-full grid col-span-full">
-          <DashboardMembersTable />
-        </div>
-        {/* Grouping Chart */}
+      </div>
+
+      {/* Team Members Section */}
+      <div>
+        <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
+          {isSquadCommander(user?.user_role as UserRole) ? "Team Members" : "Squad Members"}
+        </h3>
+        <DashboardMembersTable />
       </div>
     </div>
   );

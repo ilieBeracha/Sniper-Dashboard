@@ -85,6 +85,13 @@ export default function UserHitPercentage({ distance = null, position = null, we
               >
                 Accuracy
               </span>
+              <span className={`text-[9px] font-medium ${
+                percentage > 70 ? "text-green-500" : 
+                percentage > 50 ? "text-yellow-500" : "text-red-500"
+              }`}>
+                {percentage > 70 ? "Excellent!" : 
+                 percentage > 50 ? "Good progress" : "Keep training"}
+              </span>
             </div>
             <div className="grid grid-cols-1 gap-1.5 mt-1">
               <div className={`p-1.5 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
@@ -128,7 +135,7 @@ export default function UserHitPercentage({ distance = null, position = null, we
             </div>
             <div className={`mt-1.5 text-center text-[10px] transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
               <span className={`px-1.5 py-0.5 rounded transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
-                {userHitsStats.session_count} Training Sessions Completed
+                {userHitsStats.session_count} Sessions • {userHitsStats.session_count >= 5 ? "Consistent training! 💪" : "Train more often"}
               </span>
             </div>
           </>
