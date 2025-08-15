@@ -2,7 +2,7 @@ import { TrainingStore } from "@/store/trainingStore";
 import { useStore } from "zustand";
 import { format, differenceInDays, differenceInHours, isToday, isTomorrow, isYesterday } from "date-fns";
 import { TrainingSessionChart } from "@/types/training";
-import { Calendar, Clock, ArrowRight, MapPin } from "lucide-react";
+import { Calendar, Clock, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
 import { primitives } from "@/styles/core";
