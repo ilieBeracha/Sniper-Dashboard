@@ -64,7 +64,6 @@ export default function HourlyActivityMatrix() {
         }
       }
     });
-
     return hours;
   }, [feed]);
 
