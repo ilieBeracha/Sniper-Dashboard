@@ -1,6 +1,6 @@
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
-import { Calendar, Users, Target, Crosshair, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Calendar, Users, Target, Crosshair, TrendingUp, ArrowUpRight, ArrowDownRight, Activity } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function StatsUserKPI() {
@@ -25,43 +25,54 @@ export default function StatsUserKPI() {
 
   const avgHitRatio = data.length > 0 ? totals.avgHitRatio / data.length : 0;
 
+  // Calculate week-over-week changes and insights
+  const prevWeekData = data.length > 1 ? data[1] : null;
+  const accuracyTrend = prevWeekData ? 
+    Math.round(((avgHitRatio - (prevWeekData.avg_hit_ratio_last_week || 0)) / (prevWeekData.avg_hit_ratio_last_week || 1)) * 100) : 0;
+  const sessionsTrend = prevWeekData ? 
+    Math.round(((totals.sessions - (prevWeekData.sessions_last_week || 0)) / (prevWeekData.sessions_last_week || 1)) * 100) : 0;
+  
   const kpis = [
     { 
-      value: totals.trainings || 0, 
-      label: "Training Sessions", 
-      icon: Calendar, 
-      trend: "+12%",
-      positive: true,
-      iconColor: theme === "dark" ? "text-zinc-400" : "text-gray-600",
-      bgColor: theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
+      value: Math.round(avgHitRatio * 100) || 0, 
+      label: "Weekly Accuracy", 
+      suffix: "%", 
+      icon: Crosshair, 
+      trend: accuracyTrend > 0 ? `+${accuracyTrend}%` : `${accuracyTrend}%`,
+      positive: accuracyTrend >= 0,
+      insight: accuracyTrend > 5 ? "Improving! 🎯" : accuracyTrend < -5 ? "Need practice" : "Stable",
+      iconColor: theme === "dark" ? "text-green-400" : "text-green-600",
+      bgColor: theme === "dark" ? "bg-green-900/20" : "bg-green-100"
     },
     { 
       value: totals.sessions || 0, 
-      label: "Active Sessions", 
-      icon: Users, 
-      trend: "+8%",
-      positive: true,
-      iconColor: theme === "dark" ? "text-zinc-400" : "text-gray-600",
-      bgColor: theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
+      label: "Sessions This Week", 
+      icon: Activity, 
+      trend: sessionsTrend > 0 ? `+${sessionsTrend}%` : `${sessionsTrend}%`,
+      positive: sessionsTrend >= 0,
+      insight: totals.sessions >= 5 ? "Active week!" : "Train more",
+      iconColor: theme === "dark" ? "text-blue-400" : "text-blue-600",
+      bgColor: theme === "dark" ? "bg-blue-900/20" : "bg-blue-100"
     },
     { 
-      value: totals.targets || 0, 
-      label: "Targets Engaged", 
+      value: Math.round(totals.targets / totals.sessions) || 0, 
+      label: "Avg Targets/Session", 
       icon: Target, 
-      trend: "-3%",
-      positive: false,
-      iconColor: theme === "dark" ? "text-zinc-400" : "text-gray-600",
-      bgColor: theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
+      trend: totals.sessions > 3 ? "Good pace" : "Low volume",
+      positive: true,
+      insight: "Consistency is key",
+      iconColor: theme === "dark" ? "text-purple-400" : "text-purple-600",
+      bgColor: theme === "dark" ? "bg-purple-900/20" : "bg-purple-100"
     },
     { 
-      value: Math.round(avgHitRatio * 100) || 0, 
-      label: "Accuracy Rate", 
-      suffix: "%", 
-      icon: Crosshair, 
-      trend: "+5%",
-      positive: true,
-      iconColor: theme === "dark" ? "text-zinc-400" : "text-gray-600",
-      bgColor: theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"
+      value: totals.trainings || 0, 
+      label: "Group Trainings", 
+      icon: Users, 
+      trend: totals.trainings > 0 ? "Team player" : "Join team",
+      positive: totals.trainings > 0,
+      insight: totals.trainings > 2 ? "Great teamwork!" : "More team sessions?",
+      iconColor: theme === "dark" ? "text-orange-400" : "text-orange-600",
+      bgColor: theme === "dark" ? "bg-orange-900/20" : "bg-orange-100"
     },
   ];
 
@@ -130,6 +141,15 @@ export default function StatsUserKPI() {
                 <div className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
                   {item.label}
                 </div>
+                
+                {/* Insight */}
+                {item.insight && (
+                  <div className={`text-[10px] mt-0.5 font-medium ${
+                    theme === "dark" ? "text-zinc-500" : "text-gray-500"
+                  }`}>
+                    {item.insight}
+                  </div>
+                )}
               </div>
             </div>
           );

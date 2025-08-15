@@ -36,14 +36,22 @@ export default function DashboardStatsLink() {
             <p className={`text-xs font-medium ${
               theme === "dark" ? "text-zinc-300" : "text-gray-700"
             }`}>
-              Performance Analytics
+              Your Performance This Week
             </p>
             <div className={`flex items-center gap-3 mt-0.5 text-[10px] ${
               theme === "dark" ? "text-zinc-500" : "text-gray-500"
             }`}>
-              <span>{Math.round(hitPercentage)}% accuracy</span>
+              <span className={hitPercentage > 60 ? "text-green-500" : hitPercentage > 40 ? "text-yellow-500" : "text-red-500"}>
+                {Math.round(hitPercentage)}% accuracy
+              </span>
               <span>•</span>
               <span>{sessionsCount} sessions</span>
+              <span>•</span>
+              <span className="font-medium">
+                {hitPercentage > 60 ? "Great job! 🎯" : 
+                 hitPercentage > 40 ? "Getting there" : 
+                 "Keep practicing"}
+              </span>
             </div>
           </div>
         </div>

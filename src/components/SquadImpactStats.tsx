@@ -148,6 +148,13 @@ export default function SquadImpactStats() {
                 <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
                   Accuracy
                 </div>
+                <div className={`text-[9px] font-medium mt-0.5 ${
+                  overallAccuracy > 70 ? "text-green-500" : 
+                  overallAccuracy > 40 ? "text-yellow-500" : "text-red-500"
+                }`}>
+                  {overallAccuracy > 70 ? "Sharp!" : 
+                   overallAccuracy > 40 ? "Improving" : "Practice needed"}
+                </div>
               </div>
             </div>
           </div>
@@ -169,9 +176,14 @@ export default function SquadImpactStats() {
                 Total Hits
               </span>
             </div>
-            <span className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-              {totalHits.toLocaleString()}
-            </span>
+            <div className="text-right">
+              <span className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                {totalHits.toLocaleString()}
+              </span>
+              <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+                {totalHits > 1000 ? "Active squad" : "More practice"}
+              </div>
+            </div>
           </motion.div>
 
           <motion.div 

@@ -106,7 +106,9 @@ export default function WeeklyActivityBars() {
           </div>
         </div>
         <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
-          Daily activity breakdown (Mon-Sun)
+          {avgPerDay > 100 ? "High activity week! 🔥" : 
+           avgPerDay > 50 ? "Good momentum" : 
+           "Let's increase activity"}
         </p>
       </div>
 
