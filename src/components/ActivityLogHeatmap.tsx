@@ -288,33 +288,30 @@ export default function ActivityLogHeatmap() {
   }, [feed]);
 
   return (
-    <div className={`rounded-xl p-4 border shadow-sm ${theme === "dark" ? "bg-zinc-900/90 border-zinc-700" : "bg-white border-gray-200"}`}>
-      {/* Header */}
-      <div className="mb-3">
-        <div className="flex items-center justify-between mb-2">
+    <div className={`rounded-xl p-3 border shadow-sm ${theme === "dark" ? "bg-zinc-900/90 border-zinc-700" : "bg-white border-gray-200"}`}>
+      {/* Compact Header */}
+      <div className="mb-2">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Activity className={`w-5 h-5 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
-            <div>
-              <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>Activity Analytics Dashboard</h4>
-              <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Comprehensive team activity insights and patterns</p>
-            </div>
+            <Activity className={`w-4 h-4 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
+            <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>Activity Analytics</h4>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             {["type", "performance", "daily", "hourly"].map((mode) => (
               <button
                 key={mode}
                 onClick={() => setViewMode(mode as any)}
-                className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                className={`px-2 py-0.5 rounded text-[10px] font-medium transition-all ${
                   viewMode === mode
                     ? theme === "dark"
-                      ? "bg-zinc-700 text-white shadow-sm"
-                      : "bg-gray-200 text-gray-900 shadow-sm"
+                      ? "bg-zinc-700 text-white"
+                      : "bg-gray-200 text-gray-900"
                     : theme === "dark"
-                      ? "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      ? "text-zinc-500 hover:text-zinc-300"
+                      : "text-gray-500 hover:text-gray-700"
                 }`}
               >
-                {mode === "type" ? "Categories" : mode === "performance" ? "Analytics" : mode.charAt(0).toUpperCase() + mode.slice(1)}
+                {mode === "type" ? "Types" : mode === "performance" ? "Perf" : mode.charAt(0).toUpperCase() + mode.slice(1)}
               </button>
             ))}
           </div>
@@ -326,42 +323,42 @@ export default function ActivityLogHeatmap() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-400"></div>
         </div>
       ) : (
-        <div className="space-y-4">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
-              <div className="flex items-center gap-2 mb-1">
-                <Zap className="w-4 h-4 text-yellow-500" />
-                <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Total Activities</span>
+        <div className="space-y-3">
+          {/* Compact Stats Cards */}
+          <div className="grid grid-cols-4 gap-2">
+            <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+              <div className="flex items-center gap-1 mb-0.5">
+                <Zap className="w-3 h-3 text-yellow-500" />
+                <span className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Total</span>
               </div>
-              <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>{totalActivities.toLocaleString()}</div>
-              <div className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Last 30 days</div>
+              <div className={`text-lg font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>{totalActivities.toLocaleString()}</div>
+              <div className={`text-[9px] ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`}>30 days</div>
             </div>
-            <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
-              <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="w-4 h-4 text-green-500" />
-                <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Daily Average</span>
+            <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+              <div className="flex items-center gap-1 mb-0.5">
+                <TrendingUp className="w-3 h-3 text-green-500" />
+                <span className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Daily</span>
               </div>
-              <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>{avgPerDay}</div>
-              <div className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Activities per day</div>
+              <div className={`text-lg font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>{avgPerDay}</div>
+              <div className={`text-[9px] ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`}>Average</div>
             </div>
-            <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
-              <div className="flex items-center gap-2 mb-1">
-                <Users className="w-4 h-4 text-blue-500" />
-                <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Active Members</span>
+            <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+              <div className="flex items-center gap-1 mb-0.5">
+                <Users className="w-3 h-3 text-blue-500" />
+                <span className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Users</span>
               </div>
-              <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>{uniqueUsers}</div>
-              <div className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Unique participants</div>
+              <div className={`text-lg font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>{uniqueUsers}</div>
+              <div className={`text-[9px] ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`}>Active</div>
             </div>
-            <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
-              <div className="flex items-center gap-2 mb-1">
-                <Clock className="w-4 h-4 text-purple-500" />
-                <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Peak Activity</span>
+            <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
+              <div className="flex items-center gap-1 mb-0.5">
+                <Clock className="w-3 h-3 text-purple-500" />
+                <span className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Peak</span>
               </div>
-              <div className={`text-lg font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>
+              <div className={`text-sm font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>
                 {format(new Date(mostActiveDay.date), "MMM d")}
               </div>
-              <div className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{mostActiveDay.activities} activities</div>
+              <div className={`text-[9px] ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`}>{mostActiveDay.activities} acts</div>
             </div>
           </div>
 
@@ -377,75 +374,34 @@ export default function ActivityLogHeatmap() {
                 </p>
               </div>
 
-              {/* Category Cards */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Compact Category Cards */}
+              <div className="grid grid-cols-2 gap-2">
                 {activityCategories.map((category) => {
                   const catData = categoryData.get(category.name)!;
                   const Icon = category.icon;
-                  const colorClasses = {
-                    blue: theme === "dark" ? "from-blue-500/20 to-blue-600/20 border-blue-500/30" : "from-blue-100 to-blue-200 border-blue-300/50",
-                    emerald:
-                      theme === "dark"
-                        ? "from-emerald-500/20 to-emerald-600/20 border-emerald-500/30"
-                        : "from-emerald-100 to-emerald-200 border-emerald-300/50",
-                    purple:
-                      theme === "dark"
-                        ? "from-purple-500/20 to-purple-600/20 border-purple-500/30"
-                        : "from-purple-100 to-purple-200 border-purple-300/50",
-                    amber:
-                      theme === "dark" ? "from-amber-500/20 to-amber-600/20 border-amber-500/30" : "from-amber-100 to-amber-200 border-amber-300/50",
-                  };
 
                   return (
                     <div
                       key={category.name}
-                      className={`p-4 rounded-xl border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"}`}
+                      className={`p-2 rounded-lg border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"}`}
                     >
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg bg-gradient-to-br ${colorClasses[category.color as keyof typeof colorClasses]}`}>
-                            <Icon className={`w-5 h-5 ${theme === "dark" ? `text-${category.color}-400` : `text-${category.color}-600`}`} />
-                          </div>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <Icon className={`w-3.5 h-3.5 text-${category.color}-500`} />
                           <div>
-                            <h6 className={`text-sm font-semibold ${theme === "dark" ? "text-zinc-100" : "text-gray-800"}`}>{category.name}</h6>
-                            <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>{category.description}</p>
+                            <h6 className={`text-xs font-semibold ${theme === "dark" ? "text-zinc-100" : "text-gray-800"}`}>{category.name}</h6>
+                            <p className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{catData.count} events</p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className={`text-2xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-gray-900"}`}>
-                            {catData.count.toLocaleString()}
-                          </div>
-                          <div className={`text-xs font-medium ${theme === "dark" ? `text-${category.color}-400` : `text-${category.color}-600`}`}>
-                            {catData.percentage}%
-                          </div>
+                        <div className={`text-lg font-bold ${theme === "dark" ? `text-${category.color}-400` : `text-${category.color}-600`}`}>
+                          {catData.percentage}%
                         </div>
                       </div>
-
-                      {/* Progress bar */}
-                      <div className="mb-3">
-                        <div className={`h-2 rounded-full ${theme === "dark" ? "bg-zinc-700" : "bg-gray-200"}`}>
-                          <div
-                            className={`h-full rounded-full bg-gradient-to-r from-${category.color}-500 to-${category.color}-600 transition-all`}
-                            style={{ width: `${catData.percentage}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Type breakdown */}
-                      <div className="space-y-2">
-                        {category.types.map((type) => {
-                          const typeCount = catData.types.get(type) || 0;
-                          if (typeCount === 0) return null;
-
-                          return (
-                            <div key={type} className="flex items-center justify-between">
-                              <span className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-                                {activityTypeLabels[type] || type}
-                              </span>
-                              <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>{typeCount}</span>
-                            </div>
-                          );
-                        })}
+                      <div className={`h-1 rounded-full ${theme === "dark" ? "bg-zinc-700" : "bg-gray-200"}`}>
+                        <div
+                          className={`h-full rounded-full bg-${category.color}-500 transition-all`}
+                          style={{ width: `${catData.percentage}%` }}
+                        />
                       </div>
                     </div>
                   );
