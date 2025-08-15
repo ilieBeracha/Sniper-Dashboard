@@ -5,8 +5,8 @@ import TeamManagerRegisterForm from "@/components/Auth/TeamManagerRegisterForm";
 import SquadCommanderRegisterForm from "@/components/Auth/SquadCommanderRegisterForm";
 import SoldierRegisterForm from "@/components/Auth/SoldierRegisterForm";
 import { authStore } from "@/store/authStore";
-import { ModernLoginForm } from "@/components/Auth/ModernLoginForm";
-import ModernAuthHero from "@/components/Auth/ModernAuthHero";
+import { ElegantLoginForm } from "@/components/Auth/ElegantLoginForm";
+import ElegantAuthHero from "@/components/Auth/ElegantAuthHero";
 import { LoginUserData, RegisterUserData } from "@/types/auth";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -74,66 +74,49 @@ export default function Auth() {
   };
 
   return (
-    <div className={`flex h-[100dvh] overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
-      {/* Background pattern */}
-      <div
-        className={`absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-200 ${
-          theme === "dark" ? "opacity-10" : "opacity-5"
-        }`}
-      >
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, ${
-              theme === "dark" ? "rgba(147,51,234,0.1)" : "rgba(147,51,234,0.05)"
-            } 1px, transparent 1px)`,
-            backgroundSize: "24px 24px",
-          }}
-        />
-      </div>
+    <div className={`flex h-[100dvh] overflow-hidden transition-colors duration-200 ${
+      theme === "dark" ? "bg-gray-900" : "bg-gray-50"
+    }`}>
+      <ElegantAuthHero />
 
-      <ModernAuthHero />
-
-      <div
-        className={`w-full md:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-12 relative z-10 transition-all duration-200`}
-      >
+      <div className={`w-full md:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-12 relative z-10 transition-all duration-200`}>
         <div className="w-full max-w-md">
-          <div className="mb-8">
-            <h2 className={`text-2xl font-bold mb-2 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+          <div className="mb-6">
+            <h2 className={`text-xl font-semibold mb-2 transition-colors duration-200 ${
+              theme === "dark" ? "text-white" : "text-gray-900"
+            }`}>
               {getAuthTitle()}
             </h2>
-            <p className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>{getAuthDescription()}</p>
+            <p className={`text-sm transition-colors duration-200 ${
+              theme === "dark" ? "text-gray-400" : "text-gray-600"
+            }`}>
+              {getAuthDescription()}
+            </p>
           </div>
 
-          {/* Form Card with glassmorphism effect */}
+          {/* Form Card */}
           <div className="relative">
-            <div
-              className={`relative py-8 px-8 rounded-2xl backdrop-blur-md transition-all duration-200 ${
-                theme === "dark" 
-                  ? "bg-gray-800/30 border border-gray-700/50 shadow-xl" 
-                  : "bg-white/70 border border-gray-200/50 shadow-xl"
-              }`}
-            >
+            <div className={`relative py-6 px-6 rounded-xl transition-all duration-200 ${
+              theme === "dark" 
+                ? "bg-gray-800/50 border border-gray-700/30" 
+                : "bg-white border border-gray-200 shadow-sm"
+            }`}>
               {isLoading && (
-                <div
-                  className={`absolute inset-0 flex items-center justify-center z-10 rounded-2xl backdrop-blur-sm transition-colors duration-200 ${
-                    theme === "dark" ? "bg-gray-900/70" : "bg-white/80"
-                  }`}
-                >
+                <div className={`absolute inset-0 flex items-center justify-center z-10 rounded-xl backdrop-blur-sm transition-colors duration-200 ${
+                  theme === "dark" ? "bg-gray-900/80" : "bg-white/80"
+                }`}>
                   <div className="flex flex-col items-center">
                     <div className="relative">
-                      <div
-                        className={`w-12 h-12 border-2 rounded-full transition-colors duration-200 ${
-                          theme === "dark" ? "border-gray-700" : "border-gray-300"
-                        }`}
-                      />
-                      <div
-                        className={`absolute inset-0 w-12 h-12 border-t-2 rounded-full animate-spin transition-colors duration-200 ${
-                          theme === "dark" ? "border-purple-500" : "border-purple-600"
-                        }`}
-                      />
+                      <div className={`w-10 h-10 border-2 rounded-full transition-colors duration-200 ${
+                        theme === "dark" ? "border-gray-700" : "border-gray-300"
+                      }`} />
+                      <div className={`absolute inset-0 w-10 h-10 border-t-2 rounded-full animate-spin transition-colors duration-200 ${
+                        theme === "dark" ? "border-white" : "border-gray-900"
+                      }`} />
                     </div>
-                    <p className={`mt-4 text-sm font-medium transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-700"}`}>
+                    <p className={`mt-3 text-sm transition-colors duration-200 ${
+                      theme === "dark" ? "text-gray-300" : "text-gray-600"
+                    }`}>
                       Authenticating...
                     </p>
                   </div>
@@ -142,7 +125,7 @@ export default function Auth() {
 
               <div className="relative z-10">
                 {authType === "login" && (
-                  <ModernLoginForm
+                  <ElegantLoginForm
                     AuthSubmit={AuthSubmit}
                     onRegisterClick={(type) => setAuthType(type as AuthType)}
                     onSignInWithEmail={(email) => signInWithEmail(email)}
@@ -151,14 +134,17 @@ export default function Auth() {
                 )}
                 {authType !== "login" && (
                   <div>
-                    <p
+                    <button
                       onClick={() => setAuthType("login")}
-                      className={`mb-4 text-sm cursor-pointer transition-colors flex items-center ${
+                      className={`mb-4 text-sm font-medium transition-colors flex items-center gap-2 ${
                         theme === "dark" ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"
                       }`}
                     >
-                      ← Back to Sign In
-                    </p>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      Back to Sign In
+                    </button>
                     {authType === "squad_manager_register" && <SquadCommanderRegisterForm AuthSubmit={AuthSubmit} />}
                     {authType === "soldier_register" && <SoldierRegisterForm AuthSubmit={AuthSubmit} />}
                     {authType === "team_manager_register" && <TeamManagerRegisterForm AuthSubmit={AuthSubmit} />}
@@ -166,18 +152,12 @@ export default function Auth() {
                 )}
               </div>
 
-              {error && (
-                <div className="mt-6 p-4 bg-red-900/10 border border-red-900/20 rounded-xl flex items-center backdrop-blur-sm">
-                  <div className="w-8 h-8 bg-red-900/20 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-red-400">{error}</p>
+              {error && authType === "login" && (
+                <div className="mt-5 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 rounded-lg flex items-center gap-3">
+                  <svg className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
                 </div>
               )}
             </div>
