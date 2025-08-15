@@ -1,343 +1,203 @@
-import { useEffect, useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
-import { userStore } from "@/store/userStore";
-import { TrendingUp, TrendingDown, Minus, Target, Users, Zap, Activity, Trophy, Medal, Award, RefreshCw } from "lucide-react";
-import { ResponsiveContainer, Tooltip, PieChart, Pie, Cell } from "recharts";
 import { useTheme } from "@/contexts/ThemeContext";
+import { motion } from "framer-motion";
+import { Users, Trophy, TrendingUp, RefreshCw } from "lucide-react";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function SquadImpactStats() {
-  const { user } = useStore(userStore);
-  const { squadWeaponStats, isLoading, getSquadWeaponStats } = useStore(performanceStore);
+  const { squadWeaponStats, getSquadWeaponStats, isLoading } = useStore(performanceStore);
   const { theme } = useTheme();
 
-  // Fetch squad impact stats on mount and add refresh capability
-  const refreshData = async () => {
-    if (!user?.team_id) return;
-    console.log("Refreshing squad weapon stats...");
-    await getSquadWeaponStats(user.team_id, null, null);
+  useEffect(() => {
+    getSquadWeaponStats();
+  }, [getSquadWeaponStats]);
+
+  const handleRefresh = () => {
+    getSquadWeaponStats();
   };
 
-  useEffect(() => {
-    refreshData();
-  }, [user?.team_id]);
+  const { totalHits, totalMisses, topPerformers, weaponPerformance, overallAccuracy } = useMemo(() => {
+    if (!squadWeaponStats || squadWeaponStats.length === 0) {
+      return { totalHits: 0, totalMisses: 0, topPerformers: [], weaponPerformance: [], overallAccuracy: 0 };
+    }
 
-  // Add debug logging
-  useEffect(() => {
-    console.log("Squad weapon stats updated:", squadWeaponStats);
-  }, [squadWeaponStats]);
+    let hits = 0;
+    let misses = 0;
+    const userStats = new Map();
 
-  const stats = useMemo(() => {
-    if (!squadWeaponStats || squadWeaponStats.length === 0) return null;
-
-    const totalShots = squadWeaponStats.reduce((acc: number, d: any) => acc + (d.total_shots || 0), 0);
-    const totalHits = squadWeaponStats.reduce((acc: number, d: any) => acc + (d.total_hits || 0), 0);
-    const avgImpact = squadWeaponStats.reduce((acc: number, d: any) => acc + (d.hit_rate || 0), 0) / squadWeaponStats.length;
-    const hitRate = totalShots > 0 ? (totalHits / totalShots) * 100 : 0;
-    const activeUsers = new Set(squadWeaponStats.map((d: any) => d.user_id)).size;
-
-    const userPerformance: { [key: string]: any } = {};
     squadWeaponStats.forEach((stat: any) => {
-      const userName = `${stat.first_name} ${stat.last_name}`;
-      if (!userPerformance[userName]) {
-        userPerformance[userName] = { name: userName, shots: 0, hits: 0, sessions: 0 };
+      const userName = stat.user_name || 'Unknown';
+      const userHits = stat.hits || 0;
+      const userMisses = stat.misses || 0;
+      
+      hits += userHits;
+      misses += userMisses;
+
+      if (!userStats.has(userName)) {
+        userStats.set(userName, { name: userName, hits: 0, misses: 0, total: 0 });
       }
-      userPerformance[userName].shots += stat.total_shots || 0;
-      userPerformance[userName].hits += stat.total_hits || 0;
-      userPerformance[userName].sessions += 1;
+      
+      const user = userStats.get(userName);
+      user.hits += userHits;
+      user.misses += userMisses;
+      user.total += userHits + userMisses;
     });
 
-    const topPerformers = Object.values(userPerformance)
-      .map((u: any) => ({
-        ...u,
-        accuracy: u.shots > 0 ? Math.round((u.hits / u.shots) * 100) : 0,
-      }))
-      .sort((a, b) => b.accuracy - a.accuracy)
-      .slice(0, 3); // Reduced to 3 for more compact display
+    const accuracy = hits + misses > 0 ? Math.round((hits / (hits + misses)) * 100) : 0;
+    const performers = Array.from(userStats.values())
+      .filter(user => user.total > 0)
+      .sort((a, b) => b.hits - a.hits)
+      .slice(0, 3);
 
-    console.log("Calculated stats:", { totalShots, totalHits, hitRate, activeUsers });
-    return { totalShots, totalHits, avgImpact, hitRate, activeUsers, topPerformers };
-  }, [squadWeaponStats]);
+    const pieData = [
+      { name: 'Hits', value: hits, color: theme === "dark" ? '#10b981' : '#059669' },
+      { name: 'Misses', value: misses, color: theme === "dark" ? '#ef4444' : '#dc2626' }
+    ];
 
-  const pieData = stats
-    ? [
-        { name: "Hits", value: stats.totalHits, fill: theme === "dark" ? "#10b981" : "#059669" },
-        { name: "Misses", value: stats.totalShots - stats.totalHits, fill: theme === "dark" ? "#374151" : "#e5e7eb" },
-      ]
-    : [];
+    return {
+      totalHits: hits,
+      totalMisses: misses,
+      topPerformers: performers,
+      weaponPerformance: pieData,
+      overallAccuracy: accuracy
+    };
+  }, [squadWeaponStats, theme]);
+
+  if (isLoading) {
+    return (
+      <div className={`rounded-lg p-2 border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
+        <div className="animate-pulse space-y-2">
+          <div className={`h-3 rounded w-1/3 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+          <div className={`h-20 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={`rounded-lg p-3 border shadow-sm h-full transition-all duration-300 ${
-        theme === "dark" ? "bg-zinc-900/50 backdrop-blur-sm border-zinc-700/50" : "bg-white border-gray-200/80"
-      }`}
-    >
-      <div className="mb-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div
-              className={`p-1.5 rounded ${
-                theme === "dark" ? "bg-emerald-500/20 border border-emerald-500/30" : "bg-emerald-100 border border-emerald-300/50"
-              }`}
-            >
-              <Activity className={`w-3.5 h-3.5 ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`} />
-            </div>
-            <div>
-              <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>Squad Impact</h4>
-              <p className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Team performance metrics</p>
-            </div>
-          </div>
-          <button
-            onClick={refreshData}
-            disabled={isLoading}
-            className={`p-1.5 rounded transition-all duration-200 ${
-              theme === "dark" 
-                ? "hover:bg-zinc-800 disabled:opacity-50" 
-                : "hover:bg-gray-100 disabled:opacity-50"
-            }`}
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""} ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`} />
-          </button>
+    <div className={`rounded-lg p-2 border h-full ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
+      {/* Compact Header */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1.5">
+          <Users className={`w-3.5 h-3.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`} />
+          <h4 className={`text-xs font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-900"}`}>Squad Impact</h4>
+        </div>
+        <button
+          onClick={handleRefresh}
+          className={`p-1 rounded hover:bg-zinc-800/50 transition-colors ${
+            theme === "dark" ? "text-zinc-400 hover:text-zinc-200" : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          <RefreshCw className="w-3 h-3" />
+        </button>
+      </div>
+
+      {/* Compact Stats Grid */}
+      <div className="grid grid-cols-2 gap-1 mb-2">
+        <div className={`p-1.5 rounded text-center ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
+          <div className={`text-sm font-bold text-green-500`}>{totalHits}</div>
+          <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Hits</div>
+        </div>
+        <div className={`p-1.5 rounded text-center ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
+          <div className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{overallAccuracy}%</div>
+          <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Accuracy</div>
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-6">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-6 w-6 border-2 border-emerald-200 border-t-emerald-600 mx-auto mb-2"></div>
-          </div>
-          <p className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Loading squad data...</p>
-        </div>
-      ) : stats ? (
-        <div className="space-y-3">
-          {/* Compact Key Metrics */}
-          <div className="grid grid-cols-4 gap-1.5">
-            <StatCard icon={Target} value={stats.totalShots.toLocaleString()} label="Shots" theme={theme} />
-            <StatCard icon={Target} value={`${Math.round(stats.hitRate)}%`} label="Hit%" theme={theme} accent="emerald" />
-            <StatCard icon={Users} value={stats.activeUsers.toString()} label="Active" theme={theme} />
-            <ImpactCard avgImpact={stats.avgImpact} theme={theme} />
-          </div>
-
-          {/* Compact Chart */}
-          <div className="grid grid-cols-2 gap-2">
-            {/* Pie Chart */}
-            <div
-              className={`rounded border p-2 ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}
-            >
-              <h5
-                className={`text-[10px] font-medium text-center mb-1 ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}
+      {/* Compact Chart and Top Performers */}
+      <div className="grid grid-cols-2 gap-2">
+        {/* Pie Chart */}
+        <div className="relative">
+          <ResponsiveContainer width="100%" height={80}>
+            <PieChart>
+              <Pie
+                data={weaponPerformance}
+                cx="50%"
+                cy="50%"
+                innerRadius={15}
+                outerRadius={30}
+                paddingAngle={2}
+                dataKey="value"
               >
-                Hit Distribution
-              </h5>
-              <div className="h-24">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={18}
-                      outerRadius={35}
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
-                        border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
-                        borderRadius: "6px",
-                        fontSize: "10px",
-                        padding: "4px 8px",
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+                {weaponPerformance.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                formatter={(value: any) => value.toLocaleString()}
+                contentStyle={{
+                  backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
+                  border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
+                  borderRadius: 4,
+                  fontSize: 10,
+                  padding: "4px 6px",
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          {totalHits + totalMisses === 0 && (
+            <div className={`absolute inset-0 flex items-center justify-center text-[10px] ${
+              theme === "dark" ? "text-zinc-500" : "text-gray-500"
+            }`}>
+              No data
             </div>
+          )}
+        </div>
 
-            {/* Stats Summary */}
-            <div
-              className={`rounded border p-2 ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}
-            >
-              <h5
-                className={`text-[10px] font-medium text-center mb-1.5 ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}
-              >
-                Performance Stats
-              </h5>
-              <div className="space-y-1.5">
-                <div className="flex justify-between items-center">
-                  <span className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Total Hits</span>
-                  <span className={`text-xs font-medium ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>
-                    {stats.totalHits.toLocaleString()}
+        {/* Top Performers */}
+        <div>
+          <div className="flex items-center gap-1 mb-1">
+            <Trophy className={`w-2.5 h-2.5 ${theme === "dark" ? "text-yellow-500" : "text-yellow-600"}`} />
+            <span className={`text-[9px] font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Top</span>
+          </div>
+          <div className="space-y-1">
+            {topPerformers.length > 0 ? (
+              topPerformers.map((performer, index) => (
+                <motion.div
+                  key={performer.name}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`flex items-center justify-between p-1 rounded ${
+                    theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"
+                  }`}
+                >
+                  <span className={`text-[9px] truncate flex-1 ${
+                    theme === "dark" ? "text-zinc-300" : "text-gray-700"
+                  }`}>
+                    {performer.name}
                   </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Accuracy</span>
-                  <span className={`text-xs font-medium ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
-                    {stats.hitRate.toFixed(1)}%
+                  <span className={`text-[9px] font-medium ${
+                    theme === "dark" ? "text-green-400" : "text-green-600"
+                  }`}>
+                    {performer.hits}
                   </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>Avg Impact</span>
-                  <span className={`text-xs font-medium flex items-center gap-0.5`}>
-                    {stats.avgImpact > 0 ? (
-                      <TrendingUp className="w-3 h-3 text-emerald-500" />
-                    ) : stats.avgImpact < 0 ? (
-                      <TrendingDown className="w-3 h-3 text-rose-500" />
-                    ) : (
-                      <Minus className="w-3 h-3 text-gray-500" />
-                    )}
-                    <span className={stats.avgImpact > 0 ? "text-emerald-500" : stats.avgImpact < 0 ? "text-rose-500" : "text-gray-500"}>
-                      {Math.abs(stats.avgImpact).toFixed(1)}%
-                    </span>
-                  </span>
-                </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className={`text-[9px] text-center py-2 ${
+                theme === "dark" ? "text-zinc-500" : "text-gray-500"
+              }`}>
+                No performers yet
               </div>
-            </div>
+            )}
           </div>
-
-          {/* Compact Top Performers */}
-          <TopPerformers topPerformers={stats.topPerformers} theme={theme} />
         </div>
-      ) : (
-        <div className="text-center py-6">
-          <div
-            className={`p-2 rounded-full mx-auto mb-2 w-10 h-10 flex items-center justify-center ${
-              theme === "dark" ? "bg-zinc-800/50 border border-zinc-700/50" : "bg-gray-100 border border-gray-200"
-            }`}
-          >
-            <Target className={`h-5 w-5 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />
-          </div>
-          <p className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>No training data available</p>
-          <button
-            onClick={refreshData}
-            className={`mt-2 text-[10px] px-2.5 py-1 rounded border transition-all ${
-              theme === "dark" 
-                ? "border-zinc-700 hover:bg-zinc-800 text-zinc-400" 
-                : "border-gray-300 hover:bg-gray-100 text-gray-600"
-            }`}
-          >
-            Load Data
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ===== Compact Helper Components ===== */
-
-function StatCard({ icon, value, label, theme, accent }: { icon: React.ElementType; value: string; label: string; theme: string; accent?: string }) {
-  const Icon = icon;
-  
-  return (
-    <div
-      className={`p-1.5 rounded-md border transition-all duration-200 ${
-        theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"
-      }`}
-    >
-      <Icon className={`w-3 h-3 mx-auto mb-0.5 ${
-        accent === "emerald" 
-          ? theme === "dark" ? "text-emerald-400" : "text-emerald-600"
-          : theme === "dark" ? "text-zinc-400" : "text-gray-600"
-      }`} />
-      <div className={`text-xs font-bold text-center ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{value}</div>
-      <div className={`text-[9px] text-center ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{label}</div>
-    </div>
-  );
-}
-
-function ImpactCard({ avgImpact, theme }: { avgImpact: number; theme: string }) {
-  return (
-    <div
-      className={`p-1.5 rounded-md border transition-all duration-200 ${
-        theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"
-      }`}
-    >
-      <Zap className={`w-3 h-3 mx-auto mb-0.5 ${
-        avgImpact > 0 
-          ? theme === "dark" ? "text-emerald-400" : "text-emerald-600"
-          : avgImpact < 0
-            ? theme === "dark" ? "text-rose-400" : "text-rose-600"
-            : theme === "dark" ? "text-zinc-400" : "text-gray-600"
-      }`} />
-      <div className={`text-xs font-bold text-center flex items-center justify-center gap-0.5 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-        {avgImpact > 0 ? (
-          <TrendingUp className="w-2.5 h-2.5 text-emerald-500" />
-        ) : avgImpact < 0 ? (
-          <TrendingDown className="w-2.5 h-2.5 text-rose-500" />
-        ) : (
-          <Minus className="w-2.5 h-2.5 text-gray-500" />
-        )}
-        {Math.abs(avgImpact).toFixed(1)}%
       </div>
-      <div className={`text-[9px] text-center ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Impact</div>
-    </div>
-  );
-}
 
-function TopPerformers({ topPerformers, theme }: { topPerformers: any[]; theme: string }) {
-  const getRankIcon = (index: number) => {
-    if (index === 0) return Trophy;
-    if (index === 1) return Medal;
-    if (index === 2) return Award;
-    return null;
-  };
-
-  return (
-    <div className={`p-1.5 rounded-lg border ${theme === "dark" ? "bg-zinc-800/30 border-zinc-700/50" : "bg-gray-50 border-gray-200"}`}>
-      <h5 className={`text-[9px] font-semibold mb-1 text-center ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>🏆 Top Performers</h5>
-      <div className="space-y-1">
-        {topPerformers.map((performer, index) => {
-          const RankIcon = getRankIcon(index);
-          return (
-            <div
-              key={performer.name}
-              className={`p-1 rounded-md border transition-all duration-200 hover:scale-102 ${
-                theme === "dark" ? "bg-zinc-800/20 border-zinc-700/30 hover:border-zinc-600/50" : "bg-white border-gray-200/80 hover:border-gray-300"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <div
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold ${
-                      index === 0
-                        ? theme === "dark"
-                          ? "bg-amber-500/30 text-amber-400 border border-amber-500/50"
-                          : "bg-amber-100 text-amber-700 border border-amber-400/50"
-                        : index === 1
-                          ? theme === "dark"
-                            ? "bg-gray-500/30 text-gray-300 border border-gray-500/50"
-                            : "bg-gray-100 text-gray-600 border border-gray-400/50"
-                          : index === 2
-                            ? theme === "dark"
-                              ? "bg-amber-600/30 text-amber-300 border border-amber-600/50"
-                              : "bg-amber-200 text-amber-800 border border-amber-500/50"
-                            : theme === "dark"
-                              ? "bg-zinc-700/50 text-zinc-300 border border-zinc-600/50"
-                              : "bg-gray-100 text-gray-700 border border-gray-300"
-                    }`}
-                  >
-                    {RankIcon && <RankIcon className="w-2 h-2" />}
-                    {!RankIcon && index + 1}
-                  </div>
-                  <div>
-                    <div className={`text-[9px] font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>{performer.name}</div>
-                    <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{performer.sessions} sessions</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className={`text-xs font-bold ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>{performer.accuracy}%</div>
-                  <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{performer.shots} shots</div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+      {/* Bottom Summary */}
+      <div className={`mt-2 pt-2 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} flex items-center justify-between`}>
+        <div className="flex items-center gap-1">
+          <TrendingUp className={`w-2.5 h-2.5 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />
+          <span className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+            Total shots: {totalHits + totalMisses}
+          </span>
+        </div>
+        <span className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+          {topPerformers.length} active
+        </span>
       </div>
     </div>
   );

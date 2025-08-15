@@ -91,63 +91,63 @@ export default function WeeklyActivityBars() {
   const avgPerDay = Math.round(feed.length / 7);
 
   return (
-    <div className={`rounded-lg p-3 border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Activity className={`w-4 h-4 ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`} />
-          <h4 className={`text-sm font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-900"}`}>Weekly Activity</h4>
+    <div className={`rounded-lg p-2 border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
+      {/* Compact Header */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1.5">
+          <Activity className={`w-3.5 h-3.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`} />
+          <h4 className={`text-xs font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-900"}`}>Activity</h4>
         </div>
-        <span className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Last 7 days</span>
+        <span className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>7 days</span>
       </div>
 
-      {/* Key Metrics - Most Important */}
-      <div className="grid grid-cols-4 gap-2 mb-3">
-        <div className={`text-center p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
-          <div className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{feed.length}</div>
-          <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Total</div>
+      {/* Key Metrics - Compact Grid */}
+      <div className="grid grid-cols-4 gap-1 mb-2">
+        <div className={`text-center p-1.5 rounded ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
+          <div className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{feed.length}</div>
+          <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Total</div>
         </div>
-        <div className={`text-center p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
-          <div className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{avgPerDay}</div>
-          <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Avg/Day</div>
+        <div className={`text-center p-1.5 rounded ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
+          <div className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{avgPerDay}</div>
+          <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Daily</div>
         </div>
-        <div className={`text-center p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
-          <div className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{totalUniqueUsers}</div>
-          <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Users</div>
+        <div className={`text-center p-1.5 rounded ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
+          <div className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{totalUniqueUsers}</div>
+          <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Users</div>
         </div>
-        <div className={`text-center p-2 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"}`}>
-          <div className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{peakDay.day}</div>
-          <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Peak</div>
+        <div className={`text-center p-1.5 rounded ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
+          <div className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{peakDay.day}</div>
+          <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Peak</div>
         </div>
       </div>
 
-      {/* Bar Chart - Visual representation */}
-      <div className="mb-3">
-        <div className="flex items-end gap-1.5 h-20">
+      {/* Compact Bar Chart */}
+      <div className="mb-2">
+        <div className="flex items-end gap-1 h-16">
           {weekData.map((day) => {
             const height = day.count > 0 ? (day.count / maxCount) * 100 : 5;
 
             return (
-              <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
+              <div key={day.date} className="flex-1 flex flex-col items-center gap-0.5">
                 <div className="relative flex-1 w-full flex items-end">
                   <div
                     className={`w-full rounded-t transition-all duration-300 relative group cursor-pointer ${
                       day.isToday
-                        ? "bg-gradient-to-t from-blue-600 to-cyan-500"
+                        ? "bg-blue-500"
                         : day.count > 0
                           ? theme === "dark"
-                            ? "bg-gradient-to-t from-zinc-700 to-zinc-600 hover:from-zinc-600 hover:to-zinc-500"
-                            : "bg-gradient-to-t from-gray-300 to-gray-200 hover:from-gray-400 hover:to-gray-300"
+                            ? "bg-zinc-600 hover:bg-zinc-500"
+                            : "bg-gray-300 hover:bg-gray-400"
                           : theme === "dark"
                             ? "bg-zinc-800"
                             : "bg-gray-100"
                     }`}
-                    style={{ height: `${height}%`, minHeight: "4px" }}
+                    style={{ height: `${height}%`, minHeight: "2px" }}
                   >
-                    {/* Count label - only show for bars with significant activity */}
-                    {day.count > 2 && (
+                    {/* Count label - only for significant bars */}
+                    {day.count > 3 && (
                       <div
-                        className={`absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] font-medium ${
+                        className={`absolute -top-3 left-1/2 -translate-x-1/2 text-[9px] font-medium ${
                           theme === "dark" ? "text-zinc-400" : "text-gray-600"
                         }`}
                       >
@@ -157,21 +157,20 @@ export default function WeeklyActivityBars() {
 
                     {/* Tooltip */}
                     <div
-                      className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 
-                      rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 
+                      className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-1 p-1.5 
+                      rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 
                       transition-opacity pointer-events-none z-10 ${
                         theme === "dark" ? "bg-zinc-800 text-white border border-zinc-600" : "bg-gray-900 text-white"
                       }`}
                     >
                       <div className="font-medium">{format(new Date(day.date), "MMM d")}</div>
                       <div>{day.count} activities</div>
-                      <div className="text-[10px] opacity-80">{day.uniqueUsers} users</div>
                     </div>
                   </div>
                 </div>
                 
                 {/* Day label */}
-                <div className={`text-[10px] ${day.isToday ? "font-bold text-blue-500" : theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+                <div className={`text-[9px] ${day.isToday ? "font-bold text-blue-500" : theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
                   {day.day}
                 </div>
               </div>
@@ -180,13 +179,13 @@ export default function WeeklyActivityBars() {
         </div>
       </div>
 
-      {/* Activity Breakdown - Detailed insights */}
-      <div className={`border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} pt-3`}>
-        <div className="flex items-center justify-between mb-2">
-          <h5 className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Activity Types</h5>
-          <TrendingUp className={`w-3 h-3 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />
+      {/* Activity Types - Compact Grid */}
+      <div className={`border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} pt-2`}>
+        <div className="flex items-center justify-between mb-1.5">
+          <h5 className={`text-[10px] font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Types</h5>
+          <TrendingUp className={`w-2.5 h-2.5 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-3 gap-1">
           {Object.entries(activityTypeTotals)
             .sort(([, a], [, b]) => b - a)
             .slice(0, 6)
@@ -196,20 +195,20 @@ export default function WeeklyActivityBars() {
               return (
                 <div
                   key={type}
-                  className={`flex items-center gap-2 p-2 rounded ${
-                    theme === "dark" ? "bg-zinc-800/50" : "bg-gray-50"
+                  className={`flex items-center gap-1.5 p-1.5 rounded ${
+                    theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"
                   }`}
                 >
-                  <Icon className={`w-3 h-3 flex-shrink-0 ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`} />
+                  <Icon className={`w-2.5 h-2.5 flex-shrink-0 ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`} />
                   <div className="flex-1 min-w-0">
-                    <div className={`text-[10px] truncate ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+                    <div className={`text-[9px] truncate ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
                       {getActionLabel(type)}
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                      <span className={`text-[10px] font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
                         {count}
                       </span>
-                      <span className={`text-[10px] ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`}>
+                      <span className={`text-[8px] ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`}>
                         {percentage}%
                       </span>
                     </div>

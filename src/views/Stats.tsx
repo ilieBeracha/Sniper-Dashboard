@@ -62,12 +62,12 @@ export default function Stats() {
       <Header breadcrumbs={[{ label: "Stats", link: "/stats" }]} />
       <SpPageHeader title="Stats" subtitle="KPIs, impact and trends" icon={BarChart2} />
       <SpPageBody>
-        <div className="space-y-3">
+        <div className="space-y-2">
           {/* User Performance KPIs - Full width */}
           <WeeklyKPIs />
           
           {/* Activity and Charts Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
             {/* Weekly Activity */}
             <WeeklyActivityBars />
             
