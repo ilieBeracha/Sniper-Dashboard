@@ -5,8 +5,8 @@ import TeamManagerRegisterForm from "@/components/Auth/TeamManagerRegisterForm";
 import SquadCommanderRegisterForm from "@/components/Auth/SquadCommanderRegisterForm";
 import SoldierRegisterForm from "@/components/Auth/SoldierRegisterForm";
 import { authStore } from "@/store/authStore";
-import { ModernLogin } from "@/components/Auth/LoginForm";
-import AuthHero from "@/components/Auth/AuthHero";
+import { ModernLoginForm } from "@/components/Auth/ModernLoginForm";
+import ModernAuthHero from "@/components/Auth/ModernAuthHero";
 import { LoginUserData, RegisterUserData } from "@/types/auth";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -74,49 +74,50 @@ export default function Auth() {
   };
 
   return (
-    <div className={`flex h-[100dvh] overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-[#121212]" : "bg-gray-100"}`}>
+    <div className={`flex h-[100dvh] overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
+      {/* Background pattern */}
       <div
         className={`absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-200 ${
-          theme === "dark" ? "opacity-5" : "opacity-10"
+          theme === "dark" ? "opacity-10" : "opacity-5"
         }`}
       >
         <div
           className="absolute inset-0"
           style={{
             backgroundImage: `radial-gradient(circle at 1px 1px, ${
-              theme === "dark" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.05)"
+              theme === "dark" ? "rgba(147,51,234,0.1)" : "rgba(147,51,234,0.05)"
             } 1px, transparent 1px)`,
             backgroundSize: "24px 24px",
           }}
         />
       </div>
 
-      <AuthHero />
+      <ModernAuthHero />
 
       <div
-        className={`w-full md:w-3/5 flex items-center justify-center p-6 sm:p-8 md:p-8 relative z-10 transition-all duration-200 ${
-          theme === "dark" ? "shadow-black shadow-2xl" : "shadow-gray-300 shadow-lg"
-        }`}
+        className={`w-full md:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-12 relative z-10 transition-all duration-200`}
       >
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h2 className={`text-lg font-semibold mb-2 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            <h2 className={`text-2xl font-bold mb-2 transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
               {getAuthTitle()}
             </h2>
-            <p className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-500" : "text-gray-600"}`}>{getAuthDescription()}</p>
+            <p className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>{getAuthDescription()}</p>
           </div>
 
-          {/* Form Card */}
+          {/* Form Card with glassmorphism effect */}
           <div className="relative">
             <div
-              className={`relative py-4 px-4 rounded-xl border transition-colors duration-200 ${
-                theme === "dark" ? "border-[#2A2A2A] bg-black/20" : "border-gray-300 bg-white/80 backdrop-blur-sm"
+              className={`relative py-8 px-8 rounded-2xl backdrop-blur-md transition-all duration-200 ${
+                theme === "dark" 
+                  ? "bg-gray-800/30 border border-gray-700/50 shadow-xl" 
+                  : "bg-white/70 border border-gray-200/50 shadow-xl"
               }`}
             >
               {isLoading && (
                 <div
-                  className={`absolute inset-0 flex items-center justify-center z-10 rounded-3xl backdrop-blur-sm transition-colors duration-200 ${
-                    theme === "dark" ? "bg-black/50" : "bg-white/70"
+                  className={`absolute inset-0 flex items-center justify-center z-10 rounded-2xl backdrop-blur-sm transition-colors duration-200 ${
+                    theme === "dark" ? "bg-gray-900/70" : "bg-white/80"
                   }`}
                 >
                   <div className="flex flex-col items-center">
@@ -128,11 +129,11 @@ export default function Auth() {
                       />
                       <div
                         className={`absolute inset-0 w-12 h-12 border-t-2 rounded-full animate-spin transition-colors duration-200 ${
-                          theme === "dark" ? "border-white" : "border-gray-700"
+                          theme === "dark" ? "border-purple-500" : "border-purple-600"
                         }`}
                       />
                     </div>
-                    <p className={`mt-4 text-sm transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-700"}`}>
+                    <p className={`mt-4 text-sm font-medium transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-700"}`}>
                       Authenticating...
                     </p>
                   </div>
@@ -141,7 +142,7 @@ export default function Auth() {
 
               <div className="relative z-10">
                 {authType === "login" && (
-                  <ModernLogin
+                  <ModernLoginForm
                     AuthSubmit={AuthSubmit}
                     onRegisterClick={(type) => setAuthType(type as AuthType)}
                     onSignInWithEmail={(email) => signInWithEmail(email)}
@@ -166,8 +167,8 @@ export default function Auth() {
               </div>
 
               {error && (
-                <div className="mt-6 p-4 bg-red-900/10 border border-red-900/20 rounded-2xl flex items-center">
-                  <div className="w-8 h-8 bg-red-900/20 rounded-full flex items-center justify-center mr-3">
+                <div className="mt-6 p-4 bg-red-900/10 border border-red-900/20 rounded-xl flex items-center backdrop-blur-sm">
+                  <div className="w-8 h-8 bg-red-900/20 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
                       <path
                         fillRule="evenodd"
