@@ -20,11 +20,11 @@ export default function ActivityFeedDrawer({ isOpen, onClose }: ActivityFeedDraw
   );
 
   return isMobile ? (
-    <BaseMobileDrawer isOpen={isOpen} setIsOpen={onClose} title="Activity Feed">
+    <BaseMobileDrawer isOpen={isOpen} setIsOpen={onClose} title="Activity Feed" onClose={onClose}>
       {Content}
     </BaseMobileDrawer>
   ) : (
-    <BaseDesktopDrawer isOpen={isOpen} setIsOpen={onClose} title="Activity Feed" width="600px">
+    <BaseDesktopDrawer isOpen={isOpen} setIsOpen={onClose} title="Activity Feed" width="600px" onClose={onClose}>
       {Content}
     </BaseDesktopDrawer>
   );

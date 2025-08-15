@@ -7,6 +7,7 @@ export const weaponsStore = create(
   persist<{
     weapons: Weapon[];
     getWeapons: (teamId: string) => Promise<void>;
+    getAllWeapons: () => Promise<void>;
     createWeapon: (weapon: Weapon) => Promise<void>;
     updateWeapon: (id: string, weapon: Partial<Weapon>) => Promise<void>;
     deleteWeapon: (id: string) => Promise<void>;
@@ -17,6 +18,17 @@ export const weaponsStore = create(
       getWeapons: async (teamId: string) => {
         const weapons = await getWeapons(teamId);
         set({ weapons });
+      },
+      
+      getAllWeapons: async () => {
+        // This will use cached weapons if available
+        if (get().weapons.length === 0) {
+          // If no weapons cached, get from user's team
+          const userTeamId = localStorage.getItem('user_team_id');
+          if (userTeamId) {
+            await get().getWeapons(userTeamId);
+          }
+        }
       },
 
       createWeapon: async (weapon: Weapon) => {

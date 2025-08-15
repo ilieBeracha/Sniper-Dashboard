@@ -22,6 +22,7 @@ const SettingsPage = lazy(() => import("./Settings"));
 const DataExport = lazy(() => import("./DataExport"));
 const RulesLayout = lazy(() => import("@/layouts/Rulelayout"));
 const Rules = lazy(() => import("@/OnePlatform/RulesModel/views/Rules"));
+const Stats = lazy(() => import("@/views/Stats"));
 
 export default function AppRoutes() {
   const { token } = useStore(authStore);
@@ -122,6 +123,14 @@ export default function AppRoutes() {
               element={
                 <Suspense fallback={<LoadingFallback />}>
                   <SessionStatsFull />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/stats"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <Stats />
                 </Suspense>
               }
             />

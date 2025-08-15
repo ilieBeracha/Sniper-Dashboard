@@ -2,18 +2,22 @@ import { create } from "zustand";
 import { User as SupabaseAuthUser } from "@supabase/supabase-js";
 import { User } from "@/types/user";
 import { updateUser, getUserProfileById } from "@/services/userService";
+import { getTeamMembers } from "@/services/teamService";
 
 interface UserStore {
   user: User | null;
+  teamMembers: User[] | null;
   clearUser: () => void;
   setUser: (user: User) => void;
   setUserFromAuth: (authUser: SupabaseAuthUser) => void;
   updateUser: (user_data: Partial<User>) => Promise<User | null>;
   fetchUserFromDB: () => Promise<User | null>;
+  getTeamMembers: (teamId: string) => Promise<void>;
 }
 
 export const userStore = create<UserStore>((set, get) => ({
   user: null,
+  teamMembers: null,
 
   setUser: (user: User) => {
     set({ user });
@@ -67,6 +71,16 @@ export const userStore = create<UserStore>((set, get) => ({
     } catch (error) {
       console.error("Error fetching user from DB:", error);
       return null;
+    }
+  },
+  
+  getTeamMembers: async (teamId: string) => {
+    try {
+      const members = await getTeamMembers(teamId);
+      set({ teamMembers: members });
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+      set({ teamMembers: null });
     }
   },
 }));
