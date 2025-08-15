@@ -48,9 +48,8 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
   return (
     <div className="flex flex-col gap-2 rounded-lg ">
       <div className="flex flex-col gap-2 text-lg pt-2 pb-1">Overall Performance</div>
-      <div className="grid grid-cols-1 gap-3">
-        {/* Performance Overview - Full Width */}
-        <div className="w-full col-span-full">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+        <div className="w-full row-span-1">
           <BaseDashboardCard
             header="Performance Overview"
             tooltipContent="Current performance metrics"
@@ -102,25 +101,20 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
             <UserHitPercentage distance={hitPercentageDistance} position={hitPercentagePosition} weaponType={hitPercentageWeaponType} />
           </BaseDashboardCard>
         </div>
-        
-        {/* Other charts in a grid below */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-          <div className="grid grid-cols-1 gap-3 lg:col-span-1 xl:col-span-2">
-            <DashboardGroupingChart />
-          </div>
-          <div className="grid grid-cols-1 gap-3 lg:col-span-1 xl:col-span-1">
-            {isSquadCommander(user?.user_role as UserRole) ? (
-              <div className="flex flex-col gap-4 text-2xl">Team Members</div>
-            ) : (
-              <div className="flex flex-col gap-4 text-2xl ">Squad Members</div>
-            )}
-          </div>
+        <div className="grid grid-cols-1 gap-3 lg:col-span-1 xl:col-span-2">
+          <DashboardGroupingChart />
         </div>
-        
-        {/* Members table - full width */}
-        <div className="w-full col-span-full">
+        <div className="grid grid-cols-1 gap-3 lg:col-span-1 xl:col-span-2">
+          {isSquadCommander(user?.user_role as UserRole) ? (
+            <div className="flex flex-col gap-4 text-2xl">Team Members</div>
+          ) : (
+            <div className="flex flex-col gap-4 text-2xl ">Squad Members</div>
+          )}
+        </div>
+        <div className="w-full grid col-span-full">
           <DashboardMembersTable />
         </div>
+        {/* Grouping Chart */}
       </div>
     </div>
   );
