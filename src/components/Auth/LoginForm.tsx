@@ -33,7 +33,6 @@ export function ModernLogin({
     
     // Explicitly tell the browser this is a login action
     if ('PasswordCredential' in window) {
-      const form = e.target as HTMLFormElement;
       const cred = new (window as any).PasswordCredential({
         id: email,
         password: password,
