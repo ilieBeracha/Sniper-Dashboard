@@ -128,7 +128,10 @@ export function ModernLogin({
   );
 
   return (
-    <form className="space-y-6 " onSubmit={handleSubmit}>
+    <form className="space-y-6 " onSubmit={handleSubmit} name="loginForm" autoComplete="on">
+      {/* Hidden field to help browsers understand this is a login form */}
+      <input type="hidden" name="form-type" value="login" />
+      
       {magicLinkSent ? (
         <div
           className={`p-6 rounded-lg text-center space-y-4 ${
@@ -218,6 +221,7 @@ export function ModernLogin({
             placeholder="Enter your email"
             className="text-sm"
             leftIcon={emailIcon}
+            autoComplete="username email"
           />
 
           {loginMethod === "password" && (
@@ -232,6 +236,7 @@ export function ModernLogin({
               className="text-md"
               leftIcon={passwordIcon}
               rightIcon={togglePasswordIcon}
+              autoComplete="current-password"
             />
           )}
 
@@ -281,9 +286,9 @@ export function ModernLogin({
           </button>
 
           {onRegisterClick && (
-            <div className={`mt-6 pt-4  border-t transition-colors duration-200 ${theme === "dark" ? "border-[#2A2A2A]" : "border-gray-300"}`}>
-              <p className={`text-sm text-center mb-3 transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                Don't have an account?
+            <div className={`mt-8 pt-6 border-t-2 transition-colors duration-200 ${theme === "dark" ? "border-[#2A2A2A]" : "border-gray-200"}`}>
+              <p className={`text-sm text-center mb-4 font-medium transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                New to the platform? Create an account:
               </p>
               <div className="space-y-2">
                 <button
