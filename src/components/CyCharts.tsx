@@ -55,6 +55,7 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
           <BaseDashboardCard
             header="Hit Rate Analysis"
             tooltipContent="Accuracy metrics by distance, position, and weapon"
+            height="h-[300px]"
             withFilter={[
               {
                 label: "Distance",
@@ -93,7 +94,6 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
               position: hitPercentagePosition || "",
               weapon_type: hitPercentageWeaponType || "",
             }}
-            className="h-[300px]"
           >
             <UserHitPercentage distance={hitPercentageDistance} position={hitPercentagePosition} weaponType={hitPercentageWeaponType} />
           </BaseDashboardCard>
