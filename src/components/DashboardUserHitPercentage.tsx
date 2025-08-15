@@ -6,6 +6,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useEffect } from "react";
 import { userStore } from "@/store/userStore";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { Target, Zap } from "lucide-react";
 
 interface UserHitPercentageProps {
   distance?: string | null;
@@ -49,15 +50,15 @@ export default function UserHitPercentage({ distance = null, position = null, we
   const hitColor = getColor(percentage);
 
   return (
-    <div className="flex w-full h-full justify-evenly col-auto text-xs p-2 rounded-lg shadow-sm">
-      <div className="relative flex h-full w-full gap-4">
+    <div className="flex w-full h-full justify-evenly col-auto text-sm p-4 rounded-lg shadow-sm">
+      <div className="relative flex h-full w-full gap-6">
         {!userHitsStats.hit_percentage && userHitsStats.shots_fired === 0 ? (
           <NoDataDisplay />
         ) : (
-          <div className="flex flex-col md:flex-row w-full gap-4 items-center justify-center">
-            {/* Chart Section */}
+          <div className="flex flex-col lg:flex-row w-full gap-6 items-center justify-center">
+            {/* Chart Section - Much Bigger */}
             <div className="relative flex-shrink-0">
-              <ResponsiveContainer width={isMobile ? 150 : 200} height={isMobile ? 120 : 180} className="text-xs">
+              <ResponsiveContainer width={isMobile ? 250 : 350} height={isMobile ? 200 : 280} className="text-sm">
                 <PieChart>
                   <Pie
                     data={gaugeData}
@@ -65,77 +66,142 @@ export default function UserHitPercentage({ distance = null, position = null, we
                     cy="80%"
                     startAngle={180}
                     endAngle={0}
-                    innerRadius="60%"
-                    outerRadius="90%"
+                    innerRadius="65%"
+                    outerRadius="95%"
                     paddingAngle={0}
                     dataKey="value"
-                    cornerRadius={4}
+                    cornerRadius={8}
                   >
                     <Cell fill={hitColor} />
-                    <Cell fill={theme === "dark" ? "#333" : " #e5e7eb"} />
+                    <Cell fill={theme === "dark" ? "#27272a" : "#e5e7eb"} />
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
               
-              <div className="absolute inset-0 flex flex-col items-center justify-center mt-2">
-                <span className={`px-1 text-2xl font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+              {/* Center Stats - Much Bigger */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ paddingBottom: '20px' }}>
+                <span className={`text-5xl lg:text-6xl font-bold transition-colors duration-200 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                   {percentage ? percentage.toFixed(1) : 0}%
                 </span>
                 <span
-                  className={`text-sm uppercase tracking-wider transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+                  className={`text-lg uppercase tracking-wider font-medium transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
                 >
-                  Accuracy
+                  Hit Rate
                 </span>
+                <div className={`mt-2 text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-500"}`}>
+                  Accuracy Score
+                </div>
               </div>
             </div>
 
-            {/* Stats Section */}
-            <div className="flex flex-col gap-3 flex-1 max-w-sm">
-              <div className="grid grid-cols-1 gap-2">
-                <div className={`p-2 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
-                  <div className="flex justify-between items-center">
-                    <span className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                      Total Shots
-                    </span>
-                    <span
-                      className={`text-sm px-2 py-1 rounded transition-colors duration-200 font-medium ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
-                    >
-                      {userHitsStats.shots_fired}
-                    </span>
-                  </div>
-                  <div
-                    className={`mt-1 h-1 w-full rounded-full overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-gray-800" : "bg-gray-300"}`}
-                  >
-                    <div className="h-full rounded-full bg-purple-600" style={{ width: `100%` }}></div>
+            {/* Enhanced Stats Section */}
+            <div className="flex flex-col gap-4 flex-1 max-w-lg">
+              {/* Key Stats Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Total Shots Card */}
+                <div className={`p-4 rounded-xl transition-all duration-200 ${
+                  theme === "dark" ? "bg-zinc-800/50 border border-zinc-700/50" : "bg-gray-50 border border-gray-200"
+                }`}>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Target className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                      <span className={`text-sm font-medium ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                        Total Shots Fired
+                      </span>
+                    </div>
+                    <div className={`text-3xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                      {userHitsStats.shots_fired.toLocaleString()}
+                    </div>
+                    <div className={`w-full h-2 rounded-full overflow-hidden ${theme === "dark" ? "bg-gray-800" : "bg-gray-200"}`}>
+                      <div className="h-full rounded-full bg-purple-500" style={{ width: '100%' }}></div>
+                    </div>
                   </div>
                 </div>
 
-                <div className={`p-2 rounded-md transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
-                  <div className="flex justify-between items-center">
-                    <span className={`text-sm transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                      Confirmed Hits
-                    </span>
-                    <span
-                      className={`text-sm px-2 py-1 rounded transition-colors duration-200 font-medium ${theme === "dark" ? "bg-gray-800 text-gray-300" : "bg-gray-200 text-gray-700"}`}
-                    >
-                      {userHitsStats.confirmed_hits}
-                    </span>
-                  </div>
-                  <div
-                    className={`mt-1 h-1 w-full rounded-full overflow-hidden transition-colors duration-200 ${theme === "dark" ? "bg-gray-800" : "bg-gray-300"}`}
-                  >
-                    <div
-                      className="h-full rounded-full"
-                      style={{ width: `${(userHitsStats.confirmed_hits / userHitsStats.shots_fired) * 100}%`, backgroundColor: hitColor }}
-                    ></div>
+                {/* Confirmed Hits Card */}
+                <div className={`p-4 rounded-xl transition-all duration-200 ${
+                  theme === "dark" ? "bg-zinc-800/50 border border-zinc-700/50" : "bg-gray-50 border border-gray-200"
+                }`}>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Zap className={`w-5 h-5 ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`} />
+                      <span className={`text-sm font-medium ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                        Confirmed Hits
+                      </span>
+                    </div>
+                    <div className={`text-3xl font-bold ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>
+                      {userHitsStats.confirmed_hits.toLocaleString()}
+                    </div>
+                    <div className={`w-full h-2 rounded-full overflow-hidden ${theme === "dark" ? "bg-gray-800" : "bg-gray-200"}`}>
+                      <div 
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ 
+                          width: `${(userHitsStats.confirmed_hits / userHitsStats.shots_fired) * 100}%`, 
+                          backgroundColor: hitColor 
+                        }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
               </div>
-              
-              <div className={`text-center text-xs transition-colors duration-200 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                <span className={`px-3 py-1 rounded transition-colors duration-200 ${theme === "dark" ? "bg-[#1A1A1A]" : "bg-gray-100"}`}>
-                  {userHitsStats.session_count} Training Sessions Completed
-                </span>
+
+              {/* Additional Stats */}
+              <div className={`p-4 rounded-xl ${theme === "dark" ? "bg-zinc-800/30 border border-zinc-700/50" : "bg-gray-50 border border-gray-200"}`}>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                      {userHitsStats.session_count}
+                    </div>
+                    <div className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-gray-600"}`}>
+                      Sessions
+                    </div>
+                  </div>
+                  <div>
+                    <div className={`text-2xl font-bold ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
+                      {userHitsStats.eliminated_targets || 0}
+                    </div>
+                    <div className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-gray-600"}`}>
+                      Eliminations
+                    </div>
+                  </div>
+                  <div>
+                    <div className={`text-2xl font-bold ${
+                      percentage >= 75 
+                        ? theme === "dark" ? "text-emerald-400" : "text-emerald-600"
+                        : percentage >= 50
+                          ? theme === "dark" ? "text-amber-400" : "text-amber-600"
+                          : theme === "dark" ? "text-red-400" : "text-red-600"
+                    }`}>
+                      {percentage >= 75 ? "Expert" : percentage >= 50 ? "Good" : "Training"}
+                    </div>
+                    <div className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-gray-600"}`}>
+                      Level
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Performance Indicator */}
+              <div className={`text-center p-3 rounded-lg ${
+                percentage >= 75 
+                  ? theme === "dark" ? "bg-emerald-500/10 border border-emerald-500/30" : "bg-emerald-50 border border-emerald-200"
+                  : percentage >= 50
+                    ? theme === "dark" ? "bg-amber-500/10 border border-amber-500/30" : "bg-amber-50 border border-amber-200"
+                    : theme === "dark" ? "bg-red-500/10 border border-red-500/30" : "bg-red-50 border border-red-200"
+              }`}>
+                <div className={`text-sm font-medium ${
+                  percentage >= 75 
+                    ? theme === "dark" ? "text-emerald-400" : "text-emerald-700"
+                    : percentage >= 50
+                      ? theme === "dark" ? "text-amber-400" : "text-amber-700"
+                      : theme === "dark" ? "text-red-400" : "text-red-700"
+                }`}>
+                  {percentage >= 75 
+                    ? "🎯 Outstanding Performance - Keep it up!"
+                    : percentage >= 50
+                      ? "📈 Good Progress - Room for improvement"
+                      : "💪 Keep Training - Practice makes perfect"}
+                </div>
               </div>
             </div>
           </div>
