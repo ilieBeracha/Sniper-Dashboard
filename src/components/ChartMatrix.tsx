@@ -20,6 +20,9 @@ export default function ChartMatrix() {
       // might contain position in the payload; we ignore it
     };
     const rows = firstShotMatrix as Row[];
+    
+    // Debug log to see the raw data
+    console.log("First Shot Matrix raw data:", rows);
 
     // Aggregate across positions → per distance bucket
     const byBucket = new Map<number, { bucket: number; targets: number; hits: number; avgTimeSum: number; avgTimeN: number }>();
@@ -27,19 +30,34 @@ export default function ChartMatrix() {
       const b = r.distance_bucket;
       if (!byBucket.has(b)) byBucket.set(b, { bucket: b, targets: 0, hits: 0, avgTimeSum: 0, avgTimeN: 0 });
       const acc = byBucket.get(b)!;
-      acc.targets += r.targets ?? 0;
-      acc.hits += Math.round((r.targets ?? 0) * (r.first_shot_hit_rate ?? 0));
+      const targets = r.targets ?? 0;
+      const hitRate = r.first_shot_hit_rate ?? 0;
+      
+      // Ensure hit rate is between 0 and 1
+      const validHitRate = Math.max(0, Math.min(1, hitRate));
+      
+      acc.targets += targets;
+      // Calculate hits based on targets and hit rate
+      acc.hits += Math.round(targets * validHitRate);
+      
       if (typeof r.avg_time_to_first_shot_sec === "number") {
         acc.avgTimeSum += r.avg_time_to_first_shot_sec;
         acc.avgTimeN += 1;
       }
     }
+    
+    // Debug log to see the aggregated data
+    console.log("Aggregated data by bucket:", Array.from(byBucket.entries()));
 
     const buckets = Array.from(byBucket.values())
       .sort((a, b) => a.bucket - b.bucket)
       .map((x) => {
         const ratePct = x.targets > 0 ? Math.round((x.hits / x.targets) * 100) : 0;
         const avgTime = x.avgTimeN > 0 ? Math.round((x.avgTimeSum / x.avgTimeN) * 10) / 10 : null;
+        
+        // Debug individual bucket calculations
+        console.log(`Bucket ${x.bucket}m: targets=${x.targets}, hits=${x.hits}, rate=${ratePct}%`);
+        
         return {
           bucket: `${x.bucket}m`,
           ratePct,

@@ -92,7 +92,7 @@ export interface SessionStatsSaveData {
     windDirection?: number;
     totalHits?: number;
     mistakeCode?: string;
-    first_shot_hit?: boolean;
+    first_shot_hit?: boolean | null;
     engagements: Array<{
       user_id: string;
       shots_fired: number;
@@ -204,7 +204,7 @@ export const sessionStore = create<SessionStatsState>((set) => ({
             total_hits: totalHits,
             target_eliminated: totalHits >= 2,
             mistake_code: target.mistakeCode || null,
-            first_shot_hit: target.first_shot_hit || false,
+            first_shot_hit: target.first_shot_hit !== undefined ? target.first_shot_hit : null,
           };
 
           const engagements: Omit<CreateTargetEngagementData, "target_stats_id">[] = target.engagements.map((eng) => {
