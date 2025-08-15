@@ -391,3 +391,24 @@ svg .recharts-layer .recharts-bar {
   animation: gradient-x 15s ease infinite;
   background-size: 200% 200%;
 }
+
+/* Gradient animation for login button */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  animation: gradient 3s ease infinite;
+}
+
+.bg-size-200 {
+  background-size: 200% 200%;
+}
