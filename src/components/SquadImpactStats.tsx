@@ -97,10 +97,10 @@ export default function SquadImpactStats() {
       <div className="flex items-center justify-between mb-3">
         <div>
           <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-            Squad Performance
+            🎯 Squad Performance
           </h4>
           <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
-            Team shooting statistics
+            Team shooting stats
           </p>
         </div>
         <motion.button
@@ -219,7 +219,7 @@ export default function SquadImpactStats() {
         <div className="flex items-center gap-2 mb-2">
           <Trophy className={`w-3.5 h-3.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
           <h5 className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
-            Top Performers
+            Top Performers:
           </h5>
         </div>
         
@@ -281,7 +281,7 @@ export default function SquadImpactStats() {
             <div className={`text-center py-3 text-xs ${
               theme === "dark" ? "text-zinc-500" : "text-gray-500"
             }`}>
-              No data available yet
+              No data yet
             </div>
           )}
         </div>

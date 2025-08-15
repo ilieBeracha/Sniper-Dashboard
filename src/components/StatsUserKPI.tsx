@@ -71,10 +71,10 @@ export default function StatsUserKPI() {
       <div className="flex items-center justify-between mb-3">
         <div>
           <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-            Performance Dashboard
+            📊 Performance Dashboard
           </h4>
           <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
-            Weekly performance metrics
+            Weekly overview of key metrics
           </p>
         </div>
         <div className={`px-2 py-1 rounded-full text-[10px] font-medium ${
@@ -143,14 +143,14 @@ export default function StatsUserKPI() {
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-              Active Now
+              Active Now ✅
             </span>
           </div>
           <div className={`text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
-            <span className="font-semibold">{totals.sessions > 0 ? Math.round((totals.engagements / totals.sessions) * 100) : 0}%</span> Engagement Rate
+            Engagement Rate: <span className="font-semibold">{totals.sessions > 0 ? Math.round((totals.engagements / totals.sessions) * 100) : 0}%</span>
           </div>
           <div className={`text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
-            <span className="font-semibold">{totals.sessions > 0 ? Math.round(totals.targets / totals.sessions) : 0}</span> Avg Targets/Session
+            Avg Targets per Session: <span className="font-semibold">{totals.sessions > 0 ? Math.round(totals.targets / totals.sessions) : 0}</span>
           </div>
         </div>
         <TrendingUp className={`w-4 h-4 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />

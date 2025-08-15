@@ -99,7 +99,7 @@ export default function ChartMatrix() {
       <div className="mb-3">
         <div className="flex items-center justify-between mb-1">
           <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-            Accuracy Analytics
+            📈 Accuracy Analytics
           </h4>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
@@ -117,7 +117,7 @@ export default function ChartMatrix() {
           </div>
         </div>
         <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
-          Distance-based performance metrics
+          By distance
         </p>
       </div>
 
@@ -186,7 +186,7 @@ export default function ChartMatrix() {
             {mostEngaged.bucket}
           </div>
           <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-            Most Active
+            Most Active Range
           </div>
         </motion.div>
       </div>
@@ -262,7 +262,7 @@ export default function ChartMatrix() {
       {/* Heat Map Grid */}
       <div>
         <h5 className={`text-xs font-medium mb-2 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-          Performance Heat Map
+          Performance Heat Map:
         </h5>
         <div className="grid grid-cols-4 gap-1.5">
           {matrixData.buckets.map((b, index) => {

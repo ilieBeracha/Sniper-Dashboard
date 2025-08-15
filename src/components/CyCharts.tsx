@@ -49,7 +49,7 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
     <div className="space-y-4">
       {/* Performance Overview Section */}
       <div>
-        <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Performance Overview</h3>
+        <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">📊 Performance Overview</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {/* Hit Percentage Card - Smaller and Sharper */}
           <BaseDashboardCard

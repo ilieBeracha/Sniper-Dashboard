@@ -94,19 +94,19 @@ export default function WeeklyActivityBars() {
       <div className="mb-4">
         <div className="flex items-center justify-between mb-1">
           <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-            Activity Timeline
+            📅 Activity Timeline
           </h4>
           <div className={`flex items-center gap-1 px-2 py-1 rounded-md ${
             theme === "dark" ? "bg-zinc-800" : "bg-gray-100"
           }`}>
             <Zap className={`w-3 h-3 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
             <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
-              {feed.length} Total
+              Total Activities: {feed.length}
             </span>
           </div>
         </div>
         <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
-          Daily activity distribution
+          Daily activity breakdown (Mon-Sun)
         </p>
       </div>
 
@@ -206,7 +206,7 @@ export default function WeeklyActivityBars() {
             {peakDay.count}
           </div>
           <div className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-            Peak ({peakDay.day})
+            Peak Day: {peakDay.day}
           </div>
         </div>
         <div className={`p-2.5 rounded-lg text-center ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100"}`}>
@@ -222,7 +222,7 @@ export default function WeeklyActivityBars() {
       {/* Activity Types Pills */}
       <div>
         <h5 className={`text-xs font-medium mb-2 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-          Activity Breakdown
+          Breakdown by Type:
         </h5>
         <div className="flex flex-wrap gap-1.5">
           {Object.entries(activityTypeTotals)
