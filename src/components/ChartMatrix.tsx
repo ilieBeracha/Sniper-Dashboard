@@ -2,9 +2,9 @@ import { useMemo } from "react";
 import { useStore } from "zustand";
 import { performanceStore } from "@/store/performance";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { ComposedChart, Line } from "recharts";
-import { Target, TrendingUp } from "lucide-react";
+import { Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart } from "recharts";
+import { Target, TrendingUp, Activity, Crosshair } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function ChartMatrix() {
   const { firstShotMatrix, isLoading } = useStore(performanceStore);
@@ -16,16 +16,13 @@ export default function ChartMatrix() {
     type Row = {
       distance_bucket: number;
       targets: number;
-      first_shot_hit_rate: number; // 0..1
+      first_shot_hit_rate: number;
       avg_time_to_first_shot_sec: number | null;
-      // might contain position in the payload; we ignore it
     };
     const rows = firstShotMatrix as Row[];
     
-    // Debug log to see the raw data
     console.log("First Shot Matrix raw data:", rows);
 
-    // Aggregate across positions → per distance bucket
     const byBucket = new Map<number, { bucket: number; targets: number; hits: number; avgTimeSum: number; avgTimeN: number }>();
     for (const r of rows) {
       const b = r.distance_bucket;
@@ -34,11 +31,9 @@ export default function ChartMatrix() {
       const targets = r.targets ?? 0;
       const hitRate = r.first_shot_hit_rate ?? 0;
       
-      // Ensure hit rate is between 0 and 1
       const validHitRate = Math.max(0, Math.min(1, hitRate));
       
       acc.targets += targets;
-      // Calculate hits based on targets and hit rate
       acc.hits += Math.round(targets * validHitRate);
       
       if (typeof r.avg_time_to_first_shot_sec === "number") {
@@ -47,7 +42,6 @@ export default function ChartMatrix() {
       }
     }
     
-    // Debug log to see the aggregated data
     console.log("Aggregated data by bucket:", Array.from(byBucket.entries()));
 
     const buckets = Array.from(byBucket.values())
@@ -56,14 +50,15 @@ export default function ChartMatrix() {
         const ratePct = x.targets > 0 ? Math.round((x.hits / x.targets) * 100) : 0;
         const avgTime = x.avgTimeN > 0 ? Math.round((x.avgTimeSum / x.avgTimeN) * 10) / 10 : null;
         
-        // Debug individual bucket calculations
         console.log(`Bucket ${x.bucket}m: targets=${x.targets}, hits=${x.hits}, rate=${ratePct}%`);
         
         return {
           bucket: `${x.bucket}m`,
+          distance: x.bucket,
           ratePct,
           targets: x.targets,
           avgTime,
+          efficiency: ratePct * (x.targets / 100), // Efficiency score
         };
       });
 
@@ -72,10 +67,11 @@ export default function ChartMatrix() {
 
   if (isLoading) {
     return (
-      <div className={`rounded-lg p-2 border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
-        <div className="animate-pulse space-y-2">
-          <div className={`h-3 rounded w-1/3 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
-          <div className={`h-24 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+      <div className={`rounded-xl p-3 ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"} 
+        border ${theme === "dark" ? "border-zinc-700/50" : "border-gray-200"}`}>
+        <div className="animate-pulse space-y-3">
+          <div className={`h-4 rounded w-1/3 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+          <div className={`h-40 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
         </div>
       </div>
     );
@@ -83,128 +79,235 @@ export default function ChartMatrix() {
 
   if (!firstShotMatrix || !matrixData?.buckets || matrixData?.buckets?.length === 0) {
     return (
-      <div className={`rounded-lg p-2 border text-center ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
+      <div className={`rounded-xl p-3 text-center ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"} 
+        border ${theme === "dark" ? "border-zinc-700/50" : "border-gray-200"}`}>
         <p className={`text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>No first shot data available</p>
       </div>
     );
   }
 
-  // Calculate summary stats
   const totalTargets = matrixData.buckets.reduce((sum, b) => sum + b.targets, 0);
   const weightedHitRate = matrixData.buckets.reduce((sum, b) => sum + (b.ratePct * b.targets), 0) / totalTargets;
   const bestDistance = matrixData.buckets.reduce((best, b) => b.ratePct > best.ratePct ? b : best);
+  const mostEngaged = matrixData.buckets.reduce((most, b) => b.targets > most.targets ? b : most);
 
   return (
-    <div className={`rounded-lg p-2 border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
-      {/* Compact Header */}
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-1.5">
-          <Target className={`w-3.5 h-3.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`} />
-          <div>
-            <h4 className={`text-xs font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-900"}`}>First-Shot Accuracy</h4>
-            <p className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Hit rate by distance</p>
+    <div className={`rounded-xl p-3 ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"} 
+      border ${theme === "dark" ? "border-zinc-700/50" : "border-gray-200"}`}>
+      
+      {/* Header */}
+      <div className="mb-3">
+        <div className="flex items-center justify-between mb-1">
+          <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            Accuracy Analytics
+          </h4>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-0.5 bg-emerald-500 rounded" />
+              <span className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                Hit Rate
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-0.5 bg-blue-500 rounded" />
+              <span className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                Volume
+              </span>
+            </div>
           </div>
         </div>
-        <TrendingUp className={`w-2.5 h-2.5 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />
+        <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
+          Distance-based performance metrics
+        </p>
       </div>
 
-      {/* Compact Summary Stats */}
-      <div className="grid grid-cols-3 gap-1 mb-2">
-        <div className={`text-center p-1.5 rounded ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
-          <div className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{Math.round(weightedHitRate)}%</div>
-          <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Overall</div>
-        </div>
-        <div className={`text-center p-1.5 rounded ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
-          <div className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{bestDistance.bucket}</div>
-          <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Best</div>
-        </div>
-        <div className={`text-center p-1.5 rounded ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
-          <div className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{totalTargets}</div>
-          <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Targets</div>
-        </div>
+      {/* Key Insights */}
+      <div className="grid grid-cols-4 gap-2 mb-3">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`p-2.5 rounded-lg text-center ${
+            theme === "dark" ? "bg-gradient-to-br from-emerald-500/10 to-emerald-600/10" : "bg-gradient-to-br from-emerald-50 to-emerald-100"
+          }`}
+        >
+          <Crosshair className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
+          <div className={`text-xl font-bold text-emerald-500`}>
+            {Math.round(weightedHitRate)}%
+          </div>
+          <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+            Overall Accuracy
+          </div>
+        </motion.div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className={`p-2.5 rounded-lg text-center ${
+            theme === "dark" ? "bg-gradient-to-br from-blue-500/10 to-blue-600/10" : "bg-gradient-to-br from-blue-50 to-blue-100"
+          }`}
+        >
+          <Target className="w-4 h-4 text-blue-500 mx-auto mb-1" />
+          <div className={`text-xl font-bold text-blue-500`}>
+            {bestDistance.bucket}
+          </div>
+          <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+            Best Range
+          </div>
+        </motion.div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className={`p-2.5 rounded-lg text-center ${
+            theme === "dark" ? "bg-gradient-to-br from-purple-500/10 to-purple-600/10" : "bg-gradient-to-br from-purple-50 to-purple-100"
+          }`}
+        >
+          <Activity className="w-4 h-4 text-purple-500 mx-auto mb-1" />
+          <div className={`text-xl font-bold text-purple-500`}>
+            {totalTargets}
+          </div>
+          <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+            Total Targets
+          </div>
+        </motion.div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className={`p-2.5 rounded-lg text-center ${
+            theme === "dark" ? "bg-gradient-to-br from-orange-500/10 to-orange-600/10" : "bg-gradient-to-br from-orange-50 to-orange-100"
+          }`}
+        >
+          <TrendingUp className="w-4 h-4 text-orange-500 mx-auto mb-1" />
+          <div className={`text-xl font-bold text-orange-500`}>
+            {mostEngaged.bucket}
+          </div>
+          <div className={`text-[10px] ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+            Most Active
+          </div>
+        </motion.div>
       </div>
 
-      {/* Compact Chart */}
-      <div className="mb-2">
-        <ResponsiveContainer width="100%" height={120}>
-          <ComposedChart data={matrixData.buckets} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+      {/* Analytics Chart */}
+      <div className={`rounded-lg p-2 mb-3 ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
+        <ResponsiveContainer width="100%" height={180}>
+          <AreaChart data={matrixData.buckets} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorAccuracy" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
+              </linearGradient>
+              <linearGradient id="colorTargets" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#3f3f46" : "#e5e7eb"} opacity={0.3} />
-            <XAxis
-              dataKey="bucket"
-              tick={{ fontSize: 9, fill: theme === "dark" ? "#a1a1aa" : "#525252" }}
-              axisLine={{ stroke: theme === "dark" ? "#3f3f46" : "#e5e7eb", strokeWidth: 1 }}
-              tickLine={false}
+            <XAxis 
+              dataKey="bucket" 
+              tick={{ fontSize: 10, fill: theme === "dark" ? "#a1a1aa" : "#525252" }}
+              axisLine={{ stroke: theme === "dark" ? "#3f3f46" : "#e5e7eb" }}
             />
-            <YAxis
+            <YAxis 
               yAxisId="left"
-              tick={{ fontSize: 9, fill: theme === "dark" ? "#a1a1aa" : "#525252" }}
+              tick={{ fontSize: 10, fill: theme === "dark" ? "#a1a1aa" : "#525252" }}
+              axisLine={{ stroke: theme === "dark" ? "#3f3f46" : "#e5e7eb" }}
               domain={[0, 100]}
-              axisLine={{ stroke: theme === "dark" ? "#3f3f46" : "#e5e7eb", strokeWidth: 1 }}
-              tickLine={false}
             />
-            <YAxis
+            <YAxis 
               yAxisId="right"
               orientation="right"
-              tick={{ fontSize: 9, fill: theme === "dark" ? "#a1a1aa" : "#525252" }}
-              axisLine={{ stroke: theme === "dark" ? "#3f3f46" : "#e5e7eb", strokeWidth: 1 }}
-              tickLine={false}
+              tick={{ fontSize: 10, fill: theme === "dark" ? "#a1a1aa" : "#525252" }}
+              axisLine={{ stroke: theme === "dark" ? "#3f3f46" : "#e5e7eb" }}
             />
             <Tooltip
-              formatter={(v: any, n: string) => {
-                if (n === "Hit Rate") return [`${v}%`, "Hit Rate"];
-                if (n === "Targets") return [v, "Targets"];
-                return [v, n];
-              }}
-              labelFormatter={(label) => `${label}`}
               contentStyle={{
                 backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
                 border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
-                borderRadius: 4,
-                fontSize: 10,
-                padding: "4px 6px",
+                borderRadius: 8,
+                fontSize: 11,
+                padding: "8px 12px",
+              }}
+              formatter={(value: any, name: string) => {
+                if (name === "ratePct") return [`${value}%`, "Hit Rate"];
+                if (name === "targets") return [value, "Targets"];
+                return [value, name];
               }}
             />
-            <Bar 
-              yAxisId="left" 
+            <Area 
+              yAxisId="left"
+              type="monotone" 
               dataKey="ratePct" 
-              name="Hit Rate" 
-              fill={theme === "dark" ? "#10b981" : "#059669"} 
-              radius={[2, 2, 0, 0]}
-              opacity={0.8}
+              stroke="#10b981" 
+              fillOpacity={1} 
+              fill="url(#colorAccuracy)"
+              strokeWidth={2}
             />
-            <Line
+            <Area 
               yAxisId="right"
-              type="monotone"
-              dataKey="targets"
-              name="Targets"
-              dot={false}
-              stroke={theme === "dark" ? "#3b82f6" : "#2563eb"}
-              strokeWidth={1.5}
+              type="monotone" 
+              dataKey="targets" 
+              stroke="#3b82f6" 
+              fillOpacity={1} 
+              fill="url(#colorTargets)"
+              strokeWidth={2}
             />
-          </ComposedChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Compact Distance Grid */}
-      <div className="grid grid-cols-4 gap-1">
-        {matrixData.buckets.slice(0, 8).map((b) => (
-          <div 
-            key={b.bucket} 
-            className={`p-1 rounded text-center ${
-              theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"
-            }`}
-          >
-            <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>{b.bucket}</div>
-            <div className={`text-xs font-semibold ${
-              b.ratePct >= 75 ? "text-green-500" : 
-              b.ratePct >= 50 ? "text-yellow-500" : 
-              "text-red-500"
-            }`}>
-              {b.ratePct}%
-            </div>
-            <div className={`text-[8px] ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`}>{b.targets}</div>
-          </div>
-        ))}
+      {/* Heat Map Grid */}
+      <div>
+        <h5 className={`text-xs font-medium mb-2 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+          Performance Heat Map
+        </h5>
+        <div className="grid grid-cols-4 gap-1.5">
+          {matrixData.buckets.map((b, index) => {
+            const intensity = b.ratePct / 100;
+            const bgColor = b.ratePct >= 75 
+              ? theme === "dark" ? "from-emerald-600/30 to-emerald-500/20" : "from-emerald-200 to-emerald-100"
+              : b.ratePct >= 50 
+                ? theme === "dark" ? "from-blue-600/30 to-blue-500/20" : "from-blue-200 to-blue-100"
+                : theme === "dark" ? "from-red-600/30 to-red-500/20" : "from-red-200 to-red-100";
+            
+            return (
+              <motion.div 
+                key={b.bucket}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.05 }}
+                className={`relative p-3 rounded-lg bg-gradient-to-br ${bgColor} 
+                  border ${theme === "dark" ? "border-zinc-700/30" : "border-gray-200"} 
+                  hover:scale-105 transition-transform cursor-default`}
+              >
+                <div className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                  {b.bucket}
+                </div>
+                <div className={`text-lg font-bold ${
+                  b.ratePct >= 75 ? "text-emerald-500" : 
+                  b.ratePct >= 50 ? "text-blue-500" : 
+                  "text-red-500"
+                }`}>
+                  {b.ratePct}%
+                </div>
+                <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+                  {b.targets} targets
+                </div>
+                {/* Efficiency indicator */}
+                <div className="absolute top-1 right-1">
+                  <div className={`w-1.5 h-1.5 rounded-full ${
+                    b.efficiency > 50 ? "bg-emerald-400" : 
+                    b.efficiency > 25 ? "bg-yellow-400" : 
+                    "bg-gray-400"
+                  }`} />
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

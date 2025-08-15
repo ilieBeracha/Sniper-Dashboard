@@ -4,8 +4,8 @@ import { performanceStore } from "@/store/performance";
 import { userStore } from "@/store/userStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
-import { Users, Trophy, TrendingUp, RefreshCw } from "lucide-react";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { Users, Trophy, Target, RefreshCw, Shield, Award } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 export default function SquadImpactStats() {
   const { squadWeaponStats, getSquadWeaponStats, isLoading } = useStore(performanceStore);
@@ -24,9 +24,9 @@ export default function SquadImpactStats() {
     }
   };
 
-  const { totalHits, totalMisses, topPerformers, weaponPerformance, overallAccuracy } = useMemo(() => {
+  const { totalHits, totalMisses, topPerformers, overallAccuracy, squadStats } = useMemo(() => {
     if (!squadWeaponStats || squadWeaponStats.length === 0) {
-      return { totalHits: 0, totalMisses: 0, topPerformers: [], weaponPerformance: [], overallAccuracy: 0 };
+      return { totalHits: 0, totalMisses: 0, topPerformers: [], overallAccuracy: 0, squadStats: null };
     }
 
     let hits = 0;
@@ -42,168 +42,254 @@ export default function SquadImpactStats() {
       misses += userMisses;
 
       if (!userStats.has(userName)) {
-        userStats.set(userName, { name: userName, hits: 0, misses: 0, total: 0 });
+        userStats.set(userName, { name: userName, hits: 0, misses: 0, total: 0, accuracy: 0 });
       }
       
       const user = userStats.get(userName);
       user.hits += userHits;
       user.misses += userMisses;
       user.total += userHits + userMisses;
+      user.accuracy = user.total > 0 ? Math.round((user.hits / user.total) * 100) : 0;
     });
 
     const accuracy = hits + misses > 0 ? Math.round((hits / (hits + misses)) * 100) : 0;
     const performers = Array.from(userStats.values())
       .filter(user => user.total > 0)
-      .sort((a, b) => b.hits - a.hits)
-      .slice(0, 3);
-
-    const pieData = [
-      { name: 'Hits', value: hits, color: theme === "dark" ? '#10b981' : '#059669' },
-      { name: 'Misses', value: misses, color: theme === "dark" ? '#ef4444' : '#dc2626' }
-    ];
+      .sort((a, b) => b.accuracy - a.accuracy)
+      .slice(0, 4);
 
     return {
       totalHits: hits,
       totalMisses: misses,
       topPerformers: performers,
-      weaponPerformance: pieData,
-      overallAccuracy: accuracy
+      overallAccuracy: accuracy,
+      squadStats: {
+        totalShots: hits + misses,
+        avgAccuracy: performers.length > 0 
+          ? Math.round(performers.reduce((acc, p) => acc + p.accuracy, 0) / performers.length)
+          : 0,
+        activeMembers: userStats.size
+      }
     };
-  }, [squadWeaponStats, theme]);
+  }, [squadWeaponStats]);
 
   if (isLoading) {
     return (
-      <div className={`rounded-lg p-2 border ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
-        <div className="animate-pulse space-y-2">
-          <div className={`h-3 rounded w-1/3 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
-          <div className={`h-20 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+      <div className={`rounded-xl p-3 ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"} 
+        border ${theme === "dark" ? "border-zinc-700/50" : "border-gray-200"}`}>
+        <div className="animate-pulse space-y-3">
+          <div className={`h-4 rounded w-1/3 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
+          <div className={`h-32 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
         </div>
       </div>
     );
   }
 
+  const chartData = [
+    { name: 'Accuracy', value: overallAccuracy, fill: theme === "dark" ? '#10b981' : '#059669' },
+    { name: 'Remaining', value: 100 - overallAccuracy, fill: theme === "dark" ? '#27272a' : '#f3f4f6' }
+  ];
+
   return (
-    <div className={`rounded-lg p-2 border h-full ${theme === "dark" ? "bg-zinc-900/50 border-zinc-700/50" : "bg-white border-gray-200"}`}>
-      {/* Compact Header */}
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-1.5">
-          <Users className={`w-3.5 h-3.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`} />
-          <h4 className={`text-xs font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-900"}`}>Squad Impact</h4>
+    <div className={`rounded-xl p-3 h-full ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"} 
+      border ${theme === "dark" ? "border-zinc-700/50" : "border-gray-200"}`}>
+      
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            Squad Performance
+          </h4>
+          <p className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
+            Team shooting statistics
+          </p>
         </div>
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={handleRefresh}
-          className={`p-1 rounded hover:bg-zinc-800/50 transition-colors ${
-            theme === "dark" ? "text-zinc-400 hover:text-zinc-200" : "text-gray-500 hover:text-gray-700"
-          }`}
+          className={`p-1.5 rounded-lg ${
+            theme === "dark" ? "bg-zinc-800 hover:bg-zinc-700" : "bg-gray-100 hover:bg-gray-200"
+          } transition-colors`}
         >
-          <RefreshCw className="w-3 h-3" />
-        </button>
+          <RefreshCw className="w-3.5 h-3.5" />
+        </motion.button>
       </div>
 
-      {/* Compact Stats Grid */}
-      <div className="grid grid-cols-2 gap-1 mb-2">
-        <div className={`p-1.5 rounded text-center ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
-          <div className={`text-sm font-bold text-green-500`}>{totalHits}</div>
-          <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Hits</div>
+      {/* Main Stats Section */}
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        {/* Accuracy Ring Chart */}
+        <div className={`relative rounded-lg p-3 ${
+          theme === "dark" ? "bg-gradient-to-br from-zinc-800 to-zinc-900" : "bg-gradient-to-br from-gray-50 to-gray-100"
+        }`}>
+          <div className="relative h-28">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={chartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={30}
+                  outerRadius={45}
+                  startAngle={90}
+                  endAngle={-270}
+                  dataKey="value"
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <div className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  {overallAccuracy}%
+                </div>
+                <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
+                  Accuracy
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className={`p-1.5 rounded text-center ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
-          <div className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{overallAccuracy}%</div>
-          <div className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>Accuracy</div>
+
+        {/* Key Metrics */}
+        <div className="space-y-2">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+            className={`flex items-center justify-between p-2 rounded-lg ${
+              theme === "dark" ? "bg-emerald-500/10" : "bg-emerald-50"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Target className="w-3.5 h-3.5 text-emerald-500" />
+              <span className={`text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                Total Hits
+              </span>
+            </div>
+            <span className={`text-sm font-bold text-emerald-500`}>
+              {totalHits.toLocaleString()}
+            </span>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className={`flex items-center justify-between p-2 rounded-lg ${
+              theme === "dark" ? "bg-blue-500/10" : "bg-blue-50"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Users className="w-3.5 h-3.5 text-blue-500" />
+              <span className={`text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                Active Squad
+              </span>
+            </div>
+            <span className={`text-sm font-bold text-blue-500`}>
+              {squadStats?.activeMembers || 0}
+            </span>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className={`flex items-center justify-between p-2 rounded-lg ${
+              theme === "dark" ? "bg-purple-500/10" : "bg-purple-50"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Shield className="w-3.5 h-3.5 text-purple-500" />
+              <span className={`text-xs ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                Total Shots
+              </span>
+            </div>
+            <span className={`text-sm font-bold text-purple-500`}>
+              {squadStats?.totalShots.toLocaleString() || 0}
+            </span>
+          </motion.div>
         </div>
       </div>
 
-      {/* Compact Chart and Top Performers */}
-      <div className="grid grid-cols-2 gap-2">
-        {/* Pie Chart */}
-        <div className="relative">
-          <ResponsiveContainer width="100%" height={80}>
-            <PieChart>
-              <Pie
-                data={weaponPerformance}
-                cx="50%"
-                cy="50%"
-                innerRadius={15}
-                outerRadius={30}
-                paddingAngle={2}
-                dataKey="value"
-              >
-                {weaponPerformance.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip 
-                formatter={(value: any) => value.toLocaleString()}
-                contentStyle={{
-                  backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
-                  border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
-                  borderRadius: 4,
-                  fontSize: 10,
-                  padding: "4px 6px",
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          {totalHits + totalMisses === 0 && (
-            <div className={`absolute inset-0 flex items-center justify-center text-[10px] ${
+      {/* Top Performers Section */}
+      <div className={`rounded-lg p-2.5 ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
+        <div className="flex items-center gap-2 mb-2">
+          <Trophy className="w-3.5 h-3.5 text-yellow-500" />
+          <h5 className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+            Top Performers
+          </h5>
+        </div>
+        
+        <div className="space-y-1.5">
+          {topPerformers.length > 0 ? (
+            topPerformers.map((performer, index) => {
+              const medals = ['🥇', '🥈', '🥉', '🏅'];
+              return (
+                <motion.div
+                  key={performer.name}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`flex items-center gap-2 p-2 rounded-lg ${
+                    theme === "dark" ? "bg-zinc-900/50" : "bg-white"
+                  }`}
+                >
+                  <span className="text-sm">{medals[index]}</span>
+                  <div className="flex-1">
+                    <div className={`text-xs font-medium ${
+                      theme === "dark" ? "text-zinc-200" : "text-gray-800"
+                    }`}>
+                      {performer.name}
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <div className="flex-1 h-1.5 rounded-full bg-zinc-700/30 overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${performer.accuracy}%` }}
+                          transition={{ duration: 0.5, delay: index * 0.1 }}
+                          className={`h-full rounded-full ${
+                            performer.accuracy >= 80 
+                              ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
+                              : performer.accuracy >= 60
+                                ? "bg-gradient-to-r from-blue-500 to-blue-400"
+                                : "bg-gradient-to-r from-orange-500 to-orange-400"
+                          }`}
+                        />
+                      </div>
+                      <span className={`text-[10px] font-medium ${
+                        theme === "dark" ? "text-zinc-400" : "text-gray-600"
+                      }`}>
+                        {performer.accuracy}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-xs font-semibold ${
+                      theme === "dark" ? "text-emerald-400" : "text-emerald-600"
+                    }`}>
+                      {performer.hits}
+                    </div>
+                    <div className={`text-[10px] ${
+                      theme === "dark" ? "text-zinc-500" : "text-gray-500"
+                    }`}>
+                      hits
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })
+          ) : (
+            <div className={`text-center py-3 text-xs ${
               theme === "dark" ? "text-zinc-500" : "text-gray-500"
             }`}>
-              No data
+              No data available yet
             </div>
           )}
         </div>
-
-        {/* Top Performers */}
-        <div>
-          <div className="flex items-center gap-1 mb-1">
-            <Trophy className={`w-2.5 h-2.5 ${theme === "dark" ? "text-yellow-500" : "text-yellow-600"}`} />
-            <span className={`text-[9px] font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Top</span>
-          </div>
-          <div className="space-y-1">
-            {topPerformers.length > 0 ? (
-              topPerformers.map((performer, index) => (
-                <motion.div
-                  key={performer.name}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`flex items-center justify-between p-1 rounded ${
-                    theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"
-                  }`}
-                >
-                  <span className={`text-[9px] truncate flex-1 ${
-                    theme === "dark" ? "text-zinc-300" : "text-gray-700"
-                  }`}>
-                    {performer.name}
-                  </span>
-                  <span className={`text-[9px] font-medium ${
-                    theme === "dark" ? "text-green-400" : "text-green-600"
-                  }`}>
-                    {performer.hits}
-                  </span>
-                </motion.div>
-              ))
-            ) : (
-              <div className={`text-[9px] text-center py-2 ${
-                theme === "dark" ? "text-zinc-500" : "text-gray-500"
-              }`}>
-                No performers yet
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Summary */}
-      <div className={`mt-2 pt-2 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} flex items-center justify-between`}>
-        <div className="flex items-center gap-1">
-          <TrendingUp className={`w-2.5 h-2.5 ${theme === "dark" ? "text-zinc-500" : "text-gray-400"}`} />
-          <span className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
-            Total shots: {totalHits + totalMisses}
-          </span>
-        </div>
-        <span className={`text-[9px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>
-          {topPerformers.length} active
-        </span>
       </div>
     </div>
   );
