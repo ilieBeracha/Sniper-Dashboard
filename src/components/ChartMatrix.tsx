@@ -266,7 +266,6 @@ export default function ChartMatrix() {
         </h5>
         <div className="grid grid-cols-4 gap-1.5">
           {matrixData.buckets.map((b, index) => {
-            const intensity = b.ratePct / 100;
             const bgColor = b.ratePct >= 75 
               ? theme === "dark" ? "from-emerald-600/30 to-emerald-500/20" : "from-emerald-200 to-emerald-100"
               : b.ratePct >= 50 

@@ -4,7 +4,7 @@ import { performanceStore } from "@/store/performance";
 import { userStore } from "@/store/userStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
-import { Users, Trophy, Target, RefreshCw, Shield, Award } from "lucide-react";
+import { Users, Trophy, Target, RefreshCw, Shield } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 export default function SquadImpactStats() {
@@ -24,9 +24,9 @@ export default function SquadImpactStats() {
     }
   };
 
-  const { totalHits, totalMisses, topPerformers, overallAccuracy, squadStats } = useMemo(() => {
+  const { totalHits, topPerformers, overallAccuracy, squadStats } = useMemo(() => {
     if (!squadWeaponStats || squadWeaponStats.length === 0) {
-      return { totalHits: 0, totalMisses: 0, topPerformers: [], overallAccuracy: 0, squadStats: null };
+      return { totalHits: 0, topPerformers: [], overallAccuracy: 0, squadStats: null };
     }
 
     let hits = 0;
@@ -60,7 +60,6 @@ export default function SquadImpactStats() {
 
     return {
       totalHits: hits,
-      totalMisses: misses,
       topPerformers: performers,
       overallAccuracy: accuracy,
       squadStats: {
