@@ -8,9 +8,11 @@ export const SkeletonLine = ({ width = "w-full", height = "h-4", className = "" 
 }) => {
   const { theme } = useTheme();
   return (
-    <div className={`${width} ${height} rounded animate-pulse ${
-      theme === "dark" ? "bg-zinc-700" : "bg-gray-200"
-    } ${className}`} />
+    <div className={`${width} ${height} rounded-md ${
+      theme === "dark" 
+        ? "bg-gradient-to-r from-zinc-800 to-zinc-700" 
+        : "bg-gradient-to-r from-gray-200 to-gray-100"
+    } animate-pulse ${className}`} />
   );
 };
 
@@ -21,9 +23,11 @@ export const SkeletonCircle = ({ size = "w-12 h-12", className = "" }: {
 }) => {
   const { theme } = useTheme();
   return (
-    <div className={`${size} rounded-full animate-pulse ${
-      theme === "dark" ? "bg-zinc-700" : "bg-gray-200"
-    } ${className}`} />
+    <div className={`${size} rounded-full ${
+      theme === "dark" 
+        ? "bg-gradient-to-br from-zinc-800 to-zinc-700" 
+        : "bg-gradient-to-br from-gray-200 to-gray-100"
+    } animate-pulse ${className}`} />
   );
 };
 
@@ -35,9 +39,11 @@ export const SkeletonBox = ({ width = "w-full", height = "h-32", className = "" 
 }) => {
   const { theme } = useTheme();
   return (
-    <div className={`${width} ${height} rounded animate-pulse ${
-      theme === "dark" ? "bg-zinc-700" : "bg-gray-200"
-    } ${className}`} />
+    <div className={`${width} ${height} rounded-lg ${
+      theme === "dark" 
+        ? "bg-gradient-to-br from-zinc-800 to-zinc-700" 
+        : "bg-gradient-to-br from-gray-200 to-gray-100"
+    } animate-pulse ${className}`} />
   );
 };
 
@@ -126,6 +132,48 @@ export const LoadingWrapper = ({
     return <>{skeleton || <ContentSkeleton />}</>;
   }
   return <>{children}</>;
+};
+
+// Training Item Skeleton
+export const TrainingItemSkeleton = () => {
+  const { theme } = useTheme();
+  return (
+    <div className={`p-4 rounded-lg border ${
+      theme === "dark" 
+        ? "bg-zinc-900/50 border-zinc-800" 
+        : "bg-white border-gray-200"
+    } mb-3`}>
+      <div className="flex items-start justify-between">
+        <div className="flex-1 space-y-2">
+          <div className="flex items-center gap-3">
+            <SkeletonLine height="h-5" width="w-32" />
+            <SkeletonLine height="h-4" width="w-20" className="opacity-60" />
+          </div>
+          <SkeletonLine height="h-4" width="w-3/4" />
+          <div className="flex gap-4 mt-3">
+            <SkeletonLine height="h-3" width="w-24" />
+            <SkeletonLine height="h-3" width="w-24" />
+            <SkeletonLine height="h-3" width="w-24" />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <SkeletonBox height="h-8" width="w-8" />
+          <SkeletonBox height="h-8" width="w-8" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Trainings List Skeleton
+export const TrainingsListSkeleton = ({ count = 5 }: { count?: number }) => {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: count }).map((_, i) => (
+        <TrainingItemSkeleton key={i} />
+      ))}
+    </div>
+  );
 };
 
 // Full Dashboard Overview Skeleton - Basic and flexible

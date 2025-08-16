@@ -12,6 +12,7 @@ import Header from "@/Headers/Header";
 import { weaponsStore } from "@/store/weaponsStore";
 import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
+import { TrainingsListSkeleton } from "@/components/DashboardSkeletons";
 
 export default function Trainings() {
   const { loadTrainingByTeamId, getTrainingCountByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
@@ -26,6 +27,7 @@ export default function Trainings() {
   const [totalCount, setTotalCount] = useState(0);
   const [isPageChanging, setIsPageChanging] = useState(false);
   const [isAddTrainingOpen, setIsAddTrainingOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useLoadingState(async () => {
     if (!user?.team_id) return;
@@ -38,6 +40,7 @@ export default function Trainings() {
     const loadTrainings = async () => {
       if (!user?.team_id) return;
 
+      setIsLoading(true);
       const [result, count] = await Promise.all([
         loadTrainingByTeamId(user.team_id, LIMIT, currentPage * LIMIT),
         getTrainingCountByTeamId(user.team_id),
@@ -46,6 +49,7 @@ export default function Trainings() {
       setTrainings(result || []);
       setTotalCount(count);
       setHasMore(result?.length === LIMIT);
+      setIsLoading(false);
     };
 
     loadTrainings();
@@ -90,7 +94,11 @@ export default function Trainings() {
       <SpPageHeader title="Trainings" subtitle={"Add, edit, and manage training sessions"} icon={BiCurrentLocation} action={action()} />
 
       <SpPageBody>
-        <TrainingList trainings={trainings} />
+        {isLoading ? (
+          <TrainingsListSkeleton count={5} />
+        ) : (
+          <TrainingList trainings={trainings} />
+        )}
         <SpPagination
           currentPage={currentPage}
           totalCount={totalCount}
