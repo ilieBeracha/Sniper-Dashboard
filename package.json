@@ -43,6 +43,8 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@react-oauth/google": "^0.12.2",
+    "@sentry/react": "^10.5.0",
+    "@sentry/vite-plugin": "^4.1.1",
     "@supabase/supabase-js": "^2.49.4",
     "@tailwindcss/postcss": "^4.1.4",
     "@tailwindcss/vite": "^4.1.4",

@@ -14,6 +14,7 @@ import {
   GetUserMediansInSquadQueryResult,
   CommanderTeamDispersionEntry,
   SquadWeaponStats,
+  UserWeeklyKpisForUser,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionHeatmapDay } from "@/types/positionHeatmap";
@@ -118,10 +119,18 @@ interface PerformanceStore {
   userMediansInSquadLoading: boolean;
 
   firstShotMatrix: any[] | null;
-  getFirstShotMatrix: (teamId: string, rangeDays: number) => Promise<void>;
+  getFirstShotMatrix: (
+    teamId: string,
+    rangeDays: number,
+    positions: string[] | null,
+    bucket: number,
+    minDistance: number,
+    maxDistance: number,
+    minTargets: number,
+  ) => Promise<void>;
 
-  userWeeklyKpisForUser: any[] | null;
-  getUserWeeklyKpisForUser: (userId: string, rangeDays: number) => Promise<void>;
+  userWeeklyKpisForUser: UserWeeklyKpisForUser[] | null;
+  getUserWeeklyKpisForUser: (userId: string, startDate: Date | null, endDate: Date | null) => Promise<void>;
 
   // position heatmap
   positionHeatmapData: PositionHeatmapDay[] | null;
@@ -146,7 +155,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   userMediansInSquad: null,
   commanderTeamDispersion: [],
   userMediansInSquadLoading: false,
-  firstShotMatrix: null,
+
   fetchGroupingScores: async (trainingSessionId: string, limit: number = 20, offset: number = 0) => {
     try {
       set({ isLoading: true });
@@ -379,10 +388,19 @@ export const performanceStore = create<PerformanceStore>((set) => ({
     }
   },
 
-  getFirstShotMatrix: async (teamId: string, rangeDays: number) => {
+  firstShotMatrix: null,
+  getFirstShotMatrix: async (
+    teamId: string,
+    days: number,
+    positions: string[] | null,
+    bucket: number,
+    minDistance: number,
+    maxDistance: number,
+    minTargets: number,
+  ) => {
     try {
       set({ isLoading: true });
-      const data = await getFirstShotMatrix(teamId, rangeDays);
+      const data = await getFirstShotMatrix(teamId, days, positions, bucket, minDistance, maxDistance, minTargets);
       set({ firstShotMatrix: data });
     } catch (e) {
       console.error("Failed to load first shot matrix:", e);
@@ -393,9 +411,9 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   },
 
   userWeeklyKpisForUser: null,
-  getUserWeeklyKpisForUser: async (userId: string, rangeDays: number) => {
+  getUserWeeklyKpisForUser: async (userId: string, startDate: Date | null, endDate: Date | null) => {
     try {
-      const data = await getUserWeeklyKpisForUser(userId, rangeDays);
+      const data = await getUserWeeklyKpisForUser(userId, startDate, endDate);
       set({ userWeeklyKpisForUser: data });
     } catch (error) {
       console.error("Failed to load user weekly activity summary:", error);

@@ -431,32 +431,48 @@ export async function getUserMediansInSquad(
   return data;
 }
 
-export async function getFirstShotMatrix(teamId: string, rangeDays: number = 7) {
+export async function getFirstShotMatrix(
+  teamId: string,
+  rangeDays = 7,
+  positions: string[] | null,
+  bucket: number,
+  minDistance: number,
+  maxDistance: number,
+  minTargets: number,
+) {
   const { p_start, p_end } = buildDateRange(rangeDays);
 
   const { data, error } = await supabase.rpc("get_first_shot_matrix", {
     p_team_id: teamId,
-    p_start: p_start,
-    p_end: p_end,
-    p_min_targets: 1,
+    p_start,
+    p_end,
+    p_positions: positions,
+    p_distance_bucket: bucket,
+    p_min_targets: minTargets,
+    p_min_distance: minDistance,
+    p_max_distance: maxDistance,
   });
   if (error) throw error;
   return data;
 }
 
-export async function getUserWeeklyKpisForUser(userId: string, rangeDays: number = 7) {
-  const { p_start, p_end } = buildDateRange(rangeDays);
-  const { data, error } = await supabase.rpc("get_user_weekly_kpis_for_user", {
+export async function getUserWeeklyKpisForUser(userId: string, startDate: Date | null, endDate: Date | null) {
+  const request: any = {
     p_user_id: userId,
-    p_start: p_start,
-    p_end: p_end,
-  });
+  };
+
+  if (startDate && endDate) {
+    request.p_start = startDate.toISOString();
+    request.p_end = endDate.toISOString();
+  }
+
+  const { data, error } = await supabase.rpc("get_user_weekly_kpis_for_user", request);
 
   if (error) {
     console.error("Error fetching user weekly activity summary:", error);
     throw error;
   }
-  console.log("data", data);
+  console.log("getUserWeeklyKpisForUser", data);
   return data;
 }
 
@@ -530,8 +546,6 @@ export async function getPositionHeatmap(teamId: string, position: PositionScore
 }
 
 export async function getSquadWeaponStats(teamId: string, startDate: Date | null, endDate: Date | null) {
-  console.log("Fetching squad weapon stats with params:", { teamId, startDate, endDate });
-  
   const { data, error } = await supabase.rpc("get_team_stats_when_user_holds_weapon", {
     p_team_id: teamId,
     p_start: startDate,
@@ -542,7 +556,6 @@ export async function getSquadWeaponStats(teamId: string, startDate: Date | null
     console.error("Error fetching squad weapon stats:", error);
     throw error;
   }
-  
-  console.log("Squad weapon stats response:", data);
+
   return data || [];
 }

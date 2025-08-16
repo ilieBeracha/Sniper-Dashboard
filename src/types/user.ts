@@ -33,6 +33,7 @@ export interface User {
   user_default_duty?: UserDuty | null;
   user_default_weapon?: string | null;
   user_default_equipment?: string | null;
+  created_at?: string;
   teams?: Team;
   squads?: Squad;
 }

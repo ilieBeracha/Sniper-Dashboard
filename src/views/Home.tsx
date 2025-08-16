@@ -49,7 +49,7 @@ export default function AppRoutes() {
   }, []);
 
   const LoadingFallback = () => (
-    <div className="flex items-center h-[100dvh] justify-center bg-transparent">
+    <div className="flex items-center h-[100dvh] justify-center">
       <WaveLoader />
     </div>
   );
@@ -62,7 +62,7 @@ export default function AppRoutes() {
             <Route
               path="/"
               element={
-                <div className="w-full overflow-x-hidden">
+                <div className="w-full overflow-x-hidden h-[100dvh] ">
                   <Suspense fallback={<LoadingFallback />}>
                     <Dashboard />
                   </Suspense>

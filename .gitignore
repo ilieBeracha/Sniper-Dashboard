@@ -43,3 +43,6 @@ database_sync/setup_local_database.sql
 .gitignore
 .claude/.mcp.json
 .env.development.local.backup
+
+# Sentry Config File
+.env.sentry-build-plugin
