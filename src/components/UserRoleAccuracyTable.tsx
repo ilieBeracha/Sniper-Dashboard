@@ -83,7 +83,7 @@ const UserRoleAccuracyTable = ({ loading, commanderUserRoleBreakdown, theme }: U
                 : "text-orange-600";
 
         return (
-          <div className="flex items-center gap-2 py-3" style={{ paddingLeft: `${indent}px` }}>
+          <div className="flex items-center gap-2 py-2" style={{ paddingLeft: `${indent}px` }}>
             {(row.level === "squad" || row.level === "user") &&
               (row.isExpanded ? (
                 <ChevronDown className={`w-4 h-4 ${row.level === "squad" ? "text-blue-500" : "text-green-500"}`} />
@@ -91,7 +91,7 @@ const UserRoleAccuracyTable = ({ loading, commanderUserRoleBreakdown, theme }: U
                 <ChevronRight className="w-4 h-4 text-gray-500" />
               ))}
             <Icon className={`w-4 h-4 ${iconColor}`} />
-            <span className={`${row.level === "squad" ? "font-semibold text-base" : "font-medium"} text-xs sm:text-sm`}>
+            <span className={`${row.level === "squad" ? "font-semibold text-sm" : "font-medium"} text-xs`}>
               {row.level === "squad" ? row.first_name : row.level === "user" ? `${row.first_name} ${row.last_name}` : row.role_or_weapon}
             </span>
             {row.childCount !== undefined && row.childCount > 0 && (
@@ -124,26 +124,26 @@ const UserRoleAccuracyTable = ({ loading, commanderUserRoleBreakdown, theme }: U
       render: (value) => (
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getColor(value) }} />
-          <span className="font-semibold text-xs sm:text-sm">{value !== null ? `${value.toFixed(1)}%` : "0.0%"}</span>
+          <span className="font-semibold text-xs">{value !== null ? `${value.toFixed(1)}%` : "0.0%"}</span>
         </div>
       ),
     },
     {
       key: "shots",
       label: "Shots",
-      render: (value) => <span className="font-medium text-xs sm:text-sm">{value}</span>,
+      render: (value) => <span className="font-medium text-xs">{value}</span>,
     },
     {
       key: "hits",
       label: "Hits",
       hideOnMobile: true,
-      render: (value) => <span className="font-medium text-xs sm:text-sm">{value}</span>,
+      render: (value) => <span className="font-medium text-xs">{value}</span>,
     },
     {
       key: "sessions",
       label: "Sessions",
       hideOnMobile: true,
-      render: (value) => <span className="font-medium text-xs sm:text-sm">{value}</span>,
+      render: (value) => <span className="font-medium text-xs">{value}</span>,
     },
     {
       key: "role_or_weapon",
@@ -299,7 +299,7 @@ const UserRoleAccuracyTable = ({ loading, commanderUserRoleBreakdown, theme }: U
       currentFilterValues={{ role: "" }}
     >
       {loading ? (
-        <div className="py-10 text-center text-sm text-gray-500">Loading user role breakdown...</div>
+        <div className="py-10 text-center text-xs text-gray-500">Loading user role breakdown...</div>
       ) : !commanderUserRoleBreakdown || commanderUserRoleBreakdown.length === 0 ? (
         <NoDataDisplay />
       ) : (
