@@ -153,7 +153,7 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
       render: (_, row) => {
         if (row.isSquadHeader) {
           return (
-            <div className="flex items-center gap-3 py-3">
+            <div className="flex items-center gap-3 py-2">
               <button className="p-0.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded">
                 {row.isExpanded ? (
                   <ChevronDown className="text-blue-500 w-5 h-5" />
@@ -167,7 +167,7 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
                 <Users className={`w-4 h-4 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
               </div>
               <div className="flex flex-col">
-                <span className="font-semibold text-sm">{row.first_name}</span>
+                <span className="font-semibold text-xs">{row.first_name}</span>
                 <span className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
                   {row.userCount} members • Squad Average
                 </span>
@@ -176,14 +176,14 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
           );
         }
         return (
-          <div className="flex items-center gap-3 pl-12 py-3">
+          <div className="flex items-center gap-3 pl-12 py-2">
             <div className={`p-2 rounded-lg ${
               theme === "dark" ? "bg-green-900/20" : "bg-green-50"
             }`}>
               <User className={`w-4 h-4 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium">
+              <span className="text-xs font-medium">
                 {row.first_name} {row.last_name}
               </span>
               <span className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
@@ -202,7 +202,7 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
         <div className="flex items-center gap-3">
           <div className="flex-1">
             <div className="flex items-center justify-between mb-1">
-              <span className="font-semibold text-sm" style={{ color: getColor(value) }}>
+              <span className="font-semibold text-xs" style={{ color: getColor(value) }}>
                 {value != null ? `${value.toFixed(2)}cm` : "—"}
               </span>
               {row.performanceLevel && (
@@ -239,7 +239,7 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
       render: (value) => (
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor(value) }} />
-          <span className="font-medium text-sm" style={{ color: getColor(value) }}>
+          <span className="font-medium text-xs" style={{ color: getColor(value) }}>
             {value != null ? `${value.toFixed(2)}cm` : "—"}
           </span>
         </div>
@@ -258,7 +258,7 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
           <div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor(value) }} />
-              <span className="font-medium text-sm" style={{ color: getColor(value) }}>
+              <span className="font-medium text-xs" style={{ color: getColor(value) }}>
                 {value != null ? `${value.toFixed(2)}cm` : "—"}
               </span>
             </div>
@@ -280,7 +280,7 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
       render: (value) => (
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor(value) }} />
-          <span className="font-medium text-sm" style={{ color: getColor(value) }}>
+          <span className="font-medium text-xs" style={{ color: getColor(value) }}>
             {value != null ? `${value.toFixed(2)}cm` : "—"}
           </span>
         </div>
@@ -294,8 +294,8 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-blue-500" />
           <div>
-            <h3 className="font-semibold text-lg">Team Dispersion Analysis</h3>
-            <p className="text-sm text-gray-600 dark:text-zinc-400">
+            <h3 className="font-semibold text-base">Team Dispersion Analysis</h3>
+            <p className="text-xs text-gray-600 dark:text-zinc-400">
               Detailed performance metrics by squad and individual
             </p>
           </div>

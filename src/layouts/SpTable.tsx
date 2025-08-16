@@ -372,7 +372,7 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
 
         <div className="overflow-x-auto sm:mx-0">
           <table
-            className={`min-w-full ${isMobile ? "text-xs" : "text-sm"} transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : " text-gray-700"}`}
+            className={`min-w-full ${isMobile ? "text-xs" : "text-xs"} transition-colors duration-200 ${theme === "dark" ? "text-gray-300" : " text-gray-700"}`}
           >
             <thead
               className={`${isMobile ? "text-[10px]" : "text-xs"} uppercase border-b transition-colors duration-200 sticky top-0 z-10 ${
@@ -381,7 +381,7 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
             >
               <tr>
                 {selectable && (
-                  <th className={`${isMobile ? "px-2 py-2" : "px-4 py-3"} w-12`}>
+                  <th className={`${isMobile ? "px-2 py-1.5" : "px-3 py-2"} w-12`}>
                     <Checkbox
                       checked={selectedRows.size === sortedData.length && sortedData.length > 0}
                       onCheckedChange={(checked) => handleSelectAll(checked as boolean, sortedData)}
@@ -391,7 +391,7 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                 {columns.map((col, idx) => (
                   <th
                     key={idx}
-                    className={`${isMobile ? "px-2 py-2" : "px-4 py-3"} text-left ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""} ${
+                    className={`${isMobile ? "px-2 py-1.5" : "px-3 py-2"} text-left ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""} ${
                       col.sortable ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800" : ""
                     }`}
                     style={col.width ? { width: col.width } : undefined}
@@ -424,7 +424,7 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                     </div>
                   </th>
                 ))}
-                <th className={`${isMobile ? "px-2 py-2" : "px-4 py-3"} text-right`}>{isMobile ? "" : "Actions"}</th>
+                <th className={`${isMobile ? "px-2 py-1.5" : "px-3 py-2"} text-right`}>{isMobile ? "" : "Actions"}</th>
               </tr>
             </thead>
             <tbody>
@@ -433,20 +433,20 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                   Array.from({ length: 5 }).map((_, idx) => (
                     <tr key={`skeleton-${idx}`} className="animate-pulse">
                       {selectable && (
-                        <td className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} w-12`}>
+                        <td className={`${isMobile ? "px-2 py-1" : "px-3 py-1.5"} w-12`}>
                           <div className="w-4 h-4 bg-gray-200 dark:bg-zinc-700 rounded" />
                         </td>
                       )}
                       {columns.map((col, colIdx) => (
                         <td
                           key={colIdx}
-                          className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}
+                          className={`${isMobile ? "px-2 py-1" : "px-3 py-1.5"} ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""}`}
                         >
                           <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded w-full" />
                         </td>
                       ))}
                       {(actions.onView || actions.onEdit || actions.onDelete) && (
-                        <td className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} text-right`}>
+                        <td className={`${isMobile ? "px-2 py-1" : "px-3 py-1.5"} text-right`}>
                           <div className="inline-flex gap-2">
                             <div className="w-8 h-8 bg-gray-200 dark:bg-zinc-700 rounded" />
                             <div className="w-8 h-8 bg-gray-200 dark:bg-zinc-700 rounded" />
@@ -476,20 +476,20 @@ export function SpTable<T extends { id: string | number }>(props: SpTableProps<T
                         }`}
                       >
                         {selectable && (
-                          <td className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} w-12`} onClick={(e) => e.stopPropagation()}>
+                          <td className={`${isMobile ? "px-2 py-1" : "px-3 py-1.5"} w-12`} onClick={(e) => e.stopPropagation()}>
                             <Checkbox checked={isSelected} onCheckedChange={(checked) => handleSelectRow(row.id, checked as boolean)} />
                           </td>
                         )}
                         {columns.map((col, idx) => (
                           <td
                             key={idx}
-                            className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""} min-h-[40px]`}
-                            style={{ minHeight: "40px" }}
+                            className={`${isMobile ? "px-2 py-1" : "px-3 py-1.5"} ${col.className || ""} ${col.hideOnMobile ? "hidden sm:table-cell" : ""} min-h-[36px]`}
+                            style={{ minHeight: "36px" }}
                           >
                             {col.render ? col.render(row[col.key as keyof T], row) : ((row as any)[col.key] ?? "N/A")}
                           </td>
                         ))}
-                        <td className={`${isMobile ? "px-2 py-1" : "px-4 py-2"} text-right min-h-[40px]`} style={{ minHeight: "40px" }}>
+                        <td className={`${isMobile ? "px-2 py-1" : "px-3 py-1.5"} text-right min-h-[36px]`} style={{ minHeight: "36px" }}>
                           {isDisplayActions && (
                             <SpTableActions row={row} onView={actions.onView} onEdit={actions.onEdit} onDelete={actions.onDelete} theme={theme} />
                           )}
@@ -548,7 +548,7 @@ function SpTableFilters({
 }) {
   return (
     <div
-      className={`${isMobile ? "p-3" : "p-4"} border-b transition-colors duration-200 rounded-t-xl  ${theme === "dark" ? "border-zinc-800 bg-zinc-900/50" : "border-gray-200 bg-gray-50"}`}
+      className={`${isMobile ? "p-3" : "p-3"} border-b transition-colors duration-200 rounded-t-xl  ${theme === "dark" ? "border-zinc-800 bg-zinc-900/50" : "border-gray-200 bg-gray-50"}`}
     >
       {selectable && selectedCount && selectedCount > 0 && (
         <div
@@ -682,7 +682,7 @@ function SpTableActions({
           <DropdownTrigger>
             <button
               onClick={(e) => e.stopPropagation()}
-              className={`p-1.5 sm:p-2 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+              className={`p-1 sm:p-1.5 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
               title="More options"
             >
               <MoreVertical size={16} />
@@ -734,7 +734,7 @@ function SpTablePagination({ pagination, loading, theme }: { pagination: SpTable
   if (!pagination) return null;
   return (
     <div
-      className={`flex items-center justify-between ${isMobile ? "p-3" : "p-4"} border-t transition-colors duration-200 ${
+      className={`flex items-center justify-between ${isMobile ? "p-3" : "p-3"} border-t transition-colors duration-200 ${
         theme === "dark" ? "border-zinc-800" : "border-gray-200"
       }`}
     >
