@@ -107,7 +107,7 @@ export default function Analytics() {
                 <h1 className={`text-2xl font-bold ${
                   theme === "dark" ? "text-white" : "text-gray-900"
                 }`}>
-                  Analytics Dashboard
+                  Stats Dashboard
                 </h1>
                 <p className={`text-sm ${
                   theme === "dark" ? "text-zinc-400" : "text-gray-600"

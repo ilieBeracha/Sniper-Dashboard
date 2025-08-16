@@ -18,7 +18,7 @@ const navSections = [
     items: [
       { name: "Dashboard", href: "/", icon: <BiSolidDashboard className="w-5 h-5" /> },
       { name: "Trainings", href: "/trainings", icon: <MdModelTraining className="w-5 h-5" /> },
-      { name: "Analytics", href: "/analytics", icon: <BsBarChartFill className="w-5 h-5" /> },
+      { name: "Stats", href: "/stats", icon: <BsBarChartFill className="w-5 h-5" /> },
     ],
   },
   {
