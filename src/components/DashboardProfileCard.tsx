@@ -8,6 +8,7 @@ import { UserRole } from "@/types/user";
 import { useEffect } from "react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { TrendingUp } from "lucide-react";
+import { ProfileCardSkeleton } from "./DashboardSkeletons";
 
 export default function DashboardProfileCard() {
   const { theme } = useTheme();
@@ -41,6 +42,10 @@ export default function DashboardProfileCard() {
   };
 
   const { greeting, emoji } = getTimeBasedGreeting();
+
+  if (!user) {
+    return <ProfileCardSkeleton />;
+  }
 
   const getRoleIcon = (role: string) => {
     switch (role) {

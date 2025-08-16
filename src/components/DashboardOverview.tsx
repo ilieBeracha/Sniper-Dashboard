@@ -9,6 +9,7 @@ import DashboardCalendar from "./DashboardCalendar";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
 import { BarChart2 } from "lucide-react";
+import { DashboardOverviewSkeleton } from "./DashboardSkeletons";
 
 export default function DashboardOverview({ loading }: { loading: boolean }) {
   const navigate = useNavigate();
@@ -29,6 +30,10 @@ export default function DashboardOverview({ loading }: { loading: boolean }) {
     };
     loadTeamData();
   }, [user?.team_id, user?.user_role]);
+
+  if (loading) {
+    return <DashboardOverviewSkeleton />;
+  }
 
   return (
     <div className="space-y-4">
