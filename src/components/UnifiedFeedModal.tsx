@@ -80,19 +80,18 @@ export default function UnifiedFeedModal({ isOpen, onClose }: UnifiedFeedModalPr
 
   // Infinite scroll handler
   const handleScroll = useCallback(() => {
-    if (!scrollContainerRef.current || loadingRef.current || isLoading || !hasMore) return;
+    if (!scrollContainerRef.current || loadingRef.current || isLoading || !hasMore || !user?.team_id) return;
 
     const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
     
     // Load more when user scrolls to 80% of the content
-    if (scrollTop + clientHeight >= scrollHeight * 0.8) {
+    if (scrollTop + clientHeight >= scrollHeight * 0.8 && scrollHeight > clientHeight) {
       loadingRef.current = true;
-      if (user?.team_id) {
-        fetchFeedLog(user.team_id, false);
-        setTimeout(() => {
-          loadingRef.current = false;
-        }, 1000);
-      }
+      fetchFeedLog(user.team_id, false);
+      // Reset loading ref after a delay to prevent rapid-fire requests
+      setTimeout(() => {
+        loadingRef.current = false;
+      }, 500);
     }
   }, [user?.team_id, fetchFeedLog, isLoading, hasMore]);
 
@@ -100,10 +99,17 @@ export default function UnifiedFeedModal({ isOpen, onClose }: UnifiedFeedModalPr
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', handleScroll);
+      scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
       return () => scrollContainer.removeEventListener('scroll', handleScroll);
     }
   }, [handleScroll]);
+
+  // Reset scroll position when filters change
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [searchTerm, selectedFilter]);
 
   const filteredFeed = useMemo(() => {
     let filtered = [...typedFeed];
@@ -193,9 +199,9 @@ export default function UnifiedFeedModal({ isOpen, onClose }: UnifiedFeedModalPr
       size="md"
       contentClassName="max-w-2xl"
     >
-      <div className="flex flex-col h-[80vh] -mt-6">
+      <div className="flex flex-col h-[calc(100vh-8rem)] -m-6">
         {/* Header */}
-        <div className={`px-6 pt-2 pb-4 border-b ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+        <div className={`px-6 pt-6 pb-4 border-b ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
 
           {/* Search and Filter Bar */}
           <div className="flex gap-2">
