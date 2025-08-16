@@ -185,25 +185,10 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
       key: "total_median",
       label: "Overall Performance",
       width: "20%",
-      render: (value, row) => (
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-xs" style={{ color: getColor(value) }}>
-            {value != null ? `${value.toFixed(2)}cm` : "—"}
-          </span>
-          {row.performanceLevel && (
-            <span className={`text-[10px] px-1.5 py-0.5 rounded ${
-              row.performanceLevel === "excellent" 
-                ? "text-green-700 dark:text-green-400"
-                : row.performanceLevel === "good"
-                ? "text-blue-700 dark:text-blue-400"
-                : row.performanceLevel === "warning"
-                ? "text-amber-700 dark:text-amber-400"
-                : "text-red-700 dark:text-red-400"
-            }`}>
-              ({row.performanceLevel})
-            </span>
-          )}
-        </div>
+      render: (value) => (
+        <span className="font-medium text-xs" style={{ color: getColor(value) }}>
+          {value != null ? `${value.toFixed(2)}cm` : "—"}
+        </span>
       ),
     },
     {
