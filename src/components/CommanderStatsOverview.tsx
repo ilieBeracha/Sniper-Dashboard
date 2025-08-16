@@ -5,6 +5,8 @@ import { squadStore } from "@/store/squadStore";
 import { useTheme } from "@/contexts/ThemeContext";
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { BarChart2, ArrowRight } from "lucide-react";
 
 interface StatCardProps {
   title: string;
@@ -47,6 +49,7 @@ const StatCard = ({ title, value, subtitle, trend }: StatCardProps) => {
 
 export default function CommanderStatsOverview() {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const { commanderUserRoleBreakdown, commanderTeamDispersion } = useStore(performanceStore);
   const { members } = useStore(teamStore);
   const { squads } = useStore(squadStore);
@@ -159,6 +162,22 @@ export default function CommanderStatsOverview() {
         {statCards.map((stat, index) => (
           <StatCard key={index} {...stat} />
         ))}
+      </div>
+      
+      {/* Analytics Link */}
+      <div className="mt-4 flex justify-end">
+        <button
+          onClick={() => navigate("/analytics")}
+          className={`group flex items-center gap-2 text-sm transition-all ${
+            theme === "dark" 
+              ? "text-zinc-500 hover:text-zinc-300" 
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          <BarChart2 className="w-4 h-4" />
+          <span>View Detailed Analytics</span>
+          <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
+        </button>
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ import { getSquads } from "@/services/squadService";
 import CommanderTeamDispersionEnhanced from "./CommanderTeamDispersionEnhanced";
 import CommanderStatsOverview from "./CommanderStatsOverview";
 import CommanderPerformanceGrid from "./CommanderPerformanceGrid";
-import { Calendar, Download, RefreshCw, BarChart3 } from "lucide-react";
+import { Calendar, Download, RefreshCw } from "lucide-react";
 
 const CommanderView = () => {
   const { theme } = useTheme();
@@ -122,22 +122,6 @@ const CommanderView = () => {
               Detailed
             </button>
           </div>
-
-          {/* Analytics Link */}
-          <div className={`h-6 w-px ${theme === "dark" ? "bg-zinc-700" : "bg-gray-300"}`} />
-          
-          <a
-            href="/analytics"
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-              theme === "dark" 
-                ? "hover:bg-zinc-800 text-zinc-400 hover:text-white" 
-                : "hover:bg-gray-100 text-gray-600 hover:text-gray-900"
-            }`}
-            title="View detailed analytics"
-          >
-            <BarChart3 className="w-4 h-4" />
-            <span>Analytics</span>
-          </a>
 
           {/* Action Buttons */}
           <button
