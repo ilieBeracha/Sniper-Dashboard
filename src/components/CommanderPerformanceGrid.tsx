@@ -79,13 +79,13 @@ export default function CommanderPerformanceGrid({ userRoleData, dispersionData 
           // Determine performance level
           if (squad.avgDispersion <= 3 && squad.avgAccuracy >= 75) {
             squad.performance = "excellent";
-            squad.trend = "up";
+            squad.trend = "up"; // TODO: MOCK TREND - Replace with actual historical trend data
           } else if (squad.avgDispersion > 5 || squad.avgAccuracy < 50) {
             squad.performance = "needs-improvement";
-            squad.trend = "down";
+            squad.trend = "down"; // TODO: MOCK TREND - Replace with actual historical trend data
           } else {
             squad.performance = "good";
-            squad.trend = "stable";
+            squad.trend = "stable"; // TODO: MOCK TREND - Replace with actual historical trend data
           }
         }
       });

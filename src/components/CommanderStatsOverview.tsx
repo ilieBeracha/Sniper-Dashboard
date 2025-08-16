@@ -103,6 +103,7 @@ export default function CommanderStatsOverview() {
     const criticalPerformers = validDispersions.filter(d => d > 5).length;
     
     // Mock improvement rate (would need historical data)
+    // TODO: MOCK DATA - Replace with actual historical trend calculation
     const improvementRate = 12.5;
     
     setStats({
@@ -122,7 +123,7 @@ export default function CommanderStatsOverview() {
       title: "Total Members",
       value: stats.totalMembers,
       subtitle: `Across ${stats.activeSquads} squads`,
-      trend: { value: 8, positive: true }
+      trend: { value: 8, positive: true } // TODO: MOCK DATA - Replace with actual member growth trend
     },
     {
       title: "Team Accuracy",

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Users, User, ChevronDown, ChevronRight, TrendingUp } from "lucide-react";
+import { Users, User, ChevronDown, ChevronRight } from "lucide-react";
 import BaseDashboardCard from "./base/BaseDashboardCard";
 import { CommanderTeamDispersionEntry } from "@/types/performance";
 import { getEnumValues } from "@/services/supabaseEnums";
@@ -153,43 +153,30 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
       render: (_, row) => {
         if (row.isSquadHeader) {
           return (
-            <div className="flex items-center gap-3 py-2">
+            <div className="flex items-center gap-2 py-1">
               <button className="p-0.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded">
                 {row.isExpanded ? (
-                  <ChevronDown className="text-blue-500 w-5 h-5" />
+                  <ChevronDown className="text-blue-500 w-4 h-4" />
                 ) : (
-                  <ChevronRight className="text-gray-500 w-5 h-5" />
+                  <ChevronRight className="text-gray-500 w-4 h-4" />
                 )}
               </button>
-              <div className={`p-2 rounded-lg ${
-                theme === "dark" ? "bg-blue-900/20" : "bg-blue-50"
-              }`}>
-                <Users className={`w-4 h-4 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold text-xs">{row.first_name}</span>
-                <span className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
-                  {row.userCount} members • Squad Average
+              <Users className={`w-3 h-3 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
+              <div className="flex flex-col gap-0">
+                <span className="font-semibold text-xs leading-tight">{row.first_name}</span>
+                <span className={`text-[10px] leading-tight ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
+                  {row.userCount} members
                 </span>
               </div>
             </div>
           );
         }
         return (
-          <div className="flex items-center gap-3 pl-12 py-2">
-            <div className={`p-2 rounded-lg ${
-              theme === "dark" ? "bg-green-900/20" : "bg-green-50"
-            }`}>
-              <User className={`w-4 h-4 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-medium">
-                {row.first_name} {row.last_name}
-              </span>
-              <span className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-500"}`}>
-                Individual Performance
-              </span>
-            </div>
+          <div className="flex items-center gap-2 pl-8 py-1">
+            <User className={`w-3 h-3 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} />
+            <span className="text-xs">
+              {row.first_name} {row.last_name}
+            </span>
           </div>
         );
       },
@@ -199,36 +186,23 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
       label: "Overall Performance",
       width: "20%",
       render: (value, row) => (
-        <div className="flex items-center gap-3">
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-1">
-              <span className="font-semibold text-xs" style={{ color: getColor(value) }}>
-                {value != null ? `${value.toFixed(2)}cm` : "—"}
-              </span>
-              {row.performanceLevel && (
-                <span className={`text-xs px-2 py-0.5 rounded-full ${
-                  row.performanceLevel === "excellent" 
-                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                    : row.performanceLevel === "good"
-                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                    : row.performanceLevel === "warning"
-                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                    : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                }`}>
-                  {row.performanceLevel}
-                </span>
-              )}
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-zinc-700 rounded-full h-1.5">
-              <div 
-                className="h-1.5 rounded-full transition-all duration-300"
-                style={{ 
-                  width: value != null ? `${Math.max(10, 100 - (value * 10))}%` : "0%",
-                  backgroundColor: getColor(value)
-                }}
-              />
-            </div>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="font-medium text-xs" style={{ color: getColor(value) }}>
+            {value != null ? `${value.toFixed(2)}cm` : "—"}
+          </span>
+          {row.performanceLevel && (
+            <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+              row.performanceLevel === "excellent" 
+                ? "text-green-700 dark:text-green-400"
+                : row.performanceLevel === "good"
+                ? "text-blue-700 dark:text-blue-400"
+                : row.performanceLevel === "warning"
+                ? "text-amber-700 dark:text-amber-400"
+                : "text-red-700 dark:text-red-400"
+            }`}>
+              ({row.performanceLevel})
+            </span>
+          )}
         </div>
       ),
     },
@@ -237,12 +211,9 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
       label: "Without Effort",
       hideOnMobile: true,
       render: (value) => (
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor(value) }} />
-          <span className="font-medium text-xs" style={{ color: getColor(value) }}>
-            {value != null ? `${value.toFixed(2)}cm` : "—"}
-          </span>
-        </div>
+        <span className="text-xs" style={{ color: getColor(value) }}>
+          {value != null ? `${value.toFixed(2)}cm` : "—"}
+        </span>
       ),
     },
     {
@@ -255,20 +226,14 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
           : null;
         
         return (
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor(value) }} />
-              <span className="font-medium text-xs" style={{ color: getColor(value) }}>
-                {value != null ? `${value.toFixed(2)}cm` : "—"}
-              </span>
-            </div>
+          <div className="flex flex-col gap-0">
+            <span className="text-xs" style={{ color: getColor(value) }}>
+              {value != null ? `${value.toFixed(2)}cm` : "—"}
+            </span>
             {improvement !== null && improvement > 0 && (
-              <div className="flex items-center gap-1 mt-1">
-                <TrendingUp className="w-3 h-3 text-green-500" />
-                <span className="text-xs text-green-600 dark:text-green-400">
-                  {improvement.toFixed(0)}% better
-                </span>
-              </div>
+              <span className="text-[10px] text-green-600 dark:text-green-400">
+                -{improvement.toFixed(0)}%
+              </span>
             )}
           </div>
         );
@@ -278,12 +243,9 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
       key: "median_type_timed",
       label: "Timed Performance",
       render: (value) => (
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor(value) }} />
-          <span className="font-medium text-xs" style={{ color: getColor(value) }}>
-            {value != null ? `${value.toFixed(2)}cm` : "—"}
-          </span>
-        </div>
+        <span className="text-xs" style={{ color: getColor(value) }}>
+          {value != null ? `${value.toFixed(2)}cm` : "—"}
+        </span>
       ),
     },
   ];
@@ -291,15 +253,9 @@ const CommanderTeamDispersionEnhanced: React.FC<CommanderTeamDispersionEnhancedP
   return (
     <BaseDashboardCard
       header={
-        <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-blue-500" />
-          <div>
-            <h3 className="font-semibold text-base">Team Dispersion Analysis</h3>
-            <p className="text-xs text-gray-600 dark:text-zinc-400">
-              Detailed performance metrics by squad and individual
-            </p>
+                  <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-sm">Team Dispersion Analysis</h3>
           </div>
-        </div>
       }
       tooltipContent="Track shooting dispersion patterns across different conditions and effort levels"
       withFilter={[
