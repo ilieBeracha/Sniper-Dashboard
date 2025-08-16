@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { BiSolidDashboard, BiSolidLogOut, BiSolidCog, BiChevronRight, BiChevronLeft } from "react-icons/bi";
 import { BsBarChartFill } from "react-icons/bs";
+import { MdModelTraining } from "react-icons/md";
 import { authStore } from "@/store/authStore";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
@@ -16,7 +17,8 @@ const navSections = [
     title: "OVERVIEW",
     items: [
       { name: "Dashboard", href: "/", icon: <BiSolidDashboard className="w-5 h-5" /> },
-      { name: "Trainings", href: "/trainings", icon: <BsBarChartFill className="w-5 h-5" /> },
+      { name: "Analytics", href: "/analytics", icon: <BsBarChartFill className="w-5 h-5" /> },
+      { name: "Trainings", href: "/trainings", icon: <MdModelTraining className="w-5 h-5" /> },
     ],
   },
   {
