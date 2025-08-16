@@ -5,7 +5,7 @@ import Assets from "@/views/Assets";
 import TrainingPage from "@/views/Training";
 import ErrorPage from "@/views/404";
 import Settings from "@/views/Settings";
-import Stats from "@/views/Stats";
+import Analytics from "@/views/Analytics";
 
 export const routes: RouteObject[] = [
   {
@@ -22,11 +22,11 @@ export const routes: RouteObject[] = [
   },
   {
     path: "/analytics",
-    element: <Stats />,
+    element: <Analytics />,
   },
   {
     path: "/stats",
-    element: <Stats />,
+    element: <Analytics />,
   },
   {
     path: "/assets",
