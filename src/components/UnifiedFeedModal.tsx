@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useStore } from "zustand";
 import { feedStore } from "@/store/feedStore";
@@ -16,7 +16,6 @@ import {
   Trophy,
   Search,
   Filter,
-  X,
   Clock,
   TrendingUp,
 } from "lucide-react";
@@ -60,20 +59,51 @@ const actionConfig = {
 };
 
 export default function UnifiedFeedModal({ isOpen, onClose }: UnifiedFeedModalProps) {
-  const { feed, fetchFeedLog } = useStore(feedStore);
+  const { feed, fetchFeedLog, resetFeed, isLoading, hasMore, totalCount } = useStore(feedStore);
   const { user } = useStore(userStore);
   const { theme } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef(false);
 
   // Transform feed to ensure actor_id is properly typed
   const typedFeed = feed as any[];
 
+  // Reset and fetch initial data when modal opens
   useEffect(() => {
     if (isOpen && user?.team_id) {
-      fetchFeedLog(user.team_id);
+      resetFeed();
+      fetchFeedLog(user.team_id, true);
     }
   }, [isOpen, user?.team_id]);
+
+  // Infinite scroll handler
+  const handleScroll = useCallback(() => {
+    if (!scrollContainerRef.current || loadingRef.current || isLoading || !hasMore) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+    
+    // Load more when user scrolls to 80% of the content
+    if (scrollTop + clientHeight >= scrollHeight * 0.8) {
+      loadingRef.current = true;
+      if (user?.team_id) {
+        fetchFeedLog(user.team_id, false);
+        setTimeout(() => {
+          loadingRef.current = false;
+        }, 1000);
+      }
+    }
+  }, [user?.team_id, fetchFeedLog, isLoading, hasMore]);
+
+  // Add scroll listener
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll);
+      return () => scrollContainer.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
 
   const filteredFeed = useMemo(() => {
     let filtered = [...typedFeed];
@@ -163,27 +193,9 @@ export default function UnifiedFeedModal({ isOpen, onClose }: UnifiedFeedModalPr
       size="md"
       contentClassName="max-w-2xl"
     >
-      <div className="flex flex-col h-[80vh]">
+      <div className="flex flex-col h-[80vh] -mt-6">
         {/* Header */}
-        <div className={`px-6 py-4 border-b ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                Activity Feed
-              </h2>
-              <p className={`text-sm ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-                Recent team activities
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className={`p-2 rounded-lg transition-colors ${
-                theme === "dark" ? "hover:bg-zinc-800" : "hover:bg-gray-100"
-              }`}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+        <div className={`px-6 pt-2 pb-4 border-b ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
 
           {/* Search and Filter Bar */}
           <div className="flex gap-2">
@@ -265,7 +277,7 @@ export default function UnifiedFeedModal({ isOpen, onClose }: UnifiedFeedModalPr
         </div>
 
         {/* Feed Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-6 py-4">
           {filteredFeed.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full">
               <div className={`p-4 rounded-full mb-4 ${
@@ -370,6 +382,26 @@ export default function UnifiedFeedModal({ isOpen, onClose }: UnifiedFeedModalPr
                     </motion.div>
                   );
                 })}
+                
+                {/* Loading indicator */}
+                {isLoading && (
+                  <div className="flex justify-center py-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                )}
+                
+                {/* End of feed message */}
+                {!hasMore && filteredFeed.length > 0 && (
+                  <div className={`text-center py-4 text-sm ${
+                    theme === "dark" ? "text-zinc-500" : "text-gray-500"
+                  }`}>
+                    No more activities to load
+                  </div>
+                )}
               </div>
             </AnimatePresence>
           )}
@@ -382,7 +414,7 @@ export default function UnifiedFeedModal({ isOpen, onClose }: UnifiedFeedModalPr
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-4">
               <span className={theme === "dark" ? "text-zinc-400" : "text-gray-600"}>
-                {filteredFeed.length} activities
+                {filteredFeed.length} of {totalCount} activities
               </span>
               <div className="flex items-center gap-1">
                 <Clock className="w-3 h-3" />

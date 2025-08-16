@@ -69,7 +69,9 @@ export default function UnifiedFeed() {
   const { theme } = useTheme();
 
   useEffect(() => {
-    fetchFeedLog(user?.team_id as string);
+    if (user?.team_id) {
+      fetchFeedLog(user.team_id, true);
+    }
   }, [user?.team_id]);
 
   const groupedUserFeed = useMemo(() => {
