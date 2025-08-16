@@ -10,7 +10,6 @@ import {
   Users, 
   BarChart3,
   Calendar,
-  Zap,
   Award
 } from "lucide-react";
 
@@ -137,12 +136,6 @@ export default function Analytics() {
         >
           {/* Quick Stats Grid */}
           <motion.div variants={itemVariants}>
-            <h2 className={`text-lg font-semibold mb-4 flex items-center ${
-              theme === "dark" ? "text-white" : "text-gray-900"
-            }`}>
-              <Zap className="w-5 h-5 mr-2" />
-              Weekly Performance Overview
-            </h2>
             <WeeklyKPIs />
           </motion.div>
 
