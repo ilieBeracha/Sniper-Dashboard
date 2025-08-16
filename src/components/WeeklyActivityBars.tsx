@@ -12,7 +12,7 @@ export default function WeeklyActivityBars() {
   const { theme } = useTheme();
 
   useEffect(() => {
-    if (user?.team_id) fetchFeedLog(user.team_id);
+    if (user?.team_id) fetchFeedLog(user.team_id, true);
   }, [user?.team_id]);
 
   const weekData = useMemo(() => {

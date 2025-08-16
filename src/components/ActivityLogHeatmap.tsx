@@ -50,7 +50,7 @@ export default function ActivityLogHeatmap() {
     const loadData = async () => {
       setLoading(true);
       try {
-        fetchFeedLog(user.team_id || "");
+        fetchFeedLog(user.team_id || "", true);
       } catch (error) {
         console.error("Error loading activity feed:", error);
       } finally {
