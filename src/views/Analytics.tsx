@@ -5,7 +5,6 @@ import { performanceStore } from "@/store/performance";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import { 
-  TrendingUp, 
   Target, 
   Activity, 
   Users, 
@@ -21,7 +20,7 @@ import WeeklyKPIs from "@/components/StatsUserKPI";
 import SquadImpactStats from "@/components/SquadImpactStats";
 import WeeklyActivityBars from "@/components/WeeklyActivityBars";
 import ActivityLogHeatmap from "@/components/ActivityLogHeatmap";
-import TrainingAnalyticsTab from "@/components/TrainingAnalyticsTab";
+import CommanderStatsOverview from "@/components/CommanderStatsOverview";
 
 export default function Analytics() {
   const { user } = useStore(userStore);
@@ -232,7 +231,7 @@ export default function Analytics() {
             </div>
           </motion.div>
 
-          {/* Training Analytics */}
+          {/* Commander Stats Overview */}
           <motion.div variants={itemVariants}>
             <div className={`rounded-xl p-6 transition-all duration-300 ${
               theme === "dark" 
@@ -244,10 +243,10 @@ export default function Analytics() {
                   theme === "dark" ? "text-white" : "text-gray-900"
                 }`}>
                   <Award className="w-5 h-5 mr-2" />
-                  Training Performance Analytics
+                  Commander Performance Overview
                 </h3>
               </div>
-              <TrainingAnalyticsTab />
+              <CommanderStatsOverview />
             </div>
           </motion.div>
         </motion.div>
