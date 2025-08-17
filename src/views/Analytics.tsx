@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
-import { performanceStore } from "@/store/performance";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import { 
@@ -23,15 +22,13 @@ import CommanderStatsOverview from "@/components/CommanderStatsOverview";
 
 export default function Analytics() {
   const { user } = useStore(userStore);
-  const { getFirstShotMatrix, getUserWeeklyKpisForUser } = useStore(performanceStore);
   const { theme } = useTheme();
 
   // Function to refresh all data
   const refreshData = () => {
     if (user?.team_id) {
       console.log("Refreshing analytics data...");
-      getFirstShotMatrix(user.team_id, 7);
-      getUserWeeklyKpisForUser(user.id, 7);
+      // TODO: Add data refresh calls when methods are available
     }
   };
 
