@@ -59,7 +59,7 @@
     "dagre": "^0.8.5",
     "date-fns": "^4.1.0",
     "flatpickr": "^4.6.13",
-    "flowbite-react": "^0.11.7",
+    "flowbite-react": "^0.12.7",
     "framer-motion": "^12.9.4",
     "heroicons": "^2.2.0",
     "json-logic-js": "^2.0.5",
