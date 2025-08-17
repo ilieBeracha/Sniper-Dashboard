@@ -1,31 +1,21 @@
-import { useMemo, useEffect } from "react";
-import { useStore } from "zustand";
-import { performanceStore } from "@/store/performance";
-import { userStore } from "@/store/userStore";
+import { useMemo } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import { Users, Trophy, Target, RefreshCw, Shield } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 export default function SquadImpactStats() {
-  const { squadWeaponStats, getSquadWeaponStats, isLoading } = useStore(performanceStore);
-  const { user } = useStore(userStore);
+  const mockData = [
+    {
+      user_name: "John Doe",
+      hits: 10,
+      misses: 2,
+    },
+  ];
   const { theme } = useTheme();
 
-  useEffect(() => {
-    if (user?.team_id) {
-      getSquadWeaponStats(user.team_id, null, null);
-    }
-  }, [user?.team_id, getSquadWeaponStats]);
-
-  const handleRefresh = () => {
-    if (user?.team_id) {
-      getSquadWeaponStats(user.team_id, null, null);
-    }
-  };
-
   const { totalHits, topPerformers, overallAccuracy, squadStats } = useMemo(() => {
-    if (!squadWeaponStats || squadWeaponStats.length === 0) {
+    if (!mockData || mockData.length === 0) {
       return { totalHits: 0, topPerformers: [], overallAccuracy: 0, squadStats: null };
     }
 
@@ -33,7 +23,7 @@ export default function SquadImpactStats() {
     let misses = 0;
     const userStats = new Map();
 
-    squadWeaponStats.forEach((stat: any) => {
+    mockData.forEach((stat: any) => {
       const userName = stat.user_name || "Unknown";
       const userHits = stat.hits || 0;
       const userMisses = stat.misses || 0;
@@ -68,21 +58,7 @@ export default function SquadImpactStats() {
         activeMembers: userStats.size,
       },
     };
-  }, [squadWeaponStats]);
-
-  if (isLoading) {
-    return (
-      <div
-        className={`rounded-xl p-3 ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"} 
-        border ${theme === "dark" ? "border-zinc-700/50" : "border-gray-200"}`}
-      >
-        <div className="animate-pulse space-y-3">
-          <div className={`h-4 rounded w-1/3 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
-          <div className={`h-32 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
-        </div>
-      </div>
-    );
-  }
+  }, [mockData]);
 
   const chartData = [
     { name: "Accuracy", value: overallAccuracy, fill: theme === "dark" ? "#71717a" : "#6b7280" },
@@ -103,7 +79,6 @@ export default function SquadImpactStats() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={handleRefresh}
           className={`p-1.5 rounded-lg ${theme === "dark" ? "bg-zinc-800 hover:bg-zinc-700" : "bg-gray-100 hover:bg-gray-200"} transition-colors`}
         >
           <RefreshCw className="w-3.5 h-3.5" />

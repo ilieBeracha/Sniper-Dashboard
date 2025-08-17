@@ -1,19 +1,24 @@
 import { useMemo } from "react";
-import { useStore } from "zustand";
-import { performanceStore } from "@/store/performance";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart } from "recharts";
 import { Target, Activity, Crosshair, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function ChartMatrix() {
-  const { firstShotMatrix, isLoading } = useStore(performanceStore);
+  const mockData = [
+    {
+      distance_bucket: 100,
+      targets: 10,
+      first_shot_hit_rate: 0.5,
+      avg_time_to_first_shot_sec: 10,
+    },
+  ];
   const { theme } = useTheme();
 
   const matrixData = useMemo(() => {
-    if (!firstShotMatrix || isLoading) return null;
+    if (!mockData) return null;
 
-    const rows = firstShotMatrix as {
+    const rows = mockData as {
       distance_bucket: number;
       targets: number;
       first_shot_hit_rate: number | null;
@@ -53,22 +58,7 @@ export default function ChartMatrix() {
       ),
       mostEngaged: buckets.reduce((most, b) => (b.targets > (most?.targets ?? 0) ? b : most), null as (typeof buckets)[number] | null),
     };
-  }, [firstShotMatrix, isLoading]);
-
-  if (isLoading) {
-    return (
-      <div
-        className={`rounded-xl p-4 ${
-          theme === "dark" ? "bg-zinc-900/50" : "bg-white"
-        } border ${theme === "dark" ? "border-zinc-700/50" : "border-gray-200"} shadow-sm`}
-      >
-        <div className="animate-pulse space-y-3">
-          <div className={`h-4 rounded w-1/3 ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
-          <div className={`h-40 rounded ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}></div>
-        </div>
-      </div>
-    );
-  }
+  }, [mockData]);
 
   if (!matrixData || matrixData.buckets.length === 0) {
     return (

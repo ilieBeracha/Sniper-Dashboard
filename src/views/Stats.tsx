@@ -1,6 +1,5 @@
 // Components
 import ChartMatrix from "@/components/ChartMatrix";
-import WeeklyKPIs from "@/components/StatsUserKPI";
 import SquadImpactStats from "@/components/SquadImpactStats";
 import Header from "@/Headers/Header";
 import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
@@ -9,22 +8,23 @@ import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { useEffect } from "react";
 
-import { performanceStore } from "@/store/performance";
 import WeeklyActivityBars from "@/components/WeeklyActivityBars";
-
-import { PositionScore } from "@/types/user";
+import { useStatsStore } from "@/store/statsStore";
+import { useStatsFilters } from "@/hooks/useStatsFilters";
+import StatsUserKPI from "@/components/StatsUserKPI";
 
 export default function Stats() {
   const { user } = useStore(userStore);
-  const { getFirstShotMatrix, getUserWeeklyKpisForUser, fetchPositionHeatmap, getSquadWeaponStats } = useStore(performanceStore);
+  const { getStatsOverviewTotals, getFirstShotMetrics, getEliminationByPosition } = useStore(useStatsStore);
+  const { filters } = useStatsFilters();
 
   const refreshData = () => {
     if (user?.team_id) {
       console.log("Refreshing stats page data...");
-      getFirstShotMatrix(user.team_id, 30, null, 25, 100, 900, 0);
-      getUserWeeklyKpisForUser(user.id, new Date(new Date().setDate(new Date().getDate() - 30)), new Date());
-      fetchPositionHeatmap(user.team_id, PositionScore.Lying, new Date(new Date().setDate(new Date().getDate() - 30)), new Date());
-      getSquadWeaponStats(user.team_id, new Date(new Date().setDate(new Date().getDate() - 30)), new Date());
+
+      getStatsOverviewTotals(filters);
+      getFirstShotMetrics(filters);
+      getEliminationByPosition(filters);
     }
   };
 
@@ -63,7 +63,7 @@ export default function Stats() {
       <SpPageHeader title="Stats" subtitle="KPIs, impact and trends" icon={BarChart2} />
       <SpPageBody>
         <div className="space-y-2">
-          <WeeklyKPIs />
+          <StatsUserKPI />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
             <WeeklyActivityBars />
 

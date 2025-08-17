@@ -1,44 +1,43 @@
-import { useStore } from "zustand";
-import { performanceStore } from "@/store/performance";
-import { Calendar, Users, Target, Crosshair, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { getWeekRange } from "@/utils/getWeakRange";
+import { Calendar, Users, Target, Crosshair, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { useStore } from "zustand";
+import { useStatsStore } from "@/store/statsStore";
 
 const pct = (v?: number | null) => (v == null ? "—" : `${Math.round(v * 100)}%`);
 const pos = (v?: number | null) => (v ?? 0) >= 0;
 
 export default function StatsUserKPI() {
-  const { userWeeklyKpisForUser } = useStore(performanceStore);
+  const { statsOverviewTotals } = useStore(useStatsStore);
   const { theme } = useTheme();
 
-  if (!userWeeklyKpisForUser || userWeeklyKpisForUser.length === 0) return null;
+  if (!statsOverviewTotals) return null;
 
-  const row = userWeeklyKpisForUser[0];
+  const row = statsOverviewTotals;
 
   const kpis = [
     {
-      value: row.trainings_current,
+      value: row.sessions,
       label: "Training Sessions",
       icon: Calendar,
-      trend: pct(row.trainings_change_pct),
-      positive: pos(row.trainings_change_pct),
-    },
-    {
-      value: row.sessions_current,
-      label: "Active Sessions",
-      icon: Users,
       trend: pct(row.sessions_change_pct),
       positive: pos(row.sessions_change_pct),
     },
     {
-      value: row.targets_current,
+      value: row.sessions,
+      label: "Active Sessions",
+      icon: Users,
+      trend: pct(0.1),
+      positive: pos(0.1),
+    },
+    {
+      value: row.targets,
       label: "Targets Engaged",
       icon: Target,
       trend: pct(row.targets_change_pct),
       positive: pos(row.targets_change_pct),
     },
     {
-      value: Math.round(row.hit_ratio_current * 100),
+      value: row.hit_pct,
       label: "Accuracy Rate",
       suffix: "%",
       icon: Crosshair,
