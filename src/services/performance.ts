@@ -12,7 +12,6 @@ import {
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/user";
 import { PositionHeatmapDay } from "@/types/positionHeatmap";
-import { buildDateRange } from "@/utils/buildDayRange";
 
 export async function getUserHitStatsFull(userId: string): Promise<UserHitsData> {
   try {
@@ -432,6 +431,7 @@ export async function getUserMediansInSquad(
 }
 
 export async function getFirstShotMatrix(teamId: string, rangeDays: number = 7) {
+  const { buildDateRange } = await import("@/utils/buildDayRange");
   const { p_start, p_end } = buildDateRange(rangeDays);
 
   const { data, error } = await supabase.rpc("get_first_shot_matrix", {
@@ -445,6 +445,7 @@ export async function getFirstShotMatrix(teamId: string, rangeDays: number = 7) 
 }
 
 export async function getUserWeeklyKpisForUser(userId: string, rangeDays: number = 7) {
+  const { buildDateRange } = await import("@/utils/buildDayRange");
   const { p_start, p_end } = buildDateRange(rangeDays);
   const { data, error } = await supabase.rpc("get_user_weekly_kpis_for_user", {
     p_user_id: userId,
