@@ -83,7 +83,7 @@ export default function Stats() {
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           {/* Active filters display */}
-          {(filters.startDate || filters.endDate || filters.dayNight?.length || filters.positions?.length || filters.minShots) && (
+          {(filters.startDate || filters.endDate || filters.dayNight?.length || filters.positions?.length) && (
             <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2">
               <span className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Active filters:</span>
               <div className="flex items-center gap-1">
@@ -115,13 +115,6 @@ export default function Stats() {
                     {filters.positions.length} position{filters.positions.length > 1 ? "s" : ""}
                   </span>
                 )}
-                {filters.minShots && (
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs ${theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-700"}`}
-                  >
-                    Min: {filters.minShots} shots
-                  </span>
-                )}
               </div>
               <button
                 onClick={() => {
@@ -149,7 +142,7 @@ export default function Stats() {
         >
           <SlidersHorizontal className="w-4 h-4" />
           <span className="text-sm font-medium">Filters</span>
-          {(filters.startDate || filters.endDate || filters.dayNight?.length || filters.positions?.length || filters.minShots) && (
+          {(filters.startDate || filters.endDate || filters.dayNight?.length || filters.positions?.length) && (
             <span
               className={`ml-1 px-1.5 py-0.5 rounded-full text-xs font-medium
               ${theme === "dark" ? "bg-violet-500/20 text-violet-400" : "bg-violet-100 text-violet-600"}`}
@@ -159,7 +152,6 @@ export default function Stats() {
                 filters.endDate ? 1 : 0,
                 filters.dayNight?.length ? 1 : 0,
                 filters.positions?.length ? 1 : 0,
-                filters.minShots ? 1 : 0,
               ].reduce((a, b) => a + b, 0)}
             </span>
           )}

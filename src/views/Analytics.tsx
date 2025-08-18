@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
-import { performanceStore } from "@/store/performance";
+import { useStatsStore } from "@/store/statsStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import { 
@@ -23,15 +23,26 @@ import CommanderStatsOverview from "@/components/CommanderStatsOverview";
 
 export default function Analytics() {
   const { user } = useStore(userStore);
-  const { getFirstShotMatrix, getUserWeeklyKpisForUser } = useStore(performanceStore);
+  const { getFirstShotMatrix, getStatsOverviewTotals } = useStore(useStatsStore);
   const { theme } = useTheme();
 
   // Function to refresh all data
   const refreshData = () => {
-    if (user?.team_id) {
+    if (user?.team_id && user?.id) {
       console.log("Refreshing analytics data...");
-      getFirstShotMatrix(user.team_id, 7);
-      getUserWeeklyKpisForUser(user.id, 7);
+      // Create proper filters for stats
+      const filters = {
+        squadIds: null,
+        userId: user.id,
+        startDate: null,
+        endDate: null,
+        dayNight: null,
+        positions: null,
+        minShots: null
+      };
+      
+      getFirstShotMatrix(filters);
+      getStatsOverviewTotals(filters);
     }
   };
 

@@ -11,7 +11,7 @@ export interface StatsFilters {
   endDate: string | null; // ISO
   dayNight: DayNight[] | null; // ["DAY","NIGHT"]
   positions: PositionEnum[] | null; // enum literals
-  minShots: number | null; // null = no filter
+  minShots: number | null; // null = no filter - kept for backward compatibility but always null
 }
 
 type RpcFilters = {
