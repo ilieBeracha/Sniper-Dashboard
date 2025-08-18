@@ -339,8 +339,6 @@ export async function getFullSessionById(sessionId: string): Promise<{
     .eq("session_stats_id", sessionId);
   if (targetsError) throw targetsError;
 
-  console.log("targets", targets);
-
   return {
     sessionStats: {
       training_session_id: session.training_session_id,

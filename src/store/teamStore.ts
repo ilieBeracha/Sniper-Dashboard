@@ -16,7 +16,6 @@ export const teamStore = create<TeamStore>((set) => ({
     try {
       const members = await getTeamMembers(teamId);
       set({ members });
-      console.log("members", members);
       set({ teamId });
     } catch (err) {
       console.error("Failed to fetch team members:", err);

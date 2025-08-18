@@ -363,7 +363,6 @@ export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsage
     console.error("Error fetching weapon usage stats:", error.message);
     throw error;
   }
-  console.log("data", data);
 
   const rawResult = data?.[0];
   const result = rawResult

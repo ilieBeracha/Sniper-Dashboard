@@ -144,7 +144,6 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                               value={target.meterPerSecond || ""}
                               onChange={(e) => {
                                 const value = e.target.value ? parseFloat(e.target.value) : null;
-                                console.log("Updating meterPerSecond for target", target.id, "to", value);
                                 updateTarget(target.id, "meterPerSecond", value);
                               }}
                               className="h-7 text-xs"

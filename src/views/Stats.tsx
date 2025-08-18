@@ -97,11 +97,8 @@ export default function Stats() {
 
       // Skip if filters haven't changed and not forced
       if (!forceRefresh && currentFiltersHash === lastFiltersHash && dataVersion > 0) {
-        console.log("Skipping refresh - filters unchanged");
         return;
       }
-
-      console.log("🔄 Refreshing stats data:", { filters, currentFiltersHash, forceRefresh });
 
       // Cancel any ongoing request
       if (abortControllerRef.current) {
@@ -134,7 +131,6 @@ export default function Stats() {
 
         // Check if request was cancelled
         if (signal.aborted) {
-          console.log("Request cancelled");
           return;
         }
 
@@ -148,7 +144,6 @@ export default function Stats() {
         });
 
         if (!hasFailures) {
-          console.log("✅ All data refreshed successfully");
           setLastFiltersHash(currentFiltersHash);
         } else {
           console.warn("⚠️ Some data failed to refresh");
@@ -179,14 +174,12 @@ export default function Stats() {
 
   // Clear filters handler
   const handleClearFilters = useCallback(() => {
-    console.log("🧹 Clearing filters");
     clearFilters();
     // Don't call refreshData here - let the useEffect handle it
   }, [clearFilters]);
 
   // Effect to refresh data when filters change
   useEffect(() => {
-    console.log("🎯 Filters changed, triggering refresh:", filters);
     if (user?.team_id) {
       // Always refresh when filters change, including when cleared
       refreshData();
@@ -196,7 +189,6 @@ export default function Stats() {
   // Effect to refresh data when user changes
   useEffect(() => {
     if (user?.team_id) {
-      console.log("👤 User changed, triggering initial refresh");
       refreshData(true); // Force refresh for user change
     }
   }, [user?.team_id]); // Remove refreshData from dependencies
@@ -212,14 +204,12 @@ export default function Stats() {
 
   // Manual refresh handler
   const handleManualRefresh = useCallback(() => {
-    console.log("🔄 Manual refresh triggered");
     refreshData(true);
   }, [refreshData]);
 
   // Filter change handler with debouncing
   const handleFiltersChange = useCallback(
     (newFilters: any) => {
-      console.log("🔧 Filters changing:", newFilters);
       setFilters(newFilters);
     },
     [setFilters],
@@ -418,7 +408,6 @@ export default function Stats() {
             filters={filters}
             onFiltersChange={handleFiltersChange}
             onApply={() => {
-              console.log("🔧 Filters applied, closing drawer");
               setIsFilterDrawerOpen(false);
               // Refresh will happen automatically via useEffect
             }}

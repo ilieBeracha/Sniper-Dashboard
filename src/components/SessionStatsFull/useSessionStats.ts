@@ -35,7 +35,6 @@ export const useSessionStats = () => {
   useEffect(() => {
     (async () => {
       if (sessionId) {
-        console.log("sessionId", sessionId);
         setIsLoading(true);
         await getFullSessionById(sessionId);
         setIsLoading(false);
@@ -381,17 +380,16 @@ export const useSessionStats = () => {
   };
 
   const updateTarget = (targetId: string, field: keyof Target, value: any) => {
-    console.log("updateTarget called:", { targetId, field, value, currentTargets: targets });
     setTargets((prev) => {
       const updated = prev.map((t) => {
         if (t.id === targetId) {
           const newTarget = { ...t, [field]: value };
-          console.log("Updated target:", { old: t, new: newTarget });
+
           return newTarget;
         }
         return t;
       });
-      console.log("Updated targets array:", updated);
+
       return updated;
     });
     setHasUnsavedChanges(true);
@@ -520,8 +518,6 @@ export const useSessionStats = () => {
           // Current user for creator_id
           currentUser: user ? { id: user.id } : null,
         };
-
-        console.log("Submitting session data:", saveData);
 
         try {
           if (sessionId) {

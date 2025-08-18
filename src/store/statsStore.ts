@@ -37,24 +37,20 @@ export const useStatsStore = create<StatsStore>((set) => {
 
     getStatsOverviewTotals: async (filters: StatsFilters) => {
       const statsOverviewTotals = await rpcStatsOverview(filters);
-      console.log("statsOverviewTotals", statsOverviewTotals);
       set({ statsOverviewTotals });
     },
     getFirstShotMetrics: async (filters: StatsFilters) => {
       const firstShotMetrics = await rpcFirstShotMetrics(filters);
-      console.log("firstShotMetrics", firstShotMetrics);
       set({ firstShotMetrics });
     },
 
     getEliminationByPosition: async (filters: StatsFilters) => {
       const eliminationByPosition = await rpcEliminationByPosition(filters);
-      console.log("eliminationByPosition", eliminationByPosition);
       set({ eliminationByPosition });
     },
 
     getWeeklyTrends: async (filters: StatsFilters & { p_group_by_weapon?: boolean }) => {
       const weeklyTrends = await rpcWeeklyTrends(filters);
-      console.log("weeklyTrends", weeklyTrends);
       set({ weeklyTrends });
     },
 
@@ -67,7 +63,6 @@ export const useStatsStore = create<StatsStore>((set) => {
       },
     ) => {
       const firstShotMatrix = await rpcFirstShotMatrix(filters);
-      console.log("firstShotMatrix", firstShotMatrix);
       set({ firstShotMatrix });
     },
   };

@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair } from "lucide-react";
+import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair, Zap } from "lucide-react";
 import { Tooltip } from "@heroui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -231,6 +231,18 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                         <p className="text-xs">{item.note}</p>
                       </TooltipContent>
                     </Tooltip>
+                  </span>
+                )}
+                {/* Meter per second indicator */}
+                {item?.target_stats[0]?.meter_per_second && (
+                  <span
+                    className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium ${
+                      theme === "dark" ? "bg-purple-500/10 text-purple-400" : "bg-purple-50 text-purple-700"
+                    }`}
+                    title={`Meter per second: ${item.meter_per_second}`}
+                  >
+                    <Zap size={10} />
+                    <span>MPS</span>
                   </span>
                 )}
               </div>

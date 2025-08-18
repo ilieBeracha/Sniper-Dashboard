@@ -16,7 +16,6 @@ export default function Rules() {
   const [showTemplatesModal, setShowTemplatesModal] = useState(false);
 
   const { loadEventTypes, loadActionTypes, loadDefinitions, loadEvents, loadActions, loadExecutions } = useRuleStore();
-  console.log(user);
   useEffect(() => {
     loadEventTypes();
     loadActionTypes();
