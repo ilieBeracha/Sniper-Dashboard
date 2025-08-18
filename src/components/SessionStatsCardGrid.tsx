@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair } from "lucide-react";
+import { Sun, Moon, Activity, Info, Building2, Edit3, Trash2, Users, MoreVertical, Target, Crosshair, Zap } from "lucide-react";
 import { Tooltip } from "@heroui/tooltip";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -32,14 +32,14 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
         // Calculate total shots and hits from targets
         let totalShots = 0;
         let totalHits = 0;
-        
+
         // Check both possible data structures for targets
         const targets = item.targets || item.target_stats || [];
-        
+
         targets.forEach((target: any) => {
           // Check for engagements in different possible locations
           const engagements = target.engagements || target.target_engagements || [];
-          
+
           engagements.forEach((engagement: any) => {
             totalShots += engagement.shots_fired || 0;
             totalHits += engagement.target_hits || 0;
@@ -130,7 +130,7 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
               </div>
 
               {/* Compact Info Grid */}
-              <div className="grid grid-cols-2 gap-2 mb-1">
+              <div className="gap-2 mb-2">
                 {/* Team & Average Stats */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-1.5 text-xs">
@@ -142,29 +142,33 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                 </div>
 
                 {/* Shots and Hits Stats */}
-                <div className="space-y-2">
+                <div className="space-y-2 mt-2">
                   <div className="flex items-center gap-3 text-xs">
                     <div className="flex items-center gap-1">
                       <Target size={10} className="opacity-50" />
-                      <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
-                        {totalShots}
-                      </span>
+                      <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>{totalShots}</span>
                       <span className="opacity-60">shots</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Crosshair size={10} className="opacity-50" />
-                      <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
-                        {totalHits}
-                      </span>
+                      <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>{totalHits}</span>
                       <span className="opacity-60">hits</span>
                       {totalShots > 0 && (
-                        <span className={`ml-1 font-medium ${
-                          hitPercentage >= 70 
-                            ? theme === "dark" ? "text-green-400" : "text-green-600"
-                            : hitPercentage >= 50
-                            ? theme === "dark" ? "text-yellow-400" : "text-yellow-600"
-                            : theme === "dark" ? "text-red-400" : "text-red-600"
-                        }`}>
+                        <span
+                          className={`ml-1 font-medium ${
+                            hitPercentage >= 70
+                              ? theme === "dark"
+                                ? "text-green-400"
+                                : "text-green-600"
+                              : hitPercentage >= 50
+                                ? theme === "dark"
+                                  ? "text-yellow-400"
+                                  : "text-yellow-600"
+                                : theme === "dark"
+                                  ? "text-red-400"
+                                  : "text-red-600"
+                          }`}
+                        >
                           ({hitPercentage}%)
                         </span>
                       )}
@@ -227,6 +231,18 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                         <p className="text-xs">{item.note}</p>
                       </TooltipContent>
                     </Tooltip>
+                  </span>
+                )}
+                {/* Meter per second indicator */}
+                {item?.target_stats[0]?.meter_per_second && (
+                  <span
+                    className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium ${
+                      theme === "dark" ? "bg-purple-500/10 text-purple-400" : "bg-purple-50 text-purple-700"
+                    }`}
+                    title={`Meter per second: ${item.meter_per_second}`}
+                  >
+                    <Zap size={10} />
+                    <span>MPS</span>
                   </span>
                 )}
               </div>

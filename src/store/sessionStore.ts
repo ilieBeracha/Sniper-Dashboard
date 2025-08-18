@@ -90,9 +90,10 @@ export interface SessionStatsSaveData {
     distance: number;
     windStrength?: number;
     windDirection?: number;
+    meterPerSecond?: number;
     totalHits?: number;
     mistakeCode?: string;
-    first_shot_hit?: boolean | null;
+    firstShotHit?: boolean | null;
     engagements: Array<{
       user_id: string;
       shots_fired: number;
@@ -202,9 +203,10 @@ export const sessionStore = create<SessionStatsState>((set) => ({
             wind_strength: target.windStrength || null,
             wind_direction_deg: target.windDirection || null,
             total_hits: totalHits,
+            meter_per_second: target.meterPerSecond || null,
             target_eliminated: totalHits >= 2,
             mistake_code: target.mistakeCode || null,
-            first_shot_hit: target.first_shot_hit !== undefined ? target.first_shot_hit : null,
+            first_shot_hit: target.firstShotHit !== undefined ? target.firstShotHit : null,
           };
 
           const engagements: Omit<CreateTargetEngagementData, "target_stats_id">[] = target.engagements.map((eng) => {
@@ -325,10 +327,11 @@ export const sessionStore = create<SessionStatsState>((set) => ({
           distance_m: target.distance,
           wind_strength: target.windStrength || null,
           wind_direction_deg: target.windDirection || null,
+          meter_per_second: target.meterPerSecond || null,
           total_hits: totalHits,
           target_eliminated: totalHits >= 2,
           mistake_code: target.mistakeCode || null,
-          first_shot_hit: target.first_shot_hit || false,
+          first_shot_hit: target.firstShotHit || false,
           session_stats_id: sessionId, // Will be overwritten in service
         };
 

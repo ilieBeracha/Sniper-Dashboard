@@ -76,6 +76,11 @@ export default function TrainingPage() {
     return saved === "true";
   });
 
+  useEffect(() => {
+    localStorage.setItem("sessionViewMode", viewMode);
+    setViewMode(viewMode);
+  }, [viewMode]);
+
   // Update filters in store when they change
   useEffect(() => {
     setFilters({

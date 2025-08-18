@@ -13,10 +13,8 @@ import {
   GroupingStatsCommander,
   GetUserMediansInSquadQueryResult,
   CommanderTeamDispersionEntry,
-  SquadWeaponStats,
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
-import { PositionHeatmapDay } from "@/types/positionHeatmap";
 import {
   getWeaponPerformanceBySquadAndWeapon,
   getTrainingEffectivenessByTeam,
@@ -34,10 +32,6 @@ import {
   getBestGroupingStatsByTraining,
   getUserMediansInSquad,
   getCommanderTeamMedianDispersion,
-  getFirstShotMatrix,
-  getUserWeeklyKpisForUser,
-  getSquadWeaponStats,
-  getPositionHeatmap,
 } from "@/services/performance";
 import { userStore } from "./userStore";
 import { PositionScore } from "@/types/user";
@@ -92,8 +86,6 @@ interface PerformanceStore {
   ) => Promise<{ total_groups: number; avg_dispersion: number; best_dispersion: number } | null>;
   bestGroupingByTraining: { total_groups: number; avg_dispersion: number; best_dispersion: number } | null;
 
-  squadWeaponStats: SquadWeaponStats[] | null;
-  getSquadWeaponStats: (teamId: string, startDate: Date | null, endDate: Date | null) => Promise<void>;
   commanderTeamDispersion: CommanderTeamDispersionEntry[] | null;
   fetchCommanderTeamDispersion: (
     teamId: string,
@@ -116,16 +108,6 @@ interface PerformanceStore {
     endDate: Date | null,
   ) => Promise<void>;
   userMediansInSquadLoading: boolean;
-
-  firstShotMatrix: any[] | null;
-  getFirstShotMatrix: (teamId: string, rangeDays: number) => Promise<void>;
-
-  userWeeklyKpisForUser: any[] | null;
-  getUserWeeklyKpisForUser: (userId: string, rangeDays: number) => Promise<void>;
-
-  // position heatmap
-  positionHeatmapData: PositionHeatmapDay[] | null;
-  fetchPositionHeatmap: (teamId: string, position: PositionScore, start?: Date, end?: Date) => Promise<void>;
 }
 export const performanceStore = create<PerformanceStore>((set) => ({
   squadWeaponPerformance: [],
@@ -146,7 +128,7 @@ export const performanceStore = create<PerformanceStore>((set) => ({
   userMediansInSquad: null,
   commanderTeamDispersion: [],
   userMediansInSquadLoading: false,
-  firstShotMatrix: null,
+
   fetchGroupingScores: async (trainingSessionId: string, limit: number = 20, offset: number = 0) => {
     try {
       set({ isLoading: true });
@@ -376,54 +358,6 @@ export const performanceStore = create<PerformanceStore>((set) => ({
       set({ userMediansInSquad: null });
     } finally {
       set({ userMediansInSquadLoading: false });
-    }
-  },
-
-  getFirstShotMatrix: async (teamId: string, rangeDays: number) => {
-    try {
-      set({ isLoading: true });
-      const data = await getFirstShotMatrix(teamId, rangeDays);
-      set({ firstShotMatrix: data });
-    } catch (e) {
-      console.error("Failed to load first shot matrix:", e);
-      set({ firstShotMatrix: null });
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  userWeeklyKpisForUser: null,
-  getUserWeeklyKpisForUser: async (userId: string, rangeDays: number) => {
-    try {
-      const data = await getUserWeeklyKpisForUser(userId, rangeDays);
-      set({ userWeeklyKpisForUser: data });
-    } catch (error) {
-      console.error("Failed to load user weekly activity summary:", error);
-      set({ userWeeklyKpisForUser: null });
-    }
-  },
-
-  positionHeatmapData: null,
-  fetchPositionHeatmap: async (teamId: string, position: PositionScore, start?: Date, end?: Date) => {
-    set({ isLoading: true });
-    try {
-      const data = await getPositionHeatmap(teamId, position, start, end);
-      set({ positionHeatmapData: data, isLoading: false });
-    } catch (error) {
-      console.error("Error fetching position heatmap:", error);
-      set({ positionHeatmapData: null, isLoading: false });
-    }
-  },
-
-  squadWeaponStats: [],
-  getSquadWeaponStats: async (teamId: string, startDate: Date | null, endDate: Date | null) => {
-    set({ isLoading: true });
-    try {
-      const data = await getSquadWeaponStats(teamId, startDate, endDate);
-      set({ squadWeaponStats: data, isLoading: false });
-    } catch (error) {
-      console.error("Error fetching squad performance impact:", error);
-      set({ squadWeaponStats: null, isLoading: false });
     }
   },
 }));

@@ -30,6 +30,7 @@ export interface Target {
   distance: number;
   windStrength: number | null;
   windDirection: number | null;
+  meterPerSecond: number | null;
   mistakeCode: string;
   firstShotHit: boolean | null;
   engagements: TargetEngagement[];

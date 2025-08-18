@@ -35,7 +35,6 @@ export const useSessionStats = () => {
   useEffect(() => {
     (async () => {
       if (sessionId) {
-        console.log("sessionId", sessionId);
         setIsLoading(true);
         await getFullSessionById(sessionId);
         setIsLoading(false);
@@ -111,8 +110,14 @@ export const useSessionStats = () => {
           distance: target.targetStats?.distance_m || target.distance_m || target.distance || 0,
           windStrength: target.targetStats?.wind_strength || target.wind_strength || null,
           windDirection: target.targetStats?.wind_direction_deg || target.wind_direction_deg || target.wind_direction || null,
+          meterPerSecond: target.targetStats?.meter_per_second || target.meter_per_second || null,
           mistakeCode: target.targetStats?.mistake_code || target.mistake_code || "",
-          firstShotHit: target.targetStats?.first_shot_hit !== undefined ? target.targetStats?.first_shot_hit : (target.first_shot_hit !== undefined ? target.first_shot_hit : null),
+          firstShotHit:
+            target.targetStats?.first_shot_hit !== undefined
+              ? target.targetStats?.first_shot_hit
+              : target.first_shot_hit !== undefined
+                ? target.first_shot_hit
+                : null,
           engagements: (target.engagements || target.target_engagements || target.targetStats?.target_engagements || []).map((engagement: any) => ({
             userId: engagement.user_id,
             shotsFired: engagement.shots_fired || 0,
@@ -158,6 +163,7 @@ export const useSessionStats = () => {
           distance: 500,
           windStrength: null,
           windDirection: null,
+          meterPerSecond: null,
           mistakeCode: "",
           firstShotHit: null,
           engagements: [
@@ -365,6 +371,7 @@ export const useSessionStats = () => {
       distance: 100,
       windStrength: null,
       windDirection: null,
+      meterPerSecond: null,
       mistakeCode: "",
       firstShotHit: null,
       engagements: [],
@@ -373,7 +380,19 @@ export const useSessionStats = () => {
   };
 
   const updateTarget = (targetId: string, field: keyof Target, value: any) => {
-    setTargets((prev) => prev.map((t) => (t.id === targetId ? { ...t, [field]: value } : t)));
+    setTargets((prev) => {
+      const updated = prev.map((t) => {
+        if (t.id === targetId) {
+          const newTarget = { ...t, [field]: value };
+
+          return newTarget;
+        }
+        return t;
+      });
+
+      return updated;
+    });
+    setHasUnsavedChanges(true);
   };
 
   const removeTarget = (targetId: string) => {
@@ -484,11 +503,12 @@ export const useSessionStats = () => {
           // Targets data from wizard
           targets: targets.map((t) => ({
             distance: t.distance,
-            windStrength: t.windStrength || undefined,
-            windDirection: t.windDirection || undefined,
+            windStrength: t.windStrength !== null ? t.windStrength : undefined,
+            windDirection: t.windDirection !== null ? t.windDirection : undefined,
+            meterPerSecond: t.meterPerSecond !== null ? t.meterPerSecond : undefined,
             totalHits: t.engagements.reduce((sum, eng) => sum + (eng.targetHits || 0), 0),
             mistakeCode: t.mistakeCode || undefined,
-            first_shot_hit: t.firstShotHit !== undefined && t.firstShotHit !== null ? t.firstShotHit : null,
+            firstShotHit: t.firstShotHit !== undefined && t.firstShotHit !== null ? t.firstShotHit : null,
             engagements: t.engagements.map((eng) => ({
               user_id: eng.userId,
               shots_fired: eng.shotsFired || 0,
@@ -498,8 +518,6 @@ export const useSessionStats = () => {
           // Current user for creator_id
           currentUser: user ? { id: user.id } : null,
         };
-
-        console.log("Submitting session data:", saveData);
 
         try {
           if (sessionId) {

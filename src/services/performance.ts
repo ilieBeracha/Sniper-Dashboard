@@ -11,8 +11,6 @@ import {
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/user";
-import { PositionHeatmapDay } from "@/types/positionHeatmap";
-import { buildDateRange } from "@/utils/buildDayRange";
 
 export async function getUserHitStatsFull(userId: string): Promise<UserHitsData> {
   try {
@@ -365,7 +363,6 @@ export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsage
     console.error("Error fetching weapon usage stats:", error.message);
     throw error;
   }
-  console.log("data", data);
 
   const rawResult = data?.[0];
   const result = rawResult
@@ -429,120 +426,4 @@ export async function getUserMediansInSquad(
   }
 
   return data;
-}
-
-export async function getFirstShotMatrix(teamId: string, rangeDays: number = 7) {
-  const { p_start, p_end } = buildDateRange(rangeDays);
-
-  const { data, error } = await supabase.rpc("get_first_shot_matrix", {
-    p_team_id: teamId,
-    p_start: p_start,
-    p_end: p_end,
-    p_min_targets: 1,
-  });
-  if (error) throw error;
-  return data;
-}
-
-export async function getUserWeeklyKpisForUser(userId: string, rangeDays: number = 7) {
-  const { p_start, p_end } = buildDateRange(rangeDays);
-  const { data, error } = await supabase.rpc("get_user_weekly_kpis_for_user", {
-    p_user_id: userId,
-    p_start: p_start,
-    p_end: p_end,
-  });
-
-  if (error) {
-    console.error("Error fetching user weekly activity summary:", error);
-    throw error;
-  }
-  console.log("data", data);
-  return data;
-}
-
-export interface SquadWeaponSessionRow {
-  session_stats_id: string;
-  training_session_id: string;
-  training_date: string; // ISO date (YYYY-MM-DD)
-  squad_id: string | null;
-
-  user_id: string; // the user you're querying for
-  weapon_id: string; // the weapon they're holding
-
-  targets: number;
-
-  squad_engagements: number;
-  squad_total_shots: number;
-  squad_total_hits: number;
-  squad_hit_ratio: number; // 0..1
-
-  user_engagements: number;
-  user_total_shots: number;
-  user_total_hits: number;
-  user_hit_ratio: number; // 0..1
-}
-
-export async function getPositionHeatmap(teamId: string, position: PositionScore, start?: Date, end?: Date): Promise<PositionHeatmapDay[]> {
-  const { data, error } = await supabase
-    .from("target_engagements")
-    .select(
-      `
-      shots_fired,
-      target_hits,
-      target_stats!inner(
-        session_stats!inner(
-          created_at,
-          team_id,
-          session_participants!inner(position, user_duty)
-        )
-      )
-    `,
-    )
-    .eq("target_stats.session_stats.team_id", teamId)
-    .eq("target_stats.session_stats.session_participants.position", position.toString())
-    .eq("target_stats.session_stats.session_participants.user_duty", "Sniper")
-    .gte(start ? "target_stats.session_stats.created_at" : "", start ? start.toISOString() : undefined)
-    .lte(end ? "target_stats.session_stats.created_at" : "", end ? end.toISOString() : undefined);
-
-  if (error) throw error;
-
-  // Aggregate per day
-  const dailyMap = new Map<string, { shots: number; hits: number; engagements: number }>();
-
-  data.forEach((row: any) => {
-    const date = new Date(row.target_stats.session_stats.created_at).toISOString().split("T")[0];
-    const entry = dailyMap.get(date) || { shots: 0, hits: 0, engagements: 0 };
-    entry.shots += row.shots_fired ?? 0;
-    entry.hits += row.target_hits ?? 0;
-    entry.engagements += 1;
-    dailyMap.set(date, entry);
-  });
-
-  // Shape into array
-  return Array.from(dailyMap.entries()).map(([date, stats]) => ({
-    date,
-    position: position.toString() as "Lying" | "Sitting" | "Standing" | "Operational",
-    engagements: stats.engagements,
-    totalShots: stats.shots,
-    totalHits: stats.hits,
-    hitRatio: stats.shots > 0 ? stats.hits / stats.shots : 0,
-  }));
-}
-
-export async function getSquadWeaponStats(teamId: string, startDate: Date | null, endDate: Date | null) {
-  console.log("Fetching squad weapon stats with params:", { teamId, startDate, endDate });
-  
-  const { data, error } = await supabase.rpc("get_team_stats_when_user_holds_weapon", {
-    p_team_id: teamId,
-    p_start: startDate,
-    p_end: endDate,
-  });
-
-  if (error) {
-    console.error("Error fetching squad weapon stats:", error);
-    throw error;
-  }
-  
-  console.log("Squad weapon stats response:", data);
-  return data || [];
 }

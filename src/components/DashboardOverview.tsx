@@ -41,36 +41,24 @@ export default function DashboardOverview({ loading }: { loading: boolean }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 space-y-2">
           <DashboardProfileCard />
-          
+
           {/* Beautiful Stats Link Card */}
-          <div 
+          <div
             className={`mt-4 p-4 rounded-xl cursor-pointer transition-all duration-300 group ${
-              theme === "dark" 
-                ? "bg-gradient-to-r from-purple-900/20 to-blue-900/20 hover:from-purple-900/30 hover:to-blue-900/30 border border-purple-800/30 hover:border-purple-700/50" 
+              theme === "dark"
+                ? "bg-gradient-to-r from-purple-900/20 to-blue-900/20 hover:from-purple-900/30 hover:to-blue-900/30 border border-purple-800/30 hover:border-purple-700/50"
                 : "bg-gradient-to-r from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 border border-purple-200 hover:border-purple-300"
             } hover:shadow-lg hover:scale-[1.02]`}
             onClick={() => navigate("/stats")}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-lg ${
-                  theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
-                }`}>
-                  <BarChart2 className={`w-5 h-5 ${
-                    theme === "dark" ? "text-purple-400" : "text-purple-600"
-                  }`} />
+                <div className={`p-2.5 rounded-lg ${theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"}`}>
+                  <BarChart2 className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
                 </div>
                 <div>
-                  <h3 className={`font-semibold text-sm ${
-                    theme === "dark" ? "text-white" : "text-gray-900"
-                  }`}>
-                    View Analytics Dashboard
-                  </h3>
-                  <p className={`text-xs mt-0.5 ${
-                    theme === "dark" ? "text-zinc-400" : "text-gray-600"
-                  }`}>
-                    Performance insights & team metrics
-                  </p>
+                  <h3 className={`font-semibold text-sm ${theme === "dark" ? "text-white" : "text-gray-900"}`}>View Analytics Dashboard</h3>
+                  <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Performance insights & team metrics</p>
                 </div>
               </div>
               <svg
@@ -86,7 +74,7 @@ export default function DashboardOverview({ loading }: { loading: boolean }) {
             </div>
           </div>
         </div>
-        
+
         {/* Calendar on desktop, moves down on mobile */}
         <div className="lg:col-span-1">
           <DashboardCalendar />
