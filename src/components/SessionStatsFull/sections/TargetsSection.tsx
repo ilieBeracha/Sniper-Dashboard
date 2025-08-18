@@ -101,7 +101,7 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                                   type="number"
                                   placeholder="Speed"
                                   value={target.windStrength || ""}
-                                  onChange={(e) => updateTarget(target.id, "windStrength", e.target.value ? parseInt(e.target.value) : null)}
+                                  onChange={(e) => updateTarget(target.id, "windStrength", e.target.value ? parseFloat(e.target.value) : null)}
                                   className="h-7 text-xs"
                                 />
                                 <Input
@@ -140,8 +140,13 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                             <Input
                               type="number"
                               placeholder="Speed"
+                              step="0.5"
                               value={target.meterPerSecond || ""}
-                              onChange={(e) => updateTarget(target.id, "meterPerSecond", e.target.value ? parseInt(e.target.value) : null)}
+                              onChange={(e) => {
+                                const value = e.target.value ? parseFloat(e.target.value) : null;
+                                console.log("Updating meterPerSecond for target", target.id, "to", value);
+                                updateTarget(target.id, "meterPerSecond", value);
+                              }}
                               className="h-7 text-xs"
                             />
                           </div>

@@ -32,14 +32,14 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
         // Calculate total shots and hits from targets
         let totalShots = 0;
         let totalHits = 0;
-        
+
         // Check both possible data structures for targets
         const targets = item.targets || item.target_stats || [];
-        
+
         targets.forEach((target: any) => {
           // Check for engagements in different possible locations
           const engagements = target.engagements || target.target_engagements || [];
-          
+
           engagements.forEach((engagement: any) => {
             totalShots += engagement.shots_fired || 0;
             totalHits += engagement.target_hits || 0;
@@ -130,7 +130,7 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
               </div>
 
               {/* Compact Info Grid */}
-              <div className="grid grid-cols-2 gap-2 mb-1">
+              <div className="gap-2 mb-2">
                 {/* Team & Average Stats */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-1.5 text-xs">
@@ -142,29 +142,33 @@ export default function SessionStatsCardGrid({ data, onCardClick, onEdit, onDele
                 </div>
 
                 {/* Shots and Hits Stats */}
-                <div className="space-y-2">
+                <div className="space-y-2 mt-2">
                   <div className="flex items-center gap-3 text-xs">
                     <div className="flex items-center gap-1">
                       <Target size={10} className="opacity-50" />
-                      <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
-                        {totalShots}
-                      </span>
+                      <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>{totalShots}</span>
                       <span className="opacity-60">shots</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Crosshair size={10} className="opacity-50" />
-                      <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
-                        {totalHits}
-                      </span>
+                      <span className={`font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>{totalHits}</span>
                       <span className="opacity-60">hits</span>
                       {totalShots > 0 && (
-                        <span className={`ml-1 font-medium ${
-                          hitPercentage >= 70 
-                            ? theme === "dark" ? "text-green-400" : "text-green-600"
-                            : hitPercentage >= 50
-                            ? theme === "dark" ? "text-yellow-400" : "text-yellow-600"
-                            : theme === "dark" ? "text-red-400" : "text-red-600"
-                        }`}>
+                        <span
+                          className={`ml-1 font-medium ${
+                            hitPercentage >= 70
+                              ? theme === "dark"
+                                ? "text-green-400"
+                                : "text-green-600"
+                              : hitPercentage >= 50
+                                ? theme === "dark"
+                                  ? "text-yellow-400"
+                                  : "text-yellow-600"
+                                : theme === "dark"
+                                  ? "text-red-400"
+                                  : "text-red-600"
+                          }`}
+                        >
                           ({hitPercentage}%)
                         </span>
                       )}

@@ -138,20 +138,6 @@ export default function DashboardProfileCard() {
             </div>
           )}
         </div>
-
-        {/* Mobile stats */}
-        {isMobile && (
-          <div className="flex items-center gap-3 mt-3 pt-3 border-t border-zinc-800/50 dark:border-zinc-700/50">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Active</span>
-            </div>
-            <span className={`text-xs ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`}>•</span>
-            <div className="flex items-center gap-1">
-              <TrendingUp className="w-3 h-3 text-green-500" />
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

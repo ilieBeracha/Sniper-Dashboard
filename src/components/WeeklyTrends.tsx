@@ -1,10 +1,8 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { TrendingUp, TrendingDown, Calendar, Target, Activity, Zap } from "lucide-react";
-import { motion } from "framer-motion";
 import { useMemo } from "react";
 import { useStore } from "zustand";
 import { useStatsStore } from "@/store/statsStore";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, AreaChart } from "recharts";
+import { XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, AreaChart } from "recharts";
 import { format, parseISO } from "date-fns";
 
 export default function WeeklyTrends() {
@@ -70,12 +68,12 @@ export default function WeeklyTrends() {
     return { chartData, stats, trend };
   }, [data]);
 
-  const iconColor = theme === "dark" ? "text-zinc-400" : "text-gray-600";
+  // const iconColor = theme === "dark" ? "text-zinc-400" : "text-gray-600";
   const border = theme === "dark" ? "border-zinc-800" : "border-gray-200";
-  const textMain = theme === "dark" ? "text-white" : "text-gray-900";
-  const textSub = theme === "dark" ? "text-zinc-400" : "text-gray-600";
+  // const textMain = theme === "dark" ? "text-white" : "text-gray-900";
+  // const textSub =  theme === "dark" ? "text-zinc-400" : "text-gray-600";
 
-  const { chartData, stats, trend } = processedData;
+  const { chartData } = processedData;
 
   if (!data || data.length === 0) {
     return null;
@@ -87,7 +85,7 @@ export default function WeeklyTrends() {
       border ${border}`}
     >
       {/* Stats Overview */}
-      {stats && (
+      {/* {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -132,7 +130,7 @@ export default function WeeklyTrends() {
             <div className={`text-[9px] ${textSub}`}>Elimination</div>
           </motion.div>
         </div>
-      )}
+      )} */}
 
       {/* Main Chart */}
       <div className={`rounded-md p-2 mb-2 ${theme === "dark" ? "bg-zinc-800/20" : "bg-gray-50"}`}>
@@ -183,7 +181,7 @@ export default function WeeklyTrends() {
       </div>
 
       {/* Volume Chart */}
-      <div className={`rounded-md p-2 mb-2 ${theme === "dark" ? "bg-zinc-800/20" : "bg-gray-50"}`}>
+      {/* <div className={`rounded-md p-2 mb-2 ${theme === "dark" ? "bg-zinc-800/20" : "bg-gray-50"}`}>
         <h5 className={`text-[10px] font-medium mb-1 ${textSub}`}>Training Volume</h5>
         <ResponsiveContainer width="100%" height={80}>
           <LineChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
@@ -217,10 +215,10 @@ export default function WeeklyTrends() {
             />
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </div> */}
 
       {/* Trend Indicators */}
-      {trend && (
+      {/* {trend && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 flex-wrap">
             <div className="flex items-center gap-1">
@@ -261,7 +259,7 @@ export default function WeeklyTrends() {
             )}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

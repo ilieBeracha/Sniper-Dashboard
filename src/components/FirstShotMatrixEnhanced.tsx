@@ -1,10 +1,9 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { Target, Clock, Crosshair, Activity, AlertCircle } from "lucide-react";
-import { motion } from "framer-motion";
 import { useMemo } from "react";
 import { useStore } from "zustand";
 import { useStatsStore } from "@/store/statsStore";
-import { ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from "recharts";
+import { XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine, Area, AreaChart } from "recharts";
 
 export default function FirstShotMatrixEnhanced() {
   const { theme } = useTheme();
@@ -32,30 +31,47 @@ export default function FirstShotMatrixEnhanced() {
 
     const bestRange = chartData.reduce((best, d) => (!best || d.hitRate > best.hitRate ? d : best), null as any);
 
+    // Calculate performance benchmarks
+    const excellentThreshold = 80;
+    const goodThreshold = 60;
+
     const zones = [
       {
         name: "Close",
         range: "0-300m",
         data: chartData.filter((d) => d.distance <= 300),
         color: theme === "dark" ? "#10b981" : "#059669",
+        benchmark: 85, // Expected hit rate for close range
       },
       {
         name: "Medium",
         range: "300-600m",
         data: chartData.filter((d) => d.distance > 300 && d.distance <= 600),
         color: theme === "dark" ? "#f59e0b" : "#d97706",
+        benchmark: 70, // Expected hit rate for medium range
       },
       {
         name: "Long",
         range: "600m+",
         data: chartData.filter((d) => d.distance > 600),
         color: theme === "dark" ? "#ef4444" : "#dc2626",
+        benchmark: 50, // Expected hit rate for long range
       },
-    ].map((zone) => ({
-      ...zone,
-      avgHitRate: zone.data.length > 0 ? Math.round(zone.data.reduce((s, d) => s + d.hitRate, 0) / zone.data.length) : 0,
-      totalTargets: zone.data.reduce((s, d) => s + d.targets, 0),
-    }));
+    ].map((zone) => {
+      const avgHitRate = zone.data.length > 0 ? Math.round(zone.data.reduce((s, d) => s + d.hitRate, 0) / zone.data.length) : 0;
+      const totalTargets = zone.data.reduce((s, d) => s + d.targets, 0);
+      const trend = avgHitRate >= zone.benchmark ? "up" : avgHitRate >= zone.benchmark - 10 ? "neutral" : "down";
+      const performance = avgHitRate >= excellentThreshold ? "excellent" : avgHitRate >= goodThreshold ? "good" : "needs-improvement";
+
+      return {
+        ...zone,
+        avgHitRate,
+        totalTargets,
+        trend,
+        performance,
+        vsBenchmark: avgHitRate - zone.benchmark,
+      };
+    });
 
     return {
       chartData,
@@ -90,25 +106,33 @@ export default function FirstShotMatrixEnhanced() {
 
   return (
     <div className={` p-2.5 ${bgCard} border ${border}`}>
-      {/* Key Metrics - Smaller */}
+      {/* Key Metrics with Performance Indicators */}
       {stats && (
         <div className="grid grid-cols-4 gap-1.5 mb-2">
-          <div className={`p-1.5 rounded text-center ${bgSecondary}`}>
+          <div className={`p-1.5 rounded text-center relative ${bgSecondary}`}>
             <Crosshair className={`w-2.5 h-2.5 mx-auto mb-0.5 text-emerald-500`} />
-            <div className={`text-xs font-semibold ${textMain}`}>{stats.avgHitRate}%</div>
+            <div className={`text-xs font-semibold ${textMain}`}>
+              {stats.avgHitRate}%{stats.avgHitRate >= 80 && <span className="text-emerald-500 text-[8px] ml-0.5">●</span>}
+              {stats.avgHitRate >= 60 && stats.avgHitRate < 80 && <span className="text-yellow-500 text-[8px] ml-0.5">●</span>}
+              {stats.avgHitRate < 60 && <span className="text-red-500 text-[8px] ml-0.5">●</span>}
+            </div>
             <div className={`text-[9px] ${textSub}`}>Hit Rate</div>
           </div>
 
           <div className={`p-1.5 rounded text-center ${bgSecondary}`}>
             <Clock className={`w-2.5 h-2.5 mx-auto mb-0.5 text-blue-500`} />
-            <div className={`text-xs font-semibold ${textMain}`}>{stats.avgTime}s</div>
+            <div className={`text-xs font-semibold ${textMain}`}>
+              {stats.avgTime}s{parseFloat(stats.avgTime) <= 2 && <span className="text-emerald-500 text-[8px] ml-0.5">●</span>}
+              {parseFloat(stats.avgTime) > 2 && parseFloat(stats.avgTime) <= 4 && <span className="text-yellow-500 text-[8px] ml-0.5">●</span>}
+              {parseFloat(stats.avgTime) > 4 && <span className="text-red-500 text-[8px] ml-0.5">●</span>}
+            </div>
             <div className={`text-[9px] ${textSub}`}>Avg TTF</div>
           </div>
 
           <div className={`p-1.5 rounded text-center ${bgSecondary}`}>
             <Target className={`w-2.5 h-2.5 mx-auto mb-0.5 text-orange-500`} />
             <div className={`text-xs font-semibold ${textMain}`}>{stats.bestRange?.distance || "—"}m</div>
-            <div className={`text-[9px] ${textSub}`}>Best</div>
+            <div className={`text-[9px] ${textSub}`}>Optimal</div>
           </div>
 
           <div className={`p-1.5 rounded text-center ${bgSecondary}`}>
@@ -119,18 +143,36 @@ export default function FirstShotMatrixEnhanced() {
         </div>
       )}
 
-      {/* Scatter Plot */}
+      {/* Performance Curve with Benchmarks */}
       <div className={`rounded p-1.5 mb-2 ${bgSecondary}`}>
+        <div className={`text-[9px] font-medium ${textSub} mb-1`}>Hit Rate vs Distance</div>
         <ResponsiveContainer width="100%" height={120}>
-          <ScatterChart margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+          <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+            <defs>
+              <linearGradient id="colorHitRate" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={theme === "dark" ? "#8b5cf6" : "#7c3aed"} stopOpacity={0.8} />
+                <stop offset="95%" stopColor={theme === "dark" ? "#8b5cf6" : "#7c3aed"} stopOpacity={0.1} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#3f3f46" : "#e5e7eb"} opacity={0.3} />
-            <XAxis dataKey="distance" tick={{ fontSize: 9, fill: theme === "dark" ? "#71717a" : "#9ca3af" }} axisLine={false} tickLine={false} />
+            <XAxis
+              dataKey="distance"
+              tick={{ fontSize: 9, fill: theme === "dark" ? "#71717a" : "#9ca3af" }}
+              axisLine={false}
+              tickLine={false}
+              label={{
+                value: "Distance (m)",
+                position: "insideBottom",
+                offset: -5,
+                style: { fontSize: 8, fill: theme === "dark" ? "#71717a" : "#9ca3af" },
+              }}
+            />
             <YAxis
-              dataKey="hitRate"
               domain={[0, 100]}
               tick={{ fontSize: 9, fill: theme === "dark" ? "#71717a" : "#9ca3af" }}
               axisLine={false}
               tickLine={false}
+              label={{ value: "Hit %", angle: -90, position: "insideLeft", style: { fontSize: 8, fill: theme === "dark" ? "#71717a" : "#9ca3af" } }}
             />
             <Tooltip
               contentStyle={{
@@ -138,62 +180,41 @@ export default function FirstShotMatrixEnhanced() {
                 border: `1px solid ${theme === "dark" ? "#3f3f46" : "#e5e7eb"}`,
                 borderRadius: 4,
                 fontSize: 10,
-                padding: "2px 6px",
+                padding: "4px 8px",
               }}
               formatter={(value: any, name: string) => {
-                if (name === "hitRate") return [`${value}%`, "Hit"];
-                if (name === "timeToFirst") return [`${value}s`, "TTF"];
-                if (name === "targets") return [value, "Targets"];
+                if (name === "hitRate") return [`${value}%`, "Hit Rate"];
                 return [value, name];
               }}
             />
-            <Scatter name="Performance" data={chartData} fill={theme === "dark" ? "#8b5cf6" : "#7c3aed"}>
-              {chartData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={
-                    entry.distance <= 300
-                      ? theme === "dark"
-                        ? "#10b981"
-                        : "#059669"
-                      : entry.distance <= 600
-                        ? theme === "dark"
-                          ? "#f59e0b"
-                          : "#d97706"
-                        : theme === "dark"
-                          ? "#ef4444"
-                          : "#dc2626"
-                  }
-                />
-              ))}
-            </Scatter>
-          </ScatterChart>
+            <ReferenceLine y={80} stroke={theme === "dark" ? "#10b981" : "#059669"} strokeDasharray="5 5" strokeOpacity={0.5} />
+            <ReferenceLine y={60} stroke={theme === "dark" ? "#f59e0b" : "#d97706"} strokeDasharray="5 5" strokeOpacity={0.5} />
+            <ReferenceLine y={40} stroke={theme === "dark" ? "#ef4444" : "#dc2626"} strokeDasharray="5 5" strokeOpacity={0.5} />
+            <Area type="monotone" dataKey="hitRate" stroke={theme === "dark" ? "#8b5cf6" : "#7c3aed"} strokeWidth={2} fill="url(#colorHitRate)" />
+          </AreaChart>
         </ResponsiveContainer>
       </div>
 
       {/* Zone Performance Bars */}
 
-      {/* Zone Summary Cards - Smaller text */}
+      {/* Zone Performance Cards with Insights */}
       <div className="grid grid-cols-3 gap-1.5">
         {zones.map((zone) => (
-          <div key={zone.name} className={`p-1.5 rounded ${bgSecondary}`}>
+          <div key={zone.name} className={`p-1.5 rounded relative ${bgSecondary}`}>
             <div className="flex items-center justify-between mb-0.5">
               <span className={`text-[10px] font-medium ${textMain}`}>{zone.name}</span>
-              <span className={`text-[9px] ${textSub}`}>{zone.range}</span>
             </div>
-            <div className={`text-sm font-semibold`} style={{ color: zone.color }}>
-              {zone.avgHitRate}%
+            <div className="flex items-baseline gap-1">
+              <div className={`text-sm font-semibold`} style={{ color: zone.color }}>
+                {zone.avgHitRate}%
+              </div>
             </div>
-            <div className={`text-[9px] ${textSub}`}>{zone.totalTargets.toLocaleString()} targets</div>
-            <div className="mt-0.5">
-              <div className={`h-0.5 rounded-full overflow-hidden bg-zinc-700/20`}>
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${zone.avgHitRate}%` }}
-                  transition={{ duration: 0.8 }}
-                  className="h-full rounded-full"
-                  style={{ backgroundColor: zone.color }}
-                />
+            <div className={`text-[9px] ${textSub}`}>
+              {zone.totalTargets.toLocaleString()} shots • {zone.range}
+            </div>
+            <div className="mt-1">
+              <div className={`h-1 rounded-full overflow-hidden relative ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}>
+                <div className="absolute top-0 h-full w-px bg-zinc-600" style={{ left: `${zone.benchmark}%` }} />
               </div>
             </div>
           </div>

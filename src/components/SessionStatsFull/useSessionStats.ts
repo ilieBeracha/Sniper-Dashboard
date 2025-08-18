@@ -381,8 +381,20 @@ export const useSessionStats = () => {
   };
 
   const updateTarget = (targetId: string, field: keyof Target, value: any) => {
-    console.log("updateTarget", targetId, field, value);
-    setTargets((prev) => prev.map((t) => (t.id === targetId ? { ...t, [field]: value } : t)));
+    console.log("updateTarget called:", { targetId, field, value, currentTargets: targets });
+    setTargets((prev) => {
+      const updated = prev.map((t) => {
+        if (t.id === targetId) {
+          const newTarget = { ...t, [field]: value };
+          console.log("Updated target:", { old: t, new: newTarget });
+          return newTarget;
+        }
+        return t;
+      });
+      console.log("Updated targets array:", updated);
+      return updated;
+    });
+    setHasUnsavedChanges(true);
   };
 
   const removeTarget = (targetId: string) => {
@@ -493,12 +505,12 @@ export const useSessionStats = () => {
           // Targets data from wizard
           targets: targets.map((t) => ({
             distance: t.distance,
-            windStrength: t.windStrength || undefined,
-            windDirection: t.windDirection || undefined,
-            meter_per_second: t.meterPerSecond || undefined,
+            windStrength: t.windStrength !== null ? t.windStrength : undefined,
+            windDirection: t.windDirection !== null ? t.windDirection : undefined,
+            meterPerSecond: t.meterPerSecond !== null ? t.meterPerSecond : undefined,
             totalHits: t.engagements.reduce((sum, eng) => sum + (eng.targetHits || 0), 0),
             mistakeCode: t.mistakeCode || undefined,
-            first_shot_hit: t.firstShotHit !== undefined && t.firstShotHit !== null ? t.firstShotHit : null,
+            firstShotHit: t.firstShotHit !== undefined && t.firstShotHit !== null ? t.firstShotHit : null,
             engagements: t.engagements.map((eng) => ({
               user_id: eng.userId,
               shots_fired: eng.shotsFired || 0,

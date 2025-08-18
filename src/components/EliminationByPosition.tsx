@@ -5,143 +5,123 @@ import { useStore } from "zustand";
 import { useStatsStore } from "@/store/statsStore";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, RadialBarChart, RadialBar } from "recharts";
 import { EliminationByPositionResponse } from "@/types/stats";
-import { PositionScore } from "@/types/user";
+// If PositionScore enum includes stale values (e.g., Crouching), don't rely on it here.
+
+type BucketName = "Lying" | "Sitting" | "Standing" | "Operational" | "Total";
+
+const BUCKETS: BucketName[] = ["Lying", "Sitting", "Standing", "Operational", "Total"];
+const VISIBLE_BUCKETS: BucketName[] = ["Lying", "Sitting", "Standing", "Operational"];
 
 export default function EliminationByPosition() {
   const { theme } = useTheme();
   const { eliminationByPosition } = useStore(useStatsStore);
 
-  const data: EliminationByPositionResponse[] = eliminationByPosition || [];
+  // Normalize: aggregate by bucket in case server returns multiple users
+  const raw: EliminationByPositionResponse[] = eliminationByPosition || [];
+  const byBucket = raw.reduce<Record<string, { targets: number; eliminated: number; pct: number }>>((acc, row) => {
+    const bucket = (row.bucket || "").trim();
+    if (!BUCKETS.includes(bucket as BucketName)) return acc;
+    const cur = acc[bucket] || { targets: 0, eliminated: 0, pct: 0 };
+    cur.targets += row.targets || 0;
+    cur.eliminated += row.eliminated || 0;
+    acc[bucket] = cur;
+    return acc;
+  }, {});
 
-  const total = data.reduce((acc, d) => acc + d.targets, 0);
-  const totalEliminated = data.reduce((acc, d) => acc + d.eliminated, 0);
+  // Compute percentages AFTER aggregation
+  VISIBLE_BUCKETS.forEach((b) => {
+    const v = byBucket[b];
+    if (v) v.pct = v.targets > 0 ? v.eliminated / v.targets : 0;
+  });
 
-  const lying = data.find((d) => d.bucket === PositionScore.Lying);
-  const sitting = data.find((d) => d.bucket === PositionScore.Sitting);
-  const crouching = data.find((d) => d.bucket === PositionScore.Crouching);
-  const standing = data.find((d) => d.bucket === PositionScore.Standing);
+  const totalTargets = byBucket["Total"]?.targets || 0;
+  const totalEliminated = byBucket["Total"]?.eliminated || 0;
+  const totalPct = totalTargets > 0 ? totalEliminated / totalTargets : 0;
 
-  const pieData = [
-    {
-      name: "Lying",
-      value: lying?.eliminated || 0,
-      percentage: lying?.elimination_pct ? Math.round(lying.elimination_pct * 100) : 0,
-    },
-    {
-      name: "Sitting",
-      value: sitting?.eliminated || 0,
-      percentage: sitting?.elimination_pct ? Math.round(sitting.elimination_pct * 100) : 0,
-    },
-    {
-      name: "Standing",
-      value: standing?.eliminated || 0,
-      percentage: standing?.elimination_pct ? Math.round(standing.elimination_pct * 100) : 0,
-    },
-    {
-      name: "Crouching",
-      value: crouching?.eliminated || 0,
-      percentage: crouching?.elimination_pct ? Math.round(crouching.elimination_pct * 100) : 0,
-    },
-  ].filter((d) => d.value > 0);
+  // Early exit
+  if (raw.length === 0 || totalTargets === 0) return null;
 
-  const radialData = [
-    {
-      name: "Lying",
-      value: lying?.eliminated || 0,
-      percentage: lying?.elimination_pct ? Math.round(lying.elimination_pct * 100) : 0,
-    },
-    {
-      name: "Sitting",
-      value: sitting?.elimination_pct ? Math.round(sitting.elimination_pct * 100) : 0,
-      fill: theme === "dark" ? "#10b981" : "#059669",
-    },
-    {
-      name: "Standing",
-      value: standing?.elimination_pct ? Math.round(standing.elimination_pct * 100) : 0,
-      fill: theme === "dark" ? "#8b5cf6" : "#7c3aed",
-    },
-    {
-      name: "Crouching",
-      value: crouching?.elimination_pct ? Math.round(crouching.elimination_pct * 100) : 0,
-      fill: theme === "dark" ? "#3b82f6" : "#2563eb",
-    },
-  ];
+  // Colors (compact, professional)
+  const COLORS = {
+    lying: theme === "dark" ? "#f59e0b" : "#f97316",
+    sitting: theme === "dark" ? "#10b981" : "#059669",
+    standing: theme === "dark" ? "#8b5cf6" : "#7c3aed",
+    operational: theme === "dark" ? "#3b82f6" : "#2563eb",
+  } as const;
 
   const textMain = theme === "dark" ? "text-white" : "text-gray-900";
   const textSub = theme === "dark" ? "text-zinc-500" : "text-gray-500";
 
-  const getPositionIcon = (position: string) => {
+  const getPositionIcon = (position: BucketName) => {
     switch (position) {
       case "Sitting":
         return User;
       case "Standing":
         return UserCheck;
       default:
-        return Activity;
+        return Activity; // Lying / Operational → generic
     }
   };
 
-  if (!data || data.length === 0) {
-    return null;
+  // Early exit with placeholder
+  if (!raw.length || totalTargets === 0) {
+    return (
+      <div
+        className={`p-4 rounded-lg text-center border ${
+          theme === "dark" ? "bg-zinc-800/30 border-zinc-700 text-zinc-400" : "bg-gray-50 border-gray-200 text-gray-500"
+        }`}
+      >
+        <p className="text-sm font-medium">No elimination data available</p>
+        <p className="text-xs mt-1">Adjust filters or run a new session</p>
+      </div>
+    );
   }
+
+  // Chart data
+  const pieData = VISIBLE_BUCKETS.map((b) => ({
+    name: b,
+    value: byBucket[b]?.eliminated || 0,
+    percentage: Math.round((byBucket[b]?.pct || 0) * 100),
+    fill: b === "Lying" ? COLORS.lying : b === "Sitting" ? COLORS.sitting : b === "Standing" ? COLORS.standing : COLORS.operational,
+  })).filter((d) => d.value > 0);
+
+  const radialData = VISIBLE_BUCKETS.map((b) => ({
+    name: b,
+    value: Math.round((byBucket[b]?.pct || 0) * 100),
+    fill: b === "Lying" ? COLORS.lying : b === "Sitting" ? COLORS.sitting : b === "Standing" ? COLORS.standing : COLORS.operational,
+  }));
 
   return (
     <div className="p-2">
-      {total && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className={`grid grid-cols-3 gap-2 p-2 rounded-lg mb-3 ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}
-        >
-          <div className="text-center">
-            <div className={`text-base font-semibold ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>{total.toLocaleString()}</div>
-            <div className={`text-[10px] ${textSub}`}>Total Targets</div>
+      {/* Header KPIs */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.25 }}
+        className={`grid grid-cols-2 gap-2 p-2 rounded-lg mb-3 ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}
+      >
+        <div className="text-center">
+          <div className={`text-base font-semibold ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>
+            {totalEliminated.toLocaleString()}
           </div>
-          <div className="text-center">
-            <div className={`text-base font-semibold ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>
-              {totalEliminated.toLocaleString()}
-            </div>
-            <div className={`text-[10px] ${textSub}`}>Eliminated</div>
-          </div>
-          <div className="text-center">
-            <div className={`text-base font-semibold ${theme === "dark" ? "text-violet-400" : "text-violet-600"}`}>
-              {Math.round((totalEliminated / total) * 100)}%
-            </div>
-            <div className={`text-[10px] ${textSub}`}>Success Rate</div>
-          </div>
-        </motion.div>
-      )}
+          <div className={`text-[10px] ${textSub}`}>Eliminated</div>
+        </div>
+        <div className="text-center">
+          <div className={`text-base font-semibold ${theme === "dark" ? "text-violet-400" : "text-violet-600"}`}>{Math.round(totalPct * 100)}%</div>
+          <div className={`text-[10px] ${textSub}`}>Success Rate</div>
+        </div>
+      </motion.div>
 
       {/* Charts Container */}
       <div className="grid grid-cols-2 gap-2 mb-3">
-        {/* Pie Chart */}
+        {/* Pie Chart — distribution of eliminated by position */}
         <div>
           <h5 className={`text-[10px] font-medium ${textSub} mb-1`}>Distribution</h5>
           <ResponsiveContainer width="100%" height={120}>
             <PieChart>
               <Pie data={pieData} cx="50%" cy="50%" innerRadius={25} outerRadius={45} paddingAngle={2} dataKey="value">
-                {pieData.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={
-                      index === 0
-                        ? theme === "dark"
-                          ? "#f59e0b"
-                          : "#f97316"
-                        : index === 1
-                          ? theme === "dark"
-                            ? "#10b981"
-                            : "#059669"
-                          : index === 2
-                            ? theme === "dark"
-                              ? "#8b5cf6"
-                              : "#7c3aed"
-                            : theme === "dark"
-                              ? "#3b82f6"
-                              : "#2563eb"
-                    }
-                  />
+                {pieData.map((item, idx) => (
+                  <Cell key={`cell-${idx}`} fill={item.fill} />
                 ))}
               </Pie>
               <Tooltip
@@ -152,20 +132,20 @@ export default function EliminationByPosition() {
                   fontSize: 10,
                   padding: "2px 6px",
                 }}
-                formatter={(value: any) => [`${value} eliminated`, ""]}
+                formatter={(value: any, _name: any, entry: any) => [`${value} eliminated (${entry.payload.percentage}%)`, entry.payload.name]}
               />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Radial Bar Chart */}
+        {/* Radial Bar — success rates by position */}
         <div>
           <h5 className={`text-[10px] font-medium ${textSub} mb-1`}>Success Rates</h5>
           <ResponsiveContainer width="100%" height={120}>
             <RadialBarChart cx="50%" cy="50%" innerRadius="30%" outerRadius="90%" data={radialData}>
-              <RadialBar dataKey="value" cornerRadius={4} fill="#8884d8">
-                {radialData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.fill} />
+              <RadialBar dataKey="value" cornerRadius={4}>
+                {radialData.map((entry, idx) => (
+                  <Cell key={`cell-${idx}`} fill={entry.fill} />
                 ))}
               </RadialBar>
               <Tooltip
@@ -176,7 +156,7 @@ export default function EliminationByPosition() {
                   fontSize: 10,
                   padding: "2px 6px",
                 }}
-                formatter={(value: any) => [`${value}%`, "Success Rate"]}
+                formatter={(value: any, entry: any) => [`${value}%`, entry?.payload?.name || ""]}
               />
             </RadialBarChart>
           </ResponsiveContainer>
@@ -185,13 +165,13 @@ export default function EliminationByPosition() {
 
       {/* Position Cards */}
       <div className="space-y-2">
-        {Object.values(PositionScore).map((position) => {
-          const posData = data.find((d) => d.bucket === position);
-          if (!posData) return null;
+        {VISIBLE_BUCKETS.map((position) => {
+          const v = byBucket[position];
+          if (!v) return null;
 
           const Icon = getPositionIcon(position);
-          const successRate = Math.round((posData.elimination_pct || 0) * 100);
-          const isHighPerforming = successRate > 70;
+          const successRate = Math.round((v.pct || 0) * 100);
+          const isHigh = successRate > 70;
 
           return (
             <div
@@ -202,18 +182,18 @@ export default function EliminationByPosition() {
                 <div className="flex items-center gap-1.5">
                   <Icon
                     className={`w-3 h-3 ${
-                      position === PositionScore.Lying
+                      position === "Lying"
                         ? "text-orange-500"
-                        : position === PositionScore.Sitting
+                        : position === "Sitting"
                           ? "text-emerald-500"
-                          : position === PositionScore.Standing
+                          : position === "Standing"
                             ? "text-violet-500"
                             : "text-blue-500"
                     }`}
                   />
                   <span className={`text-[10px] font-medium ${textMain}`}>{position} Position</span>
                 </div>
-                {isHighPerforming && (
+                {isHigh && (
                   <div className="flex items-center gap-0.5">
                     <TrendingUp className={`w-2.5 h-2.5 ${theme === "dark" ? "text-emerald-400" : "text-emerald-500"}`} />
                     <span className={`text-[9px] ${theme === "dark" ? "text-emerald-400" : "text-emerald-500"}`}>High</span>
@@ -223,11 +203,11 @@ export default function EliminationByPosition() {
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <div className={`text-sm font-semibold ${textMain}`}>{posData.targets.toLocaleString()}</div>
+                  <div className={`text-sm font-semibold ${textMain}`}>{v.targets.toLocaleString()}</div>
                   <div className={`text-[9px] ${textSub}`}>Targets</div>
                 </div>
                 <div>
-                  <div className={`text-sm font-semibold ${textMain}`}>{posData.eliminated.toLocaleString()}</div>
+                  <div className={`text-sm font-semibold ${textMain}`}>{v.eliminated.toLocaleString()}</div>
                   <div className={`text-[9px] ${textSub}`}>Eliminated</div>
                 </div>
                 <div>
@@ -242,13 +222,13 @@ export default function EliminationByPosition() {
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${successRate}%` }}
-                    transition={{ duration: 0.6, delay: position === PositionScore.Sitting ? 0.2 : 0.3 }}
+                    transition={{ duration: 0.5 }}
                     className={`h-full ${
-                      position === PositionScore.Lying
+                      position === "Lying"
                         ? "bg-orange-500"
-                        : position === PositionScore.Sitting
+                        : position === "Sitting"
                           ? "bg-emerald-500"
-                          : position === PositionScore.Standing
+                          : position === "Standing"
                             ? "bg-violet-500"
                             : "bg-blue-500"
                     }`}

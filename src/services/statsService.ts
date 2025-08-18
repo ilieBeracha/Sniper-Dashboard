@@ -33,7 +33,7 @@ export async function rpcFirstShotMetrics(filters: StatsFilters): Promise<FirstS
 
 /** Elimination by position */
 export async function rpcEliminationByPosition(filters: StatsFilters): Promise<EliminationByPositionResponse[]> {
-  const { data, error } = await supabase.rpc("squad_position_elimination_pct", toRpcFilters(filters));
+  const { data, error } = await supabase.rpc("user_position_elimination_pct", toRpcFilters(filters));
   if (error) throw error;
   return (data ?? []) as EliminationByPositionResponse[];
 }

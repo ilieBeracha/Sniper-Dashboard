@@ -339,6 +339,8 @@ export async function getFullSessionById(sessionId: string): Promise<{
     .eq("session_stats_id", sessionId);
   if (targetsError) throw targetsError;
 
+  console.log("targets", targets);
+
   return {
     sessionStats: {
       training_session_id: session.training_session_id,
@@ -364,6 +366,7 @@ export async function getFullSessionById(sessionId: string): Promise<{
         distance_m: t.distance_m,
         wind_strength: t.wind_strength,
         wind_direction_deg: t.wind_direction_deg,
+        meter_per_second: t.meter_per_second,
         total_hits: t.total_hits,
         target_eliminated: t.target_eliminated,
         first_shot_hit: t.first_shot_hit,

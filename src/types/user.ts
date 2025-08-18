@@ -17,6 +17,7 @@ export enum PositionScore {
   Sitting = "Sitting",
   Standing = "Standing",
   Crouching = "Crouching",
+  Total = "Total",
 }
 
 export interface User {

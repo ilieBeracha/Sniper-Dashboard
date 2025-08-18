@@ -1,5 +1,5 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { Calendar, Crosshair, Target, TrendingUp } from "lucide-react";
+import { Calendar, Crosshair, TrendingUp } from "lucide-react";
 import { useStore } from "zustand";
 import { useStatsStore } from "@/store/statsStore";
 
@@ -18,14 +18,9 @@ export default function StatsUserKPI() {
       icon: Calendar,
       color: theme === "dark" ? "text-violet-400" : "text-violet-600",
     },
+
     {
-      value: row.targets,
-      label: "Targets",
-      icon: Target,
-      color: theme === "dark" ? "text-blue-400" : "text-blue-600",
-    },
-    {
-      value: row.hit_pct,
+      value: (row.hit_pct * 100).toFixed(1),
       label: "Accuracy",
       suffix: "%",
       icon: Crosshair,
@@ -47,19 +42,19 @@ export default function StatsUserKPI() {
 
   return (
     <div className={` ${bgCard} border ${border}`}>
-      <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-zinc-800/50">
+      <div className="grid grid-cols-3  md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-zinc-800/50">
         {kpis.map((item, idx) => {
           const Icon = item.icon;
           return (
-            <div key={idx} className="p-2.5 lg:p-3">
+            <div key={idx} className="p-2.5 lg:p-3 flex flex-col items-center justify-center">
               <div className="flex items-start justify-between mb-0.5">
                 <Icon className={`w-3 h-3 ${item.color}`} />
               </div>
               <div className={`text-base lg:text-lg font-semibold ${textMain}`}>
-                {item.value.toLocaleString()}
-                {item.suffix}
+                {item?.value?.toLocaleString()}
+                {item?.suffix}
               </div>
-              <div className={`text-[10px] ${textSub} mt-0.5`}>{item.label}</div>
+              <div className={`text-[10px] ${textSub} mt-0.5`}>{item?.label}</div>
             </div>
           );
         })}

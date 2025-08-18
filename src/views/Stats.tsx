@@ -1,9 +1,9 @@
 import Header from "@/Headers/Header";
 import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
-import { BarChart2, SlidersHorizontal, Calendar, Target, Sun, TrendingUp, Crosshair, Activity } from "lucide-react";
+import { BarChart2, SlidersHorizontal, Calendar, Target, Sun, Crosshair, Activity } from "lucide-react";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 import { useStatsStore } from "@/store/statsStore";
 import { useStatsFilters } from "@/hooks/useStatsFilters";
@@ -11,7 +11,7 @@ import StatsUserKPI from "@/components/StatsUserKPI";
 
 // Components
 import EliminationByPosition from "@/components/EliminationByPosition";
-import WeeklyTrends from "@/components/WeeklyTrends";
+// import WeeklyTrends from "@/components/WeeklyTrends";
 import FirstShotMatrixEnhanced from "@/components/FirstShotMatrixEnhanced";
 
 import FilterDrawerStats from "@/components/FilterDrawerStats";
@@ -74,14 +74,51 @@ export default function Stats() {
   const { filters, setFilters, clearFilters } = useStatsFilters();
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [lastFiltersHash, setLastFiltersHash] = useState<string>("");
+  const [dataVersion, setDataVersion] = useState(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  const refreshData = async () => {
-    if (user?.team_id) {
-      console.log("Refreshing stats page data...");
+  // Create a stable hash of filters for comparison
+  const getFiltersHash = useCallback((currentFilters: any) => {
+    return JSON.stringify({
+      startDate: currentFilters.startDate,
+      endDate: currentFilters.endDate,
+      dayNight: currentFilters.dayNight?.sort(),
+      positions: currentFilters.positions?.sort(),
+    });
+  }, []);
+
+  // Robust data refresh function with proper error handling and cancellation
+  const refreshData = useCallback(
+    async (forceRefresh = false) => {
+      if (!user?.team_id) return;
+
+      const currentFiltersHash = getFiltersHash(filters);
+
+      // Skip if filters haven't changed and not forced
+      if (!forceRefresh && currentFiltersHash === lastFiltersHash && dataVersion > 0) {
+        console.log("Skipping refresh - filters unchanged");
+        return;
+      }
+
+      console.log("🔄 Refreshing stats data:", { filters, currentFiltersHash, forceRefresh });
+
+      // Cancel any ongoing request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      // Create new abort controller
+      abortControllerRef.current = new AbortController();
+      const { signal } = abortControllerRef.current;
+
       setIsLoading(true);
 
       try {
-        await Promise.all([
+        // Increment data version to track changes
+        setDataVersion((prev) => prev + 1);
+
+        const results = await Promise.allSettled([
           getStatsOverviewTotals(filters),
           getFirstShotMetrics(filters),
           getEliminationByPosition(filters),
@@ -94,42 +131,99 @@ export default function Stats() {
             p_max_distance: 900,
           }),
         ]);
+
+        // Check if request was cancelled
+        if (signal.aborted) {
+          console.log("Request cancelled");
+          return;
+        }
+
+        // Log results and handle any failures
+        let hasFailures = false;
+        results.forEach((result, index) => {
+          if (result.status === "rejected") {
+            hasFailures = true;
+            console.error(`❌ Request ${index} failed:`, result.reason);
+          }
+        });
+
+        if (!hasFailures) {
+          console.log("✅ All data refreshed successfully");
+          setLastFiltersHash(currentFiltersHash);
+        } else {
+          console.warn("⚠️ Some data failed to refresh");
+        }
       } catch (error) {
-        console.error("Error refreshing stats data:", error);
+        if (!signal.aborted) {
+          console.error("❌ Error refreshing stats data:", error);
+        }
       } finally {
-        setIsLoading(false);
+        if (!signal.aborted) {
+          setIsLoading(false);
+        }
       }
+    },
+    [
+      user?.team_id,
+      filters,
+      lastFiltersHash,
+      dataVersion,
+      getFiltersHash,
+      getStatsOverviewTotals,
+      getFirstShotMetrics,
+      getEliminationByPosition,
+      getWeeklyTrends,
+      getFirstShotMatrix,
+    ],
+  );
+
+  // Effect to refresh data when filters change
+  useEffect(() => {
+    console.log("🎯 Filters changed, triggering refresh:", filters);
+    if (user?.team_id) {
+      refreshData();
     }
-  };
+  }, [filters, user?.team_id]); // Remove refreshData from dependencies
 
+  // Effect to refresh data when user changes
   useEffect(() => {
-    refreshData();
-  }, [user?.team_id, filters]); // Re-fetch when filters change
+    if (user?.team_id) {
+      console.log("👤 User changed, triggering initial refresh");
+      refreshData(true); // Force refresh for user change
+    }
+  }, [user?.team_id]); // Remove refreshData from dependencies
 
+  // Cleanup on unmount
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible" && user?.team_id) {
-        console.log("Page became visible, refreshing data...");
-        refreshData();
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    const handleFocus = () => {
-      if (user?.team_id) {
-        console.log("Window gained focus, refreshing data...");
-        refreshData();
-      }
-    };
-
-    window.addEventListener("focus", handleFocus);
-
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("focus", handleFocus);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
     };
-  }, [user?.team_id]);
+  }, []);
+
+  // Manual refresh handler
+  const handleManualRefresh = useCallback(() => {
+    console.log("🔄 Manual refresh triggered");
+    refreshData(true);
+  }, [refreshData]);
+
+  // Filter change handler with debouncing
+  const handleFiltersChange = useCallback(
+    (newFilters: any) => {
+      console.log("🔧 Filters changing:", newFilters);
+      setFilters(newFilters);
+    },
+    [setFilters],
+  );
+
+  // Clear filters handler
+  const handleClearFilters = useCallback(() => {
+    console.log("🧹 Clearing filters");
+    clearFilters();
+    // Force refresh after clearing
+    setTimeout(() => refreshData(true), 100);
+  }, [clearFilters, refreshData]);
 
   const hasActiveFilters = !!(filters.startDate || filters.endDate || filters.dayNight?.length || filters.positions?.length);
 
@@ -208,10 +302,7 @@ export default function Stats() {
 
               {/* Clear Button */}
               <button
-                onClick={() => {
-                  clearFilters();
-                  refreshData();
-                }}
+                onClick={handleClearFilters}
                 className={`ml-auto text-xs underline ${
                   theme === "dark" ? "text-zinc-400 hover:text-zinc-300" : "text-gray-600 hover:text-gray-800"
                 } transition-colors`}
@@ -227,7 +318,7 @@ export default function Stats() {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={refreshData}
+            onClick={handleManualRefresh}
             disabled={isLoading}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all
               ${
@@ -272,7 +363,7 @@ export default function Stats() {
 
       <SpPageBody>
         <div className="space-y-6 relative">
-          {/* Loading Overlay */}
+          {/* Loading Overlay - Now properly controlled */}
           {isLoading && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -289,20 +380,6 @@ export default function Stats() {
               </div>
             </motion.div>
           )}
-
-          <FilterDrawerStats
-            onClear={() => {
-              clearFilters();
-              refreshData();
-            }}
-            isOpen={isFilterDrawerOpen}
-            onClose={() => setIsFilterDrawerOpen(false)}
-            filters={filters}
-            onFiltersChange={setFilters}
-            onApply={() => {
-              refreshData();
-            }}
-          />
 
           {/* Masonry Grid Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
@@ -328,12 +405,24 @@ export default function Stats() {
             </div>
 
             {/* Weekly Trends - Spans 4 columns */}
-            <div className="lg:col-span-4">
+            {/* <div className="lg:col-span-4">
               <StatsCard title="Weekly Trends" icon={TrendingUp} color="subtle">
                 <WeeklyTrends />
               </StatsCard>
-            </div>
+            </div> */}
           </div>
+          <FilterDrawerStats
+            onClear={handleClearFilters}
+            isOpen={isFilterDrawerOpen}
+            onClose={() => setIsFilterDrawerOpen(false)}
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onApply={() => {
+              console.log("🔧 Filters applied, closing drawer");
+              setIsFilterDrawerOpen(false);
+              // Refresh will happen automatically via useEffect
+            }}
+          />
         </div>
       </SpPageBody>
     </SpPage>
