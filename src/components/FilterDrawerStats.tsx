@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Filter, LayoutGrid, Layers, Calendar, Check } from "lucide-react";
-import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import { X, Filter, LayoutGrid, Layers, Check } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import type { PositionEnum, StatsFilters } from "@/types/stats";
