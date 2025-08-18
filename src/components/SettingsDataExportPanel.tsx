@@ -8,7 +8,7 @@ import { useStore } from "zustand";
 import { reportStore } from "@/store/reportStore";
 
 export default function SettingsDataExportPanel() {
-  const { setReport, isGenerating, setIsGenerating, generateReport, report } = useStore(reportStore);
+  const { setReport, isGenerating, setIsGenerating, generateReport } = useStore(reportStore);
   const { theme } = useTheme();
   const [startDate, setStartDate] = useState(format(subDays(new Date(), 30), "yyyy-MM-dd"));
   const [endDate, setEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -21,8 +21,6 @@ export default function SettingsDataExportPanel() {
 
     setIsGenerating(false);
   };
-
-  console.log(report);
 
   return (
     <main className="sm:px-6 lg:flex-auto lg:px-0 max-w-4xl mx-auto">

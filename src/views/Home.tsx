@@ -11,8 +11,7 @@ import { getSquadsWithUsersByTeamId } from "@/services/squadService";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import { WaveLoader } from "@/components/ui/loader";
 import Assets from "./Assets";
-// import SessionStats from "./SessionStats";
-// Dynamic imports for better code splitting
+
 const Dashboard = lazy(() => import("./Dashboard"));
 const Training = lazy(() => import("./Trainings"));
 const TrainingPage = lazy(() => import("./Training"));
@@ -22,6 +21,7 @@ const SettingsPage = lazy(() => import("./Settings"));
 const DataExport = lazy(() => import("./DataExport"));
 const RulesLayout = lazy(() => import("@/layouts/Rulelayout"));
 const Rules = lazy(() => import("@/OnePlatform/RulesModel/views/Rules"));
+const Stats = lazy(() => import("@/views/Stats"));
 
 export default function AppRoutes() {
   const { token } = useStore(authStore);
@@ -48,7 +48,7 @@ export default function AppRoutes() {
   }, []);
 
   const LoadingFallback = () => (
-    <div className="flex items-center h-[100dvh] justify-center bg-transparent">
+    <div className="flex items-center h-[100dvh] justify-center">
       <WaveLoader />
     </div>
   );
@@ -61,7 +61,7 @@ export default function AppRoutes() {
             <Route
               path="/"
               element={
-                <div className="w-full overflow-x-hidden">
+                <div className="w-full overflow-x-hidden h-[100dvh] ">
                   <Suspense fallback={<LoadingFallback />}>
                     <Dashboard />
                   </Suspense>
@@ -122,6 +122,14 @@ export default function AppRoutes() {
               element={
                 <Suspense fallback={<LoadingFallback />}>
                   <SessionStatsFull />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/stats"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <Stats />
                 </Suspense>
               }
             />

@@ -10,7 +10,7 @@ export function SpPage({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
   return (
-    <div className={`w-full bg-black/30 transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "bg-white text-gray-900"}`}>
+    <div className={`w-full h-full transition-colors duration-200 ${theme === "dark" ? "text-gray-100" : "bg-white text-gray-900"}`}>
       <main className={`flex flex-col gap-3 ${isMobile ? "space-y-2" : ""}`}>{children}</main>
     </div>
   );
@@ -163,7 +163,7 @@ export function SpPageTabs({
 
 export function SpPageBody({ children }: { children: ReactNode }) {
   return (
-    <div className="flex-1 overflow-y-auto h-fit">
+    <div className="flex-1 h-fit">
       <div className="px-3 sm:px-4 md:px-6 pb-3">{children}</div>
     </div>
   );

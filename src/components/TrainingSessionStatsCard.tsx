@@ -2,7 +2,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { performanceStore } from "@/store/performance";
 import { Skeleton } from "@heroui/react";
 import { useEffect } from "react";
-import { Target, TrendingUp } from "lucide-react";
+import { Target, TrendingUp, Wind, Zap } from "lucide-react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function TrainingSessionStatsCard({ trainingSessionId }: { trainingSessionId: string }) {
@@ -46,13 +46,25 @@ export default function TrainingSessionStatsCard({ trainingSessionId }: { traini
       value: stats.total_shots_fired ? stats.total_shots_fired : "—",
       icon: Target,
     },
+    {
+      label: "Avg Dispersion",
+      value: stats.avg_cm_dispersion ? `${stats.avg_cm_dispersion.toFixed(1)} cm` : "—",
+      icon: Zap,
+      showIcon: stats.avg_cm_dispersion && stats.avg_cm_dispersion > 0,
+    },
+    {
+      label: "Best Dispersion",
+      value: stats.best_cm_dispersion ? `${stats.best_cm_dispersion.toFixed(1)} cm` : "—",
+      icon: Wind,
+      showIcon: stats.best_cm_dispersion && stats.best_cm_dispersion > 0,
+    },
   ];
 
   return (
     <div
       className={`rounded-xl ${isMobile ? "p-3" : "px-6 py-3"} ${theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-white border border-gray-200"}`}
     >
-      <div className={`grid grid-cols-2  md:grid-cols-4 ${isMobile ? "gap-3" : "gap-6"}`}>
+      <div className={`grid grid-cols-2 md:grid-cols-4 ${isMobile ? "gap-3" : "gap-6"}`}>
         {primaryStats.map((stat, index) => (
           <div key={index} className="relative">
             <div className={`flex items-center ${isMobile ? "gap-1 mb-0.5" : "gap-2 mb-1"}`}>
@@ -62,6 +74,10 @@ export default function TrainingSessionStatsCard({ trainingSessionId }: { traini
                 }`}
               />
               <p className={`${isMobile ? "text-xs" : "text-lg"} ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>{stat.label}</p>
+              {/* Show additional icon when data is available */}
+              {stat.showIcon && (
+                <div className={`ml-1 ${isMobile ? "w-2 h-2" : "w-3 h-3"} rounded-full ${theme === "dark" ? "bg-green-400" : "bg-green-500"}`} />
+              )}
             </div>
             <p
               className={`${isMobile ? "text-lg" : "text-xl"} font-semibold ${

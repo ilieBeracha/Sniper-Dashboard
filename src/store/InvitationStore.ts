@@ -23,7 +23,6 @@ export const InvitationStore = create<InvitationStore>((set) => ({
 
   regenerateInvite: async (userId: string) => {
     try {
-      console.log("regenerateInvite", userId);
       const newInvite = await regenerateInvite(userId);
       if (!newInvite) {
         toastService.error("Failed to create invite");
@@ -40,7 +39,7 @@ export const InvitationStore = create<InvitationStore>((set) => ({
 
 export async function getUserInviteTargetRole() {
   const targetRole = userStore.getState().user?.user_role;
-  console.log("getUserInviteTargetRole", targetRole);
+
   switch (targetRole) {
     case UserRole.Commander:
       return "squad_commander";
@@ -53,11 +52,11 @@ export async function getUserInviteTargetRole() {
 
 export async function regenerateInvite(inviterId: string) {
   const targetRole = await getUserInviteTargetRole();
-  console.log("regenerateInvite", inviterId, targetRole);
+
   const { data } = await supabase.rpc("regenerate_invite", {
     inviter_id: inviterId,
     target_role: targetRole as UserRole,
   });
-  console.log("regenerateInvite data", data);
+
   return data;
 }

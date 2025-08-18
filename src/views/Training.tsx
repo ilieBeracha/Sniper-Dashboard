@@ -76,6 +76,11 @@ export default function TrainingPage() {
     return saved === "true";
   });
 
+  useEffect(() => {
+    localStorage.setItem("sessionViewMode", viewMode);
+    setViewMode(viewMode);
+  }, [viewMode]);
+
   // Update filters in store when they change
   useEffect(() => {
     setFilters({
@@ -107,7 +112,7 @@ export default function TrainingPage() {
   }, [hasActiveFilters, autoLoadStackView, viewMode]);
 
   // Client-side filtering only for distance (complex query)
-  const filteredSessionStats = Array.isArray(sessionStats) 
+  const filteredSessionStats = Array.isArray(sessionStats)
     ? sessionStats.filter((s) => {
         // Distance filtering (still done client-side due to complexity)
         if (filterDistance !== "all") {

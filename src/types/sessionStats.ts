@@ -22,12 +22,13 @@ export interface CreateParticipantData {
 export interface CreateTargetStatsData {
   session_stats_id: string;
   distance_m: number;
+  meter_per_second?: number | null;
   wind_strength?: number | null;
   wind_direction_deg?: number | null;
   total_hits: number;
   target_eliminated: boolean;
   mistake_code?: string | null;
-  first_shot_hit: boolean;
+  first_shot_hit: boolean | null;
 }
 
 export interface CreateTargetEngagementData {

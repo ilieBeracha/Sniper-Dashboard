@@ -71,19 +71,19 @@ export default function FilterDrawer({
       />
 
       {/* Drawer */}
-      <div className={`fixed z-50 transition-transform duration-300 ${
-        isMobile 
-          ? `bottom-0 left-0 right-0 ${isOpen ? "translate-y-0" : "translate-y-full"}`
-          : `top-0 right-0 bottom-0 ${isOpen ? "translate-x-0" : "translate-x-full"}`
-      }`}>
+      <div
+        className={`fixed z-50 transition-transform duration-300 ${
+          isMobile
+            ? `bottom-0 left-0 right-0 ${isOpen ? "translate-y-0" : "translate-y-full"}`
+            : `top-0 right-0 bottom-0 ${isOpen ? "translate-x-0" : "translate-x-full"}`
+        }`}
+      >
         <div
-          className={`${
-            theme === "dark" ? "bg-gradient-to-b from-zinc-900 to-zinc-950" : "bg-white"
-          } ${
-            isMobile 
-              ? `rounded-t-2xl border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}` 
+          className={`${theme === "dark" ? "bg-gradient-to-b from-zinc-900 to-zinc-950" : "bg-white"} ${
+            isMobile
+              ? `rounded-t-2xl border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`
               : `h-full border-l ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`
-          } shadow-2xl ${!isMobile ? 'w-[400px] relative' : ''}`}
+          } shadow-2xl ${!isMobile ? "w-[400px] relative" : ""}`}
         >
           {/* Handle - Only on mobile */}
           {isMobile && (
@@ -93,7 +93,7 @@ export default function FilterDrawer({
           )}
 
           {/* Header */}
-          <div className={`flex items-center justify-between p-4 ${isMobile ? 'pb-2' : 'pt-6'}`}>
+          <div className={`flex items-center justify-between p-4 ${isMobile ? "pb-2" : "pt-6"}`}>
             <div className="flex items-center gap-2">
               <Filter size={18} className="opacity-70" />
               <h3 className="text-base font-semibold">Filters & Sort</h3>
@@ -109,9 +109,7 @@ export default function FilterDrawer({
           </div>
 
           {/* Content */}
-          <div className={`px-4 pb-4 overflow-y-auto custom-scrollbar ${
-            isMobile ? 'max-h-[60vh]' : 'h-[calc(100vh-200px)]'
-          }`}>
+          <div className={`px-4 pb-4 overflow-y-auto custom-scrollbar ${isMobile ? "max-h-[60vh]" : "h-[calc(100vh-200px)]"}`}>
             {/* Filters Grid */}
             <div className="grid grid-cols-2 gap-3 mb-4">
               {/* Day/Night */}
@@ -285,17 +283,19 @@ export default function FilterDrawer({
                 {onViewModeChange && (
                   <div className="mb-3">
                     <label className="text-xs font-medium opacity-70 mb-2 block">View Mode</label>
-                    <div className={`flex rounded-lg p-1 ${theme === 'dark' ? 'bg-zinc-800/50 border border-zinc-700' : 'bg-gray-100 border border-gray-300'}`}>
+                    <div
+                      className={`flex rounded-lg p-1 ${theme === "dark" ? "bg-zinc-800/50 border border-zinc-700" : "bg-gray-100 border border-gray-300"}`}
+                    >
                       <button
                         onClick={() => onViewModeChange("grid")}
                         className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded transition-all ${
                           viewMode === "grid"
-                            ? theme === 'dark' 
-                              ? 'bg-zinc-700 text-white' 
-                              : 'bg-white text-gray-900 shadow-sm'
-                            : theme === 'dark'
-                              ? 'text-zinc-400 hover:text-zinc-300'
-                              : 'text-gray-500 hover:text-gray-700'
+                            ? theme === "dark"
+                              ? "bg-zinc-700 text-white"
+                              : "bg-white text-gray-900 shadow-sm"
+                            : theme === "dark"
+                              ? "text-zinc-400 hover:text-zinc-300"
+                              : "text-gray-500 hover:text-gray-700"
                         }`}
                       >
                         <LayoutGrid size={16} />
@@ -305,12 +305,12 @@ export default function FilterDrawer({
                         onClick={() => onViewModeChange("stack")}
                         className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded transition-all ${
                           viewMode === "stack"
-                            ? theme === 'dark' 
-                              ? 'bg-zinc-700 text-white' 
-                              : 'bg-white text-gray-900 shadow-sm'
-                            : theme === 'dark'
-                              ? 'text-zinc-400 hover:text-zinc-300'
-                              : 'text-gray-500 hover:text-gray-700'
+                            ? theme === "dark"
+                              ? "bg-zinc-700 text-white"
+                              : "bg-white text-gray-900 shadow-sm"
+                            : theme === "dark"
+                              ? "text-zinc-400 hover:text-zinc-300"
+                              : "text-gray-500 hover:text-gray-700"
                         }`}
                       >
                         <Layers size={16} />
@@ -319,7 +319,7 @@ export default function FilterDrawer({
                     </div>
                   </div>
                 )}
-                
+
                 {/* Auto-load Toggle */}
                 {onAutoLoadChange && (
                   <label className="flex items-center gap-3 cursor-pointer">
@@ -397,9 +397,11 @@ export default function FilterDrawer({
           </div>
 
           {/* Actions */}
-          <div className={`flex gap-3 p-4 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} ${
-            !isMobile ? `absolute bottom-0 left-0 right-0 ${theme === "dark" ? "bg-zinc-950" : "bg-white"}` : ''
-          }`}>
+          <div
+            className={`flex gap-3 p-4 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} ${
+              !isMobile ? `absolute bottom-0 left-0 right-0 ${theme === "dark" ? "bg-zinc-950" : "bg-white"}` : ""
+            }`}
+          >
             <button
               onClick={handleClear}
               className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${

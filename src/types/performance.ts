@@ -21,7 +21,6 @@ export interface CommanderTeamMedianDispersion {
   day_period: string | null;
 }
 
-// src/types/performance.ts
 export interface CommanderTeamDispersionEntry {
   user_id: string;
   first_name: string;
@@ -35,7 +34,6 @@ export interface CommanderTeamDispersionEntry {
   shooting_position: string | null;
   day_period: string | null;
 }
-
 
 export type GroupingScoreEntry = {
   id: string;
@@ -131,6 +129,13 @@ export interface SquadStats {
   squad_name: string;
 }
 
+export interface getStatsWhenUserHoldsWeapon {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  squad_name: string;
+  total_shots: number;
+}
 export interface WeaponUsageStats {
   weapon_id: string;
   total_shots_fired: number;
@@ -216,4 +221,67 @@ export interface GetUserMediansInSquadQueryResult {
   first_name: string;
   last_name: string;
   median_cm_dispersion: number;
+}
+
+export interface SquadWeaponStatsQuery {
+  squad_id: string;
+  training_session_id: string;
+  training_date: string;
+  other_weapon_id: string;
+  other_weapon_name: string;
+  total_shots: number;
+  total_hits: number;
+  hit_rate: number;
+  users_count: number;
+}
+
+export interface SquadWeaponStats {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  squad_name: string;
+  total_shots: number;
+  total_hits: number;
+  hit_rate: number;
+  users_count: number;
+  created_at: string;
+  action_type: string;
+  actor_id: string;
+}
+
+export interface UserWeeklyKpisForUser {
+  user_id: string;
+
+  trainings_current: number;
+  trainings_prev: number;
+  trainings_change: number;
+  trainings_change_pct: number | null;
+
+  sessions_current: number;
+  sessions_prev: number;
+  sessions_change: number;
+  sessions_change_pct: number | null;
+
+  engagements_current: number;
+  engagements_prev: number;
+  engagements_change: number;
+  engagements_change_pct: number | null;
+
+  targets_current: number;
+  targets_prev: number;
+  targets_change: number;
+  targets_change_pct: number | null;
+
+  hit_ratio_current: number;
+  hit_ratio_prev: number;
+  hit_ratio_change: number;
+  hit_ratio_change_pct: number | null;
+
+  engagement_rate_current: number;
+  engagement_rate_prev: number;
+  engagement_rate_change: number;
+
+  targets_per_session_current: number;
+  targets_per_session_prev: number;
+  targets_per_session_change: number;
 }

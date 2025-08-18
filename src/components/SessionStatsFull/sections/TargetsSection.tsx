@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Target as TargetIcon, Trash2, Wind, Plus, Minus, AlertCircle, ChevronDown } from "lucide-react";
+import { Target as TargetIcon, Trash2, Wind, Plus, Minus, AlertCircle, ChevronDown, MoveDiagonal } from "lucide-react";
 import { Target } from "../types";
 import { SectionHeader } from "./SectionHeader";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -101,7 +101,7 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                                   type="number"
                                   placeholder="Speed"
                                   value={target.windStrength || ""}
-                                  onChange={(e) => updateTarget(target.id, "windStrength", e.target.value ? parseInt(e.target.value) : null)}
+                                  onChange={(e) => updateTarget(target.id, "windStrength", e.target.value ? parseFloat(e.target.value) : null)}
                                   className="h-7 text-xs"
                                 />
                                 <Input
@@ -127,6 +127,25 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                               placeholder="Optional"
                               value={target.mistakeCode}
                               onChange={(e) => updateTarget(target.id, "mistakeCode", e.target.value)}
+                              className="h-7 text-xs"
+                            />
+                          </div>
+
+                          {/* Meter Per Second */}
+                          <div>
+                            <Label className="text-xs text-zinc-500 mb-1 flex items-center gap-1">
+                              <MoveDiagonal className="w-3 h-3" />
+                              Speed (m/s)
+                            </Label>
+                            <Input
+                              type="number"
+                              placeholder="Speed"
+                              step="0.5"
+                              value={target.meterPerSecond || ""}
+                              onChange={(e) => {
+                                const value = e.target.value ? parseFloat(e.target.value) : null;
+                                updateTarget(target.id, "meterPerSecond", value);
+                              }}
                               className="h-7 text-xs"
                             />
                           </div>

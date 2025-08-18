@@ -7,7 +7,8 @@ import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
 import { useEffect } from "react";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { Users, Shield, Calendar } from "lucide-react";
+import { TrendingUp } from "lucide-react";
+import { ProfileCardSkeleton } from "./DashboardSkeletons";
 
 export default function DashboardProfileCard() {
   const { theme } = useTheme();
@@ -35,94 +36,109 @@ export default function DashboardProfileCard() {
 
   const getTimeBasedGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return { greeting: "Morning", icon: "☀️" };
-    if (hour < 17) return { greeting: "Afternoon", icon: "🌤️" };
-    return { greeting: "Evening", icon: "🌙" };
+    if (hour < 12) return { greeting: "Good Morning" };
+    if (hour < 17) return { greeting: "Good Afternoon" };
+    return { greeting: "Good Evening" };
   };
 
-  const { greeting, icon } = getTimeBasedGreeting();
+  const { greeting } = getTimeBasedGreeting();
+
+  if (!user) {
+    return <ProfileCardSkeleton />;
+  }
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case "commander":
+        return theme === "dark" ? "text-yellow-400" : "text-yellow-600";
+      case "squad_commander":
+        return theme === "dark" ? "text-blue-400" : "text-blue-600";
+      case "soldier":
+        return theme === "dark" ? "text-green-400" : "text-green-600";
+      default:
+        return theme === "dark" ? "text-gray-400" : "text-gray-600";
+    }
+  };
 
   return (
-    <div className={`rounded-lg border p-4 ${theme === "dark" ? "bg-zinc-900/50 border-zinc-800" : "bg-white border-gray-200"}`}>
-      <div className="flex items-center justify-between">
-        {/* Left side - Compact user info */}
-        <div className="flex items-center gap-3">
-          {/* Avatar with initials */}
-          <div
-            className={`relative w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
-              theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-700"
-            }`}
-          >
-            {user?.first_name?.[0]}
-            {user?.last_name?.[0]}
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-zinc-900"></div>
-          </div>
-
-          {/* User details - horizontal layout */}
-          <div className="flex items-center gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base font-medium">
-                  {user?.first_name} {user?.last_name}
-                </h2>
-                {!isMobile && <span className="text-sm opacity-50">{icon}</span>}
-              </div>
-              <p className="text-xs opacity-60">{greeting} Commander</p>
-            </div>
-
-            {/* Divider */}
-            {!isMobile && <div className={`h-8 w-px ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`} />}
-
-            {/* Tags - inline */}
-            {!isMobile && (
-              <div className="flex items-center gap-3 text-xs">
-                <span className={`px-2 py-0.5 rounded ${theme === "dark" ? "bg-zinc-800 text-zinc-400" : "bg-gray-100 text-gray-600"}`}>
-                  {user?.user_role?.replace("_", " ").toUpperCase()}
-                </span>
-
-                {user?.team_name && (
-                  <div className="flex items-center gap-1.5 opacity-70">
-                    <Users size={12} />
-                    <span>{user?.team_name}</span>
-                  </div>
-                )}
-
-                {user?.squad_name && (
-                  <div className="flex items-center gap-1.5 opacity-70">
-                    <Shield size={12} />
-                    <span>{user?.squad_name}</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right side - Date */}
-        <div className="hidden md:flex items-center gap-2 text-xs opacity-60">
-          <Calendar size={14} />
-          <span>{new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>
-        </div>
+    <div
+      className={`relative overflow-hidden rounded-xl border transition-all duration-200 ${
+        theme === "dark"
+          ? "bg-gradient-to-br from-zinc-900 to-zinc-900/50 border-zinc-800"
+          : "bg-gradient-to-br from-white to-gray-50 border-gray-200"
+      }`}
+    >
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, ${
+              theme === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"
+            } 1px, transparent 1px)`,
+            backgroundSize: "20px 20px",
+          }}
+        />
       </div>
 
-      {/* Mobile tags */}
-      {isMobile && (
-        <div className="flex items-center gap-2 mt-3 text-xs">
-          {user?.team_name && (
-            <div className="flex items-center gap-1 opacity-70">
-              <Users size={12} />
-              <span>{user?.team_name}</span>
+      <div className="relative p-4 sm:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          {/* Left side - User info */}
+          <div className="flex items-center gap-3">
+            {/* Avatar */}
+            <div
+              className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold ${
+                theme === "dark"
+                  ? "bg-gradient-to-br from-zinc-700 to-zinc-800 text-white"
+                  : "bg-gradient-to-br from-gray-200 to-gray-300 text-gray-700"
+              } shadow-lg`}
+            >
+              {user?.first_name?.[0]?.toUpperCase()}
+              {user?.last_name?.[0]?.toUpperCase() || "U"}
             </div>
-          )}
 
-          {user?.squad_name && (
-            <div className="flex items-center gap-1 opacity-70">
-              <Shield size={12} />
-              <span>{user?.squad_name}</span>
+            {/* User details */}
+            <div className="flex-1">
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <h2 className={`text-base sm:text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  {greeting}, {user?.first_name}
+                </h2>
+              </div>
+              <div className="flex items-center gap-3 mt-1">
+                <span className={`text-xs sm:text-sm font-medium ${getRoleColor(user?.user_role || "")}`}>
+                  {user?.user_role?.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                </span>
+                {user?.team_name && (
+                  <>
+                    <span className={`text-xs ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`}>•</span>
+                    <span className={`text-xs sm:text-sm ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>{user.team_name}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right side - Quick stats */}
+          {!isMobile && (
+            <div className="flex items-center gap-4">
+              {/* Activity indicator */}
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100/80"}`}>
+                <div className="relative">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping" />
+                </div>
+                <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>Active</span>
+              </div>
+
+              {/* Streak or performance indicator */}
+              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${theme === "dark" ? "bg-zinc-800/50" : "bg-gray-100/80"}`}>
+                <TrendingUp className={`w-3.5 h-3.5 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} />
+                <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>+12%</span>
+              </div>
             </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

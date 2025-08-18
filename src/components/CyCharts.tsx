@@ -39,82 +39,81 @@ export default function DashboardSquadProgress({ loading }: { loading: boolean }
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full">
+      <div className="flex justify-center items-center h-64">
         <WaveLoader />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg ">
-      <div className="flex flex-col gap-4 text-2xl pt-4 pb-2">Overall Performance</div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        <div className="w-full row-span-1">
-          <BaseDashboardCard
-            header="Performance Overview"
-            tooltipContent="Current performance metrics"
-            withFilter={[
-              {
-                label: "Distance",
-                value: "distance",
-                onChange: (val) => {
-                  setHitPercentageDistance(val || null);
-                },
-                options: [
-                  { label: "All Distances", value: "" },
-                  { label: "Short (0-300m)", value: "short" },
-                  { label: "Mid (300-600m)", value: "medium" },
-                  { label: "Long (600-900m)", value: "long" },
-                ],
-                type: "select",
+    <div className="space-y-4">
+      {/* Section Header */}
+      <div className="text-lg font-medium">Overall Performance</div>
+      
+      {/* Two Charts Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Performance Overview Chart */}
+        <BaseDashboardCard
+          header="Performance Overview"
+          tooltipContent="Current performance metrics"
+          withFilter={[
+            {
+              label: "Distance",
+              value: "distance",
+              onChange: (val) => {
+                setHitPercentageDistance(val || null);
               },
-              {
-                label: "Position",
-                value: "position",
-                onChange: (val) => {
-                  setHitPercentagePosition(val || null);
-                },
-                options: [{ label: "All Positions", value: "" }, ...positions.map((pos) => ({ label: formatEnumLabel(pos), value: pos }))],
-                type: "select",
+              options: [
+                { label: "All Distances", value: "" },
+                { label: "Short (0-300m)", value: "short" },
+                { label: "Mid (300-600m)", value: "medium" },
+                { label: "Long (600-900m)", value: "long" },
+              ],
+              type: "select",
+            },
+            {
+              label: "Position",
+              value: "position",
+              onChange: (val) => {
+                setHitPercentagePosition(val || null);
               },
-              {
-                label: "Weapon Type",
-                value: "weapon_type",
-                onChange: (val) => {
-                  setHitPercentageWeaponType(val || null);
-                },
-                options: [{ label: "All Weapons", value: "" }, ...weaponTypes.map((type) => ({ label: formatEnumLabel(type), value: type }))],
-                type: "select",
+              options: [{ label: "All Positions", value: "" }, ...positions.map((pos) => ({ label: formatEnumLabel(pos), value: pos }))],
+              type: "select",
+            },
+            {
+              label: "Weapon Type",
+              value: "weapon_type",
+              onChange: (val) => {
+                setHitPercentageWeaponType(val || null);
               },
-            ]}
-            onClearFilters={() => {
-              setHitPercentageDistance(null);
-              setHitPercentagePosition(null);
-              setHitPercentageWeaponType(null);
-            }}
-            currentFilterValues={{
-              distance: hitPercentageDistance || "",
-              position: hitPercentagePosition || "",
-              weapon_type: hitPercentageWeaponType || "",
-            }}
-          >
-            <UserHitPercentage distance={hitPercentageDistance} position={hitPercentagePosition} weaponType={hitPercentageWeaponType} />
-          </BaseDashboardCard>
-        </div>
-        <div className="grid grid-cols-1 gap-6 lg:col-span-1 xl:col-span-2">
-          <DashboardGroupingChart />
-        </div>
-        <div className="grid grid-cols-1 gap-6 lg:col-span-1 xl:col-span-2">
-          {isSquadCommander(user?.user_role as UserRole) ? (
-            <div className="flex flex-col gap-4 text-2xl">Team Members</div>
-          ) : (
-            <div className="flex flex-col gap-4 text-2xl ">Squad Members</div>
-          )}
-        </div>
-        <div className="w-full grid col-span-full">
-          <DashboardMembersTable />
-        </div>
+              options: [{ label: "All Weapons", value: "" }, ...weaponTypes.map((type) => ({ label: formatEnumLabel(type), value: type }))],
+              type: "select",
+            },
+          ]}
+          onClearFilters={() => {
+            setHitPercentageDistance(null);
+            setHitPercentagePosition(null);
+            setHitPercentageWeaponType(null);
+          }}
+          currentFilterValues={{
+            distance: hitPercentageDistance || "",
+            position: hitPercentagePosition || "",
+            weapon_type: hitPercentageWeaponType || "",
+          }}
+        >
+          <UserHitPercentage distance={hitPercentageDistance} position={hitPercentagePosition} weaponType={hitPercentageWeaponType} />
+        </BaseDashboardCard>
+
         {/* Grouping Chart */}
+        <DashboardGroupingChart />
+      </div>
+
+      {/* Members Section */}
+      <div className="space-y-4">
+        <div className="text-lg font-medium">
+          {isSquadCommander(user?.user_role as UserRole) ? "Team Members" : "Squad Members"}
+        </div>
+        <DashboardMembersTable />
       </div>
     </div>
   );

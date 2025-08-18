@@ -46,28 +46,77 @@ export async function getUserHitStatsWithFilters(
   }
 }
 
-
-
 export async function getCommanderTeamMedianDispersion(
   teamId: string,
   startDate?: string,
   endDate?: string,
   weaponType?: string,
   position?: string,
-  dayPeriod?: string
+  dayPeriod?: string,
 ): Promise<CommanderTeamDispersionEntry[]> {
-  const { data, error } = await supabase
-    .rpc("get_commander_team_median_dispersion", {
-      p_team_id: teamId,
-      p_start_date: startDate ?? null,
-      p_end_date: endDate ?? null,
-      p_weapon_type: weaponType || null,
-      p_position: position || null,
-      p_day_period: dayPeriod || null,
-    });
+  const { data, error } = await supabase.rpc("get_commander_team_median_dispersion", {
+    p_team_id: teamId,
+    p_start_date: startDate ?? null,
+    p_end_date: endDate ?? null,
+    p_weapon_type: weaponType || null,
+    p_position: position || null,
+    p_day_period: dayPeriod || null,
+  });
 
   if (error) throw error;
   return data || [];
+}
+
+export interface SquadImpactData {
+  user_id: string;
+  user_name: string;
+  weapon_id: string;
+  weapon_name: string;
+  training_date: string;
+  user_hit_rate: number;
+  squad_hit_rate_before: number;
+  squad_hit_rate_after: number;
+  impact_percentage: number;
+  total_shots: number;
+  squad_members_count: number;
+}
+
+export async function getSquadPerformanceImpact(
+  teamId: string,
+  userId?: string,
+  weaponId?: string,
+  startDate?: string,
+  endDate?: string,
+): Promise<SquadImpactData[]> {
+  try {
+    // Try to call the RPC function
+    const { data, error } = await supabase.rpc("get_squad_performance_impact", {
+      p_team_id: teamId,
+      p_user_id: userId || null,
+      p_weapon_id: weaponId || null,
+      p_start_date: startDate || null,
+      p_end_date: endDate || null,
+    });
+
+    if (error) {
+      // If RPC doesn't exist, return mock data for demonstration
+      if (error.message.includes("Could not find the function")) {
+        console.warn("RPC function not deployed yet. Run the migration in supabase/migrations/squad_performance_impact.sql");
+
+        // Return empty array for now
+        return [];
+
+        // Or return mock data for testing:
+        // return getMockSquadImpactData(teamId, userId, weaponId, startDate, endDate);
+      }
+      throw error;
+    }
+
+    return data || [];
+  } catch (error: any) {
+    console.error("Error fetching squad performance impact:", error.message);
+    throw new Error("Failed to fetch squad performance impact");
+  }
 }
 
 export async function getSquadRoleHitPercentages(squadId: string, distance: string | null = null) {
@@ -314,7 +363,6 @@ export async function getWeaponUsageStats(weaponId: string): Promise<WeaponUsage
     console.error("Error fetching weapon usage stats:", error.message);
     throw error;
   }
-  console.log("data", data);
 
   const rawResult = data?.[0];
   const result = rawResult

@@ -6,7 +6,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { SpPageBreadcrumbs } from "@/layouts/SpPage";
 import { useState, useRef, useEffect } from "react";
-import ActivityFeedDrawer from "@/components/ActivityFeedDrawer";
+import UnifiedFeedModal from "@/components/UnifiedFeedModal";
 import InviteModal from "@/components/InviteModal";
 import ProfileMenu from "./ProfileMenu";
 
@@ -53,7 +53,7 @@ export default function Header({
         {/* Profile Menu */}
         <ProfileMenu setIsActivityFeedOpen={setIsActivityFeedOpen} setIsInviteModalOpen={setIsInviteModalOpen} />
       </div>
-      <ActivityFeedDrawer isOpen={isActivityFeedOpen} onClose={() => setIsActivityFeedOpen(false)} />
+      <UnifiedFeedModal isOpen={isActivityFeedOpen} onClose={() => setIsActivityFeedOpen(false)} />
       {user?.id && <InviteModal isOpen={isInviteModalOpen} setIsOpen={setIsInviteModalOpen} userId={user.id} />}
     </div>
   );

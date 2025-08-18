@@ -109,7 +109,6 @@ interface PerformanceStore {
   ) => Promise<void>;
   userMediansInSquadLoading: boolean;
 }
-
 export const performanceStore = create<PerformanceStore>((set) => ({
   squadWeaponPerformance: [],
   isLoading: false,
