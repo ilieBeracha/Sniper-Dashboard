@@ -11,8 +11,7 @@ import { getSquadsWithUsersByTeamId } from "@/services/squadService";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import { WaveLoader } from "@/components/ui/loader";
 import Assets from "./Assets";
-// import SessionStats from "./SessionStats";
-// Dynamic imports for better code splitting
+
 const Dashboard = lazy(() => import("./Dashboard"));
 const Training = lazy(() => import("./Trainings"));
 const TrainingPage = lazy(() => import("./Training"));
