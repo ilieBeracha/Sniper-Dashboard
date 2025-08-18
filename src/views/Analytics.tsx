@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useStore } from "zustand";
 import { userStore } from "@/store/userStore";
-import { performanceStore } from "@/store/performance";
+// import { performanceStore } from "@/store/performance";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import { 
