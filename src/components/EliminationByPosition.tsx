@@ -86,7 +86,7 @@ export default function EliminationByPosition() {
   }
 
   return (
-    <div className="p-3">
+    <div className="p-2">
       {total && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -150,7 +150,7 @@ export default function EliminationByPosition() {
                   border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
                   borderRadius: 4,
                   fontSize: 10,
-                  padding: '2px 6px',
+                  padding: "2px 6px",
                 }}
                 formatter={(value: any) => [`${value} eliminated`, ""]}
               />
@@ -174,7 +174,7 @@ export default function EliminationByPosition() {
                   border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
                   borderRadius: 4,
                   fontSize: 10,
-                  padding: '2px 6px',
+                  padding: "2px 6px",
                 }}
                 formatter={(value: any) => [`${value}%`, "Success Rate"]}
               />

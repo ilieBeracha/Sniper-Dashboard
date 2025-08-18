@@ -159,7 +159,7 @@ export default function Stats() {
       <SpPageHeader title="Stats" subtitle="Performance analytics" icon={BarChart2} />
 
       {/* Filter Section - Improved Mobile Layout */}
-      <div className="mb-6 px-4 sm:px-0">
+      <div className=" px-4 sm:px-0">
         {/* Active Filters Display - Mobile Optimized */}
         {hasActiveFilters && (
           <motion.div
@@ -305,7 +305,7 @@ export default function Stats() {
           />
 
           {/* Masonry Grid Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
             {/* KPI Overview - Spans full width */}
             <div className="lg:col-span-12">
               <StatsCard title="Performance Overview" icon={Activity} color="accent">
@@ -313,17 +313,17 @@ export default function Stats() {
               </StatsCard>
             </div>
 
-            {/* First Shot Matrix - Spans 6 columns */}
-            <div className="lg:col-span-6">
-              <StatsCard title="First Shot Matrix" icon={Crosshair} color="neutral">
-                <FirstShotMatrixEnhanced />
-              </StatsCard>
-            </div>
-
             {/* Position & Elimination - Spans 8 columns */}
             <div className="lg:col-span-8">
               <StatsCard title="Position & Elimination Analysis" icon={Target} color="subtle">
                 <EliminationByPosition />
+              </StatsCard>
+            </div>
+
+            {/* First Shot Matrix - Spans 6 columns */}
+            <div className="lg:col-span-6">
+              <StatsCard title="First Shot Matrix" icon={Crosshair} color="neutral">
+                <FirstShotMatrixEnhanced />
               </StatsCard>
             </div>
 
