@@ -11,8 +11,8 @@ import {
 } from "@/types/performance";
 import { GroupingSummary } from "@/types/groupingScore";
 import { PositionScore } from "@/types/user";
-import { PositionHeatmapDay } from "@/types/positionHeatmap";
-import { buildDateRange } from "@/utils/buildDayRange";
+// import { PositionHeatmapDay } from "@/types/positionHeatmap";
+// import { buildDateRange } from "@/utils/buildDayRange";
 
 export async function getUserHitStatsFull(userId: string): Promise<UserHitsData> {
   try {

@@ -23,15 +23,17 @@ import CommanderStatsOverview from "@/components/CommanderStatsOverview";
 
 export default function Analytics() {
   const { user } = useStore(userStore);
-  const { getFirstShotMatrix, getUserWeeklyKpisForUser } = useStore(performanceStore);
+  // TODO: Add these methods to performanceStore when implementing analytics data fetching
+  // const { getFirstShotMatrix, getUserWeeklyKpisForUser } = useStore(performanceStore);
   const { theme } = useTheme();
 
   // Function to refresh all data
   const refreshData = () => {
     if (user?.team_id) {
       console.log("Refreshing analytics data...");
-      getFirstShotMatrix(user.team_id, 7);
-      getUserWeeklyKpisForUser(user.id, 7);
+      // TODO: Uncomment when methods are implemented
+      // getFirstShotMatrix(user.team_id, 7);
+      // getUserWeeklyKpisForUser(user.id, 7);
     }
   };
 

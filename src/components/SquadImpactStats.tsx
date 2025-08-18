@@ -23,7 +23,12 @@ export default function SquadImpactStats() {
 
     // Process elimination by position data
     const eliminationData = eliminationByPosition || [];
-    const positionStats = eliminationData.map(pos => ({
+    const positionStats = eliminationData.map((pos: {
+      bucket: "Sitting" | "Standing" | "Total";
+      targets: number;
+      eliminated: number;
+      elimination_pct: number;
+    }) => ({
       position: pos.bucket,
       targets: pos.targets,
       eliminated: pos.eliminated,
@@ -153,8 +158,8 @@ export default function SquadImpactStats() {
           </div>
           <div className="space-y-1.5">
             {eliminationStats
-              .filter(stat => stat.position !== "Total")
-              .map((stat, index) => (
+              .filter((stat: any) => stat.position !== "Total")
+              .map((stat: any) => (
                 <div
                   key={stat.position}
                   className={`flex items-center justify-between p-2 rounded-lg ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"}`}
