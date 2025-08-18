@@ -1,5 +1,5 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { Calendar, Users, Target, Crosshair, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Calendar, Crosshair, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { useStore } from "zustand";
 import { useStatsStore } from "@/store/statsStore";
 
@@ -19,30 +19,14 @@ export default function StatsUserKPI() {
       value: row.sessions,
       label: "Training Sessions",
       icon: Calendar,
-      trend: pct(row.sessions_change_pct),
-      positive: pos(row.sessions_change_pct),
-    },
-    {
-      value: row.sessions,
-      label: "Active Sessions",
-      icon: Users,
-      trend: pct(0.1),
-      positive: pos(0.1),
-    },
-    {
-      value: row.targets,
-      label: "Targets Engaged",
-      icon: Target,
-      trend: pct(row.targets_change_pct),
-      positive: pos(row.targets_change_pct),
     },
     {
       value: row.hit_pct,
       label: "Accuracy Rate",
       suffix: "%",
       icon: Crosshair,
-      trend: pct(row.hit_ratio_change_pct),
-      positive: pos(row.hit_ratio_change_pct),
+      trend: pct(row.hit_pct),
+      positive: pos(row.hit_pct),
     },
   ];
 

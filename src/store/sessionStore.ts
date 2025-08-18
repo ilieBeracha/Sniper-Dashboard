@@ -90,6 +90,7 @@ export interface SessionStatsSaveData {
     distance: number;
     windStrength?: number;
     windDirection?: number;
+    meter_per_second?: number;
     totalHits?: number;
     mistakeCode?: string;
     first_shot_hit?: boolean | null;

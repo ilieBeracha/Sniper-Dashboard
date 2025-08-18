@@ -1,40 +1,44 @@
 import { useEffect, useState } from "react";
-import { StatsFilters } from "@/types/stats";
-import { useStore } from "zustand";
+import { StatsFilters, PositionEnum } from "@/types/stats";
 import { userStore } from "@/store/userStore";
+import { useStore } from "zustand";
+import { DayNight } from "@/types/equipment";
 
 export const useStatsFilters = () => {
   const { user } = useStore(userStore);
+
   const [filters, setFilters] = useState<StatsFilters>({
-    teamId: user?.team_id ?? null,
-    squadId: null,
-    userId: user?.id ?? null,
-    isSquad: true, // default to squad view to avoid empty scope
+    squadIds: null, // set to ['<squad-uuid>', ...] for squad mode
+    userId: user?.id ?? null, // required when squadIds is null/empty
     startDate: null,
     endDate: null,
-    dayNight: null,
-    positions: null,
+    dayNight: null as DayNight[] | null,
+    positions: null as PositionEnum[] | null,
     minShots: null,
   });
 
   useEffect(() => {
+    if (user?.id) {
+      setFilters((prev) => ({ ...prev, userId: user.id }));
+    }
+  }, [user?.id]);
+
+  const clearFilters = () => {
     setFilters({
-      teamId: user?.team_id ?? null,
-      squadId: user?.squad_id ?? null,
-      userId: user?.id ?? null,
-      isSquad: true,
+      squadIds: null,
+      userId: null,
       startDate: null,
       endDate: null,
       dayNight: null,
       positions: null,
       minShots: null,
     });
-  }, [user]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleFilterChange = (filter: keyof StatsFilters, value: string | string[] | number | boolean | null) => {
-    setFilters((prev) => ({ ...prev, [filter]: value as any }));
   };
 
-  return { filters, setFilters, isLoading, setIsLoading, handleFilterChange };
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleFilterChange = (key: keyof StatsFilters, value: string | string[] | number | boolean | null) =>
+    setFilters((prev) => ({ ...prev, [key]: value as any }));
+
+  return { filters, setFilters, isLoading, setIsLoading, handleFilterChange, clearFilters };
 };
