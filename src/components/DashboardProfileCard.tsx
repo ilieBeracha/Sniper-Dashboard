@@ -149,7 +149,6 @@ export default function DashboardProfileCard() {
             <span className={`text-xs ${theme === "dark" ? "text-zinc-600" : "text-gray-400"}`}>•</span>
             <div className="flex items-center gap-1">
               <TrendingUp className="w-3 h-3 text-green-500" />
-              <span className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>+12% this week</span>
             </div>
           </div>
         )}
