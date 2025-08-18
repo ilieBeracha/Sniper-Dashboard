@@ -1,10 +1,7 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { Calendar, Crosshair, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Calendar, Crosshair, Target, TrendingUp } from "lucide-react";
 import { useStore } from "zustand";
 import { useStatsStore } from "@/store/statsStore";
-
-const pct = (v?: number | null) => (v == null ? "—" : `${Math.round(v * 100)}%`);
-const pos = (v?: number | null) => (v ?? 0) >= 0;
 
 export default function StatsUserKPI() {
   const { statsOverviewTotals } = useStore(useStatsStore);
@@ -17,53 +14,52 @@ export default function StatsUserKPI() {
   const kpis = [
     {
       value: row.sessions,
-      label: "Training Sessions",
+      label: "Sessions",
       icon: Calendar,
+      color: theme === "dark" ? "text-violet-400" : "text-violet-600",
+    },
+    {
+      value: row.targets,
+      label: "Targets",
+      icon: Target,
+      color: theme === "dark" ? "text-blue-400" : "text-blue-600",
     },
     {
       value: row.hit_pct,
-      label: "Accuracy Rate",
+      label: "Accuracy",
       suffix: "%",
       icon: Crosshair,
-      trend: pct(row.hit_pct),
-      positive: pos(row.hit_pct),
+      color: theme === "dark" ? "text-emerald-400" : "text-emerald-600",
+    },
+    {
+      value: row.elimination_pct,
+      label: "Elimination",
+      suffix: "%",
+      icon: TrendingUp,
+      color: theme === "dark" ? "text-orange-400" : "text-orange-600",
     },
   ];
 
-  const iconColor = theme === "dark" ? "text-zinc-400" : "text-gray-600";
-  const bgHover = theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50";
+  const bgCard = theme === "dark" ? "bg-zinc-900/50" : "bg-white";
   const border = theme === "dark" ? "border-zinc-800" : "border-gray-200";
   const textMain = theme === "dark" ? "text-white" : "text-gray-900";
-  const textSub = theme === "dark" ? "text-zinc-400" : "text-gray-600";
-  const divide = theme === "dark" ? "divide-zinc-800" : "divide-gray-200";
+  const textSub = theme === "dark" ? "text-zinc-500" : "text-gray-500";
 
   return (
-    <div className={`rounded-xl ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"} border ${border}`}>
-      <div className={`grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 ${divide}`}>
+    <div className={`rounded-lg ${bgCard} border ${border}`}>
+      <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-zinc-800/50">
         {kpis.map((item, idx) => {
           const Icon = item.icon;
-          const TrendIcon = item.positive ? ArrowUpRight : ArrowDownRight;
           return (
-            <div key={idx} className={`p-4 lg:p-5 hover:${bgHover} transition-colors`}>
-              <div className="flex items-center justify-between mb-2">
-                <Icon className={`w-4 h-4 ${iconColor}`} />
-                <div
-                  className={`flex items-center gap-0.5 text-[11px] font-medium ${
-                    item.positive ? (theme === "dark" ? "text-emerald-400" : "text-emerald-600") : theme === "dark" ? "text-red-400" : "text-red-600"
-                  }`}
-                >
-                  <TrendIcon className="w-3 h-3" />
-                  {item.trend}
-                </div>
+            <div key={idx} className="p-2.5 lg:p-3">
+              <div className="flex items-start justify-between mb-0.5">
+                <Icon className={`w-3 h-3 ${item.color}`} />
               </div>
-
-              <div>
-                <div className={`text-xl lg:text-2xl font-bold ${textMain}`}>
-                  {item.value.toLocaleString()}
-                  {item.suffix}
-                </div>
-                <div className={`text-xs ${textSub} mt-0.5`}>{item.label}</div>
+              <div className={`text-base lg:text-lg font-semibold ${textMain}`}>
+                {item.value.toLocaleString()}
+                {item.suffix}
               </div>
+              <div className={`text-[10px] ${textSub} mt-0.5`}>{item.label}</div>
             </div>
           );
         })}

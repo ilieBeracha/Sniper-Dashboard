@@ -1,16 +1,15 @@
 import Header from "@/Headers/Header";
 import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
-import { BarChart2, SlidersHorizontal } from "lucide-react";
+import { BarChart2, SlidersHorizontal, Calendar, Target, MapPin, Sun } from "lucide-react";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { useEffect, useState } from "react";
 
-// import WeeklyActivityBars from "@/components/WeeklyActivityBars";
 import { useStatsStore } from "@/store/statsStore";
 import { useStatsFilters } from "@/hooks/useStatsFilters";
 import StatsUserKPI from "@/components/StatsUserKPI";
 
-// New components
+// Components
 import FirstShotMetrics from "@/components/FirstShotMetrics";
 import EliminationByPosition from "@/components/EliminationByPosition";
 import WeeklyTrends from "@/components/WeeklyTrends";
@@ -19,6 +18,7 @@ import FirstShotMatrixEnhanced from "@/components/FirstShotMatrixEnhanced";
 import FilterDrawerStats from "@/components/FilterDrawerStats";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
+import { Loader2, RefreshCw } from "lucide-react";
 
 export default function Stats() {
   const { user } = useStore(userStore);
@@ -26,22 +26,32 @@ export default function Stats() {
   const { getStatsOverviewTotals, getFirstShotMetrics, getEliminationByPosition, getWeeklyTrends, getFirstShotMatrix } = useStore(useStatsStore);
   const { filters, setFilters, clearFilters } = useStatsFilters();
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const refreshData = () => {
+  const refreshData = async () => {
     if (user?.team_id) {
       console.log("Refreshing stats page data...");
+      setIsLoading(true);
 
-      getStatsOverviewTotals(filters);
-      getFirstShotMetrics(filters);
-      getEliminationByPosition(filters);
-      getWeeklyTrends({ ...filters, p_group_by_weapon: false });
-      getFirstShotMatrix({
-        ...filters,
-        p_distance_bucket: 25,
-        p_min_targets: 0,
-        p_min_distance: 100,
-        p_max_distance: 900,
-      });
+      try {
+        await Promise.all([
+          getStatsOverviewTotals(filters),
+          getFirstShotMetrics(filters),
+          getEliminationByPosition(filters),
+          getWeeklyTrends({ ...filters, p_group_by_weapon: false }),
+          getFirstShotMatrix({
+            ...filters,
+            p_distance_bucket: 25,
+            p_min_targets: 0,
+            p_min_distance: 100,
+            p_max_distance: 900,
+          }),
+        ]);
+      } catch (error) {
+        console.error("Error refreshing stats data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -74,99 +84,159 @@ export default function Stats() {
     };
   }, [user?.team_id]);
 
+  const hasActiveFilters = !!(filters.startDate || filters.endDate || filters.dayNight?.length || filters.positions?.length);
+
+  // Format date range for display
+  const getDateRangeDisplay = () => {
+    if (filters.startDate && filters.endDate) {
+      const start = new Date(filters.startDate);
+      const end = new Date(filters.endDate);
+      const formatOptions: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+      
+      // Check if same year
+      if (start.getFullYear() === end.getFullYear()) {
+        // Check if same month
+        if (start.getMonth() === end.getMonth()) {
+          return `${start.toLocaleDateString('en-US', formatOptions)} - ${end.getDate()}`;
+        }
+        return `${start.toLocaleDateString('en-US', formatOptions)} - ${end.toLocaleDateString('en-US', formatOptions)}`;
+      }
+      return `${start.toLocaleDateString('en-US', { ...formatOptions, year: '2-digit' })} - ${end.toLocaleDateString('en-US', { ...formatOptions, year: '2-digit' })}`;
+    }
+    return null;
+  };
+
   return (
     <SpPage>
       <Header breadcrumbs={[{ label: "Stats", link: "/stats" }]} />
-      <SpPageHeader title="Stats" subtitle="KPIs, impact and trends" icon={BarChart2} />
+      <SpPageHeader title="Stats" subtitle="Performance analytics" icon={BarChart2} />
 
-      {/* Filter Button Section */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {/* Active filters display */}
-          {(filters.startDate || filters.endDate || filters.dayNight?.length || filters.positions?.length || filters.minShots) && (
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2">
-              <span className={`text-xs ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Active filters:</span>
-              <div className="flex items-center gap-1">
-                {filters.startDate && (
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs ${theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-700"}`}
-                  >
-                    From: {new Date(filters.startDate).toLocaleDateString()}
-                  </span>
-                )}
-                {filters.endDate && (
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs ${theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-700"}`}
-                  >
-                    To: {new Date(filters.endDate).toLocaleDateString()}
-                  </span>
-                )}
-                {filters.dayNight?.length && (
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs ${theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-700"}`}
-                  >
-                    {filters.dayNight.join(", ")}
-                  </span>
-                )}
-                {filters.positions?.length && (
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs ${theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-700"}`}
-                  >
-                    {filters.positions.length} position{filters.positions.length > 1 ? "s" : ""}
-                  </span>
-                )}
-                {filters.minShots && (
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs ${theme === "dark" ? "bg-zinc-800 text-zinc-300" : "bg-gray-100 text-gray-700"}`}
-                  >
-                    Min: {filters.minShots} shots
-                  </span>
-                )}
-              </div>
+      {/* Filter Section - Improved Mobile Layout */}
+      <div className="mb-4 px-4 sm:px-0">
+        {/* Active Filters Display - Mobile Optimized */}
+        {hasActiveFilters && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }} 
+            animate={{ opacity: 1, y: 0 }}
+            className={`mb-3 p-3 rounded-lg ${
+              theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-gray-50 border border-gray-200"
+            }`}
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
+                Active:
+              </span>
+              
+              {/* Date Range */}
+              {getDateRangeDisplay() && (
+                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
+                  theme === "dark" ? "bg-violet-500/20 text-violet-300" : "bg-violet-100 text-violet-700"
+                }`}>
+                  <Calendar className="w-3 h-3" />
+                  {getDateRangeDisplay()}
+                </span>
+              )}
+              
+              {/* Day/Night */}
+              {filters.dayNight?.length && (
+                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
+                  theme === "dark" ? "bg-blue-500/20 text-blue-300" : "bg-blue-100 text-blue-700"
+                }`}>
+                  <Sun className="w-3 h-3" />
+                  {filters.dayNight.length === 2 ? "Day & Night" : filters.dayNight[0]}
+                </span>
+              )}
+              
+              {/* Position */}
+              {filters.positions?.length && (
+                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
+                  theme === "dark" ? "bg-green-500/20 text-green-300" : "bg-green-100 text-green-700"
+                }`}>
+                  <Target className="w-3 h-3" />
+                  {filters.positions.length === 1 ? filters.positions[0] : `${filters.positions.length} positions`}
+                </span>
+              )}
+              
+              {/* Clear Button */}
               <button
                 onClick={() => {
                   clearFilters();
                   refreshData();
                 }}
-                className={`ml-2 text-xs underline ${theme === "dark" ? "text-zinc-400 hover:text-zinc-300" : "text-gray-600 hover:text-gray-800"} transition-colors`}
+                className={`ml-auto text-xs underline ${
+                  theme === "dark" ? "text-zinc-400 hover:text-zinc-300" : "text-gray-600 hover:text-gray-800"
+                } transition-colors`}
               >
-                Clear all
+                Clear
               </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={refreshData}
+            disabled={isLoading}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all
+              ${theme === "dark"
+                ? "bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 disabled:opacity-50"
+                : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 disabled:opacity-50"
+              }`}
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
+            <span className="hidden sm:inline">Refresh</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setIsFilterDrawerOpen(true)}
+            disabled={isLoading}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all flex-1 sm:flex-initial
+              ${theme === "dark"
+                ? "bg-violet-600 hover:bg-violet-500 text-white disabled:opacity-50"
+                : "bg-violet-600 hover:bg-violet-700 text-white disabled:opacity-50"
+              }`}
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <span>Filters</span>
+            {hasActiveFilters && (
+              <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                theme === "dark" ? "bg-violet-500/30 text-violet-200" : "bg-violet-500 text-white"
+              }`}>
+                {[
+                  filters.startDate ? 1 : 0,
+                  filters.endDate ? 1 : 0,
+                  filters.dayNight?.length ? 1 : 0,
+                  filters.positions?.length ? 1 : 0
+                ].reduce((a, b) => a + b, 0)}
+              </span>
+            )}
+          </motion.button>
+        </div>
+      </div>
+
+      <SpPageBody>
+        <div className="space-y-3 relative">
+          {/* Loading Overlay */}
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="absolute inset-0 bg-black/5 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg min-h-[200px]"
+            >
+              <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                theme === "dark" ? "bg-zinc-800 text-white" : "bg-white text-gray-900"
+              } shadow-lg`}>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm">Loading data...</span>
+              </div>
             </motion.div>
           )}
-        </div>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setIsFilterDrawerOpen(true)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all
-            ${
-              theme === "dark"
-                ? "bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700"
-                : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
-            }`}
-        >
-          <SlidersHorizontal className="w-4 h-4" />
-          <span className="text-sm font-medium">Filters</span>
-          {(filters.startDate || filters.endDate || filters.dayNight?.length || filters.positions?.length || filters.minShots) && (
-            <span
-              className={`ml-1 px-1.5 py-0.5 rounded-full text-xs font-medium
-              ${theme === "dark" ? "bg-violet-500/20 text-violet-400" : "bg-violet-100 text-violet-600"}`}
-            >
-              {[
-                filters.startDate ? 1 : 0,
-                filters.endDate ? 1 : 0,
-                filters.dayNight?.length ? 1 : 0,
-                filters.positions?.length ? 1 : 0,
-                filters.minShots ? 1 : 0,
-              ].reduce((a, b) => a + b, 0)}
-            </span>
-          )}
-        </motion.button>
-      </div>
-      <SpPageBody>
-        <div className="space-y-2">
           <FilterDrawerStats
             onClear={() => {
               clearFilters();
@@ -180,17 +250,16 @@ export default function Stats() {
               refreshData();
             }}
           />
+          
           <StatsUserKPI />
 
-          {/* New Stats Components */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+          {/* Stats Grid - Responsive Layout */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
             <FirstShotMetrics />
+            <FirstShotMatrixEnhanced />
             <EliminationByPosition />
+            <WeeklyTrends />
           </div>
-
-          <WeeklyTrends />
-
-          <FirstShotMatrixEnhanced />
         </div>
       </SpPageBody>
     </SpPage>

@@ -9,12 +9,10 @@ export const useStatsFilters = () => {
 
   const [filters, setFilters] = useState<StatsFilters>({
     squadIds: null, // set to ['<squad-uuid>', ...] for squad mode
-    userId: user?.id ?? null, // required when squadIds is null/empty
     startDate: null,
     endDate: null,
     dayNight: null as DayNight[] | null,
     positions: null as PositionEnum[] | null,
-    minShots: null,
   });
 
   useEffect(() => {
@@ -26,12 +24,10 @@ export const useStatsFilters = () => {
   const clearFilters = () => {
     setFilters({
       squadIds: null,
-      userId: null,
       startDate: null,
       endDate: null,
       dayNight: null,
       positions: null,
-      minShots: null,
     });
   };
 
