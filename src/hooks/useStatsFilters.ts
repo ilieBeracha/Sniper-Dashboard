@@ -14,7 +14,7 @@ export const useStatsFilters = () => {
     endDate: null,
     dayNight: null as DayNight[] | null,
     positions: null as PositionEnum[] | null,
-    minShots: null,
+    minShots: null, // Always null - minShots filter removed
   });
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export const useStatsFilters = () => {
       endDate: null,
       dayNight: null,
       positions: null,
-      minShots: null,
+      minShots: null, // Always null - minShots filter removed
     });
   };
 
