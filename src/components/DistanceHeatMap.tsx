@@ -1,16 +1,15 @@
 // /components/FirstShotMatrixHeatmap.tsx
 import { useMemo, useState } from "react";
 import { useStore } from "zustand";
-import { performanceStore } from "@/store/performance";
+import { useStatsStore } from "@/store/statsStore";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Crosshair, Target, Activity, ChevronDown, ChevronUp } from "lucide-react";
-import { PositionHeatmapDay } from "@/types/positionHeatmap";
 
 type RangeKey = "0-100" | "100-200" | "200-300" | "300+";
 type BucketRow = { distance_bucket: number; targets: number; first_shot_hit_rate: number | null };
 
 export default function FirstShotMatrixHeatmap() {
-  const { positionHeatmapData } = useStore(performanceStore);
+  const { firstShotMatrix } = useStore(useStatsStore);
   const { theme } = useTheme();
   const [showDetails, setShowDetails] = useState(false);
 
@@ -22,7 +21,7 @@ export default function FirstShotMatrixHeatmap() {
       "300+": { buckets: [], totalTargets: 0, weightedHits: 0 },
     };
 
-    for (const r of (positionHeatmapData ?? []) as PositionHeatmapDay[]) {
+    for (const r of (firstShotMatrix ?? []) as any[]) {
       const b = r.totalShots ?? 0;
       const targets = r.totalHits ?? 0;
       const rate = r.hitRatio ?? 0;
@@ -70,7 +69,7 @@ export default function FirstShotMatrixHeatmap() {
       .slice(0, 8);
 
     return { ranges, overallAccuracy, bestRange, mostActiveRange, maxTargetsAcrossRanges, topBuckets };
-  }, [positionHeatmapData]);
+  }, [firstShotMatrix]);
 
   const textMuted = theme === "dark" ? "text-zinc-400" : "text-gray-600";
   const textMain = theme === "dark" ? "text-white" : "text-gray-900";
