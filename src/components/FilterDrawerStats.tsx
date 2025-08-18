@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Filter, Calendar } from "lucide-react";
+import { X, Filter, LayoutGrid, Layers } from "lucide-react";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -9,12 +9,17 @@ import { DayNight } from "@/types/equipment";
 interface FilterDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  filters: StatsFilters;
-  onFiltersChange: (filters: StatsFilters) => void;
+  filters: StatsFilters; // { squadIds | userId | startDate | endDate | dayNight | positions | minShots }
+  onFiltersChange: (filters: StatsFilters) => void; // receives canonical StatsFilters
   onApply: () => void;
   onClear: () => void;
+  autoLoadStackView?: boolean;
+  onAutoLoadChange?: (value: boolean) => void;
+  viewMode?: "grid" | "stack";
+  onViewModeChange?: (mode: "grid" | "stack") => void;
 }
 
+// helpers
 const arrOrNull = <T,>(a: T[] | null | undefined) => (a && a.length ? a : null);
 const validPositions: PositionEnum[] = ["Sitting", "Standing", "Lying", "Operational"];
 
@@ -22,20 +27,29 @@ function sanitize(filters: StatsFilters): StatsFilters {
   const dayNight = arrOrNull(filters.dayNight?.map((d) => (d || "").toLowerCase() as DayNight));
   const positions = arrOrNull((filters.positions ?? []).filter((p): p is PositionEnum => validPositions.includes(p as PositionEnum)));
 
+  // Dates: keep as ISO or null; do not coerce
   const startDate = filters.startDate ?? null;
   const endDate = filters.endDate ?? null;
 
   return { startDate, endDate, dayNight, positions, squadIds: null };
 }
 
-export default function FilterDrawerStats({ isOpen, onClose, filters, onFiltersChange, onApply, onClear }: FilterDrawerProps) {
+export default function FilterDrawer({
+  isOpen,
+  onClose,
+  filters,
+  onFiltersChange,
+  onApply,
+  onClear,
+  autoLoadStackView,
+  onAutoLoadChange,
+  viewMode,
+  onViewModeChange,
+}: FilterDrawerProps) {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
 
   const [localFilters, setLocalFilters] = useState<StatsFilters>(filters);
-
-  // Get today's date in YYYY-MM-DD format for max date constraint
-  const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     setLocalFilters(filters);
@@ -49,48 +63,16 @@ export default function FilterDrawerStats({ isOpen, onClose, filters, onFiltersC
   };
 
   const handleClear = () => {
-    const cleared: StatsFilters = {
+    const cleared: Partial<StatsFilters> = {
       squadIds: null,
       startDate: null,
       endDate: null,
       dayNight: null,
       positions: null,
     };
-    setLocalFilters(cleared);
-    onFiltersChange(cleared);
+    setLocalFilters(cleared as StatsFilters);
+    onFiltersChange(cleared as StatsFilters);
     onClear();
-    onClose();
-  };
-
-  const handleDateRangeChange = (start: string | null, end: string | null) => {
-    setLocalFilters({
-      ...localFilters,
-      startDate: start ? new Date(start).toISOString() : null,
-      endDate: end ? new Date(end).toISOString() : null,
-    });
-  };
-
-  const setPresetDateRange = (days: number | "today" | "year") => {
-    const now = new Date();
-    now.setHours(23, 59, 59, 999);
-
-    let start: Date;
-    if (days === "today") {
-      start = new Date();
-      start.setHours(0, 0, 0, 0);
-    } else if (days === "year") {
-      start = new Date(now.getFullYear(), 0, 1);
-    } else {
-      start = new Date();
-      start.setDate(start.getDate() - days);
-      start.setHours(0, 0, 0, 0);
-    }
-
-    setLocalFilters({
-      ...localFilters,
-      startDate: start.toISOString(),
-      endDate: now.toISOString(),
-    });
   };
 
   return (
@@ -110,28 +92,24 @@ export default function FilterDrawerStats({ isOpen, onClose, filters, onFiltersC
         }`}
       >
         <div
-          className={`${theme === "dark" ? "bg-zinc-900" : "bg-white"} ${
+          className={`${theme === "dark" ? "bg-gradient-to-b from-zinc-900 to-zinc-950" : "bg-white"} ${
             isMobile
-              ? `rounded-t-xl border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} max-h-[85vh]`
+              ? `rounded-t-2xl border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`
               : `h-full border-l ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`
-          } shadow-xl ${!isMobile ? "w-[380px]" : ""}`}
+          } shadow-2xl ${!isMobile ? "w-[400px] relative" : ""}`}
         >
           {/* Handle (mobile) */}
           {isMobile && (
-            <div className="flex justify-center pt-2 pb-1">
-              <div className={`w-10 h-1 rounded-full ${theme === "dark" ? "bg-zinc-600" : "bg-gray-300"}`} />
+            <div className="flex justify-center pt-2">
+              <div className={`w-12 h-1.5 rounded-full ${theme === "dark" ? "bg-zinc-600" : "bg-gray-300"}`} />
             </div>
           )}
 
           {/* Header */}
-          <div
-            className={`flex items-center justify-between px-4 ${isMobile ? "py-3" : "py-4"} border-b ${
-              theme === "dark" ? "border-zinc-800" : "border-gray-200"
-            }`}
-          >
+          <div className={`flex items-center justify-between p-4 ${isMobile ? "pb-2" : "pt-6"}`}>
             <div className="flex items-center gap-2">
-              <Filter className={`w-4 h-4 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
-              <h3 className={`text-sm font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Filters</h3>
+              <Filter size={18} className="opacity-70" />
+              <h3 className="text-base font-semibold">Filters & Sort</h3>
             </div>
             <button
               onClick={onClose}
@@ -139,213 +117,321 @@ export default function FilterDrawerStats({ isOpen, onClose, filters, onFiltersC
                 theme === "dark" ? "hover:bg-zinc-800 text-zinc-400" : "hover:bg-gray-100 text-gray-500"
               }`}
             >
-              <X className="w-4 h-4" />
+              <X size={18} />
             </button>
           </div>
 
           {/* Content */}
-          <div className={`overflow-y-auto ${isMobile ? "max-h-[calc(85vh-120px)]" : "h-[calc(100%-120px)]"}`}>
-            <div className="p-4 space-y-4">
-              {/* Date Range Section */}
+          <div className={`px-4 pb-4 overflow-y-auto custom-scrollbar ${isMobile ? "max-h-[60vh]" : "h-[calc(100vh-200px)]"}`}>
+            {/* Filters Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              {/* Day/Night */}
               <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <Calendar className={`w-3.5 h-3.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
-                  <label className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>Date Range</label>
-                </div>
-
-                {/* Combined Date Range Input */}
-                <div className={`relative rounded-lg border ${theme === "dark" ? "bg-zinc-800/50 border-zinc-700" : "bg-gray-50 border-gray-300"}`}>
-                  <div className="flex items-center">
-                    <input
-                      type="date"
-                      value={localFilters.startDate ? new Date(localFilters.startDate).toISOString().split("T")[0] : ""}
-                      onChange={(e) =>
-                        handleDateRangeChange(
-                          e.target.value,
-                          localFilters.endDate ? new Date(localFilters.endDate).toISOString().split("T")[0] : null,
-                        )
-                      }
-                      max={today}
-                      placeholder="Start date"
-                      className={`flex-1 h-9 px-3 bg-transparent border-0 text-sm focus:outline-none ${
-                        theme === "dark" ? "text-zinc-100 placeholder-zinc-500" : "text-gray-900 placeholder-gray-500"
-                      }`}
-                    />
-                    <span className={`px-2 text-xs ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>to</span>
-                    <input
-                      type="date"
-                      value={localFilters.endDate ? new Date(localFilters.endDate).toISOString().split("T")[0] : ""}
-                      onChange={(e) =>
-                        handleDateRangeChange(
-                          localFilters.startDate ? new Date(localFilters.startDate).toISOString().split("T")[0] : null,
-                          e.target.value,
-                        )
-                      }
-                      min={localFilters.startDate ? new Date(localFilters.startDate).toISOString().split("T")[0] : undefined}
-                      max={today}
-                      placeholder="End date"
-                      className={`flex-1 h-9 px-3 bg-transparent border-0 text-sm focus:outline-none ${
-                        theme === "dark" ? "text-zinc-100 placeholder-zinc-500" : "text-gray-900 placeholder-gray-500"
-                      }`}
-                    />
-                  </div>
-                </div>
-
-                {/* Quick Date Presets */}
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  <button
-                    onClick={() => setPresetDateRange("today")}
-                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-                      theme === "dark" ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                <label className="text-xs font-medium opacity-70 mb-1 block">Day/Night</label>
+                <Select
+                  value={
+                    !localFilters.dayNight || localFilters.dayNight.length === 0
+                      ? "ALL"
+                      : localFilters.dayNight.length === 2
+                        ? "day,night"
+                        : localFilters.dayNight[0]
+                  }
+                  onValueChange={(v) =>
+                    setLocalFilters({
+                      ...localFilters,
+                      dayNight: v === "ALL" ? null : (v.split(",").map((x) => x.toLowerCase()) as DayNight[]),
+                    })
+                  }
+                >
+                  <SelectTrigger
+                    className={`w-full h-9 ${
+                      theme === "dark" ? "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50" : "bg-gray-50 border-gray-300 hover:bg-gray-100"
                     }`}
                   >
-                    Today
-                  </button>
-                  <button
-                    onClick={() => setPresetDateRange(7)}
-                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-                      theme === "dark" ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                    }`}
-                  >
-                    7 days
-                  </button>
-                  <button
-                    onClick={() => setPresetDateRange(30)}
-                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-                      theme === "dark" ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                    }`}
-                  >
-                    30 days
-                  </button>
-                  <button
-                    onClick={() => setPresetDateRange("year")}
-                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-                      theme === "dark" ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                    }`}
-                  >
-                    Year
-                  </button>
-                </div>
+                    <span className="text-sm">{localFilters.dayNight?.join(", ") ?? "All"}</span>
+                  </SelectTrigger>
+                  <SelectContent className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}>
+                    <SelectItem value="ALL">All</SelectItem>
+                    <SelectItem value="day">Day</SelectItem>
+                    <SelectItem value="night">Night</SelectItem>
+                    {/* If you want both, keep the composite */}
+                    <SelectItem value="day,night">Day + Night</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Other Filters */}
-              <div className="grid grid-cols-2 gap-3">
-                {/* Day/Night Filter */}
-                <div>
-                  <label className={`text-xs font-medium mb-1.5 block ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>Time of Day</label>
-                  <Select
-                    value={
-                      !localFilters.dayNight || localFilters.dayNight.length === 0
-                        ? "all"
-                        : localFilters.dayNight.length === 2
-                          ? "both"
-                          : localFilters.dayNight[0]
-                    }
-                    onValueChange={(v) =>
-                      setLocalFilters({
-                        ...localFilters,
-                        dayNight: v === "all" ? null : v === "both" ? (["day", "night"] as DayNight[]) : [v as DayNight],
-                      })
-                    }
+              {/* Positions */}
+              <div>
+                <label className="text-xs font-medium opacity-70 mb-1 block">Position</label>
+                <Select
+                  value={!localFilters.positions || localFilters.positions.length === 0 ? "ALL" : localFilters.positions.join(",")}
+                  onValueChange={(v) =>
+                    setLocalFilters({
+                      ...localFilters,
+                      positions: v === "ALL" ? null : (v.split(",").filter((x) => validPositions.includes(x as PositionEnum)) as PositionEnum[]),
+                    })
+                  }
+                >
+                  <SelectTrigger
+                    className={`w-full h-9 ${
+                      theme === "dark" ? "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50" : "bg-gray-50 border-gray-300 hover:bg-gray-100"
+                    }`}
                   >
-                    <SelectTrigger
-                      className={`w-full h-8 text-xs ${
-                        theme === "dark" ? "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50" : "bg-gray-50 border-gray-300 hover:bg-gray-100"
-                      }`}
-                    >
-                      <span>
-                        {!localFilters.dayNight || localFilters.dayNight.length === 0
-                          ? "All"
-                          : localFilters.dayNight.length === 2
-                            ? "Day & Night"
-                            : localFilters.dayNight[0] === "day"
-                              ? "Day"
-                              : "Night"}
-                      </span>
-                    </SelectTrigger>
-                    <SelectContent className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="day">Day Only</SelectItem>
-                      <SelectItem value="night">Night Only</SelectItem>
-                      <SelectItem value="both">Day & Night</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Position Filter */}
-                <div>
-                  <label className={`text-xs font-medium mb-1.5 block ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>Position</label>
-                  <Select
-                    value={!localFilters.positions || localFilters.positions.length === 0 ? "all" : localFilters.positions[0]}
-                    onValueChange={(v) =>
-                      setLocalFilters({
-                        ...localFilters,
-                        positions: v === "all" ? null : [v as PositionEnum],
-                      })
-                    }
-                  >
-                    <SelectTrigger
-                      className={`w-full h-8 text-xs ${
-                        theme === "dark" ? "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50" : "bg-gray-50 border-gray-300 hover:bg-gray-100"
-                      }`}
-                    >
-                      <span>{!localFilters.positions || localFilters.positions.length === 0 ? "All" : localFilters.positions[0]}</span>
-                    </SelectTrigger>
-                    <SelectContent className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}>
-                      <SelectItem value="all">All Positions</SelectItem>
-                      <SelectItem value="Sitting">Sitting</SelectItem>
-                      <SelectItem value="Standing">Standing</SelectItem>
-                      <SelectItem value="Lying">Lying</SelectItem>
-                      <SelectItem value="Operational">Operational</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <span className="text-sm">{localFilters.positions?.join(", ") ?? "All"}</span>
+                  </SelectTrigger>
+                  <SelectContent className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"}>
+                    <SelectItem value="ALL">All</SelectItem>
+                    <SelectItem value="Sitting">Sitting</SelectItem>
+                    <SelectItem value="Standing">Standing</SelectItem>
+                    <SelectItem value="Lying">Lying</SelectItem>
+                    <SelectItem value="Operational">Operational</SelectItem>
+                    {/* Optional composites */}
+                    <SelectItem value="Sitting,Standing">Sitting + Standing</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Active Filters Summary */}
-              {(localFilters.dayNight || localFilters.positions || localFilters.startDate || localFilters.endDate) && (
-                <div className={`pt-3 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
-                  <div className={`text-xs font-medium mb-2 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Active Filters</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {localFilters.startDate && localFilters.endDate && (
-                      <span
-                        className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md ${
-                          theme === "dark" ? "bg-violet-500/20 text-violet-300" : "bg-violet-100 text-violet-700"
-                        }`}
-                      >
-                        <Calendar className="w-3 h-3" />
-                        {new Date(localFilters.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                        {" - "}
-                        {new Date(localFilters.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                      </span>
-                    )}
-                    {localFilters.dayNight && (
-                      <span
-                        className={`text-xs px-2 py-1 rounded-md ${theme === "dark" ? "bg-blue-500/20 text-blue-300" : "bg-blue-100 text-blue-700"}`}
-                      >
-                        {localFilters.dayNight.length === 2 ? "Day & Night" : localFilters.dayNight[0]}
-                      </span>
-                    )}
-                    {localFilters.positions && (
-                      <span
-                        className={`text-xs px-2 py-1 rounded-md ${
-                          theme === "dark" ? "bg-green-500/20 text-green-300" : "bg-green-100 text-green-700"
-                        }`}
-                      >
-                        {localFilters.positions[0]}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
+              {/* Scope: My sessions vs All (squadIds external) */}
             </div>
+
+            {/* Date Range Selection */}
+            <div className={`border-t pt-3 mt-3 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+              <label className="text-xs font-medium opacity-70 mb-2 block">Date Range</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="text-xs opacity-60 mb-1 block">From</label>
+                  <input
+                    type="date"
+                    value={localFilters.startDate ? new Date(localFilters.startDate).toISOString().split("T")[0] : ""}
+                    onChange={(e) =>
+                      setLocalFilters({
+                        ...localFilters,
+                        startDate: e.target.value ? new Date(e.target.value).toISOString() : null,
+                      })
+                    }
+                    className={`w-full h-9 px-3 rounded-md border text-sm ${
+                      theme === "dark"
+                        ? "bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700/50"
+                        : "bg-gray-50 border-gray-300 text-gray-900 hover:bg-gray-100"
+                    }`}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs opacity-60 mb-1 block">To</label>
+                  <input
+                    type="date"
+                    value={localFilters.endDate ? new Date(localFilters.endDate).toISOString().split("T")[0] : ""}
+                    onChange={(e) =>
+                      setLocalFilters({
+                        ...localFilters,
+                        endDate: e.target.value ? new Date(e.target.value).toISOString() : null,
+                      })
+                    }
+                    className={`w-full h-9 px-3 rounded-md border text-sm ${
+                      theme === "dark"
+                        ? "bg-zinc-800/50 border-zinc-700 text-zinc-100 hover:bg-zinc-700/50"
+                        : "bg-gray-50 border-gray-300 text-gray-900 hover:bg-gray-100"
+                    }`}
+                  />
+                </div>
+              </div>
+              {/* Quick Date Presets */}
+              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                <button
+                  onClick={() => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    setLocalFilters({
+                      ...localFilters,
+                      startDate: today.toISOString(),
+                      endDate: tomorrow.toISOString(),
+                    });
+                  }}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    theme === "dark"
+                      ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700"
+                      : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300"
+                  }`}
+                >
+                  Today
+                </button>
+                <button
+                  onClick={() => {
+                    const today = new Date();
+                    const lastWeek = new Date(today);
+                    lastWeek.setDate(lastWeek.getDate() - 7);
+                    setLocalFilters({
+                      ...localFilters,
+                      startDate: lastWeek.toISOString(),
+                      endDate: today.toISOString(),
+                    });
+                  }}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    theme === "dark"
+                      ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700"
+                      : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300"
+                  }`}
+                >
+                  Last 7 days
+                </button>
+                <button
+                  onClick={() => {
+                    const today = new Date();
+                    const lastMonth = new Date(today);
+                    lastMonth.setDate(lastMonth.getDate() - 30);
+                    setLocalFilters({
+                      ...localFilters,
+                      startDate: lastMonth.toISOString(),
+                      endDate: today.toISOString(),
+                    });
+                  }}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    theme === "dark"
+                      ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700"
+                      : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300"
+                  }`}
+                >
+                  Last 30 days
+                </button>
+                <button
+                  onClick={() => {
+                    const today = new Date();
+                    const thisYear = new Date(today.getFullYear(), 0, 1);
+                    setLocalFilters({
+                      ...localFilters,
+                      startDate: thisYear.toISOString(),
+                      endDate: today.toISOString(),
+                    });
+                  }}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    theme === "dark"
+                      ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700"
+                      : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300"
+                  }`}
+                >
+                  This year
+                </button>
+              </div>
+            </div>
+
+            {/* View Mode / Auto-load */}
+            {(onViewModeChange || onAutoLoadChange) && (
+              <div className={`border-t pt-3 mt-3 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+                {onViewModeChange && (
+                  <div className="mb-3">
+                    <label className="text-xs font-medium opacity-70 mb-2 block">View Mode</label>
+                    <div
+                      className={`flex rounded-lg p-1 ${
+                        theme === "dark" ? "bg-zinc-800/50 border border-zinc-700" : "bg-gray-100 border border-gray-300"
+                      }`}
+                    >
+                      <button
+                        onClick={() => onViewModeChange!("grid")}
+                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded transition-all ${
+                          viewMode === "grid"
+                            ? theme === "dark"
+                              ? "bg-zinc-700 text-white"
+                              : "bg-white text-gray-900 shadow-sm"
+                            : theme === "dark"
+                              ? "text-zinc-400 hover:text-zinc-300"
+                              : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        <LayoutGrid size={16} />
+                        <span className="text-sm font-medium">Grid</span>
+                      </button>
+                      <button
+                        onClick={() => onViewModeChange!("stack")}
+                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded transition-all ${
+                          viewMode === "stack"
+                            ? theme === "dark"
+                              ? "bg-zinc-700 text-white"
+                              : "bg-white text-gray-900 shadow-sm"
+                            : theme === "dark"
+                              ? "text-zinc-400 hover:text-zinc-300"
+                              : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        <Layers size={16} />
+                        <span className="text-sm font-medium">Stack</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {onAutoLoadChange && (
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={autoLoadStackView || false}
+                      onChange={(e) => onAutoLoadChange!(e.target.checked)}
+                      className={`w-4 h-4 rounded ${theme === "dark" ? "accent-blue-500" : "accent-blue-600"}`}
+                    />
+                    <div className="flex-1">
+                      <div className="text-sm font-medium">Auto-disable stack view with filters</div>
+                      <div className="text-xs opacity-60 mt-0.5">When filters are active, automatically switch to grid view</div>
+                    </div>
+                  </label>
+                )}
+              </div>
+            )}
+
+            {/* Active Filters Summary */}
+            {(localFilters.dayNight || localFilters.positions || localFilters.startDate || localFilters.endDate) && (
+              <div className={`border-t pt-3 mt-3 ${theme === "dark" ? "border-zinc-800" : "border-gray-200"}`}>
+                <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start">
+                  {localFilters.dayNight && (
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-blue-600/20 text-blue-300" : "bg-blue-100 text-blue-700"}`}
+                    >
+                      {localFilters.dayNight.join(", ")}
+                    </span>
+                  )}
+                  {localFilters.positions && (
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-green-600/20 text-green-300" : "bg-green-100 text-green-700"}`}
+                    >
+                      Positions: {localFilters.positions.join(", ")}
+                    </span>
+                  )}
+
+                  {localFilters.squadIds && (
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-orange-600/20 text-orange-300" : "bg-orange-100 text-orange-700"}`}
+                    >
+                      My sessions
+                    </span>
+                  )}
+                  {localFilters.startDate && (
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-indigo-600/20 text-indigo-300" : "bg-indigo-100 text-indigo-700"}`}
+                    >
+                      Start: {new Date(localFilters.startDate).toLocaleDateString()}
+                    </span>
+                  )}
+                  {localFilters.endDate && (
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-indigo-600/20 text-indigo-300" : "bg-indigo-100 text-indigo-700"}`}
+                    >
+                      End: {new Date(localFilters.endDate).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Actions */}
-          <div className={`flex gap-2 p-4 border-t ${theme === "dark" ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"}`}>
+          <div
+            className={`flex flex-col sm:flex-row gap-3 p-4 border-t ${theme === "dark" ? "border-zinc-800" : "border-gray-200"} ${
+              !isMobile ? `absolute bottom-0 left-0 right-0 ${theme === "dark" ? "bg-zinc-950" : "bg-white"}` : ""
+            }`}
+          >
             <button
               onClick={handleClear}
-              className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+              className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 theme === "dark" ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
               }`}
             >
@@ -353,8 +439,10 @@ export default function FilterDrawerStats({ isOpen, onClose, filters, onFiltersC
             </button>
             <button
               onClick={handleApply}
-              className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                theme === "dark" ? "bg-violet-600 hover:bg-violet-500 text-white" : "bg-violet-600 hover:bg-violet-700 text-white"
+              className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                theme === "dark"
+                  ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
               Apply Filters

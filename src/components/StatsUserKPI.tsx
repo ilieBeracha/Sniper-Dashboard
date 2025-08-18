@@ -46,7 +46,7 @@ export default function StatsUserKPI() {
   const textSub = theme === "dark" ? "text-zinc-500" : "text-gray-500";
 
   return (
-    <div className={`rounded-lg ${bgCard} border ${border}`}>
+    <div className={` ${bgCard} border ${border}`}>
       <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-zinc-800/50">
         {kpis.map((item, idx) => {
           const Icon = item.icon;

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useMemo } from "react";
 import { useStore } from "zustand";
 import { useStatsStore } from "@/store/statsStore";
-import { ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, BarChart, Bar } from "recharts";
+import { ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from "recharts";
 
 export default function FirstShotMatrixEnhanced() {
   const { theme } = useTheme();
@@ -89,16 +89,7 @@ export default function FirstShotMatrixEnhanced() {
   }
 
   return (
-    <div className={`rounded-lg p-2.5 ${bgCard} border ${border}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-2">
-        <div>
-          <h4 className={`text-xs font-semibold ${textMain}`}>Distance Matrix</h4>
-          <p className={`text-[10px] ${textSub}`}>Performance by range</p>
-        </div>
-        <Target className={`w-3.5 h-3.5 ${textSub}`} />
-      </div>
-
+    <div className={` p-2.5 ${bgCard} border ${border}`}>
       {/* Key Metrics - Smaller */}
       {stats && (
         <div className="grid grid-cols-4 gap-1.5 mb-2">
@@ -181,30 +172,6 @@ export default function FirstShotMatrixEnhanced() {
       </div>
 
       {/* Zone Performance Bars */}
-      <div className={`rounded p-1.5 mb-2 ${bgSecondary}`}>
-        <ResponsiveContainer width="100%" height={70}>
-          <BarChart data={zones} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#3f3f46" : "#e5e7eb"} opacity={0.3} vertical={false} />
-            <XAxis dataKey="name" tick={{ fontSize: 9, fill: theme === "dark" ? "#71717a" : "#9ca3af" }} axisLine={false} tickLine={false} />
-            <YAxis domain={[0, 100]} tick={{ fontSize: 9, fill: theme === "dark" ? "#71717a" : "#9ca3af" }} axisLine={false} tickLine={false} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
-                border: `1px solid ${theme === "dark" ? "#3f3f46" : "#e5e7eb"}`,
-                borderRadius: 4,
-                fontSize: 10,
-                padding: "2px 6px",
-              }}
-              formatter={(value: any) => [`${value}%`, "Hit Rate"]}
-            />
-            <Bar dataKey="avgHitRate" radius={[3, 3, 0, 0]}>
-              {zones.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
 
       {/* Zone Summary Cards - Smaller text */}
       <div className="grid grid-cols-3 gap-1.5">

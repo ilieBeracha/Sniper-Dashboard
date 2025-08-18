@@ -1,6 +1,6 @@
 import Header from "@/Headers/Header";
 import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
-import { BarChart2, SlidersHorizontal, Calendar, Target, Sun } from "lucide-react";
+import { BarChart2, SlidersHorizontal, Calendar, Target, Sun, TrendingUp, Crosshair, Activity } from "lucide-react";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { useEffect, useState } from "react";
@@ -10,7 +10,6 @@ import { useStatsFilters } from "@/hooks/useStatsFilters";
 import StatsUserKPI from "@/components/StatsUserKPI";
 
 // Components
-import FirstShotMetrics from "@/components/FirstShotMetrics";
 import EliminationByPosition from "@/components/EliminationByPosition";
 import WeeklyTrends from "@/components/WeeklyTrends";
 import FirstShotMatrixEnhanced from "@/components/FirstShotMatrixEnhanced";
@@ -19,6 +18,54 @@ import FilterDrawerStats from "@/components/FilterDrawerStats";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import { Loader2, RefreshCw } from "lucide-react";
+
+const StatsCard = ({
+  title,
+  icon: Icon,
+  children,
+  className = "",
+  color = "neutral",
+}: {
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  children: React.ReactNode;
+  className?: string;
+  color?: "neutral" | "subtle" | "accent";
+}) => {
+  const { theme } = useTheme();
+
+  const colorClasses = {
+    neutral: {
+      bg: theme === "dark" ? "bg-zinc-900/50" : "bg-white",
+      border: theme === "dark" ? "border-zinc-900" : "border-gray-200",
+      icon: theme === "dark" ? "text-zinc-400" : "text-gray-600",
+    },
+    subtle: {
+      bg: theme === "dark" ? "bg-zinc-900/50" : "bg-gray-50",
+      border: theme === "dark" ? "border-zinc-900" : "border-gray-300",
+      icon: theme === "dark" ? "text-zinc-500" : "text-gray-500",
+    },
+    accent: {
+      bg: theme === "dark" ? "bg-zinc-900/50" : "bg-violet-50/50",
+      border: theme === "dark" ? "border-zinc-900" : "border-violet-200",
+      icon: theme === "dark" ? "text-zinc-400" : "text-violet-600",
+    },
+  };
+
+  const classes = colorClasses[color];
+
+  return (
+    <div className={`rounded-xl border ${classes.bg} ${classes.border} overflow-hidden ${className}`}>
+      <div className="px-4 py-3 border-b border-inherit">
+        <div className="flex items-center gap-2">
+          <Icon className={`w-4 h-4 ${classes.icon}`} />
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white">{title}</h3>
+        </div>
+      </div>
+      <div className="">{children}</div>
+    </div>
+  );
+};
 
 export default function Stats() {
   const { user } = useStore(userStore);
@@ -112,7 +159,7 @@ export default function Stats() {
       <SpPageHeader title="Stats" subtitle="Performance analytics" icon={BarChart2} />
 
       {/* Filter Section - Improved Mobile Layout */}
-      <div className="mb-4 px-4 sm:px-0">
+      <div className="mb-6 px-4 sm:px-0">
         {/* Active Filters Display - Mobile Optimized */}
         {hasActiveFilters && (
           <motion.div
@@ -139,7 +186,7 @@ export default function Stats() {
               {filters.dayNight?.length && (
                 <span
                   className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
-                    theme === "dark" ? "bg-blue-500/20 text-blue-300" : "bg-blue-100 text-blue-700"
+                    theme === "dark" ? "bg-zinc-500/20 text-zinc-300" : "bg-gray-100 text-gray-700"
                   }`}
                 >
                   <Sun className="w-3 h-3" />
@@ -151,7 +198,7 @@ export default function Stats() {
               {filters.positions?.length && (
                 <span
                   className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
-                    theme === "dark" ? "bg-green-500/20 text-green-300" : "bg-green-100 text-green-700"
+                    theme === "dark" ? "bg-zinc-500/20 text-zinc-300" : "bg-gray-100 text-gray-700"
                   }`}
                 >
                   <Target className="w-3 h-3" />
@@ -201,7 +248,7 @@ export default function Stats() {
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all flex-1 sm:flex-initial
               ${
                 theme === "dark"
-                  ? "bg-violet-600 hover:bg-violet-500 text-white disabled:opacity-50"
+                  ? "bg-violet-700 hover:bg-violet-500 text-white disabled:opacity-50"
                   : "bg-violet-600 hover:bg-violet-700 text-white disabled:opacity-50"
               }`}
           >
@@ -224,7 +271,7 @@ export default function Stats() {
       </div>
 
       <SpPageBody>
-        <div className="space-y-3 relative">
+        <div className="space-y-6 relative">
           {/* Loading Overlay */}
           {isLoading && (
             <motion.div
@@ -257,14 +304,35 @@ export default function Stats() {
             }}
           />
 
-          <StatsUserKPI />
+          {/* Masonry Grid Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* KPI Overview - Spans full width */}
+            <div className="lg:col-span-12">
+              <StatsCard title="Performance Overview" icon={Activity} color="accent">
+                <StatsUserKPI />
+              </StatsCard>
+            </div>
 
-          {/* Stats Grid - Responsive Layout */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-            <FirstShotMetrics />
-            <FirstShotMatrixEnhanced />
-            <EliminationByPosition />
-            <WeeklyTrends />
+            {/* First Shot Matrix - Spans 6 columns */}
+            <div className="lg:col-span-6">
+              <StatsCard title="First Shot Matrix" icon={Crosshair} color="neutral">
+                <FirstShotMatrixEnhanced />
+              </StatsCard>
+            </div>
+
+            {/* Position & Elimination - Spans 8 columns */}
+            <div className="lg:col-span-8">
+              <StatsCard title="Position & Elimination Analysis" icon={Target} color="subtle">
+                <EliminationByPosition />
+              </StatsCard>
+            </div>
+
+            {/* Weekly Trends - Spans 4 columns */}
+            <div className="lg:col-span-4">
+              <StatsCard title="Weekly Trends" icon={TrendingUp} color="subtle">
+                <WeeklyTrends />
+              </StatsCard>
+            </div>
           </div>
         </div>
       </SpPageBody>

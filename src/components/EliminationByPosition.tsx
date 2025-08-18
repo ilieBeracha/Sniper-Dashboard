@@ -1,5 +1,5 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { User, UserCheck, Activity, TrendingUp, Users } from "lucide-react";
+import { User, UserCheck, Activity, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 import { useStore } from "zustand";
 import { useStatsStore } from "@/store/statsStore";
@@ -67,9 +67,8 @@ export default function EliminationByPosition() {
     },
   ];
 
-  const border = theme === "dark" ? "border-zinc-800" : "border-gray-200";
   const textMain = theme === "dark" ? "text-white" : "text-gray-900";
-  const textSub = theme === "dark" ? "text-zinc-400" : "text-gray-600";
+  const textSub = theme === "dark" ? "text-zinc-500" : "text-gray-500";
 
   const getPositionIcon = (position: string) => {
     switch (position) {
@@ -87,55 +86,60 @@ export default function EliminationByPosition() {
   }
 
   return (
-    <div className={`rounded-xl p-4 ${theme === "dark" ? "bg-zinc-900" : "bg-white"} border ${border}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h4 className={`text-sm font-semibold ${textMain}`}>Position Analysis</h4>
-          <p className={`text-xs ${textSub} mt-0.5`}>Elimination performance by shooting position</p>
-        </div>
-        <Users className={`w-4 h-4 ${theme === "dark" ? "text-emerald-500" : "text-emerald-400"}`} />
-      </div>
-
-      {/* Overall Stats */}
+    <div className="p-3">
       {total && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className={`grid grid-cols-3 gap-4 p-3 rounded-lg mb-4 ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}
+          className={`grid grid-cols-3 gap-2 p-2 rounded-lg mb-3 ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}
         >
           <div className="text-center">
-            <div className={`text-2xl font-bold ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>{total.toLocaleString()}</div>
-            <div className={`text-xs ${textSub}`}>Total Targets</div>
+            <div className={`text-base font-semibold ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>{total.toLocaleString()}</div>
+            <div className={`text-[10px] ${textSub}`}>Total Targets</div>
           </div>
           <div className="text-center">
-            <div className={`text-2xl font-bold ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>{totalEliminated.toLocaleString()}</div>
-            <div className={`text-xs ${textSub}`}>Eliminated</div>
+            <div className={`text-base font-semibold ${theme === "dark" ? "text-emerald-400" : "text-emerald-600"}`}>
+              {totalEliminated.toLocaleString()}
+            </div>
+            <div className={`text-[10px] ${textSub}`}>Eliminated</div>
           </div>
           <div className="text-center">
-            <div className={`text-2xl font-bold ${theme === "dark" ? "text-violet-400" : "text-violet-600"}`}>{Math.round((totalEliminated / total) * 100)}%</div>
-            <div className={`text-xs ${textSub}`}>Success Rate</div>
+            <div className={`text-base font-semibold ${theme === "dark" ? "text-violet-400" : "text-violet-600"}`}>
+              {Math.round((totalEliminated / total) * 100)}%
+            </div>
+            <div className={`text-[10px] ${textSub}`}>Success Rate</div>
           </div>
         </motion.div>
       )}
 
       {/* Charts Container */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="grid grid-cols-2 gap-2 mb-3">
         {/* Pie Chart */}
         <div>
-          <h5 className={`text-xs font-medium ${textSub} mb-2`}>Distribution</h5>
-          <ResponsiveContainer width="100%" height={140}>
+          <h5 className={`text-[10px] font-medium ${textSub} mb-1`}>Distribution</h5>
+          <ResponsiveContainer width="100%" height={120}>
             <PieChart>
-              <Pie data={pieData} cx="50%" cy="50%" innerRadius={30} outerRadius={50} paddingAngle={2} dataKey="value">
+              <Pie data={pieData} cx="50%" cy="50%" innerRadius={25} outerRadius={45} paddingAngle={2} dataKey="value">
                 {pieData.map((_, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={
-                      index === 0 ? (theme === "dark" ? "#f59e0b" : "#f97316") : 
-                      index === 1 ? (theme === "dark" ? "#10b981" : "#059669") : 
-                      index === 2 ? (theme === "dark" ? "#8b5cf6" : "#7c3aed") : 
-                      (theme === "dark" ? "#3b82f6" : "#2563eb")
+                      index === 0
+                        ? theme === "dark"
+                          ? "#f59e0b"
+                          : "#f97316"
+                        : index === 1
+                          ? theme === "dark"
+                            ? "#10b981"
+                            : "#059669"
+                          : index === 2
+                            ? theme === "dark"
+                              ? "#8b5cf6"
+                              : "#7c3aed"
+                            : theme === "dark"
+                              ? "#3b82f6"
+                              : "#2563eb"
                     }
                   />
                 ))}
@@ -144,8 +148,9 @@ export default function EliminationByPosition() {
                 contentStyle={{
                   backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
                   border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
-                  borderRadius: 6,
-                  fontSize: 11,
+                  borderRadius: 4,
+                  fontSize: 10,
+                  padding: '2px 6px',
                 }}
                 formatter={(value: any) => [`${value} eliminated`, ""]}
               />
@@ -155,8 +160,8 @@ export default function EliminationByPosition() {
 
         {/* Radial Bar Chart */}
         <div>
-          <h5 className={`text-xs font-medium ${textSub} mb-2`}>Success Rates</h5>
-          <ResponsiveContainer width="100%" height={140}>
+          <h5 className={`text-[10px] font-medium ${textSub} mb-1`}>Success Rates</h5>
+          <ResponsiveContainer width="100%" height={120}>
             <RadialBarChart cx="50%" cy="50%" innerRadius="30%" outerRadius="90%" data={radialData}>
               <RadialBar dataKey="value" cornerRadius={4} fill="#8884d8">
                 {radialData.map((entry, index) => (
@@ -167,8 +172,9 @@ export default function EliminationByPosition() {
                 contentStyle={{
                   backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
                   border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
-                  borderRadius: 6,
-                  fontSize: 11,
+                  borderRadius: 4,
+                  fontSize: 10,
+                  padding: '2px 6px',
                 }}
                 formatter={(value: any) => [`${value}%`, "Success Rate"]}
               />
@@ -178,7 +184,7 @@ export default function EliminationByPosition() {
       </div>
 
       {/* Position Cards */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         {Object.values(PositionScore).map((position) => {
           const posData = data.find((d) => d.bucket === position);
           if (!posData) return null;
@@ -190,53 +196,61 @@ export default function EliminationByPosition() {
           return (
             <div
               key={position}
-              className={`p-3 rounded-lg border ${theme === "dark" ? "bg-zinc-800/20 border-zinc-800" : "bg-gray-50 border-gray-200"}`}
+              className={`p-2 rounded-lg border ${theme === "dark" ? "bg-zinc-800/20 border-zinc-800" : "bg-gray-50 border-gray-200"}`}
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Icon className={`w-4 h-4 ${
-                    position === PositionScore.Lying ? (theme === "dark" ? "text-orange-500" : "text-orange-500") :
-                    position === PositionScore.Sitting ? (theme === "dark" ? "text-emerald-500" : "text-emerald-500") :
-                    position === PositionScore.Standing ? (theme === "dark" ? "text-violet-500" : "text-violet-500") :
-                    (theme === "dark" ? "text-blue-500" : "text-blue-500")
-                  }`} />
-                  <span className={`text-xs font-medium ${textMain}`}>{position} Position</span>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5">
+                  <Icon
+                    className={`w-3 h-3 ${
+                      position === PositionScore.Lying
+                        ? "text-orange-500"
+                        : position === PositionScore.Sitting
+                          ? "text-emerald-500"
+                          : position === PositionScore.Standing
+                            ? "text-violet-500"
+                            : "text-blue-500"
+                    }`}
+                  />
+                  <span className={`text-[10px] font-medium ${textMain}`}>{position} Position</span>
                 </div>
                 {isHighPerforming && (
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className={`w-3 h-3 ${theme === "dark" ? "text-emerald-400" : "text-emerald-500"}`} />
-                    <span className={`text-xs ${theme === "dark" ? "text-emerald-400" : "text-emerald-500"}`}>High Performance</span>
+                  <div className="flex items-center gap-0.5">
+                    <TrendingUp className={`w-2.5 h-2.5 ${theme === "dark" ? "text-emerald-400" : "text-emerald-500"}`} />
+                    <span className={`text-[9px] ${theme === "dark" ? "text-emerald-400" : "text-emerald-500"}`}>High</span>
                   </div>
                 )}
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <div className={`text-lg font-semibold ${textMain}`}>{posData.targets.toLocaleString()}</div>
-                  <div className={`text-xs ${textSub}`}>Targets</div>
+                  <div className={`text-sm font-semibold ${textMain}`}>{posData.targets.toLocaleString()}</div>
+                  <div className={`text-[9px] ${textSub}`}>Targets</div>
                 </div>
                 <div>
-                  <div className={`text-lg font-semibold ${textMain}`}>{posData.eliminated.toLocaleString()}</div>
-                  <div className={`text-xs ${textSub}`}>Eliminated</div>
+                  <div className={`text-sm font-semibold ${textMain}`}>{posData.eliminated.toLocaleString()}</div>
+                  <div className={`text-[9px] ${textSub}`}>Eliminated</div>
                 </div>
                 <div>
-                  <div className={`text-lg font-semibold ${textMain}`}>{successRate}%</div>
-                  <div className={`text-xs ${textSub}`}>Success</div>
+                  <div className={`text-sm font-semibold ${textMain}`}>{successRate}%</div>
+                  <div className={`text-[9px] ${textSub}`}>Success</div>
                 </div>
               </div>
 
               {/* Progress Bar */}
-              <div className="mt-3">
-                <div className={`h-1 rounded-full overflow-hidden ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}>
+              <div className="mt-1.5">
+                <div className={`h-0.5 rounded-full overflow-hidden ${theme === "dark" ? "bg-zinc-800" : "bg-gray-200"}`}>
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${successRate}%` }}
                     transition={{ duration: 0.6, delay: position === PositionScore.Sitting ? 0.2 : 0.3 }}
                     className={`h-full ${
-                      position === PositionScore.Lying ? (theme === "dark" ? "bg-orange-500" : "bg-orange-400") :
-                      position === PositionScore.Sitting ? (theme === "dark" ? "bg-emerald-500" : "bg-emerald-400") :
-                      position === PositionScore.Standing ? (theme === "dark" ? "bg-violet-500" : "bg-violet-400") :
-                      (theme === "dark" ? "bg-blue-500" : "bg-blue-400")
+                      position === PositionScore.Lying
+                        ? "bg-orange-500"
+                        : position === PositionScore.Sitting
+                          ? "bg-emerald-500"
+                          : position === PositionScore.Standing
+                            ? "bg-violet-500"
+                            : "bg-blue-500"
                     }`}
                   />
                 </div>

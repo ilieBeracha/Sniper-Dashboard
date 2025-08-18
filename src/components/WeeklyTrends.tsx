@@ -1,7 +1,7 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { TrendingUp, TrendingDown, Calendar, Target, Activity, Zap, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, Calendar, Target, Activity, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useStore } from "zustand";
 import { useStatsStore } from "@/store/statsStore";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, AreaChart } from "recharts";
@@ -10,7 +10,6 @@ import { format, parseISO } from "date-fns";
 export default function WeeklyTrends() {
   const { theme } = useTheme();
   const { weeklyTrends } = useStore(useStatsStore);
-  const [groupByWeapon, setGroupByWeapon] = useState(false);
 
   const data = weeklyTrends || [];
 
@@ -84,35 +83,9 @@ export default function WeeklyTrends() {
 
   return (
     <div
-      className={`rounded-lg p-2 sm:p-3 ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"} 
+      className={` p-2 sm:p-3 ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"} 
       border ${border}`}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-2">
-        <div>
-          <h4 className={`text-xs sm:text-sm font-semibold ${textMain}`}>Weekly Trends</h4>
-          <p className={`text-[10px] sm:text-xs ${textSub} hidden sm:block`}>Performance over time</p>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={() => setGroupByWeapon(!groupByWeapon)}
-            className={`px-1.5 py-0.5 rounded-md text-[9px] sm:text-[10px] font-medium transition-colors
-              ${
-                groupByWeapon
-                  ? theme === "dark"
-                    ? "bg-zinc-700 text-zinc-200"
-                    : "bg-gray-200 text-gray-700"
-                  : theme === "dark"
-                    ? "bg-zinc-800 text-zinc-400"
-                    : "bg-gray-100 text-gray-600"
-              }`}
-          >
-            {groupByWeapon ? "By Weapon" : "All"}
-          </button>
-          <BarChart3 className={`w-3 h-3 ${iconColor}`} />
-        </div>
-      </div>
-
       {/* Stats Overview */}
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
