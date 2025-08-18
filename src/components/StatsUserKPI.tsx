@@ -13,6 +13,20 @@ export default function StatsUserKPI() {
   if (!statsOverviewTotals) return null;
 
   const row = statsOverviewTotals;
+  
+  // Debug: Log the hit_pct value to understand the format
+  console.log('StatsUserKPI - statsOverviewTotals:', row);
+  
+  // Calculate accuracy percentage if hit_pct is not in the expected format
+  const accuracyValue = (() => {
+    if (typeof row.hit_pct === 'number' && row.hit_pct <= 100) {
+      return Math.round(row.hit_pct);
+    } else if (row.hits && row.targets && row.targets > 0) {
+      // Calculate percentage from hits and targets
+      return Math.round((row.hits / row.targets) * 100);
+    }
+    return 0;
+  })();
 
   const kpis = [
     {
@@ -37,7 +51,7 @@ export default function StatsUserKPI() {
       positive: pos(row.targets_change_pct),
     },
     {
-      value: row.hit_pct,
+      value: accuracyValue,
       label: "Accuracy Rate",
       suffix: "%",
       icon: Crosshair,

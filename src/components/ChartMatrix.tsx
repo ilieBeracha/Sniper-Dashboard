@@ -3,22 +3,17 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart } from "recharts";
 import { Target, Activity, Crosshair, Clock } from "lucide-react";
 import { motion } from "framer-motion";
+import { useStore } from "zustand";
+import { useStatsStore } from "@/store/statsStore";
 
 export default function ChartMatrix() {
-  const mockData = [
-    {
-      distance_bucket: 100,
-      targets: 10,
-      first_shot_hit_rate: 0.5,
-      avg_time_to_first_shot_sec: 10,
-    },
-  ];
+  const { firstShotMetrics } = useStore(useStatsStore);
   const { theme } = useTheme();
 
   const matrixData = useMemo(() => {
-    if (!mockData) return null;
+    if (!firstShotMetrics) return null;
 
-    const rows = mockData as {
+    const rows = firstShotMetrics as {
       distance_bucket: number;
       targets: number;
       first_shot_hit_rate: number | null;
@@ -58,7 +53,7 @@ export default function ChartMatrix() {
       ),
       mostEngaged: buckets.reduce((most, b) => (b.targets > (most?.targets ?? 0) ? b : most), null as (typeof buckets)[number] | null),
     };
-  }, [mockData]);
+  }, [firstShotMetrics]);
 
   if (!matrixData || matrixData.buckets.length === 0) {
     return (
