@@ -3,62 +3,53 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import { Users, Trophy, Target, RefreshCw, Shield } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { useStore } from "zustand";
+import { useStatsStore } from "@/store/statsStore";
 
 export default function SquadImpactStats() {
-  const mockData = [
-    {
-      user_name: "John Doe",
-      hits: 10,
-      misses: 2,
-    },
-  ];
+  const { eliminationByPosition, statsOverviewTotals } = useStore(useStatsStore);
   const { theme } = useTheme();
 
-  const { totalHits, topPerformers, overallAccuracy, squadStats } = useMemo(() => {
-    if (!mockData || mockData.length === 0) {
-      return { totalHits: 0, topPerformers: [], overallAccuracy: 0, squadStats: null };
+  const { totalHits, topPerformers, overallAccuracy, squadStats, eliminationStats } = useMemo(() => {
+    if (!statsOverviewTotals && !eliminationByPosition) {
+      return { totalHits: 0, topPerformers: [], overallAccuracy: 0, squadStats: null, eliminationStats: null };
     }
 
-    let hits = 0;
-    let misses = 0;
-    const userStats = new Map();
+    // Get overall stats from statsOverviewTotals
+    const hits = statsOverviewTotals?.hits || 0;
+    const targets = statsOverviewTotals?.targets || 0;
+    const accuracy = statsOverviewTotals?.hit_pct || 0;
+    const sessions = statsOverviewTotals?.sessions || 0;
 
-    mockData.forEach((stat: any) => {
-      const userName = stat.user_name || "Unknown";
-      const userHits = stat.hits || 0;
-      const userMisses = stat.misses || 0;
+    // Process elimination by position data
+    const eliminationData = eliminationByPosition || [];
+    const positionStats = eliminationData.map(pos => ({
+      position: pos.bucket,
+      targets: pos.targets,
+      eliminated: pos.eliminated,
+      percentage: Math.round(pos.elimination_pct * 100)
+    }));
 
-      hits += userHits;
-      misses += userMisses;
-
-      if (!userStats.has(userName)) {
-        userStats.set(userName, { name: userName, hits: 0, misses: 0, total: 0, accuracy: 0 });
-      }
-
-      const user = userStats.get(userName);
-      user.hits += userHits;
-      user.misses += userMisses;
-      user.total += userHits + userMisses;
-      user.accuracy = user.total > 0 ? Math.round((user.hits / user.total) * 100) : 0;
-    });
-
-    const accuracy = hits + misses > 0 ? Math.round((hits / (hits + misses)) * 100) : 0;
-    const performers = Array.from(userStats.values())
-      .filter((user) => user.total > 0)
-      .sort((a, b) => b.accuracy - a.accuracy)
-      .slice(0, 4);
+    // Create mock top performers data (since we don't have individual user data yet)
+    const performers = [
+      { name: "Top Performer", hits: Math.round(hits * 0.3), total: Math.round(targets * 0.25), accuracy: 95 },
+      { name: "Squad Member 2", hits: Math.round(hits * 0.25), total: Math.round(targets * 0.25), accuracy: 88 },
+      { name: "Squad Member 3", hits: Math.round(hits * 0.22), total: Math.round(targets * 0.25), accuracy: 82 },
+      { name: "Squad Member 4", hits: Math.round(hits * 0.23), total: Math.round(targets * 0.25), accuracy: 78 },
+    ].filter(p => p.total > 0);
 
     return {
       totalHits: hits,
       topPerformers: performers,
       overallAccuracy: accuracy,
       squadStats: {
-        totalShots: hits + misses,
-        avgAccuracy: performers.length > 0 ? Math.round(performers.reduce((acc, p) => acc + p.accuracy, 0) / performers.length) : 0,
-        activeMembers: userStats.size,
+        totalShots: targets,
+        avgAccuracy: accuracy,
+        activeMembers: sessions,
       },
+      eliminationStats: positionStats,
     };
-  }, [mockData]);
+  }, [statsOverviewTotals, eliminationByPosition]);
 
   const chartData = [
     { name: "Accuracy", value: overallAccuracy, fill: theme === "dark" ? "#71717a" : "#6b7280" },
@@ -152,6 +143,46 @@ export default function SquadImpactStats() {
           </motion.div>
         </div>
       </div>
+
+      {/* Elimination by Position Section */}
+      {eliminationStats && eliminationStats.length > 0 && (
+        <div className={`rounded-lg p-2.5 mb-3 ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
+          <div className="flex items-center gap-2 mb-2">
+            <Target className={`w-3.5 h-3.5 ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`} />
+            <h5 className={`text-xs font-medium ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>Elimination by Position</h5>
+          </div>
+          <div className="space-y-1.5">
+            {eliminationStats
+              .filter(stat => stat.position !== "Total")
+              .map((stat, index) => (
+                <div
+                  key={stat.position}
+                  className={`flex items-center justify-between p-2 rounded-lg ${theme === "dark" ? "bg-zinc-900/50" : "bg-white"}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2 h-2 rounded-full ${stat.position === "Standing" ? "bg-emerald-500" : "bg-blue-500"}`} />
+                    <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-200" : "text-gray-800"}`}>
+                      {stat.position}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <div className={`text-xs font-semibold ${theme === "dark" ? "text-zinc-300" : "text-gray-700"}`}>
+                        {stat.eliminated}/{stat.targets}
+                      </div>
+                      <div className={`text-[10px] ${theme === "dark" ? "text-zinc-500" : "text-gray-500"}`}>targets</div>
+                    </div>
+                    <div className={`text-sm font-bold px-2 py-1 rounded-md ${
+                      theme === "dark" ? "bg-zinc-800 text-zinc-200" : "bg-gray-100 text-gray-800"
+                    }`}>
+                      {stat.percentage}%
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
 
       {/* Top Performers Section */}
       <div className={`rounded-lg p-2.5 ${theme === "dark" ? "bg-zinc-800/30" : "bg-gray-50"}`}>
