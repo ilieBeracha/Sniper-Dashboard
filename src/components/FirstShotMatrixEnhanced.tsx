@@ -1,7 +1,7 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { Target, Clock, Crosshair, Activity, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useStore } from "zustand";
 import { useStatsStore } from "@/store/statsStore";
 import { ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, BarChart, Bar } from "recharts";
@@ -133,12 +133,7 @@ export default function FirstShotMatrixEnhanced() {
         <ResponsiveContainer width="100%" height={120}>
           <ScatterChart margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#3f3f46" : "#e5e7eb"} opacity={0.3} />
-            <XAxis
-              dataKey="distance"
-              tick={{ fontSize: 9, fill: theme === "dark" ? "#71717a" : "#9ca3af" }}
-              axisLine={false}
-              tickLine={false}
-            />
+            <XAxis dataKey="distance" tick={{ fontSize: 9, fill: theme === "dark" ? "#71717a" : "#9ca3af" }} axisLine={false} tickLine={false} />
             <YAxis
               dataKey="hitRate"
               domain={[0, 100]}
@@ -152,7 +147,7 @@ export default function FirstShotMatrixEnhanced() {
                 border: `1px solid ${theme === "dark" ? "#3f3f46" : "#e5e7eb"}`,
                 borderRadius: 4,
                 fontSize: 10,
-                padding: '2px 6px',
+                padding: "2px 6px",
               }}
               formatter={(value: any, name: string) => {
                 if (name === "hitRate") return [`${value}%`, "Hit"];
@@ -167,10 +162,16 @@ export default function FirstShotMatrixEnhanced() {
                   key={`cell-${index}`}
                   fill={
                     entry.distance <= 300
-                      ? theme === "dark" ? "#10b981" : "#059669"
+                      ? theme === "dark"
+                        ? "#10b981"
+                        : "#059669"
                       : entry.distance <= 600
-                        ? theme === "dark" ? "#f59e0b" : "#d97706"
-                        : theme === "dark" ? "#ef4444" : "#dc2626"
+                        ? theme === "dark"
+                          ? "#f59e0b"
+                          : "#d97706"
+                        : theme === "dark"
+                          ? "#ef4444"
+                          : "#dc2626"
                   }
                 />
               ))}
@@ -184,25 +185,15 @@ export default function FirstShotMatrixEnhanced() {
         <ResponsiveContainer width="100%" height={70}>
           <BarChart data={zones} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#3f3f46" : "#e5e7eb"} opacity={0.3} vertical={false} />
-            <XAxis 
-              dataKey="name" 
-              tick={{ fontSize: 9, fill: theme === "dark" ? "#71717a" : "#9ca3af" }} 
-              axisLine={false} 
-              tickLine={false} 
-            />
-            <YAxis
-              domain={[0, 100]}
-              tick={{ fontSize: 9, fill: theme === "dark" ? "#71717a" : "#9ca3af" }}
-              axisLine={false}
-              tickLine={false}
-            />
+            <XAxis dataKey="name" tick={{ fontSize: 9, fill: theme === "dark" ? "#71717a" : "#9ca3af" }} axisLine={false} tickLine={false} />
+            <YAxis domain={[0, 100]} tick={{ fontSize: 9, fill: theme === "dark" ? "#71717a" : "#9ca3af" }} axisLine={false} tickLine={false} />
             <Tooltip
               contentStyle={{
                 backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
                 border: `1px solid ${theme === "dark" ? "#3f3f46" : "#e5e7eb"}`,
                 borderRadius: 4,
                 fontSize: 10,
-                padding: '2px 6px',
+                padding: "2px 6px",
               }}
               formatter={(value: any) => [`${value}%`, "Hit Rate"]}
             />
@@ -218,10 +209,7 @@ export default function FirstShotMatrixEnhanced() {
       {/* Zone Summary Cards - Smaller text */}
       <div className="grid grid-cols-3 gap-1.5">
         {zones.map((zone) => (
-          <div
-            key={zone.name}
-            className={`p-1.5 rounded ${bgSecondary}`}
-          >
+          <div key={zone.name} className={`p-1.5 rounded ${bgSecondary}`}>
             <div className="flex items-center justify-between mb-0.5">
               <span className={`text-[10px] font-medium ${textMain}`}>{zone.name}</span>
               <span className={`text-[9px] ${textSub}`}>{zone.range}</span>
@@ -229,9 +217,7 @@ export default function FirstShotMatrixEnhanced() {
             <div className={`text-sm font-semibold`} style={{ color: zone.color }}>
               {zone.avgHitRate}%
             </div>
-            <div className={`text-[9px] ${textSub}`}>
-              {zone.totalTargets.toLocaleString()} targets
-            </div>
+            <div className={`text-[9px] ${textSub}`}>{zone.totalTargets.toLocaleString()} targets</div>
             <div className="mt-0.5">
               <div className={`h-0.5 rounded-full overflow-hidden bg-zinc-700/20`}>
                 <motion.div

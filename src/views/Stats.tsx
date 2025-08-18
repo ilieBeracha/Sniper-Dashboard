@@ -1,6 +1,6 @@
 import Header from "@/Headers/Header";
 import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
-import { BarChart2, SlidersHorizontal, Calendar, Target, MapPin, Sun } from "lucide-react";
+import { BarChart2, SlidersHorizontal, Calendar, Target, Sun } from "lucide-react";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { useEffect, useState } from "react";
@@ -91,17 +91,17 @@ export default function Stats() {
     if (filters.startDate && filters.endDate) {
       const start = new Date(filters.startDate);
       const end = new Date(filters.endDate);
-      const formatOptions: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
-      
+      const formatOptions: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
+
       // Check if same year
       if (start.getFullYear() === end.getFullYear()) {
         // Check if same month
         if (start.getMonth() === end.getMonth()) {
-          return `${start.toLocaleDateString('en-US', formatOptions)} - ${end.getDate()}`;
+          return `${start.toLocaleDateString("en-US", formatOptions)} - ${end.getDate()}`;
         }
-        return `${start.toLocaleDateString('en-US', formatOptions)} - ${end.toLocaleDateString('en-US', formatOptions)}`;
+        return `${start.toLocaleDateString("en-US", formatOptions)} - ${end.toLocaleDateString("en-US", formatOptions)}`;
       }
-      return `${start.toLocaleDateString('en-US', { ...formatOptions, year: '2-digit' })} - ${end.toLocaleDateString('en-US', { ...formatOptions, year: '2-digit' })}`;
+      return `${start.toLocaleDateString("en-US", { ...formatOptions, year: "2-digit" })} - ${end.toLocaleDateString("en-US", { ...formatOptions, year: "2-digit" })}`;
     }
     return null;
   };
@@ -115,48 +115,50 @@ export default function Stats() {
       <div className="mb-4 px-4 sm:px-0">
         {/* Active Filters Display - Mobile Optimized */}
         {hasActiveFilters && (
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }} 
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`mb-3 p-3 rounded-lg ${
-              theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-gray-50 border border-gray-200"
-            }`}
+            className={`mb-3 p-3 rounded-lg ${theme === "dark" ? "bg-zinc-900/50 border border-zinc-800" : "bg-gray-50 border border-gray-200"}`}
           >
             <div className="flex flex-wrap items-center gap-2">
-              <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>
-                Active:
-              </span>
-              
+              <span className={`text-xs font-medium ${theme === "dark" ? "text-zinc-400" : "text-gray-600"}`}>Active:</span>
+
               {/* Date Range */}
               {getDateRangeDisplay() && (
-                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
-                  theme === "dark" ? "bg-violet-500/20 text-violet-300" : "bg-violet-100 text-violet-700"
-                }`}>
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
+                    theme === "dark" ? "bg-violet-500/20 text-violet-300" : "bg-violet-100 text-violet-700"
+                  }`}
+                >
                   <Calendar className="w-3 h-3" />
                   {getDateRangeDisplay()}
                 </span>
               )}
-              
+
               {/* Day/Night */}
               {filters.dayNight?.length && (
-                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
-                  theme === "dark" ? "bg-blue-500/20 text-blue-300" : "bg-blue-100 text-blue-700"
-                }`}>
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
+                    theme === "dark" ? "bg-blue-500/20 text-blue-300" : "bg-blue-100 text-blue-700"
+                  }`}
+                >
                   <Sun className="w-3 h-3" />
                   {filters.dayNight.length === 2 ? "Day & Night" : filters.dayNight[0]}
                 </span>
               )}
-              
+
               {/* Position */}
               {filters.positions?.length && (
-                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
-                  theme === "dark" ? "bg-green-500/20 text-green-300" : "bg-green-100 text-green-700"
-                }`}>
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
+                    theme === "dark" ? "bg-green-500/20 text-green-300" : "bg-green-100 text-green-700"
+                  }`}
+                >
                   <Target className="w-3 h-3" />
                   {filters.positions.length === 1 ? filters.positions[0] : `${filters.positions.length} positions`}
                 </span>
               )}
-              
+
               {/* Clear Button */}
               <button
                 onClick={() => {
@@ -181,9 +183,10 @@ export default function Stats() {
             onClick={refreshData}
             disabled={isLoading}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all
-              ${theme === "dark"
-                ? "bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 disabled:opacity-50"
-                : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 disabled:opacity-50"
+              ${
+                theme === "dark"
+                  ? "bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 disabled:opacity-50"
+                  : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 disabled:opacity-50"
               }`}
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
@@ -196,23 +199,24 @@ export default function Stats() {
             onClick={() => setIsFilterDrawerOpen(true)}
             disabled={isLoading}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all flex-1 sm:flex-initial
-              ${theme === "dark"
-                ? "bg-violet-600 hover:bg-violet-500 text-white disabled:opacity-50"
-                : "bg-violet-600 hover:bg-violet-700 text-white disabled:opacity-50"
+              ${
+                theme === "dark"
+                  ? "bg-violet-600 hover:bg-violet-500 text-white disabled:opacity-50"
+                  : "bg-violet-600 hover:bg-violet-700 text-white disabled:opacity-50"
               }`}
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
             <span>Filters</span>
             {hasActiveFilters && (
-              <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs font-medium ${
-                theme === "dark" ? "bg-violet-500/30 text-violet-200" : "bg-violet-500 text-white"
-              }`}>
-                {[
-                  filters.startDate ? 1 : 0,
-                  filters.endDate ? 1 : 0,
-                  filters.dayNight?.length ? 1 : 0,
-                  filters.positions?.length ? 1 : 0
-                ].reduce((a, b) => a + b, 0)}
+              <span
+                className={`ml-1 px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                  theme === "dark" ? "bg-violet-500/30 text-violet-200" : "bg-violet-500 text-white"
+                }`}
+              >
+                {[filters.startDate ? 1 : 0, filters.endDate ? 1 : 0, filters.dayNight?.length ? 1 : 0, filters.positions?.length ? 1 : 0].reduce(
+                  (a, b) => a + b,
+                  0,
+                )}
               </span>
             )}
           </motion.button>
@@ -228,9 +232,11 @@ export default function Stats() {
               animate={{ opacity: 1 }}
               className="absolute inset-0 bg-black/5 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg min-h-[200px]"
             >
-              <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                theme === "dark" ? "bg-zinc-800 text-white" : "bg-white text-gray-900"
-              } shadow-lg`}>
+              <div
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                  theme === "dark" ? "bg-zinc-800 text-white" : "bg-white text-gray-900"
+                } shadow-lg`}
+              >
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span className="text-sm">Loading data...</span>
               </div>
@@ -250,7 +256,7 @@ export default function Stats() {
               refreshData();
             }}
           />
-          
+
           <StatsUserKPI />
 
           {/* Stats Grid - Responsive Layout */}
