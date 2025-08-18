@@ -177,10 +177,18 @@ export default function Stats() {
     ],
   );
 
+  // Clear filters handler
+  const handleClearFilters = useCallback(() => {
+    console.log("🧹 Clearing filters");
+    clearFilters();
+    // Don't call refreshData here - let the useEffect handle it
+  }, [clearFilters]);
+
   // Effect to refresh data when filters change
   useEffect(() => {
     console.log("🎯 Filters changed, triggering refresh:", filters);
     if (user?.team_id) {
+      // Always refresh when filters change, including when cleared
       refreshData();
     }
   }, [filters, user?.team_id]); // Remove refreshData from dependencies
@@ -216,14 +224,6 @@ export default function Stats() {
     },
     [setFilters],
   );
-
-  // Clear filters handler
-  const handleClearFilters = useCallback(() => {
-    console.log("🧹 Clearing filters");
-    clearFilters();
-    // Force refresh after clearing
-    setTimeout(() => refreshData(true), 100);
-  }, [clearFilters, refreshData]);
 
   const hasActiveFilters = !!(filters.startDate || filters.endDate || filters.dayNight?.length || filters.positions?.length);
 
