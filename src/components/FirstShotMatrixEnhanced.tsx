@@ -206,7 +206,7 @@ export default function FirstShotMatrixEnhanced() {
             </div>
             <div className="flex items-baseline gap-1">
               <div className={`text-sm font-semibold`} style={{ color: zone.color }}>
-                {zone.avgHitRate}%
+                {zone.avgHitRate === 0 ? "—" : zone.avgHitRate + "%"}
               </div>
             </div>
             <div className={`text-[9px] ${textSub}`}>

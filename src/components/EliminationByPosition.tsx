@@ -124,16 +124,6 @@ export default function EliminationByPosition() {
                   <Cell key={`cell-${idx}`} fill={item.fill} />
                 ))}
               </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
-                  border: `1px solid ${theme === "dark" ? "#27272a" : "#e5e7eb"}`,
-                  borderRadius: 4,
-                  fontSize: 10,
-                  padding: "2px 6px",
-                }}
-                formatter={(value: any, _name: any, entry: any) => [`${value} eliminated (${entry.payload.percentage}%)`, entry.payload.name]}
-              />
             </PieChart>
           </ResponsiveContainer>
         </div>

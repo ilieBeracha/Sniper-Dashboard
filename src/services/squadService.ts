@@ -31,6 +31,19 @@ export async function getSquadsWithUsersByTeamId(team_id: string) {
   }
 }
 
+export async function getSquadsByTeamId(team_id: string) {
+  try {
+    const { data, error } = await supabase.from("squads").select("id, squad_name").eq("team_id", team_id);
+
+    if (error) throw error;
+
+    return data;
+  } catch (error: any) {
+    console.error("Failed to fetch squads:", error.message);
+    throw new Error("Could not fetch squads for team");
+  }
+}
+
 export async function getSquadUsersBySquadId(squad_id: string) {
   try {
     const { data, error } = await supabase
