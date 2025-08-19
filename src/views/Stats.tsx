@@ -405,26 +405,29 @@ export default function Stats() {
       <SpPageBody>
         <div className="space-y-6 relative">
           {/* Error Banner */}
-          {Object.keys(errors).length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`p-4 rounded-lg border flex items-start gap-3 ${
-                theme === "dark" 
-                  ? "bg-red-900/20 border-red-800 text-red-300" 
-                  : "bg-red-50 border-red-200 text-red-700"
-              }`}
-            >
-              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="font-medium">Some data failed to load</p>
-                <p className="text-sm mt-1 opacity-90">
-                  {Object.values(errors).filter(Boolean).length} component{Object.values(errors).filter(Boolean).length > 1 ? 's' : ''} encountered errors. 
-                  Please refresh the page or try again later.
-                </p>
-              </div>
-            </motion.div>
-          )}
+          {(() => {
+            const errorCount = Object.values(errors).filter(Boolean).length;
+            return errorCount > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`p-4 rounded-lg border flex items-start gap-3 ${
+                  theme === "dark" 
+                    ? "bg-red-900/20 border-red-800 text-red-300" 
+                    : "bg-red-50 border-red-200 text-red-700"
+                }`}
+              >
+                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-medium">Some data failed to load</p>
+                  <p className="text-sm mt-1 opacity-90">
+                    {errorCount} component{errorCount !== 1 ? 's' : ''} encountered errors. 
+                    Please refresh the page or try again later.
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })()}
 
           {/* Loading Overlay - Improved with timeout warning */}
           {isLoading && (
