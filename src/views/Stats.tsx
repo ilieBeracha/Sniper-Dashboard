@@ -1,6 +1,6 @@
 import Header from "@/Headers/Header";
 import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
-import { BarChart2, SlidersHorizontal, Calendar, Target, Sun, Crosshair, Activity, Building2 } from "lucide-react";
+import { BarChart2, SlidersHorizontal, Calendar, Target, Sun, Crosshair, Activity, Building2, TrendingUp } from "lucide-react";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -22,6 +22,7 @@ import { squadStore } from "@/store/squadStore";
 import { getSquadsByTeamId } from "@/services/squadService";
 import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
+import UserWeaponPerformanceChart from "@/components/UserWeaponPerformanceChart";
 
 const StatsCard = ({
   title,
@@ -74,7 +75,8 @@ const StatsCard = ({
 export default function Stats() {
   const { user } = useStore(userStore);
   const { theme } = useTheme();
-  const { getStatsOverviewTotals, getFirstShotMetrics, getEliminationByPosition, getWeeklyTrends, getFirstShotMatrix } = useStore(useStatsStore);
+  const { getStatsOverviewTotals, getFirstShotMetrics, getEliminationByPosition, getWeeklyTrends, getFirstShotMatrix, getUserWeaponPerformance } =
+    useStore(useStatsStore);
   const { filters, setFilters, clearFilters } = useStatsFilters();
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -139,6 +141,7 @@ export default function Stats() {
             p_min_distance: 100,
             p_max_distance: 900,
           }),
+          getUserWeaponPerformance(filters),
         ]);
 
         // Check if request was cancelled
@@ -181,6 +184,7 @@ export default function Stats() {
       getEliminationByPosition,
       getWeeklyTrends,
       getFirstShotMatrix,
+      getUserWeaponPerformance,
     ],
   );
 
@@ -429,11 +433,11 @@ export default function Stats() {
             </div>
 
             {/* Weekly Trends - Spans 4 columns */}
-            {/* <div className="lg:col-span-4">
-              <StatsCard title="Weekly Trends" icon={TrendingUp} color="subtle">
-                <WeeklyTrends />
+            <div className="lg:col-span-4">
+              <StatsCard title="Weapon Performance" icon={TrendingUp} color="subtle">
+                <UserWeaponPerformanceChart />
               </StatsCard>
-            </div> */}
+            </div>
           </div>
           <FilterDrawerStats
             onClear={handleClearFilters}

@@ -270,7 +270,7 @@ export default function FilterDrawer({
                             : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300"
                       }`}
                     >
-                      My Squad
+                      {user?.squad_name}
                     </button>
                   )}
                 </div>
@@ -484,7 +484,7 @@ export default function FilterDrawer({
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full ${theme === "dark" ? "bg-orange-600/20 text-orange-300" : "bg-orange-100 text-orange-700"}`}
                     >
-                      My sessions
+                      {user?.squad_name}
                     </span>
                   )}
                   {localFilters.startDate && (

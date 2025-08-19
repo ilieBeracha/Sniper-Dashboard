@@ -7,6 +7,7 @@ import {
   FirstShotMetricsResponse,
   EliminationByPositionResponse,
   WeeklyTrendsResponse,
+  UserWeaponPerformanceResponse,
 } from "@/types/stats";
 
 /** Overview cards */
@@ -70,4 +71,10 @@ export async function rpcFirstShotMatrix(
     first_shot_hit_rate: number | null;
     avg_time_to_first_shot_sec: number | null;
   }>;
+}
+
+export async function userWeaponPerformance(filters: StatsFilters): Promise<UserWeaponPerformanceResponse[]> {
+  const { data, error } = await supabase.rpc("user_weapon_performance", toRpcFilters(filters));
+  if (error) throw error;
+  return (data ?? []) as UserWeaponPerformanceResponse[];
 }

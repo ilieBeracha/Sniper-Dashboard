@@ -1,5 +1,19 @@
-import { StatsFilters, StatsOverviewResponse, FirstShotMetricsResponse, EliminationByPositionResponse, WeeklyTrendsResponse } from "@/types/stats";
-import { rpcEliminationByPosition, rpcFirstShotMetrics, rpcStatsOverview, rpcWeeklyTrends, rpcFirstShotMatrix } from "@/services/statsService";
+import {
+  StatsFilters,
+  StatsOverviewResponse,
+  FirstShotMetricsResponse,
+  EliminationByPositionResponse,
+  WeeklyTrendsResponse,
+  UserWeaponPerformanceResponse,
+} from "@/types/stats";
+import {
+  rpcEliminationByPosition,
+  rpcFirstShotMetrics,
+  rpcStatsOverview,
+  rpcWeeklyTrends,
+  rpcFirstShotMatrix,
+  userWeaponPerformance,
+} from "@/services/statsService";
 import { create } from "zustand";
 
 interface StatsStore {
@@ -25,6 +39,10 @@ interface StatsStore {
       p_max_distance?: number;
     },
   ) => Promise<void>;
+  userWeaponPerformance: UserWeaponPerformanceResponse[] | null;
+  getUserWeaponPerformance: (filters: StatsFilters) => Promise<void>;
+  userWeaponPerformanceLoading: boolean;
+  setUserWeaponPerformanceLoading: (loading: boolean) => void;
 }
 
 export const useStatsStore = create<StatsStore>((set) => {
@@ -34,7 +52,9 @@ export const useStatsStore = create<StatsStore>((set) => {
     eliminationByPosition: null,
     weeklyTrends: null,
     firstShotMatrix: null,
-
+    userWeaponPerformance: null,
+    userWeaponPerformanceLoading: false,
+    setUserWeaponPerformanceLoading: (loading: boolean) => set({ userWeaponPerformanceLoading: loading }),
     getStatsOverviewTotals: async (filters: StatsFilters) => {
       const statsOverviewTotals = await rpcStatsOverview(filters);
       set({ statsOverviewTotals });
@@ -64,6 +84,19 @@ export const useStatsStore = create<StatsStore>((set) => {
     ) => {
       const firstShotMatrix = await rpcFirstShotMatrix(filters);
       set({ firstShotMatrix });
+    },
+
+    getUserWeaponPerformance: async (filters: StatsFilters) => {
+      try {
+        set({ userWeaponPerformanceLoading: true });
+        const data = await userWeaponPerformance(filters);
+        set({ userWeaponPerformance: data });
+      } catch (error) {
+        console.error("Failed to load user weapon performance:", error);
+        set({ userWeaponPerformance: null });
+      } finally {
+        set({ userWeaponPerformanceLoading: false });
+      }
     },
   };
 });

@@ -101,3 +101,14 @@ export interface DistanceMetricsResponse {
   elimination_pct: number;
   median_ttf_sec: number | null;
 }
+
+/** ========== User weapon performance ========== */
+export interface UserWeaponPerformanceResponse {
+  user_id: string;
+  weapon_id: string;
+  weapon_name: string;
+  shots: number;
+  hits: number;
+  hit_pct: number;
+  elimination_pct: number;
+}

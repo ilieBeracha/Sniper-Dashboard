@@ -16,7 +16,7 @@ export default function StatsUserKPI() {
       value: row.sessions,
       label: "Sessions",
       icon: Calendar,
-      color: theme === "dark" ? "text-violet-400" : "text-violet-600",
+      color: theme === "dark" ? "text-white" : "text-violet-600",
     },
 
     {
@@ -24,14 +24,14 @@ export default function StatsUserKPI() {
       label: "Accuracy",
       suffix: "%",
       icon: Crosshair,
-      color: theme === "dark" ? "text-emerald-400" : "text-emerald-600",
+      color: theme === "dark" ? "text-white" : "text-emerald-600",
     },
     {
       value: (row.elimination_pct * 100).toFixed(1),
       label: "Elimination",
       suffix: "%",
       icon: TrendingUp,
-      color: theme === "dark" ? "text-orange-400" : "text-orange-600",
+      color: theme === "dark" ? "text-white" : "text-orange-600",
     },
   ];
 
