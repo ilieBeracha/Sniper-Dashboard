@@ -11,67 +11,47 @@ export class ApiError extends Error {
 
 export interface ApiOptions {
   timeout?: number;
-  retries?: number;
-  retryDelay?: number;
 }
 
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
-const DEFAULT_RETRIES = 2;
-const DEFAULT_RETRY_DELAY = 1000; // 1 second
 
 /**
- * Wrapper for API calls with timeout and retry logic
+ * Wrapper for API calls with timeout
  */
 export async function apiCallWithTimeout<T>(
   apiCall: () => Promise<T>,
   options: ApiOptions = {}
 ): Promise<T> {
-  const {
-    timeout = DEFAULT_TIMEOUT,
-    retries = DEFAULT_RETRIES,
-    retryDelay = DEFAULT_RETRY_DELAY
-  } = options;
+  const { timeout = DEFAULT_TIMEOUT } = options;
 
-  let lastError: Error | null = null;
-  
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      // Create timeout promise
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          reject(new ApiError('Request timeout', 'TIMEOUT'));
-        }, timeout);
-      });
+  try {
+    // Create timeout promise
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        reject(new ApiError('Request timeout', 'TIMEOUT'));
+      }, timeout);
+    });
 
-      // Race between API call and timeout
-      const result = await Promise.race([
-        apiCall(),
-        timeoutPromise
-      ]);
+    // Race between API call and timeout
+    const result = await Promise.race([
+      apiCall(),
+      timeoutPromise
+    ]);
 
-      return result;
-    } catch (error) {
-      lastError = error as Error;
-      
-      // Don't retry on certain errors
-      if (error instanceof ApiError && error.code === 'TIMEOUT') {
-        throw error;
-      }
-      
-      // Check if it's a network error
-      if (error instanceof Error && error.message.includes('Failed to fetch')) {
-        throw new ApiError('Network error. Please check your connection.', 'NETWORK_ERROR', error);
-      }
-      
-      // If not the last attempt, wait before retrying
-      if (attempt < retries) {
-        await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
-        continue;
-      }
+    return result;
+  } catch (error) {
+    // Don't retry on timeout errors
+    if (error instanceof ApiError && error.code === 'TIMEOUT') {
+      throw error;
     }
+    
+    // Check if it's a network error
+    if (error instanceof Error && error.message.includes('Failed to fetch')) {
+      throw new ApiError('Network error. Please check your connection.', 'NETWORK_ERROR', error);
+    }
+    
+    throw error;
   }
-
-  throw lastError || new ApiError('Unknown error occurred');
 }
 
 /**

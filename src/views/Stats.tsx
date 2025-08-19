@@ -91,7 +91,7 @@ export default function Stats() {
   const [isLoading, setIsLoading] = useState(false);
   const [lastFiltersHash, setLastFiltersHash] = useState<string>("");
   const [dataVersion, setDataVersion] = useState(0);
-  const [retryCount, setRetryCount] = useState(0);
+
   const abortControllerRef = useRef<AbortController | null>(null);
   const { squads } = useStore(squadStore);
   // Create a stable hash of filters for comparison
@@ -167,7 +167,6 @@ export default function Stats() {
 
         if (successCount === totalCount) {
           setLastFiltersHash(currentFiltersHash);
-          setRetryCount(0);
         } else if (successCount > 0) {
           // Partial success
           setLastFiltersHash(currentFiltersHash);
@@ -175,12 +174,10 @@ export default function Stats() {
         } else {
           // Complete failure
           console.error("❌ Failed to load any data");
-          setRetryCount((prev) => prev + 1);
         }
       } catch (error) {
         if (!signal.aborted) {
           console.error("❌ Error refreshing stats data:", error);
-          setRetryCount((prev) => prev + 1);
         }
       } finally {
         if (!signal.aborted) {
@@ -423,20 +420,9 @@ export default function Stats() {
                 <p className="font-medium">Some data failed to load</p>
                 <p className="text-sm mt-1 opacity-90">
                   {Object.values(errors).filter(Boolean).length} component{Object.values(errors).filter(Boolean).length > 1 ? 's' : ''} encountered errors. 
-                  {retryCount < 3 && "Click refresh to try again."}
-                  {retryCount >= 3 && "Please check your connection and try again later."}
+                  Please refresh the page or try again later.
                 </p>
               </div>
-              <button
-                onClick={handleManualRefresh}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  theme === "dark"
-                    ? "bg-red-800 hover:bg-red-700 text-white"
-                    : "bg-red-600 hover:bg-red-700 text-white"
-                }`}
-              >
-                Retry
-              </button>
             </motion.div>
           )}
 
