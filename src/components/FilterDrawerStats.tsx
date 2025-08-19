@@ -1,16 +1,21 @@
 import { useState, useEffect } from "react";
 import { X, Filter, LayoutGrid, Layers } from "lucide-react";
-import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import type { PositionEnum, StatsFilters } from "@/types/stats";
 import { DayNight } from "@/types/equipment";
+import { userStore } from "@/store/userStore";
+import { useStore } from "zustand";
+import { squadStore } from "@/store/squadStore";
+import { isCommander } from "@/utils/permissions";
+import { UserRole } from "@/types/user";
 
 interface FilterDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  filters: StatsFilters; // { squadIds | userId | startDate | endDate | dayNight | positions | minShots }
-  onFiltersChange: (filters: StatsFilters) => void; // receives canonical StatsFilters
+  filters: StatsFilters;
+  onFiltersChange: (filters: StatsFilters) => void;
   onApply: () => void;
   onClear: () => void;
   autoLoadStackView?: boolean;
@@ -19,7 +24,6 @@ interface FilterDrawerProps {
   onViewModeChange?: (mode: "grid" | "stack") => void;
 }
 
-// helpers
 const arrOrNull = <T,>(a: T[] | null | undefined) => (a && a.length ? a : null);
 const validPositions: PositionEnum[] = ["Sitting", "Standing", "Lying", "Operational"];
 
@@ -31,7 +35,10 @@ function sanitize(filters: StatsFilters): StatsFilters {
   const startDate = filters.startDate ?? null;
   const endDate = filters.endDate ?? null;
 
-  return { startDate, endDate, dayNight, positions, squadIds: null };
+  // Keep squadIds as is - don't force to null
+  const squadIds = filters.squadIds ?? null;
+
+  return { startDate, endDate, dayNight, positions, squadIds };
 }
 
 export default function FilterDrawer({
@@ -48,12 +55,24 @@ export default function FilterDrawer({
 }: FilterDrawerProps) {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
-
+  const { user } = useStore(userStore);
   const [localFilters, setLocalFilters] = useState<StatsFilters>(filters);
+  const { squads } = useStore(squadStore);
+  const { getSquadsByTeamId } = useStore(squadStore);
+  useEffect(() => {
+    if (isCommander(user?.user_role as UserRole) && user?.team_id) {
+      getSquadsByTeamId(user?.team_id);
+    }
+  }, [user?.team_id]);
 
   useEffect(() => {
     setLocalFilters(filters);
   }, [filters]);
+
+  // Effect to refresh data when filters change
+  useEffect(() => {
+    console.log("🎯 Local filters changed:", localFilters);
+  }, [localFilters]);
 
   const handleApply = () => {
     const next = sanitize(localFilters);
@@ -154,10 +173,18 @@ export default function FilterDrawer({
                     <SelectItem value="ALL">All</SelectItem>
                     <SelectItem value="day">Day</SelectItem>
                     <SelectItem value="night">Night</SelectItem>
-                    {/* If you want both, keep the composite */}
                     <SelectItem value="day,night">Day + Night</SelectItem>
                   </SelectContent>
                 </Select>
+
+                {user?.squad_id && (
+                  <button
+                    onClick={() => setLocalFilters({ ...localFilters, squadIds: user?.squad_id ? [user?.squad_id] : null })}
+                    className="text-xs text-zinc-500"
+                  >
+                    Squad Mode
+                  </button>
+                )}
               </div>
 
               {/* Positions */}
@@ -192,6 +219,62 @@ export default function FilterDrawer({
               </div>
 
               {/* Scope: My sessions vs All (squadIds external) */}
+              <div className="mb-3">
+                <label className="text-xs font-medium opacity-70 mb-2 block">Session Scope</label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setLocalFilters({ ...localFilters, squadIds: null })}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                      !localFilters.squadIds
+                        ? theme === "dark"
+                          ? "bg-zinc-700 text-white"
+                          : "bg-gray-200 text-gray-900"
+                        : theme === "dark"
+                          ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700"
+                          : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300"
+                    }`}
+                  >
+                    All
+                  </button>
+                  {isCommander(user?.user_role as UserRole) && squads && squads.length > 0 && (
+                    <Select
+                      value={localFilters.squadIds?.[0] ?? ""}
+                      onValueChange={(v) => setLocalFilters({ ...localFilters, squadIds: v ? [v] : null })}
+                    >
+                      <SelectTrigger
+                        className={`w-full h-9 ${
+                          theme === "dark" ? "bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50" : "bg-gray-50 border-gray-300 hover:bg-gray-100"
+                        }`}
+                      >
+                        <SelectValue placeholder="Select squad" />
+                      </SelectTrigger>
+                      <SelectContent className={theme === "dark" ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"} position="popper">
+                        {squads?.map((squad) => (
+                          <SelectItem key={squad.id} value={squad.id}>
+                            {squad.squad_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  {user?.squad_id && (
+                    <button
+                      onClick={() => setLocalFilters({ ...localFilters, squadIds: user.squad_id ? [user.squad_id] : null })}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                        localFilters.squadIds?.length === 1 && localFilters.squadIds[0] === user.squad_id
+                          ? theme === "dark"
+                            ? "bg-zinc-700 text-white"
+                            : "bg-gray-200 text-gray-900"
+                          : theme === "dark"
+                            ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700"
+                            : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300"
+                      }`}
+                    >
+                      My Squad
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Date Range Selection */}

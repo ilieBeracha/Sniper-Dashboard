@@ -5,6 +5,7 @@ import {
   getSquadsWithUsersByTeamId,
   getSquadUsersBySquadId,
   getSquads,
+  getSquadsByTeamId,
 } from "@/services/squadService";
 import { Squad } from "@/types/squad";
 
@@ -33,6 +34,7 @@ interface SquadStore {
   getSquadUsersBySquadId: (squad_id: string) => Promise<void>;
   getSquadsHitsByTeamId: (team_id: string) => Promise<void>;
   getSquads: (team_id: string) => Promise<void>;
+  getSquadsByTeamId: (team_id: string) => Promise<void>;
 }
 
 export const squadStore = create<SquadStore>((set) => ({
@@ -60,6 +62,10 @@ export const squadStore = create<SquadStore>((set) => ({
   },
   getSquads: async (team_id) => {
     const data = await getSquads(team_id);
+    set({ squads: data as unknown as Squad[] });
+  },
+  getSquadsByTeamId: async (team_id) => {
+    const data = await getSquadsByTeamId(team_id);
     set({ squads: data as unknown as Squad[] });
   },
 }));

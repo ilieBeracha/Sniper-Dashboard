@@ -23,6 +23,7 @@ type RpcFilters = {
 const arrOrNull = <T>(a: T[] | null | undefined) => (a && a.length ? a : null);
 
 export function toRpcFilters(f: StatsFilters): RpcFilters {
+  console.log("f", f);
   return {
     p_squad_ids: arrOrNull(f.squadIds),
     p_start: f.startDate ?? null,

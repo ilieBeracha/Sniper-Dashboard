@@ -27,7 +27,7 @@ export default function StatsUserKPI() {
       color: theme === "dark" ? "text-emerald-400" : "text-emerald-600",
     },
     {
-      value: row.elimination_pct,
+      value: (row.elimination_pct * 100).toFixed(1),
       label: "Elimination",
       suffix: "%",
       icon: TrendingUp,

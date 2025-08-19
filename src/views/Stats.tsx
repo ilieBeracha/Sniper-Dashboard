@@ -1,6 +1,6 @@
 import Header from "@/Headers/Header";
 import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
-import { BarChart2, SlidersHorizontal, Calendar, Target, Sun, Crosshair, Activity } from "lucide-react";
+import { BarChart2, SlidersHorizontal, Calendar, Target, Sun, Crosshair, Activity, Building2 } from "lucide-react";
 import { userStore } from "@/store/userStore";
 import { useStore } from "zustand";
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -18,6 +18,10 @@ import FilterDrawerStats from "@/components/FilterDrawerStats";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import { Loader2, RefreshCw } from "lucide-react";
+import { squadStore } from "@/store/squadStore";
+import { getSquadsByTeamId } from "@/services/squadService";
+import { isCommander } from "@/utils/permissions";
+import { UserRole } from "@/types/user";
 
 const StatsCard = ({
   title,
@@ -77,7 +81,7 @@ export default function Stats() {
   const [lastFiltersHash, setLastFiltersHash] = useState<string>("");
   const [dataVersion, setDataVersion] = useState(0);
   const abortControllerRef = useRef<AbortController | null>(null);
-
+  const { squads } = useStore(squadStore);
   // Create a stable hash of filters for comparison
   const getFiltersHash = useCallback((currentFilters: any) => {
     return JSON.stringify({
@@ -85,8 +89,16 @@ export default function Stats() {
       endDate: currentFilters.endDate,
       dayNight: currentFilters.dayNight?.sort(),
       positions: currentFilters.positions?.sort(),
+      squadIds: currentFilters.squadIds?.sort(),
     });
   }, []);
+
+  useEffect(() => {
+    console.log("squads", squads);
+    if (isCommander(user?.user_role as UserRole) && user?.team_id) {
+      getSquadsByTeamId(user?.team_id);
+    }
+  }, [user?.team_id]);
 
   // Robust data refresh function with proper error handling and cancellation
   const refreshData = useCallback(
@@ -210,12 +222,19 @@ export default function Stats() {
   // Filter change handler with debouncing
   const handleFiltersChange = useCallback(
     (newFilters: any) => {
+      console.log("newFilters", newFilters);
       setFilters(newFilters);
     },
     [setFilters],
   );
 
-  const hasActiveFilters = !!(filters.startDate || filters.endDate || filters.dayNight?.length || filters.positions?.length);
+  const hasActiveFilters = !!(
+    filters.startDate ||
+    filters.endDate ||
+    filters.dayNight?.length ||
+    filters.positions?.length ||
+    filters.squadIds?.length
+  );
 
   // Format date range for display
   const getDateRangeDisplay = () => {
@@ -290,6 +309,18 @@ export default function Stats() {
                 </span>
               )}
 
+              {/* Squad Filter */}
+              {filters.squadIds?.length && (
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
+                    theme === "dark" ? "bg-orange-500/20 text-orange-300" : "bg-orange-100 text-orange-700"
+                  }`}
+                >
+                  <Building2 className="w-3 h-3" />
+                  <span>My Squad</span>
+                </span>
+              )}
+
               {/* Clear Button */}
               <button
                 onClick={handleClearFilters}
@@ -341,10 +372,13 @@ export default function Stats() {
                   theme === "dark" ? "bg-violet-500/30 text-violet-200" : "bg-violet-500 text-white"
                 }`}
               >
-                {[filters.startDate ? 1 : 0, filters.endDate ? 1 : 0, filters.dayNight?.length ? 1 : 0, filters.positions?.length ? 1 : 0].reduce(
-                  (a, b) => a + b,
-                  0,
-                )}
+                {[
+                  filters.startDate ? 1 : 0,
+                  filters.endDate ? 1 : 0,
+                  filters.dayNight?.length ? 1 : 0,
+                  filters.positions?.length ? 1 : 0,
+                  filters.squadIds?.length ? 1 : 0,
+                ].reduce((a, b) => a + b, 0)}
               </span>
             )}
           </motion.button>

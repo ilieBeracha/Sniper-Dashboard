@@ -137,17 +137,78 @@ export const TargetsSection = ({ section, targets, addTarget, updateTarget, remo
                               <MoveDiagonal className="w-3 h-3" />
                               Speed (m/s)
                             </Label>
-                            <Input
-                              type="number"
-                              placeholder="Speed"
-                              step="0.5"
-                              value={target.meterPerSecond || ""}
-                              onChange={(e) => {
-                                const value = e.target.value ? parseFloat(e.target.value) : null;
-                                updateTarget(target.id, "meterPerSecond", value);
-                              }}
-                              className="h-7 text-xs"
-                            />
+                            <div className="flex items-center gap-1">
+                              <Input
+                                type="number"
+                                placeholder="0.0"
+                                step="0.5"
+                                min="0"
+                                max="50"
+                                value={target.meterPerSecond || ""}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === "") {
+                                    updateTarget(target.id, "meterPerSecond", null);
+                                    return;
+                                  }
+
+                                  const numValue = parseFloat(value);
+                                  if (isNaN(numValue)) return;
+
+                                  // Check if value is a valid 0.5 increment
+                                  const isValidIncrement = (numValue * 2) % 1 === 0;
+                                  if (!isValidIncrement) {
+                                    // Round to nearest 0.5
+                                    const roundedValue = Math.round(numValue * 2) / 2;
+                                    updateTarget(target.id, "meterPerSecond", roundedValue);
+                                    return;
+                                  }
+
+                                  // Value is valid, update normally
+                                  updateTarget(target.id, "meterPerSecond", numValue);
+                                }}
+                                onBlur={(e) => {
+                                  // Ensure value is properly formatted on blur
+                                  const value = e.target.value;
+                                  if (value && value !== "") {
+                                    const numValue = parseFloat(value);
+                                    if (!isNaN(numValue)) {
+                                      const roundedValue = Math.round(numValue * 2) / 2;
+                                      if (roundedValue !== numValue) {
+                                        updateTarget(target.id, "meterPerSecond", roundedValue);
+                                      }
+                                    }
+                                  }
+                                }}
+                                className="h-7 text-xs flex-1"
+                              />
+                              <div className="flex flex-col gap-0.5">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const current = target.meterPerSecond || 0;
+                                    const newValue = Math.min(current + 0.5, 50);
+                                    updateTarget(target.id, "meterPerSecond", newValue);
+                                  }}
+                                  className="w-5 h-3.5 rounded-t-sm bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-[10px] text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
+                                  title="+0.5 m/s"
+                                >
+                                  ▲
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const current = target.meterPerSecond || 0;
+                                    const newValue = Math.max(current - 0.5, 0);
+                                    updateTarget(target.id, "meterPerSecond", newValue);
+                                  }}
+                                  className="w-5 h-3.5 rounded-b-sm bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-[10px] text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
+                                  title="-0.5 m/s"
+                                >
+                                  ▼
+                                </button>
+                              </div>
+                            </div>
                           </div>
 
                           {/* Delete Button */}
