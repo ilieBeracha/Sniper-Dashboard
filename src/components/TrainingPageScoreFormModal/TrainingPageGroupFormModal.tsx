@@ -32,7 +32,7 @@ const groupScoreSchema = z.object({
   shooting_position: z.string().min(1, "Shooting position is required"),
   effort: z.boolean(),
   day_period: z.enum(["day", "night"]),
-  type: z.enum(["normal", "timed", "position_abandonment"]),
+  type: z.enum(["normal", "timed", "position_abandonment", "motion"]),
 });
 
 type GroupScoreFormValues = z.infer<typeof groupScoreSchema>;
@@ -263,6 +263,7 @@ export default function TrainingPageGroupFormModal({ isOpen, onClose, onSubmit, 
                 { value: "normal", label: "Normal" },
                 { value: "timed", label: "Timed" },
                 { value: "position_abandonment", label: "Position Abandonment" },
+                { value: "motion", label: "Motion" },
               ]}
               disabled={isSubmitting}
             />
