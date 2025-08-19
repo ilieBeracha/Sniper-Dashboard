@@ -2,12 +2,15 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Calendar, Crosshair, TrendingUp } from "lucide-react";
 import { useStore } from "zustand";
 import { useStatsStore } from "@/store/statsStore";
+import { StatsKPISkeleton } from "@/components/ui/skeleton-loaders";
 
 export default function StatsUserKPI() {
-  const { statsOverviewTotals } = useStore(useStatsStore);
+  const { statsOverviewTotals, loadingStates } = useStore(useStatsStore);
   const { theme } = useTheme();
 
-  if (!statsOverviewTotals) return null;
+  if (loadingStates.statsOverview || !statsOverviewTotals) {
+    return <StatsKPISkeleton />;
+  }
 
   const row = statsOverviewTotals;
 
