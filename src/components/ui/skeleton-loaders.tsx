@@ -42,8 +42,6 @@ export function StatsKPISkeleton() {
 }
 
 export function ChartSkeleton({ className }: { className?: string }) {
-  const { theme } = useTheme();
-  
   return (
     <div className={cn("p-4", className)}>
       <div className="space-y-4">
@@ -62,11 +60,13 @@ export function ChartSkeleton({ className }: { className?: string }) {
           {/* Chart bars/lines */}
           <div className="ml-10 h-full flex items-end justify-around gap-2">
             {[...Array(6)].map((_, i) => (
-              <Skeleton
+              <div
                 key={i}
                 className="flex-1"
                 style={{ height: `${Math.random() * 60 + 20}%` }}
-              />
+              >
+                <Skeleton className="w-full h-full" />
+              </div>
             ))}
           </div>
           

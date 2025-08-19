@@ -1,5 +1,3 @@
-import { supabase } from "@/services/supabaseClient";
-
 export class ApiError extends Error {
   constructor(
     message: string,
