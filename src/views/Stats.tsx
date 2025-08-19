@@ -17,12 +17,13 @@ import FirstShotMatrixEnhanced from "@/components/FirstShotMatrixEnhanced";
 import FilterDrawerStats from "@/components/FilterDrawerStats";
 import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
-import { Loader2, RefreshCw } from "lucide-react";
+import { Loader2, RefreshCw, AlertCircle } from "lucide-react";
 import { squadStore } from "@/store/squadStore";
 import { getSquadsByTeamId } from "@/services/squadService";
 import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
 import UserWeaponPerformanceChart from "@/components/UserWeaponPerformanceChart";
+import { executeParallelApiCalls } from "@/utils/apiUtils";
 
 const StatsCard = ({
   title,
@@ -75,13 +76,22 @@ const StatsCard = ({
 export default function Stats() {
   const { user } = useStore(userStore);
   const { theme } = useTheme();
-  const { getStatsOverviewTotals, getFirstShotMetrics, getEliminationByPosition, getWeeklyTrends, getFirstShotMatrix, getUserWeaponPerformance } =
-    useStore(useStatsStore);
+  const { 
+    getStatsOverviewTotals, 
+    getFirstShotMetrics, 
+    getEliminationByPosition, 
+    getWeeklyTrends, 
+    getFirstShotMatrix, 
+    getUserWeaponPerformance,
+    errors,
+    clearErrors 
+  } = useStore(useStatsStore);
   const { filters, setFilters, clearFilters } = useStatsFilters();
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [lastFiltersHash, setLastFiltersHash] = useState<string>("");
   const [dataVersion, setDataVersion] = useState(0);
+  const [retryCount, setRetryCount] = useState(0);
   const abortControllerRef = useRef<AbortController | null>(null);
   const { squads } = useStore(squadStore);
   // Create a stable hash of filters for comparison
@@ -124,48 +134,53 @@ export default function Stats() {
       const { signal } = abortControllerRef.current;
 
       setIsLoading(true);
+      clearErrors();
 
       try {
         // Increment data version to track changes
         setDataVersion((prev) => prev + 1);
 
-        const results = await Promise.allSettled([
-          getStatsOverviewTotals(filters),
-          getFirstShotMetrics(filters),
-          getEliminationByPosition(filters),
-          getWeeklyTrends({ ...filters, p_group_by_weapon: false }),
-          getFirstShotMatrix({
+        // Execute all API calls in parallel with individual error handling
+        const results = await executeParallelApiCalls({
+          statsOverview: () => getStatsOverviewTotals(filters),
+          firstShot: () => getFirstShotMetrics(filters),
+          elimination: () => getEliminationByPosition(filters),
+          trends: () => getWeeklyTrends({ ...filters, p_group_by_weapon: false }),
+          matrix: () => getFirstShotMatrix({
             ...filters,
             p_distance_bucket: 25,
             p_min_targets: 0,
             p_min_distance: 100,
             p_max_distance: 900,
           }),
-          getUserWeaponPerformance(filters),
-        ]);
+          weapons: () => getUserWeaponPerformance(filters),
+        });
 
         // Check if request was cancelled
         if (signal.aborted) {
           return;
         }
 
-        // Log results and handle any failures
-        let hasFailures = false;
-        results.forEach((result, index) => {
-          if (result.status === "rejected") {
-            hasFailures = true;
-            console.error(`❌ Request ${index} failed:`, result.reason);
-          }
-        });
+        // Count successful requests
+        const successCount = Object.values(results).filter(r => r.success).length;
+        const totalCount = Object.keys(results).length;
 
-        if (!hasFailures) {
+        if (successCount === totalCount) {
           setLastFiltersHash(currentFiltersHash);
+          setRetryCount(0);
+        } else if (successCount > 0) {
+          // Partial success
+          setLastFiltersHash(currentFiltersHash);
+          console.warn(`⚠️ Loaded ${successCount}/${totalCount} data sources`);
         } else {
-          console.warn("⚠️ Some data failed to refresh");
+          // Complete failure
+          console.error("❌ Failed to load any data");
+          setRetryCount((prev) => prev + 1);
         }
       } catch (error) {
         if (!signal.aborted) {
           console.error("❌ Error refreshing stats data:", error);
+          setRetryCount((prev) => prev + 1);
         }
       } finally {
         if (!signal.aborted) {
@@ -179,6 +194,7 @@ export default function Stats() {
       lastFiltersHash,
       dataVersion,
       getFiltersHash,
+      clearErrors,
       getStatsOverviewTotals,
       getFirstShotMetrics,
       getEliminationByPosition,
@@ -391,7 +407,40 @@ export default function Stats() {
 
       <SpPageBody>
         <div className="space-y-6 relative">
-          {/* Loading Overlay - Now properly controlled */}
+          {/* Error Banner */}
+          {Object.keys(errors).length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`p-4 rounded-lg border flex items-start gap-3 ${
+                theme === "dark" 
+                  ? "bg-red-900/20 border-red-800 text-red-300" 
+                  : "bg-red-50 border-red-200 text-red-700"
+              }`}
+            >
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-medium">Some data failed to load</p>
+                <p className="text-sm mt-1 opacity-90">
+                  {Object.values(errors).filter(Boolean).length} component{Object.values(errors).filter(Boolean).length > 1 ? 's' : ''} encountered errors. 
+                  {retryCount < 3 && "Click refresh to try again."}
+                  {retryCount >= 3 && "Please check your connection and try again later."}
+                </p>
+              </div>
+              <button
+                onClick={handleManualRefresh}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  theme === "dark"
+                    ? "bg-red-800 hover:bg-red-700 text-white"
+                    : "bg-red-600 hover:bg-red-700 text-white"
+                }`}
+              >
+                Retry
+              </button>
+            </motion.div>
+          )}
+
+          {/* Loading Overlay - Improved with timeout warning */}
           {isLoading && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -399,12 +448,15 @@ export default function Stats() {
               className="absolute inset-0 bg-black/5 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg min-h-[200px]"
             >
               <div
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                className={`flex flex-col items-center gap-3 px-6 py-4 rounded-lg ${
                   theme === "dark" ? "bg-zinc-800 text-white" : "bg-white text-gray-900"
                 } shadow-lg`}
               >
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">Loading data...</span>
+                <Loader2 className="w-6 h-6 animate-spin" />
+                <div className="text-center">
+                  <p className="text-sm font-medium">Loading data...</p>
+                  <p className="text-xs opacity-70 mt-1">This may take a few moments</p>
+                </div>
               </div>
             </motion.div>
           )}
