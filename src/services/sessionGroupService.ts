@@ -73,8 +73,8 @@ export async function addTrainingsToGroup(payload: AddTrainingsToGroupPayload): 
     // The foreign key constraint expects session_stats IDs, not training_session IDs
     const { data: sessionStats, error: statsError } = await supabase
       .from("session_stats")
-      .select("id, training_id")
-      .in("training_id", payload.training_ids);
+      .select("id")
+      .in("training_session_id", payload.training_ids);
 
     if (statsError) {
       console.error("Error fetching session stats:", statsError);
@@ -90,7 +90,7 @@ export async function addTrainingsToGroup(payload: AddTrainingsToGroupPayload): 
     // Map to session_stats IDs for the insert
     const insertData = sessionStats.map(stat => ({
       group_id: payload.group_id,
-      training_id: stat.id // Use session_stats ID, not training_session ID
+      training_id: stat.id // Use session_stats ID
     }));
 
     const { error } = await supabase
@@ -114,25 +114,31 @@ export async function addTrainingsToGroup(payload: AddTrainingsToGroupPayload): 
 
 export async function removeTrainingFromGroup(groupId: string, trainingId: string): Promise<boolean> {
   try {
-    // First get the session_stats ID for this training
+    // First get the session_stats IDs for this training
     const { data: sessionStats, error: statsError } = await supabase
       .from("session_stats")
       .select("id")
-      .eq("training_id", trainingId)
-      .limit(1)
-      .single();
+      .eq("training_session_id", trainingId);
 
-    if (statsError || !sessionStats) {
+    if (statsError) {
       console.error("Error fetching session stats:", statsError);
       toast.error("Failed to find session statistics");
       return false;
     }
 
+    if (!sessionStats || sessionStats.length === 0) {
+      toast.error("No session statistics found for this training");
+      return false;
+    }
+
+    // Remove all session_stats entries for this training from the group
+    const sessionStatsIds = sessionStats.map(stat => stat.id);
+    
     const { error } = await supabase
       .from("training_group_trainings")
       .delete()
       .eq("group_id", groupId)
-      .eq("training_id", sessionStats.id); // Use session_stats ID
+      .in("training_id", sessionStatsIds); // Use session_stats IDs
 
     if (error) {
       console.error("Error removing training from group:", error);
@@ -151,34 +157,20 @@ export async function removeTrainingFromGroup(groupId: string, trainingId: strin
 
 export async function getTrainingsInGroup(groupId: string): Promise<any[]> {
   try {
-    // First get the session_stats IDs in this group
-    const { data: groupTrainings, error: groupError } = await supabase
-      .from("training_group_trainings")
-      .select("training_id") // This is actually session_stats ID
-      .eq("group_id", groupId);
-
-    if (groupError) {
-      console.error("Error fetching group trainings:", groupError);
-      toast.error("Failed to fetch trainings in group");
-      return [];
-    }
-
-    if (!groupTrainings || groupTrainings.length === 0) {
-      return [];
-    }
-
-    // Extract session_stats IDs
-    const sessionStatsIds = groupTrainings.map(gt => gt.training_id);
-
-    // Get the actual training_session IDs from session_stats
+    // Your SQL shows: JOIN public.training_group_trainings tgt ON tgt.training_id = ss.id
+    // So we need to join session_stats with training_group_trainings
     const { data: sessionStats, error: statsError } = await supabase
       .from("session_stats")
-      .select("training_id")
-      .in("id", sessionStatsIds);
+      .select(`
+        id,
+        training_session_id,
+        training_group_trainings!inner(group_id)
+      `)
+      .eq("training_group_trainings.group_id", groupId);
 
     if (statsError) {
       console.error("Error fetching session stats:", statsError);
-      toast.error("Failed to fetch session statistics");
+      toast.error("Failed to fetch trainings in group");
       return [];
     }
 
@@ -186,8 +178,8 @@ export async function getTrainingsInGroup(groupId: string): Promise<any[]> {
       return [];
     }
 
-    // Get unique training IDs
-    const trainingIds = [...new Set(sessionStats.map(stat => stat.training_id))];
+    // Get unique training session IDs
+    const trainingIds = [...new Set(sessionStats.map(stat => stat.training_session_id))];
 
     // Now fetch the training sessions
     const { data: trainings, error: trainingsError } = await supabase
