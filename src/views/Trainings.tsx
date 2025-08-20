@@ -8,11 +8,11 @@ import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
 import TrainingListEnhanced from "@/components/TrainingList/TrainingListEnhanced";
 import SpPagination from "@/layouts/SpPagination";
 import TrainingAddTrainingSessionModal from "@/components/TrainingModal/AddTrainingSessionModal";
-import SessionGroupFilterCard from "@/components/SessionGroups/SessionGroupFilterCard";
-import SessionGroupBulkActionsBar from "@/components/SessionGroups/SessionGroupBulkActionsBar";
-import SessionGroupManagementModal from "@/components/SessionGroups/SessionGroupManagementModal";
+import SessionGroupFilterCompact from "@/components/SessionGroups/SessionGroupFilterCompact";
+import SessionGroupBulkActionsCompact from "@/components/SessionGroups/SessionGroupBulkActionsCompact";
+import SessionGroupManagementSimple from "@/components/SessionGroups/SessionGroupManagementSimple";
 import { BiCurrentLocation } from "react-icons/bi";
-import { Settings } from "lucide-react";
+
 import Header from "@/Headers/Header";
 import { weaponsStore } from "@/store/weaponsStore";
 import { isCommander } from "@/utils/permissions";
@@ -191,11 +191,7 @@ export default function Trainings() {
         onClick: toggleSelectionMode
       });
 
-      actions.push({
-        label: "Manage Groups",
-        onClick: () => setIsGroupManagementOpen(true),
-        icon: Settings
-      });
+
     }
     
     return actions;
@@ -217,15 +213,17 @@ export default function Trainings() {
       />
 
       <SpPageBody>
-        {/* Group Filter Cards */}
-        <SessionGroupFilterCard 
-          onGroupChange={handleGroupChange}
-          onCreateClick={() => setIsGroupManagementOpen(true)}
-        />
+        {/* Compact Filter and Actions Bar */}
+        <div className="flex items-start justify-between mb-4">
+          <SessionGroupFilterCompact 
+            onGroupChange={handleGroupChange}
+            onCreateClick={() => setIsGroupManagementOpen(true)}
+          />
+        </div>
 
-        {/* Bulk Actions Toolbar - Commanders Only */}
+        {/* Bulk Actions - Commanders Only */}
         {isCommanderUser && isSelectionMode && selectedSessions.length > 0 && (
-          <SessionGroupBulkActionsBar
+          <SessionGroupBulkActionsCompact
             selectedSessions={selectedSessions}
             onClearSelection={handleClearSelection}
             trainings={trainings}
@@ -266,7 +264,7 @@ export default function Trainings() {
       />
 
       {isCommanderUser && (
-        <SessionGroupManagementModal
+        <SessionGroupManagementSimple
           isOpen={isGroupManagementOpen}
           onClose={() => setIsGroupManagementOpen(false)}
         />
