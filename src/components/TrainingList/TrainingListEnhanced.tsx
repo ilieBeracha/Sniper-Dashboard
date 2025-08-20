@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { TrainingSession } from "@/types/training";
 import { TrainingSessionCard } from "../TrainingSessionCard";
 import { TrainingSessionCardSelectable } from "../TrainingSessionCard/TrainingSessionCardSelectable";
