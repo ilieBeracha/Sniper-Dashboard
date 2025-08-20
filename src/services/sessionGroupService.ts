@@ -69,9 +69,28 @@ export async function createTrainingGroup(payload: CreateTrainingGroupPayload): 
 
 export async function addTrainingsToGroup(payload: AddTrainingsToGroupPayload): Promise<boolean> {
   try {
-    const insertData = payload.training_ids.map(training_id => ({
+    // First, we need to get the session_stats IDs for these training sessions
+    // The foreign key constraint expects session_stats IDs, not training_session IDs
+    const { data: sessionStats, error: statsError } = await supabase
+      .from("session_stats")
+      .select("id, training_id")
+      .in("training_id", payload.training_ids);
+
+    if (statsError) {
+      console.error("Error fetching session stats:", statsError);
+      toast.error("Failed to fetch session statistics");
+      return false;
+    }
+
+    if (!sessionStats || sessionStats.length === 0) {
+      toast.warning("No session statistics found for the selected trainings. Only trainings with recorded statistics can be added to groups.");
+      return false;
+    }
+
+    // Map to session_stats IDs for the insert
+    const insertData = sessionStats.map(stat => ({
       group_id: payload.group_id,
-      training_id: training_id
+      training_id: stat.id // Use session_stats ID, not training_session ID
     }));
 
     const { error } = await supabase
@@ -84,7 +103,7 @@ export async function addTrainingsToGroup(payload: AddTrainingsToGroupPayload): 
       return false;
     }
 
-    toast.success(`Added ${payload.training_ids.length} training(s) to group`);
+    toast.success(`Added ${sessionStats.length} training(s) to group`);
     return true;
   } catch (error: any) {
     console.error("Exception when adding trainings to group:", error);
@@ -95,11 +114,25 @@ export async function addTrainingsToGroup(payload: AddTrainingsToGroupPayload): 
 
 export async function removeTrainingFromGroup(groupId: string, trainingId: string): Promise<boolean> {
   try {
+    // First get the session_stats ID for this training
+    const { data: sessionStats, error: statsError } = await supabase
+      .from("session_stats")
+      .select("id")
+      .eq("training_id", trainingId)
+      .limit(1)
+      .single();
+
+    if (statsError || !sessionStats) {
+      console.error("Error fetching session stats:", statsError);
+      toast.error("Failed to find session statistics");
+      return false;
+    }
+
     const { error } = await supabase
       .from("training_group_trainings")
       .delete()
       .eq("group_id", groupId)
-      .eq("training_id", trainingId);
+      .eq("training_id", sessionStats.id); // Use session_stats ID
 
     if (error) {
       console.error("Error removing training from group:", error);
@@ -118,10 +151,10 @@ export async function removeTrainingFromGroup(groupId: string, trainingId: strin
 
 export async function getTrainingsInGroup(groupId: string): Promise<any[]> {
   try {
-    // First get the training IDs in this group
+    // First get the session_stats IDs in this group
     const { data: groupTrainings, error: groupError } = await supabase
       .from("training_group_trainings")
-      .select("training_id")
+      .select("training_id") // This is actually session_stats ID
       .eq("group_id", groupId);
 
     if (groupError) {
@@ -134,8 +167,27 @@ export async function getTrainingsInGroup(groupId: string): Promise<any[]> {
       return [];
     }
 
-    // Extract training IDs
-    const trainingIds = groupTrainings.map(gt => gt.training_id);
+    // Extract session_stats IDs
+    const sessionStatsIds = groupTrainings.map(gt => gt.training_id);
+
+    // Get the actual training_session IDs from session_stats
+    const { data: sessionStats, error: statsError } = await supabase
+      .from("session_stats")
+      .select("training_id")
+      .in("id", sessionStatsIds);
+
+    if (statsError) {
+      console.error("Error fetching session stats:", statsError);
+      toast.error("Failed to fetch session statistics");
+      return [];
+    }
+
+    if (!sessionStats || sessionStats.length === 0) {
+      return [];
+    }
+
+    // Get unique training IDs
+    const trainingIds = [...new Set(sessionStats.map(stat => stat.training_id))];
 
     // Now fetch the training sessions
     const { data: trainings, error: trainingsError } = await supabase
@@ -148,20 +200,16 @@ export async function getTrainingsInGroup(groupId: string): Promise<any[]> {
         status,
         creator:users!fk_training_session_creator_id (
           id,
-          name
+          first_name,
+          last_name,
+          email
         ),
-        assignments (
+        assignment_session:assignment_session (
           id,
-          assignment_name,
-          assignment_sessions (
+          assignment:assignment_id (
             id,
-            user_id,
-            status,
-            created_at,
-            session_stats (
-              id,
-              created_at
-            )
+            assignment_name,
+            created_at
           )
         )
       `)
