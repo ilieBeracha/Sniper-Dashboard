@@ -8,9 +8,11 @@ import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
 import TrainingListEnhanced from "@/components/TrainingList/TrainingListEnhanced";
 import SpPagination from "@/layouts/SpPagination";
 import TrainingAddTrainingSessionModal from "@/components/TrainingModal/AddTrainingSessionModal";
-import SessionGroupFilter from "@/components/SessionGroupFilter";
-import SessionGroupBulkActions from "@/components/SessionGroupBulkActions";
+import SessionGroupFilterCard from "@/components/SessionGroups/SessionGroupFilterCard";
+import SessionGroupBulkActionsBar from "@/components/SessionGroups/SessionGroupBulkActionsBar";
+import SessionGroupManagementModal from "@/components/SessionGroups/SessionGroupManagementModal";
 import { BiCurrentLocation } from "react-icons/bi";
+import { Settings } from "lucide-react";
 import Header from "@/Headers/Header";
 import { weaponsStore } from "@/store/weaponsStore";
 import { isCommander } from "@/utils/permissions";
@@ -42,6 +44,9 @@ export default function Trainings() {
   const [isAddTrainingOpen, setIsAddTrainingOpen] = useState(false);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedSessions, setSelectedSessions] = useState<string[]>([]);
+  const [isGroupManagementOpen, setIsGroupManagementOpen] = useState(false);
+
+  const isCommanderUser = isCommander(user?.user_role as UserRole);
 
   // Load initial data
   useLoadingState(async () => {
@@ -63,7 +68,6 @@ export default function Trainings() {
       if (selectedGroup) {
         // Load trainings for selected group
         await loadTrainingsInGroup(selectedGroup.id);
-        // trainingsInGroup will be updated in the store
         setHasMore(false);
         setCurrentPage(0);
       } else {
@@ -173,10 +177,10 @@ export default function Trainings() {
   };
 
   // Action buttons
-  const getActions = (): { label: string; onClick: () => void }[] => {
+  const getActions = (): { label: string; onClick: () => void; icon?: any }[] => {
     const actions = [];
     
-    if (isCommander(user?.user_role as UserRole)) {
+    if (isCommanderUser) {
       actions.push({ 
         label: "Add Training", 
         onClick: () => setIsAddTrainingOpen(true) 
@@ -185,6 +189,12 @@ export default function Trainings() {
       actions.push({ 
         label: isSelectionMode ? "Cancel Selection" : "Bulk Select", 
         onClick: toggleSelectionMode
+      });
+
+      actions.push({
+        label: "Manage Groups",
+        onClick: () => setIsGroupManagementOpen(true),
+        icon: Settings
       });
     }
     
@@ -207,17 +217,15 @@ export default function Trainings() {
       />
 
       <SpPageBody>
-        {/* Group Filter */}
-        <div className="mb-6">
-          <SessionGroupFilter 
-            onGroupChange={handleGroupChange}
-            selectedGroupId={selectedGroup?.id}
-          />
-        </div>
+        {/* Group Filter Cards */}
+        <SessionGroupFilterCard 
+          onGroupChange={handleGroupChange}
+          onCreateClick={() => setIsGroupManagementOpen(true)}
+        />
 
-        {/* Bulk Actions Toolbar */}
-        {isSelectionMode && selectedSessions.length > 0 && (
-          <SessionGroupBulkActions
+        {/* Bulk Actions Toolbar - Commanders Only */}
+        {isCommanderUser && isSelectionMode && selectedSessions.length > 0 && (
+          <SessionGroupBulkActionsBar
             selectedSessions={selectedSessions}
             onClearSelection={handleClearSelection}
             trainings={trainings}
@@ -230,7 +238,7 @@ export default function Trainings() {
         ) : (
           <TrainingListEnhanced 
             trainings={trainings}
-            isSelectionMode={isSelectionMode}
+            isSelectionMode={isSelectionMode && isCommanderUser}
             selectedSessions={selectedSessions}
             onSelectionChange={handleSelectionChange}
             onSelectAll={handleSelectAll}
@@ -249,13 +257,20 @@ export default function Trainings() {
         )}
       </SpPageBody>
 
-      {/* Add Training Modal */}
+      {/* Modals */}
       <TrainingAddTrainingSessionModal 
         isOpen={isAddTrainingOpen} 
         onClose={handleModalClose} 
         onSuccess={fetchTrainings} 
         assignments={assignments} 
       />
+
+      {isCommanderUser && (
+        <SessionGroupManagementModal
+          isOpen={isGroupManagementOpen}
+          onClose={() => setIsGroupManagementOpen(false)}
+        />
+      )}
     </SpPage>
   );
 }
