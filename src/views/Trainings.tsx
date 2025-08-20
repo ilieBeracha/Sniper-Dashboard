@@ -92,7 +92,7 @@ export default function Trainings() {
     if (user?.team_id) await loadAssignments();
   };
 
-  const handleGroupChange = (group: TrainingGroup | null) => {
+  const handleGroupChange = (_group: TrainingGroup | null) => {
     // Group change is handled by the store, just reset selection
     setSelectedSessions([]);
     setShowBulkSelect(false);

@@ -30,14 +30,15 @@ export default function TrainingListWithSelection({
 
   const renderSessionWithCheckbox = (session: TrainingSession, highlight?: boolean, showDate?: boolean) => {
     if (!session.id) return null;
-    const isSelected = selectedSessions.includes(session.id);
+    const sessionId = session.id; // Store in const to satisfy TypeScript
+    const isSelected = selectedSessions.includes(sessionId);
     
     return (
-      <div key={session.id} className="flex items-start gap-3">
+      <div key={sessionId} className="flex items-start gap-3">
         {showSelection && (
           <Checkbox
             checked={isSelected}
-            onCheckedChange={(checked) => onSelectionChange(session.id, checked as boolean)}
+            onCheckedChange={(checked) => onSelectionChange(sessionId, checked as boolean)}
             className="mt-4"
           />
         )}

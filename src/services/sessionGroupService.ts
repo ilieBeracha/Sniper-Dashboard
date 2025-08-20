@@ -118,33 +118,63 @@ export async function removeTrainingFromGroup(groupId: string, trainingId: strin
 
 export async function getTrainingsInGroup(groupId: string): Promise<any[]> {
   try {
-    const { data, error } = await supabase
-      .rpc("get_trainings_in_group", {
-        p_group_id: groupId
-      });
+    // First get the training IDs in this group
+    const { data: groupTrainings, error: groupError } = await supabase
+      .from("training_group_trainings")
+      .select("training_id")
+      .eq("group_id", groupId);
 
-    if (error) {
-      // If RPC doesn't exist, use regular join query
-      const { data: joinData, error: joinError } = await supabase
-        .from("session_stats")
-        .select("*")
-        .in("id", 
-          supabase
-            .from("training_group_trainings")
-            .select("training_id")
-            .eq("group_id", groupId)
-        );
-
-      if (joinError) {
-        console.error("Error fetching trainings in group:", joinError);
-        toast.error("Failed to fetch trainings in group");
-        return [];
-      }
-
-      return joinData || [];
+    if (groupError) {
+      console.error("Error fetching group trainings:", groupError);
+      toast.error("Failed to fetch trainings in group");
+      return [];
     }
 
-    return data || [];
+    if (!groupTrainings || groupTrainings.length === 0) {
+      return [];
+    }
+
+    // Extract training IDs
+    const trainingIds = groupTrainings.map(gt => gt.training_id);
+
+    // Now fetch the training sessions
+    const { data: trainings, error: trainingsError } = await supabase
+      .from("training_session")
+      .select(`
+        id,
+        date,
+        session_name,
+        location,
+        status,
+        creator:users!fk_training_session_creator_id (
+          id,
+          name
+        ),
+        assignments (
+          id,
+          assignment_name,
+          assignment_sessions (
+            id,
+            user_id,
+            status,
+            created_at,
+            session_stats (
+              id,
+              created_at
+            )
+          )
+        )
+      `)
+      .in("id", trainingIds)
+      .order("date", { ascending: false });
+
+    if (trainingsError) {
+      console.error("Error fetching trainings:", trainingsError);
+      toast.error("Failed to fetch training details");
+      return [];
+    }
+
+    return trainings || [];
   } catch (error: any) {
     console.error("Exception when fetching trainings in group:", error);
     toast.error(error.message);
