@@ -48,8 +48,8 @@ export default function SessionGroupBulkActions({
     label: group.name
   }));
 
-  const selectedTrainings = trainings.filter(t => selectedSessions.includes(t.id));
-  const selectedNames = selectedTrainings.map(t => t.session_name).join(", ");
+  const selectedTrainings = trainings.filter(t => t.id && selectedSessions.includes(t.id));
+  const selectedNames = selectedTrainings.map(t => t.session_name || "Unnamed").join(", ");
 
   return (
     <div className={`sticky top-0 z-10 ${

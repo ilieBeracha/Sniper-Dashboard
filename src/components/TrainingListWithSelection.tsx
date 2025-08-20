@@ -1,11 +1,8 @@
-import { useState } from "react";
 import { TrainingSession } from "@/types/training";
 import { TrainingSessionCard } from "./TrainingSessionCard";
 import TrainingSessionGroup from "./TrainingSessionGroup";
 import TrainingCalendar from "./TrainingCalendar";
-import TrainingSection from "./TrainingSection";
 import TrainingListEmpty from "./TrainingListEmpty";
-import { useTheme } from "@/contexts/ThemeContext";
 import { filterTrainingsByDate } from "@/utils/trainingFilters";
 import { primitives } from "@/styles/core";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -26,13 +23,13 @@ export default function TrainingListWithSelection({
   onSelectAll,
   showSelection = false
 }: TrainingListWithSelectionProps) {
-  const { theme } = useTheme();
   const isMobile = useIsMobile();
 
   const { todaySessions, upcoming, past } = filterTrainingsByDate(trainings);
   const today = new Date();
 
   const renderSessionWithCheckbox = (session: TrainingSession, highlight?: boolean, showDate?: boolean) => {
+    if (!session.id) return null;
     const isSelected = selectedSessions.includes(session.id);
     
     return (
