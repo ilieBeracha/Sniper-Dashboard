@@ -8,8 +8,7 @@ import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
 import TrainingListEnhanced from "@/components/TrainingList/TrainingListEnhanced";
 import SpPagination from "@/layouts/SpPagination";
 import TrainingAddTrainingSessionModal from "@/components/TrainingModal/AddTrainingSessionModal";
-import SessionGroupFilterCompact from "@/components/SessionGroups/SessionGroupFilterCompact";
-import SessionGroupBulkActionsCompact from "@/components/SessionGroups/SessionGroupBulkActionsCompact";
+import SessionGroupBar from "@/components/SessionGroups/SessionGroupBar";
 import SessionGroupManagementSimple from "@/components/SessionGroups/SessionGroupManagementSimple";
 import { BiCurrentLocation } from "react-icons/bi";
 
@@ -213,22 +212,14 @@ export default function Trainings() {
       />
 
       <SpPageBody>
-        {/* Compact Filter and Actions Bar */}
-        <div className="flex items-start justify-between mb-4">
-          <SessionGroupFilterCompact 
-            onGroupChange={handleGroupChange}
-            onCreateClick={() => setIsGroupManagementOpen(true)}
-          />
-        </div>
-
-        {/* Bulk Actions - Commanders Only */}
-        {isCommanderUser && isSelectionMode && selectedSessions.length > 0 && (
-          <SessionGroupBulkActionsCompact
-            selectedSessions={selectedSessions}
-            onClearSelection={handleClearSelection}
-            trainings={trainings}
-          />
-        )}
+        {/* Unified Group Management Bar */}
+        <SessionGroupBar
+          onGroupChange={handleGroupChange}
+          onCreateClick={() => setIsGroupManagementOpen(true)}
+          selectedSessions={selectedSessions}
+          onClearSelection={handleClearSelection}
+          isSelectionMode={isSelectionMode}
+        />
 
         {/* Training List */}
         {isLoading ? (

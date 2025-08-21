@@ -34,6 +34,9 @@ export function TrainingSessionCardSelectable({
   const sessionId = session.id;
 
   const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent default to avoid any scrolling issues
+    e.preventDefault();
+    
     // If clicking on checkbox area, don't navigate
     if (isSelectable && (e.target as HTMLElement).closest('.checkbox-wrapper')) {
       return;
@@ -41,7 +44,6 @@ export function TrainingSessionCardSelectable({
     
     if (isSelectable) {
       // In selection mode, clicking anywhere on the card toggles selection
-      e.preventDefault();
       e.stopPropagation();
       onSelectionChange?.(sessionId, !isSelected);
     } else {

@@ -3,3 +3,5 @@ export { default as SessionGroupBulkActionsBar } from './SessionGroupBulkActions
 export { default as SessionGroupManagementModal } from './SessionGroupManagementModal';
 export { default as SessionGroupFilterCompact } from './SessionGroupFilterCompact';
 export { default as SessionGroupBulkActionsCompact } from './SessionGroupBulkActionsCompact';
+export { default as SessionGroupBar } from './SessionGroupBar';
+export { default as SessionGroupManagementSimple } from './SessionGroupManagementSimple';

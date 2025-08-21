@@ -106,7 +106,7 @@ export default function SessionGroupManagementSimple({
             <Button
               onClick={handleCreate}
               disabled={!name.trim() || isCreating}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
             >
               <Plus className="w-4 h-4 mr-1" />
               {isCreating ? "Creating..." : "Create Group"}
