@@ -93,8 +93,6 @@ export default function BulkEditOverlay({
             onSelectionChange(training.id, true);
           }
         });
-        
-        toast.info(`Selected ${trainingsInSelectedGroup.length} trainings from group`);
       }
     } catch (error) {
       console.error("Error loading group trainings:", error);
@@ -161,15 +159,38 @@ export default function BulkEditOverlay({
     }
   };
 
+  // Add effect to set body background when overlay is open
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      const originalBackground = document.documentElement.style.background;
+      document.body.style.overflow = 'hidden';
+      if (theme === 'dark') {
+        document.documentElement.style.background = '#000';
+      }
+      
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.documentElement.style.background = originalBackground;
+      };
+    }
+  }, [isOpen, theme]);
+
   if (!isOpen) return null;
 
   const allPageIds = paginatedTrainings.filter(t => t.id).map(t => t.id as string);
   const allPageSelected = allPageIds.length > 0 && allPageIds.every(id => selectedSessions.includes(id));
 
   return (
-    <div className={`fixed inset-0 z-50 flex flex-col ${
-      theme === 'dark' ? 'bg-black' : 'bg-white'
-    }`}>
+    <>
+      {/* Background overlay to ensure full coverage */}
+      <div className={`fixed inset-0 z-40 ${
+        theme === 'dark' ? 'bg-black' : 'bg-white'
+      }`} />
+      
+      <div className={`fixed inset-0 z-50 flex flex-col ${
+        theme === 'dark' ? 'bg-black' : 'bg-white'
+      }`}>
       {/* Header */}
       <div className={`flex items-center justify-between p-4 border-b ${
         theme === 'dark' ? 'border-gray-800 bg-black' : 'border-gray-200 bg-gray-50'
@@ -370,5 +391,6 @@ export default function BulkEditOverlay({
         </div>
       )}
     </div>
+    </>
   );
 }
