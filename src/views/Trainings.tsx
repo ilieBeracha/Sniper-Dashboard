@@ -1,60 +1,107 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useStore } from "zustand";
 import { TrainingStore } from "@/store/trainingStore";
 import { userStore } from "@/store/userStore";
+import { sessionGroupStore } from "@/store/sessionGroupStore";
 import { useLoadingState } from "@/hooks/useLoadingState";
 import { SpPage, SpPageBody, SpPageHeader } from "@/layouts/SpPage";
-import TrainingList from "@/components/TrainingList";
+import TrainingListEnhanced from "@/components/TrainingList/TrainingListEnhanced";
 import SpPagination from "@/layouts/SpPagination";
 import TrainingAddTrainingSessionModal from "@/components/TrainingModal/AddTrainingSessionModal";
+import SessionGroupBar from "@/components/SessionGroups/SessionGroupBar";
+import SessionGroupManagementSimple from "@/components/SessionGroups/SessionGroupManagementSimple";
+import BulkEditOverlay from "@/components/SessionGroups/BulkEditOverlay";
 import { BiCurrentLocation } from "react-icons/bi";
 import Header from "@/Headers/Header";
 import { weaponsStore } from "@/store/weaponsStore";
 import { isCommander } from "@/utils/permissions";
 import { UserRole } from "@/types/user";
 import { TrainingsListSkeleton } from "@/components/DashboardSkeletons";
+import { TrainingGroup } from "@/types/sessionGroup";
+import { TrainingSession } from "@/types/training";
 
 export default function Trainings() {
+  // Store hooks
   const { loadTrainingByTeamId, getTrainingCountByTeamId, loadAssignments, loadWeeklyAssignmentsStats } = useStore(TrainingStore);
   const user = useStore(userStore).user;
   const assignments = useStore(TrainingStore).assignments;
   const { getWeapons } = useStore(weaponsStore);
+  const { selectedGroup, trainingsInGroup, loadTrainingsInGroup } = useStore(sessionGroupStore);
 
+  // Pagination state
   const LIMIT = 20;
-  const [currentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [trainings, setTrainings] = useState<any[]>([]);
+  
+  // Training data state
+  const [trainings, setTrainings] = useState<TrainingSession[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // UI state
   const [isPageChanging, setIsPageChanging] = useState(false);
   const [isAddTrainingOpen, setIsAddTrainingOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
+  const [selectedSessions, setSelectedSessions] = useState<string[]>([]);
+  const [isGroupManagementOpen, setIsGroupManagementOpen] = useState(false);
+  const [showBulkEditOverlay, setShowBulkEditOverlay] = useState(false);
+
+  const isCommanderUser = isCommander(user?.user_role as UserRole);
+
+  // Load initial data
   useLoadingState(async () => {
     if (!user?.team_id) return;
-    await loadWeeklyAssignmentsStats(user.team_id);
-    await loadAssignments();
-    await getWeapons(user.team_id as string);
+    await Promise.all([
+      loadWeeklyAssignmentsStats(user.team_id),
+      loadAssignments(),
+      getWeapons(user.team_id)
+    ]);
   }, [user?.team_id]);
 
-  useEffect(() => {
-    const loadTrainings = async () => {
-      if (!user?.team_id) return;
+  // Load trainings based on group selection
+  const loadTrainings = useCallback(async () => {
+    if (!user?.team_id) return;
 
-      setIsLoading(true);
-      const [result, count] = await Promise.all([
-        loadTrainingByTeamId(user.team_id, LIMIT, currentPage * LIMIT),
-        getTrainingCountByTeamId(user.team_id),
-      ]);
-
-      setTrainings(result || []);
-      setTotalCount(count);
-      setHasMore(result?.length === LIMIT);
+    setIsLoading(true);
+    
+    try {
+      if (selectedGroup) {
+        // Load trainings for selected group
+        await loadTrainingsInGroup(selectedGroup.id);
+        setHasMore(false);
+        setCurrentPage(0);
+      } else {
+        // Load all trainings with pagination
+        const [result, count] = await Promise.all([
+          loadTrainingByTeamId(user.team_id, LIMIT, currentPage * LIMIT),
+          getTrainingCountByTeamId(user.team_id),
+        ]);
+        
+        setTrainings(result || []);
+        setTotalCount(count);
+        setHasMore((result?.length || 0) === LIMIT);
+      }
+    } catch (error) {
+      console.error("Error loading trainings:", error);
+    } finally {
       setIsLoading(false);
-    };
+    }
+  }, [user?.team_id, currentPage, selectedGroup, loadTrainingByTeamId, getTrainingCountByTeamId, loadTrainingsInGroup]);
 
+  // Effect to load trainings when dependencies change
+  useEffect(() => {
     loadTrainings();
-  }, [user?.team_id, currentPage]);
+  }, [loadTrainings]);
 
+  // Update displayed trainings based on group selection
+  useEffect(() => {
+    if (selectedGroup && trainingsInGroup) {
+      setTrainings(trainingsInGroup);
+      setTotalCount(trainingsInGroup.length);
+    }
+  }, [selectedGroup, trainingsInGroup]);
+
+  // Page scrolling effect
   useEffect(() => {
     if (isPageChanging) {
       setTimeout(() => {
@@ -62,13 +109,53 @@ export default function Trainings() {
         setIsPageChanging(false);
       }, 200);
     }
-  }, [trainings, isPageChanging]);
+  }, [isPageChanging]);
+
+  // Event handlers
+  const handleGroupChange = (_group: TrainingGroup | null) => {
+    // Reset selection when group changes
+    setSelectedSessions([]);
+    setCurrentPage(0); // Reset to first page
+  };
+
+  const handleSelectionChange = (sessionId: string, isSelected: boolean) => {
+    setSelectedSessions(prev => 
+      isSelected 
+        ? [...prev, sessionId]
+        : prev.filter(id => id !== sessionId)
+    );
+  };
+
+  const handleSelectAll = (isSelected: boolean) => {
+    if (isSelected) {
+      const allIds = trainings
+        .filter(t => t.id)
+        .map(t => t.id as string);
+      setSelectedSessions(allIds);
+    } else {
+      setSelectedSessions([]);
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedSessions([]);
+  };
+
+
+
+  const openBulkEdit = () => {
+    setShowBulkEditOverlay(true);
+    setSelectedSessions([]); // Clear any previous selections
+  };
+
+  const closeBulkEdit = () => {
+    setShowBulkEditOverlay(false);
+    setSelectedSessions([]);
+  };
 
   const fetchTrainings = async () => {
-    const teamId = user?.team_id;
-    if (!teamId) return;
-    const result = await loadTrainingByTeamId(teamId, LIMIT, currentPage * LIMIT);
-    setTrainings(result || []);
+    if (!user?.team_id) return;
+    await loadTrainings();
     setIsAddTrainingOpen(false);
   };
 
@@ -77,12 +164,40 @@ export default function Trainings() {
     if (user?.team_id) await loadAssignments();
   };
 
-  const action = (): { label: string; onClick: () => void }[] => {
-    if (isCommander(user?.user_role as UserRole)) {
-      return [{ label: "Add Training", onClick: () => setIsAddTrainingOpen(true) }];
+  // Pagination handlers
+  const handlePrevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+      setIsPageChanging(true);
     }
-    return [];
   };
+
+  const handleNextPage = () => {
+    if (hasMore) {
+      setCurrentPage(currentPage + 1);
+      setIsPageChanging(true);
+    }
+  };
+
+  // Action buttons
+  const getActions = (): { label: string; onClick: () => void; icon?: any }[] => {
+    const actions = [];
+    
+    if (isCommanderUser) {
+      actions.push({ 
+        label: "Add Training", 
+        onClick: () => setIsAddTrainingOpen(true) 
+      });
+      
+      actions.push({ 
+        label: "Bulk Edit", 
+        onClick: openBulkEdit
+      });
+    }
+    
+    return actions;
+  };
+
   return (
     <SpPage>
       <Header
@@ -91,32 +206,68 @@ export default function Trainings() {
           { label: "Trainings", link: "/trainings" },
         ]}
       />
-      <SpPageHeader title="Trainings" subtitle={"Add, edit, and manage training sessions"} icon={BiCurrentLocation} action={action()} />
+      <SpPageHeader 
+        title="Trainings" 
+        subtitle="Add, edit, and manage training sessions" 
+        icon={BiCurrentLocation} 
+        action={getActions()} 
+      />
 
       <SpPageBody>
+        {/* Unified Group Management Bar */}
+        <SessionGroupBar
+          onGroupChange={handleGroupChange}
+          onCreateClick={() => setIsGroupManagementOpen(true)}
+        />
+
+        {/* Training List */}
         {isLoading ? (
           <TrainingsListSkeleton count={5} />
         ) : (
-          <TrainingList trainings={trainings} />
+          <TrainingListEnhanced 
+            trainings={trainings}
+            isSelectionMode={false}
+            selectedSessions={selectedSessions}
+            onSelectionChange={handleSelectionChange}
+            onSelectAll={handleSelectAll}
+          />
         )}
-        <SpPagination
-          currentPage={currentPage}
-          totalCount={totalCount}
-          LIMIT={LIMIT}
-          prevPageWithScroll={() => {
-            if (currentPage > 0) {
-              setIsPageChanging(true);
-            }
-          }}
-          nextPageWithScroll={() => {
-            if (hasMore) {
-              setIsPageChanging(true);
-            }
-          }}
-        />
+        
+        {/* Pagination - only show when not filtering by group */}
+        {!selectedGroup && (
+          <SpPagination
+            currentPage={currentPage}
+            totalCount={totalCount}
+            LIMIT={LIMIT}
+            prevPageWithScroll={handlePrevPage}
+            nextPageWithScroll={handleNextPage}
+          />
+        )}
       </SpPageBody>
 
-      <TrainingAddTrainingSessionModal isOpen={isAddTrainingOpen} onClose={handleModalClose} onSuccess={fetchTrainings} assignments={assignments} />
+      {/* Modals */}
+      <TrainingAddTrainingSessionModal 
+        isOpen={isAddTrainingOpen} 
+        onClose={handleModalClose} 
+        onSuccess={fetchTrainings} 
+        assignments={assignments} 
+      />
+
+      {isCommanderUser && (
+        <>
+          <SessionGroupManagementSimple
+            isOpen={isGroupManagementOpen}
+            onClose={() => setIsGroupManagementOpen(false)}
+          />
+          <BulkEditOverlay
+            isOpen={showBulkEditOverlay}
+            onClose={closeBulkEdit}
+            selectedSessions={selectedSessions}
+            onSelectionChange={handleSelectionChange}
+            onClearSelection={handleClearSelection}
+          />
+        </>
+      )}
     </SpPage>
   );
 }
