@@ -23,7 +23,6 @@ interface BulkEditOverlayProps {
   onClose: () => void;
   selectedSessions: string[];
   onSelectionChange: (sessionId: string, isSelected: boolean) => void;
-  onSelectAll: (isSelected: boolean) => void;
   onClearSelection: () => void;
 }
 
@@ -32,7 +31,6 @@ export default function BulkEditOverlay({
   onClose,
   selectedSessions,
   onSelectionChange,
-  onSelectAll,
   onClearSelection
 }: BulkEditOverlayProps) {
   const { theme } = useTheme();

@@ -10,7 +10,6 @@ import SpPagination from "@/layouts/SpPagination";
 import TrainingAddTrainingSessionModal from "@/components/TrainingModal/AddTrainingSessionModal";
 import SessionGroupBar from "@/components/SessionGroups/SessionGroupBar";
 import SessionGroupManagementSimple from "@/components/SessionGroups/SessionGroupManagementSimple";
-import BulkEditOverlay from "@/components/SessionGroups/BulkEditOverlay";
 import { BiCurrentLocation } from "react-icons/bi";
 
 import Header from "@/Headers/Header";
