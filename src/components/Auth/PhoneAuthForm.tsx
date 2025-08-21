@@ -207,15 +207,7 @@ export function PhoneAuthForm({
                   }`}
                 >
                   <option value="+1">🇺🇸 +1</option>
-                  <option value="+44">🇬🇧 +44</option>
-                  <option value="+33">🇫🇷 +33</option>
-                  <option value="+49">🇩🇪 +49</option>
-                  <option value="+34">🇪🇸 +34</option>
-                  <option value="+39">🇮🇹 +39</option>
-                  <option value="+81">🇯🇵 +81</option>
-                  <option value="+86">🇨🇳 +86</option>
-                  <option value="+91">🇮🇳 +91</option>
-                  <option value="+61">🇦🇺 +61</option>
+                  <option value="+972">🇮🇱 +972</option>
                 </select>
                 <BaseInput
                   type="tel"
