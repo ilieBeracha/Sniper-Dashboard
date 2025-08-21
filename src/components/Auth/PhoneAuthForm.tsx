@@ -304,7 +304,9 @@ export function PhoneAuthForm({
               {otp.map((digit, index) => (
                 <input
                   key={index}
-                  ref={(el) => (otpRefs.current[index] = el)}
+                  ref={(el) => {
+                    otpRefs.current[index] = el;
+                  }}
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]"

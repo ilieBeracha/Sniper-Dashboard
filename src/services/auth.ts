@@ -1,4 +1,4 @@
-import { LoginUserData, RegisterUserData, PhoneAuthData } from "@/types/auth";
+import { LoginUserData, RegisterUserData } from "@/types/auth";
 import { toastService } from "./toastService";
 import { axiosInstance } from "./requestService";
 import { supabase } from "./supabaseClient";
