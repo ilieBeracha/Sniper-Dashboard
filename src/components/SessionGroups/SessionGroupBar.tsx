@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Filter, X, ChevronDown, Plus } from "lucide-react";
+import { Filter, X, ChevronDown, Plus, Check } from "lucide-react";
 import { useStore } from "zustand";
 import { sessionGroupStore } from "@/store/sessionGroupStore";
 import { userStore } from "@/store/userStore";
@@ -42,107 +42,107 @@ export default function SessionGroupBar({
   };
 
   return (
-    <div className="flex items-center gap-2 mb-4">
+    <div className="flex items-center gap-2 mb-3">
       {/* Filter Dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button 
             variant="outline" 
             size="sm"
-            className={`${
+            className={`h-8 px-3 text-sm ${
               selectedGroup 
                 ? theme === 'dark'
-                  ? 'border-blue-600 text-blue-400 hover:bg-blue-950' 
+                  ? 'border-blue-600 text-blue-400 hover:bg-blue-950/50' 
                   : 'border-blue-500 text-blue-600 hover:bg-blue-50'
                 : theme === 'dark'
-                  ? 'border-gray-700 bg-gray-950 hover:bg-gray-900'
-                  : 'border-gray-300 hover:bg-gray-100'
+                  ? 'border-gray-700 bg-gray-950 hover:bg-gray-900 text-gray-300'
+                  : 'border-gray-300 hover:bg-gray-50'
             }`}
           >
-            <Filter className="w-4 h-4 mr-2" />
+            <Filter className="w-3.5 h-3.5 mr-1.5" />
             {selectedGroup ? (
               <>
-                {selectedGroup.name}
-                <span className={`ml-2 text-xs ${
+                <span className="max-w-[150px] truncate">{selectedGroup.name}</span>
+                <span className={`ml-1.5 text-xs ${
                   theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
                 }`}>
                   ({(selectedGroup as any).training_count || 0})
                 </span>
               </>
             ) : (
-              'Filter by Group'
+              'All Trainings'
             )}
-            <ChevronDown className="w-4 h-4 ml-2" />
+            <ChevronDown className="w-3.5 h-3.5 ml-1.5" />
           </Button>
         </DropdownMenuTrigger>
         
         <DropdownMenuContent 
           align="start" 
-          className={`w-64 ${
+          className={`w-56 ${
             theme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white'
           }`}
         >
           {/* All Sessions Option */}
           <DropdownMenuItem
             onClick={() => handleGroupSelect(null)}
-            className={`cursor-pointer ${
+            className={`cursor-pointer text-sm ${
               !selectedGroup 
                 ? theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100' 
                 : ''
             }`}
           >
             <div className="flex items-center justify-between w-full">
-              <span className={!selectedGroup ? 'font-semibold' : ''}>
-                All Sessions
+              <span className={!selectedGroup ? 'font-medium' : ''}>
+                All Trainings
               </span>
               {!selectedGroup && (
-                <span className={`text-xs ${
+                <Check className={`w-3.5 h-3.5 ${
                   theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
-                }`}>
-                  Active
-                </span>
+                }`} />
               )}
             </div>
           </DropdownMenuItem>
           
-          {groups.length > 0 && <DropdownMenuSeparator />}
+          {groups.length > 0 && <DropdownMenuSeparator className={
+            theme === 'dark' ? 'bg-gray-800' : ''
+          } />}
           
           {/* Group Options */}
           {groups.map(group => (
             <DropdownMenuItem
               key={group.id}
               onClick={() => handleGroupSelect(group)}
-              className={`cursor-pointer ${
+              className={`cursor-pointer text-sm ${
                 selectedGroup?.id === group.id 
                   ? theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'
                   : ''
               }`}
             >
               <div className="flex items-center justify-between w-full">
-                <div className="flex-1 mr-2">
-                  <span className={selectedGroup?.id === group.id ? 'font-semibold' : ''}>
+                <div className="flex-1 mr-2 min-w-0">
+                  <span className={`block truncate ${
+                    selectedGroup?.id === group.id ? 'font-medium' : ''
+                  }`}>
                     {group.name}
                   </span>
                   {group.description && (
-                    <p className={`text-xs line-clamp-1 ${
+                    <p className={`text-xs truncate ${
                       theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
                     }`}>
                       {group.description}
                     </p>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 flex-shrink-0">
                   <span className={`text-xs ${
                     theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
                   }`}>
                     {group.training_count || 0}
                   </span>
                   {selectedGroup?.id === group.id && (
-                    <span className={`text-xs ${
+                    <Check className={`w-3.5 h-3.5 ${
                       theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
-                    }`}>
-                      Active
-                    </span>
+                    }`} />
                   )}
                 </div>
               </div>
@@ -152,16 +152,18 @@ export default function SessionGroupBar({
           {/* Create New Group - Commanders Only */}
           {isCommanderUser && (
             <>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className={
+                theme === 'dark' ? 'bg-gray-800' : ''
+              } />
               <DropdownMenuItem
                 onClick={onCreateClick}
-                className={`cursor-pointer ${
+                className={`cursor-pointer text-sm ${
                   theme === 'dark' 
-                    ? 'text-blue-400 hover:bg-blue-950' 
+                    ? 'text-blue-400 hover:bg-blue-950/50' 
                     : 'text-blue-600 hover:bg-blue-50'
                 }`}
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-3.5 h-3.5 mr-1.5" />
                 Create New Group
               </DropdownMenuItem>
             </>
@@ -169,15 +171,17 @@ export default function SessionGroupBar({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Clear Filter Button */}
+      {/* Clear Filter */}
       {selectedGroup && (
         <Button
           variant="ghost"
-          size="sm"
+          size="icon"
           onClick={() => handleGroupSelect(null)}
-          className="h-8 px-2"
+          className={`h-8 w-8 ${
+            theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
+          }`}
         >
-          <X className="w-4 h-4" />
+          <X className="w-3.5 h-3.5" />
         </Button>
       )}
     </div>
