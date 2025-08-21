@@ -95,8 +95,31 @@ export async function addTrainingsToGroup(payload: AddTrainingsToGroupPayload): 
       return false;
     }
 
+    // Get existing entries to avoid duplicates
+    const sessionStatsIds = sessionStats.map(stat => stat.id);
+    const { data: existingEntries, error: existingError } = await supabase
+      .from("training_group_trainings")
+      .select("training_id")
+      .eq("group_id", payload.group_id)
+      .in("training_id", sessionStatsIds);
+
+    if (existingError) {
+      console.error("Error checking existing entries:", existingError);
+      toast.error("Failed to check existing group trainings");
+      return false;
+    }
+
+    // Filter out already existing entries
+    const existingIds = new Set(existingEntries?.map(entry => entry.training_id) || []);
+    const newSessionStats = sessionStats.filter(stat => !existingIds.has(stat.id));
+
+    if (newSessionStats.length === 0) {
+      toast.info("All selected trainings are already in this group");
+      return true;
+    }
+
     // Map to session_stats IDs for the insert
-    const insertData = sessionStats.map(stat => ({
+    const insertData = newSessionStats.map(stat => ({
       group_id: payload.group_id,
       training_id: stat.id // Use session_stats ID
     }));
@@ -111,7 +134,12 @@ export async function addTrainingsToGroup(payload: AddTrainingsToGroupPayload): 
       return false;
     }
 
-    toast.success(`Added ${sessionStats.length} training(s) to group`);
+    const skippedCount = sessionStats.length - newSessionStats.length;
+    if (skippedCount > 0) {
+      toast.success(`Added ${newSessionStats.length} training(s) to group (${skippedCount} already in group)`);
+    } else {
+      toast.success(`Added ${newSessionStats.length} training(s) to group`);
+    }
     return true;
   } catch (error: any) {
     console.error("Exception when adding trainings to group:", error);
