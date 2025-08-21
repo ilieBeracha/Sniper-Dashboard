@@ -9,6 +9,12 @@ export interface RegisterUserData {
 }
 
 export interface LoginUserData {
-  email: string;
-  password: string;
+  email?: string;
+  password?: string;
+  phone?: string;
+}
+
+export interface PhoneAuthData {
+  phone: string;
+  otp?: string;
 }

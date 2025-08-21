@@ -5,6 +5,9 @@ import { validateAuthForm } from "@/lib/formValidation";
 import { GoogleLogin } from "@react-oauth/google";
 import { toastService } from "@/services/toastService";
 import { motion, AnimatePresence } from "framer-motion";
+import { PhoneAuthForm } from "./PhoneAuthForm";
+import { authStore } from "@/store/authStore";
+import { useStore } from "zustand";
 
 export function MinimalLoginForm({
   AuthSubmit,
@@ -21,10 +24,11 @@ export function MinimalLoginForm({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [loginMethod, setLoginMethod] = useState<"password" | "magiclink">("password");
+  const [loginMethod, setLoginMethod] = useState<"password" | "magiclink" | "phone">("password");
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const { theme } = useTheme();
+  const { sendPhoneOTP, verifyPhoneOTP, phoneNumber } = useStore(authStore);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -214,6 +218,21 @@ export function MinimalLoginForm({
               </button>
               <button
                 type="button"
+                onClick={() => setLoginMethod("phone")}
+                className={`flex-1 py-1.5 px-2 rounded-md text-xs font-medium transition-all ${
+                  loginMethod === "phone"
+                    ? theme === "dark"
+                      ? "bg-white text-black shadow-sm"
+                      : "bg-white text-gray-900 shadow-sm"
+                    : theme === "dark"
+                      ? "text-gray-400 hover:text-white"
+                      : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                Phone
+              </button>
+              <button
+                type="button"
                 onClick={() => setLoginMethod("magiclink")}
                 className={`flex-1 py-1.5 px-2 rounded-md text-xs font-medium transition-all ${
                   loginMethod === "magiclink"
@@ -230,47 +249,57 @@ export function MinimalLoginForm({
             </div>
 
             {/* Compact Input Fields */}
-            <div className="space-y-3">
-              <BaseInput
-                label="Email"
-                type="email"
-                id="email"
-                name="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="text-sm py-2"
-                leftIcon={emailIcon}
-                labelClassName="text-xs"
+            {loginMethod === "phone" ? (
+              <PhoneAuthForm
+                onSubmitPhone={sendPhoneOTP}
+                onVerifyOTP={(otp) => verifyPhoneOTP(phoneNumber || "", otp)}
+                onBack={() => setLoginMethod("password")}
+                isLoading={isLoading}
+                error={error}
               />
+            ) : (
+              <div className="space-y-3">
+                <BaseInput
+                  label="Email"
+                  type="email"
+                  id="email"
+                  name="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="text-sm py-2"
+                  leftIcon={emailIcon}
+                  labelClassName="text-xs"
+                />
 
-              {loginMethod === "password" && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <BaseInput
-                    label="Password"
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    name="password"
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="text-sm py-2"
-                    leftIcon={passwordIcon}
-                    rightIcon={togglePasswordIcon}
-                    labelClassName="text-xs"
-                  />
-                </motion.div>
-              )}
-            </div>
+                {loginMethod === "password" && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <BaseInput
+                      label="Password"
+                      type={showPassword ? "text" : "password"}
+                      id="password"
+                      name="password"
+                      autoComplete="current-password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="text-sm py-2"
+                      leftIcon={passwordIcon}
+                      rightIcon={togglePasswordIcon}
+                      labelClassName="text-xs"
+                    />
+                  </motion.div>
+                )}
+              </div>
+            )}
 
             {loginMethod === "password" && (
               <div className="text-right">
@@ -288,63 +317,69 @@ export function MinimalLoginForm({
             )}
 
             {/* Compact Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`w-full flex justify-center items-center px-3 py-2.5 rounded-xl font-medium text-sm focus:outline-none focus:ring-2 transition-all duration-200 ${
-                theme === "dark"
-                  ? "bg-white text-[#0A0A0A] hover:bg-gray-100 focus:ring-gray-400 focus:ring-offset-1 focus:ring-offset-[#0A0A0A] disabled:opacity-50 disabled:cursor-not-allowed"
-                  : "bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-600 focus:ring-offset-1 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed"
-              }`}
-            >
-              {isLoading ? (
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-              ) : loginMethod === "password" ? (
-                "Sign In"
-              ) : (
-                "Send Magic Link"
-              )}
-            </button>
+            {loginMethod !== "phone" && (
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full flex justify-center items-center px-3 py-2.5 rounded-xl font-medium text-sm focus:outline-none focus:ring-2 transition-all duration-200 ${
+                  theme === "dark"
+                    ? "bg-white text-[#0A0A0A] hover:bg-gray-100 focus:ring-gray-400 focus:ring-offset-1 focus:ring-offset-[#0A0A0A] disabled:opacity-50 disabled:cursor-not-allowed"
+                    : "bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-600 focus:ring-offset-1 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed"
+                }`}
+              >
+                {isLoading ? (
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                ) : loginMethod === "password" ? (
+                  "Sign In"
+                ) : (
+                  "Send Magic Link"
+                )}
+              </button>
+            )}
 
             {/* Minimal Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className={`w-full border-t ${
-                  theme === "dark" ? "border-[#2A2A2A]" : "border-gray-200"
-                }`} />
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className={`px-2 ${
-                  theme === "dark" ? "bg-black/20 text-gray-600" : "bg-white/80 text-gray-400"
-                } text-[10px] uppercase`}>
-                  or
-                </span>
-              </div>
-            </div>
+            {loginMethod !== "phone" && (
+              <>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className={`w-full border-t ${
+                      theme === "dark" ? "border-[#2A2A2A]" : "border-gray-200"
+                    }`} />
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className={`px-2 ${
+                      theme === "dark" ? "bg-black/20 text-gray-600" : "bg-white/80 text-gray-400"
+                    } text-[10px] uppercase`}>
+                      or
+                    </span>
+                  </div>
+                </div>
 
-            {/* Google Sign In - Compact */}
-            <div className="w-full [&>div]:w-full [&>div>div]:w-full [&>div>div>div]:w-full [&>div>div>div>iframe]:w-full [&>div>div>div>iframe]:!h-10 bg-transparent">
-              <GoogleLogin
-                size="medium"
-                width="100%"
-                type="standard"
-                onSuccess={handleGoogleLogin}
-                shape="rectangular"
-                logo_alignment="center"
-                text="signin_with"
-                auto_select={false}
-                useOneTap={false}
-                ux_mode="popup"
-                onError={() => toastService.error("Failed to sign in with Google")}
-              />
-            </div>
+                {/* Google Sign In - Compact */}
+                <div className="w-full [&>div]:w-full [&>div>div]:w-full [&>div>div>div]:w-full [&>div>div>div>iframe]:w-full [&>div>div>div>iframe]:!h-10 bg-transparent">
+                  <GoogleLogin
+                    size="medium"
+                    width="100%"
+                    type="standard"
+                    onSuccess={handleGoogleLogin}
+                    shape="rectangular"
+                    logo_alignment="center"
+                    text="signin_with"
+                    auto_select={false}
+                    useOneTap={false}
+                    ux_mode="popup"
+                    onError={() => toastService.error("Failed to sign in with Google")}
+                  />
+                </div>
+              </>
+            )}
           </>
         )}
       </AnimatePresence>

@@ -1,4 +1,4 @@
-import { LoginUserData, RegisterUserData } from "@/types/auth";
+import { LoginUserData, RegisterUserData, PhoneAuthData } from "@/types/auth";
 import { toastService } from "./toastService";
 import { axiosInstance } from "./requestService";
 import { supabase } from "./supabaseClient";
@@ -77,10 +77,57 @@ async function handleSignInWithGoogle(response: any) {
   return data;
 }
 
+async function sendPhoneOTP(phoneNumber: string) {
+  try {
+    const { data, error } = await supabase.auth.signInWithOtp({
+      phone: phoneNumber,
+      options: {
+        shouldCreateUser: false,
+      },
+    });
+    
+    if (error) {
+      console.error("Error sending OTP:", error.message);
+      toastService.error(error.message);
+      throw new Error("Failed to send verification code");
+    }
+    
+    return data;
+  } catch (error: any) {
+    console.error("Error sending OTP:", error.message);
+    toastService.error(error.message);
+    throw error;
+  }
+}
+
+async function verifyPhoneOTP(phoneNumber: string, otp: string) {
+  try {
+    const { data, error } = await supabase.auth.verifyOtp({
+      phone: phoneNumber,
+      token: otp,
+      type: 'sms',
+    });
+    
+    if (error) {
+      console.error("Error verifying OTP:", error.message);
+      toastService.error(error.message);
+      throw new Error("Invalid verification code");
+    }
+    
+    return data;
+  } catch (error: any) {
+    console.error("Error verifying OTP:", error.message);
+    toastService.error(error.message);
+    throw error;
+  }
+}
+
 export const authService = {
   registerCommander,
   registerSoldier,
   registerSquadCommander,
   login,
   handleSignInWithGoogle,
+  sendPhoneOTP,
+  verifyPhoneOTP,
 };
