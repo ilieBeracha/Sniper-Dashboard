@@ -52,10 +52,10 @@ export default function SessionGroupBar({
             className={`h-8 px-3 text-sm ${
               selectedGroup 
                 ? theme === 'dark'
-                  ? 'border-blue-600 text-blue-400 hover:bg-blue-950/50' 
+                  ? 'border-blue-600 text-blue-400 hover:bg-gray-900' 
                   : 'border-blue-500 text-blue-600 hover:bg-blue-50'
                 : theme === 'dark'
-                  ? 'border-gray-700 bg-gray-950 hover:bg-gray-900 text-gray-300'
+                  ? 'border-gray-800 bg-black hover:bg-gray-900 text-gray-300'
                   : 'border-gray-300 hover:bg-gray-50'
             }`}
           >
@@ -79,7 +79,7 @@ export default function SessionGroupBar({
         <DropdownMenuContent 
           align="start" 
           className={`w-56 ${
-            theme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white'
+            theme === 'dark' ? 'bg-black border-gray-800' : 'bg-white'
           }`}
         >
           {/* All Sessions Option */}

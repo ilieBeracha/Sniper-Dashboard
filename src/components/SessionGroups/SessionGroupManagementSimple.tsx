@@ -60,7 +60,7 @@ export default function SessionGroupManagementSimple({ isOpen, onClose }: Sessio
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={`sm:max-w-md ${
-        theme === 'dark' ? 'bg-gray-950 border-gray-800' : ''
+        theme === 'dark' ? 'bg-black border-gray-800' : ''
       }`}>
         <DialogHeader>
           <DialogTitle className={`text-lg font-semibold ${

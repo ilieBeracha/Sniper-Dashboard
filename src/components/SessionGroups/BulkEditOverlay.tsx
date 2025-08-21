@@ -4,7 +4,7 @@ import { useStore } from "zustand";
 import { TrainingStore } from "@/store/trainingStore";
 import { sessionGroupStore } from "@/store/sessionGroupStore";
 import { userStore } from "@/store/userStore";
-
+import { getTrainingsInGroup } from "@/services/sessionGroupService";
 import { TrainingSession } from "@/types/training";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,7 @@ export default function BulkEditOverlay({
 }: BulkEditOverlayProps) {
   const { theme } = useTheme();
   const { loadTrainingByTeamId } = useStore(TrainingStore);
-  const { groups, addTrainingsToGroup, trainingsInGroup, loadTrainingsInGroup } = useStore(sessionGroupStore);
+  const { groups, addTrainingsToGroup } = useStore(sessionGroupStore);
   const user = useStore(userStore).user;
 
   const [allTrainings, setAllTrainings] = useState<TrainingSession[]>([]);
@@ -55,10 +55,10 @@ export default function BulkEditOverlay({
 
   // Pre-select trainings when group is selected
   useEffect(() => {
-    if (selectedGroup) {
+    if (selectedGroup && isOpen) {
       preselectGroupTrainings();
     }
-  }, [selectedGroup]);
+  }, [selectedGroup, isOpen]);
 
   const loadAllTrainings = async () => {
     if (!user?.team_id) return;
@@ -80,15 +80,21 @@ export default function BulkEditOverlay({
     if (!selectedGroup) return;
     
     try {
-      await loadTrainingsInGroup(selectedGroup);
-      // Select all trainings in this group
-      if (trainingsInGroup && trainingsInGroup.length > 0) {
-        trainingsInGroup.forEach(training => {
-          if (training.id && !selectedSessions.includes(training.id)) {
+      // Call the service directly to get trainings in group
+      const trainingsInSelectedGroup = await getTrainingsInGroup(selectedGroup);
+      
+      if (trainingsInSelectedGroup && trainingsInSelectedGroup.length > 0) {
+        // Clear previous selections first
+        onClearSelection();
+        
+        // Select all trainings in this group
+        trainingsInSelectedGroup.forEach(training => {
+          if (training.id) {
             onSelectionChange(training.id, true);
           }
         });
-        toast.info(`Pre-selected ${trainingsInGroup.length} trainings from group`);
+        
+        toast.info(`Selected ${trainingsInSelectedGroup.length} trainings from group`);
       }
     } catch (error) {
       console.error("Error loading group trainings:", error);
@@ -162,11 +168,11 @@ export default function BulkEditOverlay({
 
   return (
     <div className={`fixed inset-0 z-50 flex flex-col ${
-      theme === 'dark' ? 'bg-gray-950' : 'bg-white'
+      theme === 'dark' ? 'bg-black' : 'bg-white'
     }`}>
       {/* Header */}
       <div className={`flex items-center justify-between p-4 border-b ${
-        theme === 'dark' ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-gray-50'
+        theme === 'dark' ? 'border-gray-800 bg-black' : 'border-gray-200 bg-gray-50'
       }`}>
         <div className="flex items-center gap-4">
           <h2 className={`text-xl font-semibold ${
@@ -185,7 +191,7 @@ export default function BulkEditOverlay({
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className={theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}
+          className={theme === 'dark' ? 'hover:bg-gray-900' : 'hover:bg-gray-100'}
         >
           <X className="w-5 h-5" />
         </Button>
@@ -193,13 +199,13 @@ export default function BulkEditOverlay({
 
       {/* Controls Bar */}
       <div className={`p-4 border-b ${
-        theme === 'dark' ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-gray-50'
+        theme === 'dark' ? 'border-gray-800 bg-black' : 'border-gray-200 bg-gray-50'
       }`}>
         <div className="flex flex-col sm:flex-row gap-3">
           {/* Search */}
           <div className="relative flex-1 max-w-md">
             <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
             }`} />
             <Input
               value={searchQuery}
@@ -207,7 +213,7 @@ export default function BulkEditOverlay({
               placeholder="Search trainings..."
               className={`pl-10 ${
                 theme === 'dark' 
-                  ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-500' 
+                  ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-600' 
                   : 'bg-white'
               }`}
             />
@@ -218,13 +224,13 @@ export default function BulkEditOverlay({
             <Select value={selectedGroup} onValueChange={setSelectedGroup}>
               <SelectTrigger className={`w-[200px] ${
                 theme === 'dark' 
-                  ? 'bg-gray-950 border-gray-700 text-white' 
+                  ? 'bg-gray-950 border-gray-800 text-white' 
                   : 'bg-white'
               }`}>
                 <SelectValue placeholder="Select group..." />
               </SelectTrigger>
               <SelectContent className={
-                theme === 'dark' ? 'bg-gray-950 border-gray-800' : ''
+                theme === 'dark' ? 'bg-black border-gray-800' : ''
               }>
                 {groups.map(group => (
                   <SelectItem key={group.id} value={group.id}>
@@ -246,7 +252,7 @@ export default function BulkEditOverlay({
             <Button
               onClick={handleSelectAll}
               variant="outline"
-              className={theme === 'dark' ? 'border-gray-700' : ''}
+              className={theme === 'dark' ? 'border-gray-800 hover:bg-gray-900' : ''}
             >
               {allPageSelected ? 'Deselect Page' : 'Select Page'}
             </Button>
@@ -255,7 +261,7 @@ export default function BulkEditOverlay({
               <Button
                 onClick={onClearSelection}
                 variant="ghost"
-                className={theme === 'dark' ? 'hover:bg-gray-800' : ''}
+                className={theme === 'dark' ? 'hover:bg-gray-900' : ''}
               >
                 Clear All
               </Button>
@@ -292,10 +298,10 @@ export default function BulkEditOverlay({
                   className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
                     isSelected
                       ? theme === 'dark'
-                        ? 'border-blue-500 bg-blue-950/30'
+                        ? 'border-blue-500 bg-blue-950/20'
                         : 'border-blue-500 bg-blue-50'
                       : theme === 'dark'
-                        ? 'border-gray-800 bg-gray-900 hover:border-gray-700'
+                        ? 'border-gray-800 bg-gray-950 hover:border-gray-700'
                         : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
@@ -313,7 +319,7 @@ export default function BulkEditOverlay({
                   </div>
                   
                   <div className={`text-xs space-y-1 ${
-                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    theme === 'dark' ? 'text-gray-500' : 'text-gray-600'
                   }`}>
                     <p>{format(sessionDate, 'MMM d, yyyy')}</p>
                     {training.location && (
@@ -330,10 +336,10 @@ export default function BulkEditOverlay({
       {/* Pagination */}
       {totalPages > 1 && (
         <div className={`flex items-center justify-between p-4 border-t ${
-          theme === 'dark' ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-gray-50'
+          theme === 'dark' ? 'border-gray-800 bg-black' : 'border-gray-200 bg-gray-50'
         }`}>
           <div className={`text-sm ${
-            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            theme === 'dark' ? 'text-gray-500' : 'text-gray-600'
           }`}>
             Showing {currentPage * ITEMS_PER_PAGE + 1}-{Math.min((currentPage + 1) * ITEMS_PER_PAGE, filteredTrainings.length)} of {filteredTrainings.length}
           </div>
@@ -344,7 +350,7 @@ export default function BulkEditOverlay({
               size="sm"
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 0}
-              className={theme === 'dark' ? 'border-gray-700' : ''}
+              className={theme === 'dark' ? 'border-gray-800 hover:bg-gray-900' : ''}
             >
               <ChevronLeft className="w-4 h-4" />
               Previous
@@ -355,7 +361,7 @@ export default function BulkEditOverlay({
               size="sm"
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage >= totalPages - 1}
-              className={theme === 'dark' ? 'border-gray-700' : ''}
+              className={theme === 'dark' ? 'border-gray-800 hover:bg-gray-900' : ''}
             >
               Next
               <ChevronRight className="w-4 h-4" />
