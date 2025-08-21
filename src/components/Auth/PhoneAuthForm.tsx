@@ -42,6 +42,15 @@ export function PhoneAuthForm({
 
   const formatPhoneNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, "");
+    
+    // Israeli phone number format: 05X-XXX-XXXX
+    if (countryCode === "+972") {
+      if (cleaned.length <= 3) return cleaned;
+      if (cleaned.length <= 6) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+    }
+    
+    // US phone number format: (XXX) XXX-XXXX
     if (cleaned.length <= 3) return cleaned;
     if (cleaned.length <= 6) return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
     return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
@@ -57,9 +66,20 @@ export function PhoneAuthForm({
     setError("");
     
     const cleanedPhone = phoneNumber.replace(/\D/g, "");
-    if (cleanedPhone.length < 10) {
-      setError("Please enter a valid phone number");
-      return;
+    
+    // Validate phone number based on country
+    if (countryCode === "+972") {
+      // Israeli mobile numbers should be 10 digits and start with 05
+      if (cleanedPhone.length !== 10 || !cleanedPhone.startsWith("05")) {
+        setError("Please enter a valid Israeli mobile number (05X-XXX-XXXX)");
+        return;
+      }
+    } else {
+      // US phone numbers should be 10 digits
+      if (cleanedPhone.length !== 10) {
+        setError("Please enter a valid 10-digit phone number");
+        return;
+      }
     }
 
     try {
@@ -213,7 +233,7 @@ export function PhoneAuthForm({
                   type="tel"
                   value={phoneNumber}
                   onChange={handlePhoneChange}
-                  placeholder="(555) 123-4567"
+                  placeholder={countryCode === "+972" ? "050-123-4567" : "(555) 123-4567"}
                   className="flex-1 text-sm py-2"
                   leftIcon={phoneIcon}
                   required
