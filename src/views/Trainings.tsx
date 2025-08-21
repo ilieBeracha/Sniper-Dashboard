@@ -10,8 +10,8 @@ import SpPagination from "@/layouts/SpPagination";
 import TrainingAddTrainingSessionModal from "@/components/TrainingModal/AddTrainingSessionModal";
 import SessionGroupBar from "@/components/SessionGroups/SessionGroupBar";
 import SessionGroupManagementSimple from "@/components/SessionGroups/SessionGroupManagementSimple";
+import BulkEditOverlay from "@/components/SessionGroups/BulkEditOverlay";
 import { BiCurrentLocation } from "react-icons/bi";
-
 import Header from "@/Headers/Header";
 import { weaponsStore } from "@/store/weaponsStore";
 import { isCommander } from "@/utils/permissions";
@@ -41,9 +41,10 @@ export default function Trainings() {
   // UI state
   const [isPageChanging, setIsPageChanging] = useState(false);
   const [isAddTrainingOpen, setIsAddTrainingOpen] = useState(false);
-  const [isSelectionMode, setIsSelectionMode] = useState(false);
+
   const [selectedSessions, setSelectedSessions] = useState<string[]>([]);
   const [isGroupManagementOpen, setIsGroupManagementOpen] = useState(false);
+  const [showBulkEditOverlay, setShowBulkEditOverlay] = useState(false);
 
   const isCommanderUser = isCommander(user?.user_role as UserRole);
 
@@ -114,7 +115,6 @@ export default function Trainings() {
   const handleGroupChange = (_group: TrainingGroup | null) => {
     // Reset selection when group changes
     setSelectedSessions([]);
-    setIsSelectionMode(false);
     setCurrentPage(0); // Reset to first page
   };
 
@@ -141,12 +141,16 @@ export default function Trainings() {
     setSelectedSessions([]);
   };
 
-  const toggleSelectionMode = () => {
-    setIsSelectionMode(!isSelectionMode);
-    if (isSelectionMode) {
-      // Exiting selection mode - clear selections
-      setSelectedSessions([]);
-    }
+
+
+  const openBulkEdit = () => {
+    setShowBulkEditOverlay(true);
+    setSelectedSessions([]); // Clear any previous selections
+  };
+
+  const closeBulkEdit = () => {
+    setShowBulkEditOverlay(false);
+    setSelectedSessions([]);
   };
 
   const fetchTrainings = async () => {
@@ -186,11 +190,9 @@ export default function Trainings() {
       });
       
       actions.push({ 
-        label: isSelectionMode ? "Cancel Selection" : "Bulk Select", 
-        onClick: toggleSelectionMode
+        label: "Bulk Edit", 
+        onClick: openBulkEdit
       });
-
-
     }
     
     return actions;
@@ -216,9 +218,6 @@ export default function Trainings() {
         <SessionGroupBar
           onGroupChange={handleGroupChange}
           onCreateClick={() => setIsGroupManagementOpen(true)}
-          selectedSessions={selectedSessions}
-          onClearSelection={handleClearSelection}
-          isSelectionMode={isSelectionMode}
         />
 
         {/* Training List */}
@@ -227,7 +226,7 @@ export default function Trainings() {
         ) : (
           <TrainingListEnhanced 
             trainings={trainings}
-            isSelectionMode={isSelectionMode && isCommanderUser}
+            isSelectionMode={false}
             selectedSessions={selectedSessions}
             onSelectionChange={handleSelectionChange}
             onSelectAll={handleSelectAll}
@@ -235,7 +234,7 @@ export default function Trainings() {
         )}
         
         {/* Pagination - only show when not filtering by group */}
-        {!selectedGroup && !isSelectionMode && (
+        {!selectedGroup && (
           <SpPagination
             currentPage={currentPage}
             totalCount={totalCount}
@@ -255,10 +254,19 @@ export default function Trainings() {
       />
 
       {isCommanderUser && (
-        <SessionGroupManagementSimple
-          isOpen={isGroupManagementOpen}
-          onClose={() => setIsGroupManagementOpen(false)}
-        />
+        <>
+          <SessionGroupManagementSimple
+            isOpen={isGroupManagementOpen}
+            onClose={() => setIsGroupManagementOpen(false)}
+          />
+          <BulkEditOverlay
+            isOpen={showBulkEditOverlay}
+            onClose={closeBulkEdit}
+            selectedSessions={selectedSessions}
+            onSelectionChange={handleSelectionChange}
+            onClearSelection={handleClearSelection}
+          />
+        </>
       )}
     </SpPage>
   );

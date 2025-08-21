@@ -258,7 +258,11 @@ export default function BulkEditOverlay({
                 return (
                   <div
                     key={training.id}
-                    onClick={() => onSelectionChange(training.id!, !isSelected)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onSelectionChange(training.id!, !isSelected);
+                    }}
                     className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                       isSelected
                         ? theme === 'dark'

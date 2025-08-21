@@ -9,14 +9,9 @@ import {
 
 export async function getTrainingGroups(teamId: string): Promise<TrainingGroupWithCount[]> {
   try {
-    const { data, error } = await supabase
+    const { data: groups, error } = await supabase
       .from("training_groups")
-      .select(`
-        *,
-        training_group_trainings (
-          count
-        )
-      `)
+      .select("*")
       .eq("team_id", teamId)
       .order("created_at", { ascending: false });
 
@@ -26,11 +21,24 @@ export async function getTrainingGroups(teamId: string): Promise<TrainingGroupWi
       return [];
     }
 
-    // Transform data to include count
-    const groupsWithCount = data?.map(group => ({
-      ...group,
-      training_count: group.training_group_trainings?.length || 0
-    })) || [];
+    // For each group, get the count of unique training sessions
+    const groupsWithCount = await Promise.all(
+      (groups || []).map(async (group) => {
+        // Get session stats for this group
+        const { data: stats } = await supabase
+          .from("session_stats")
+          .select("training_session_id, training_group_trainings!inner(group_id)")
+          .eq("training_group_trainings.group_id", group.id);
+
+        // Count unique training sessions
+        const uniqueTrainingIds = [...new Set(stats?.map(s => s.training_session_id) || [])];
+        
+        return {
+          ...group,
+          training_count: uniqueTrainingIds.length
+        };
+      })
+    );
 
     return groupsWithCount;
   } catch (error: any) {
