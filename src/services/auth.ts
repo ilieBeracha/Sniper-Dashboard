@@ -79,19 +79,25 @@ async function handleSignInWithGoogle(response: any) {
 
 async function sendPhoneOTP(phoneNumber: string) {
   try {
+    // Supabase expects phone numbers with + prefix
+    const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
+    
+    console.log("Sending OTP to phone:", formattedPhone);
+    
     const { data, error } = await supabase.auth.signInWithOtp({
-      phone: phoneNumber,
+      phone: formattedPhone,
       options: {
-        shouldCreateUser: false,
+        shouldCreateUser: true, // Changed to true to allow new users
       },
     });
     
     if (error) {
-      console.error("Error sending OTP:", error.message);
+      console.error("Error sending OTP:", error.message, error);
       toastService.error(error.message);
-      throw new Error("Failed to send verification code");
+      throw new Error(error.message || "Failed to send verification code");
     }
     
+    console.log("OTP sent successfully:", data);
     return data;
   } catch (error: any) {
     console.error("Error sending OTP:", error.message);
@@ -102,8 +108,11 @@ async function sendPhoneOTP(phoneNumber: string) {
 
 async function verifyPhoneOTP(phoneNumber: string, otp: string) {
   try {
+    // Supabase expects phone numbers with + prefix
+    const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
+    
     const { data, error } = await supabase.auth.verifyOtp({
-      phone: phoneNumber,
+      phone: formattedPhone,
       token: otp,
       type: 'sms',
     });

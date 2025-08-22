@@ -251,7 +251,10 @@ export function MinimalLoginForm({
             {/* Compact Input Fields */}
             {loginMethod === "phone" ? (
               <PhoneAuthForm
-                onSubmitPhone={sendPhoneOTP}
+                onSubmitPhone={async (phone) => {
+                  await sendPhoneOTP(phone);
+                  return;
+                }}
                 onVerifyOTP={(otp) => verifyPhoneOTP(phoneNumber || "", otp)}
                 onBack={() => setLoginMethod("password")}
                 isLoading={isLoading}

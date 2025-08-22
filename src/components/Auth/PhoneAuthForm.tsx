@@ -83,7 +83,18 @@ export function PhoneAuthForm({
     }
 
     try {
-      await onSubmitPhone(countryCode + cleanedPhone);
+      // For Israeli numbers, remove the leading 0 and prepend country code without +
+      let fullPhoneNumber = "";
+      if (countryCode === "+972") {
+        // Remove leading 0 from Israeli mobile numbers (05X becomes 5X)
+        const phoneWithoutZero = cleanedPhone.startsWith("0") ? cleanedPhone.substring(1) : cleanedPhone;
+        fullPhoneNumber = "972" + phoneWithoutZero;
+      } else {
+        // For US numbers, just prepend 1
+        fullPhoneNumber = "1" + cleanedPhone;
+      }
+      
+      await onSubmitPhone(fullPhoneNumber);
       setStep("otp");
       setResendTimer(60);
     } catch (err: any) {
@@ -158,7 +169,17 @@ export function PhoneAuthForm({
     setError("");
     try {
       const cleanedPhone = phoneNumber.replace(/\D/g, "");
-      await onSubmitPhone(countryCode + cleanedPhone);
+      
+      // Use the same format as handlePhoneSubmit
+      let fullPhoneNumber = "";
+      if (countryCode === "+972") {
+        const phoneWithoutZero = cleanedPhone.startsWith("0") ? cleanedPhone.substring(1) : cleanedPhone;
+        fullPhoneNumber = "972" + phoneWithoutZero;
+      } else {
+        fullPhoneNumber = "1" + cleanedPhone;
+      }
+      
+      await onSubmitPhone(fullPhoneNumber);
       setResendTimer(60);
       setOtp(["", "", "", "", "", ""]);
       otpRefs.current[0]?.focus();
