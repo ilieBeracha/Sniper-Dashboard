@@ -9,22 +9,60 @@ This document explains how to configure phone authentication using Vonage SMS pr
 
 ## Configuration Steps
 
-### 1. Supabase Configuration
+### 1. Frontend Environment Configuration
 
-Add the following configuration to your `supabase/config.toml` file:
+Create a `.env` file in your project root (copy from `.env.example`):
+
+```env
+# Required for Supabase connection
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+
+# Other required variables
+VITE_GOOGLE_CLIENT_ID=your-google-client-id
+VITE_AUTH_BASE_URL=your-backend-url
+```
+
+**Note:** Vonage credentials are NOT stored in the frontend. They are configured in Supabase Dashboard only.
+
+### 2. Supabase Dashboard Configuration
+
+1. **Go to your Supabase Dashboard**: https://app.supabase.com
+2. **Select your project**
+3. **Navigate to**: Authentication → Providers
+4. **Find "Phone" in the providers list**
+5. **Enable Phone Provider**: Toggle the switch to enable
+6. **Configure Vonage**:
+   - Provider: Select "Vonage" from the dropdown
+   - API Key: Your Vonage API key
+   - API Secret: Your Vonage API secret
+   - From Number: Your Vonage phone number (with country code, e.g., +1234567890)
+7. **Save the configuration**
+
+### 3. Vonage Account Setup
+
+If you don't have Vonage credentials yet:
+
+1. **Sign up at**: https://dashboard.nexmo.com/sign-up
+2. **Get your API credentials**:
+   - API Key: Found in your Vonage dashboard
+   - API Secret: Found in your Vonage dashboard
+3. **Purchase a phone number**:
+   - Go to Numbers → Buy Numbers
+   - Select a number that supports SMS
+   - This will be your "From Number"
+
+### 4. Local Development with Supabase CLI (Optional)
+
+If using Supabase CLI for local development, add to `supabase/config.toml`:
 
 ```toml
 [auth.sms]
-# Allow/disallow new user signups via SMS to your project.
 enable_signup = true
-# If enabled, users need to confirm their phone number before signing in.
 enable_confirmations = true
-# Template for the SMS message. Use `.Code` to insert the OTP code.
 template = "Your verification code is: .Code"
-# Controls the minimum amount of time that must pass before sending another sms otp.
 max_frequency = "5s"
 
-# Configure Vonage as the SMS provider
 [auth.sms.vonage]
 enabled = true
 api_key = "env(VONAGE_API_KEY)"
@@ -32,23 +70,13 @@ api_secret = "env(VONAGE_API_SECRET)"
 from = "env(VONAGE_FROM_NUMBER)"
 ```
 
-### 2. Environment Variables
-
-Add these environment variables to your `.env` file:
-
-```env
-VONAGE_API_KEY=your_vonage_api_key
-VONAGE_API_SECRET=your_vonage_api_secret
-VONAGE_FROM_NUMBER=your_vonage_phone_number
+Then set environment variables for local Supabase:
+```bash
+# In supabase/.env.local
+VONAGE_API_KEY=your_api_key
+VONAGE_API_SECRET=your_api_secret
+VONAGE_FROM_NUMBER=your_phone_number
 ```
-
-### 3. Supabase Dashboard Setup
-
-1. Go to your Supabase project dashboard
-2. Navigate to Authentication > Providers
-3. Enable Phone provider
-4. Select Vonage as the SMS provider
-5. Enter your Vonage credentials
 
 ## Features Implemented
 
@@ -102,6 +130,22 @@ To test phone authentication:
 3. Check Supabase logs for any SMS delivery issues
 4. Monitor Vonage dashboard for SMS status
 
+## Quick Setup Summary
+
+1. **Frontend (.env file)**:
+   ```env
+   VITE_SUPABASE_URL=https://xxxxx.supabase.co
+   VITE_SUPABASE_ANON_KEY=eyJxxxxx...
+   ```
+
+2. **Supabase Dashboard**:
+   - Authentication → Providers → Phone → Enable
+   - Select "Vonage" as provider
+   - Enter Vonage API Key, API Secret, and From Number
+   - Save
+
+3. **That's it!** The phone authentication will now work.
+
 ## Troubleshooting
 
 If SMS messages are not being received:
@@ -110,3 +154,19 @@ If SMS messages are not being received:
 3. Ensure Vonage API credentials are valid
 4. Check Supabase logs for any errors
 5. Verify SMS provider is enabled in Supabase dashboard
+
+### Common Issues:
+
+**"Failed to send verification code"**
+- Check Vonage balance
+- Verify From Number is in correct format (+1234567890)
+- Ensure Vonage API credentials are correct in Supabase
+
+**"Invalid phone number"**
+- Israeli numbers must start with 05 (e.g., 050-123-4567)
+- US numbers must be 10 digits (e.g., (555) 123-4567)
+
+**"Phone provider is not enabled"**
+- Go to Supabase Dashboard → Authentication → Providers
+- Enable Phone provider
+- Configure Vonage credentials
