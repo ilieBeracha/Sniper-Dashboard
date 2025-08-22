@@ -20,12 +20,16 @@ interface props {
   resetError: () => void;
   handleSignInWithGoogle: (response: any) => Promise<any>;
   isLoadingAuth: boolean;
+  sendPhoneOTP: (phoneNumber: string) => Promise<any>;
+  verifyPhoneOTP: (phoneNumber: string, otp: string) => Promise<any>;
+  phoneNumber: string | null;
 }
 
 export const authStore = create<props>((set, get) => ({
   token: null,
   error: "",
   isLoadingAuth: true,
+  phoneNumber: null,
 
   checkAuth: async () => {
     set({ isLoadingAuth: true });
@@ -175,5 +179,42 @@ export const authStore = create<props>((set, get) => ({
     set({ token: res.session.access_token });
     get().supabaseLogin(res.session);
     userStore.getState().setUser(res.user as unknown as User);
+  },
+
+  sendPhoneOTP: async (phoneNumber: string) => {
+    try {
+      authStore.getState().resetError();
+      set({ phoneNumber });
+      await authService.sendPhoneOTP(phoneNumber);
+      return true;
+    } catch (error: any) {
+      console.error("Phone OTP error:", error);
+      const errorMessage = error?.message || "Failed to send verification code";
+      set({ error: errorMessage });
+      throw error;
+    }
+  },
+
+  verifyPhoneOTP: async (phoneNumber: string, otp: string) => {
+    try {
+      authStore.getState().resetError();
+      const data = await authService.verifyPhoneOTP(phoneNumber, otp);
+      
+      if (data.session) {
+        set({ token: data.session.access_token });
+        get().supabaseLogin(data.session);
+        
+        if (data.user) {
+          userStore.getState().setUserFromAuth(data.user);
+        }
+      }
+      
+      return data;
+    } catch (error: any) {
+      console.error("OTP verification error:", error);
+      const errorMessage = error?.message || "Invalid verification code";
+      set({ error: errorMessage });
+      throw error;
+    }
   },
 }));

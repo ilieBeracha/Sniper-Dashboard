@@ -77,10 +77,66 @@ async function handleSignInWithGoogle(response: any) {
   return data;
 }
 
+async function sendPhoneOTP(phoneNumber: string) {
+  try {
+    // Supabase expects phone numbers with + prefix
+    const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
+    
+    console.log("Sending OTP to phone:", formattedPhone);
+    
+    const { data, error } = await supabase.auth.signInWithOtp({
+      phone: formattedPhone,
+      options: {
+        shouldCreateUser: true, // Changed to true to allow new users
+      },
+    });
+    
+    if (error) {
+      console.error("Error sending OTP:", error.message, error);
+      toastService.error(error.message);
+      throw new Error(error.message || "Failed to send verification code");
+    }
+    
+    console.log("OTP sent successfully:", data);
+    return data;
+  } catch (error: any) {
+    console.error("Error sending OTP:", error.message);
+    toastService.error(error.message);
+    throw error;
+  }
+}
+
+async function verifyPhoneOTP(phoneNumber: string, otp: string) {
+  try {
+    // Supabase expects phone numbers with + prefix
+    const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
+    
+    const { data, error } = await supabase.auth.verifyOtp({
+      phone: formattedPhone,
+      token: otp,
+      type: 'sms',
+    });
+    
+    if (error) {
+      console.error("Error verifying OTP:", error.message);
+      toastService.error(error.message);
+      throw new Error("Invalid verification code");
+    }
+    
+    return data;
+  } catch (error: any) {
+    console.error("Error verifying OTP:", error.message);
+    toastService.error(error.message);
+    throw error;
+  }
+}
+
 export const authService = {
   registerCommander,
   registerSoldier,
   registerSquadCommander,
   login,
   handleSignInWithGoogle,
+  sendPhoneOTP,
+  verifyPhoneOTP,
 };
