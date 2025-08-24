@@ -76,6 +76,7 @@ export interface SessionStatsSaveData {
     timeToFirstShot: number | null;
     effort: boolean | null;
     note?: string | null;
+    is_quick_stats?: boolean;
   };
   // Participants data from wizard
   participants: Array<{
